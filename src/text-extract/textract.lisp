@@ -95,7 +95,7 @@
      (alist-hash-table data))))
 
 (defun write-index-file (fname bynum)
-  (with-open-file (s fname :direction :output)
+  (with-open-file (s fname :direction :output :if-exists :supersede)
     (do-hash-table (k v bynum)
       (dolist (url v)
 	(format s "~d ~a~%" k url)))))

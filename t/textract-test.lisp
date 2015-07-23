@@ -19,7 +19,7 @@
   (ensure-directories-exist (make-pathname :directory *cache-path*))
   (initialize-indices))
 
-(test (textract-initial :depends-on (and initialize))
+(test (textract-initial :depends-on initialize)
   (is (null (is-cached *test-url*)))
   (is (null (is-fresh *test-url*)))
   (is (null (has-failure *test-url*)))
@@ -32,9 +32,9 @@
   (update-page *test-url*)
   (sleep 1)
   (is (is-cached *test-url*))
-  (print (grab-title *test-url*))
-  (print wf/text-extract:*cache-path*)
-  (print (wf/text-extract::cache-loc *test-url*)))
+  (is (string= (grab-title *test-url*) "Sample Web Page"))
+  (is (streamp (grab-text *test-url*)))
+  (is (sequence-starts-with (read-line (grab-text *test-url*)) "Sample")))
   
 
 
