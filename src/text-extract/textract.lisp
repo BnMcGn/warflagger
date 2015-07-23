@@ -33,11 +33,11 @@
 (defvar *bynum*)
 (defvar *byurl*)
 (defparameter *extractor-script* 
-  "/home/ben/quicklisp/local-projects/warflagger/text-extract/textract.py")
+  "/home/ben/quicklisp/local-projects/warflagger/src/text-extract/textract.py")
 
 (defun cache-loc (url)
   (concatenate 
-   'string *cache-path* (princ-to-string (gethash url *byurl*))))
+   'string *cache-path* (princ-to-string (gethash url *byurl*)) "/"))
 
 (defun page-loc (url)
   (concatenate 'string (cache-loc url) "page.html"))
@@ -122,15 +122,13 @@
 (defun save-page-to-cache (url)
   (let ((index (get-url-index url)))
     (ensure-directories-exist (make-pathname :directory (cache-loc url)))
-    (print "In save-page-to-cache")
-    (print (cache-loc url))
-    (print url)
-    (let* ((process (external-program:start *extractor-script* 
+    ;FIXME: external-program:start is exceeding erratic. Investigate.
+    ;Fails to report non-existent script.
+    (let ((process (external-program:start *extractor-script* 
 					    (list (cache-loc url))
-					    :input :stream))
-	   (stream (external-program:process-input-stream process)))
-      (write-line url stream)
-      (close stream)
+					    :input :stream)))
+      (write-line url (external-program:process-input-stream process))
+      (close (external-program:process-input-stream process))
       index)))
 
 (defun clean-locks ()
