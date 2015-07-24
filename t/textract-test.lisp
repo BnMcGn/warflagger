@@ -30,11 +30,20 @@
 
 (test (textract :depends-on initialize)
   (update-page *test-url*)
-  (sleep 1)
+  (sleep 0.25)
   (is (is-cached *test-url*))
   (is (string= (grab-title *test-url*) "Sample Web Page"))
   (is (streamp (grab-text *test-url*)))
   (is (sequence-starts-with (read-line (grab-text *test-url*)) "Sample")))
+
+(test (textract-nonexistent-url :depends-on initialize)
+  (let ((test-url2 (strcat *test-url* "x")))
+    (update-page test-url2)
+    (sleep 0.25)
+    (is (is-cached test-url2))
+    (is (has-failure test-url2))
+    (is (fresh-failure test-url2))
+    (is (null (is-pending test-url2)))))
   
 
 

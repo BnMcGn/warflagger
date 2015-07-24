@@ -74,7 +74,9 @@ def do_page_save(url):
             try:
                 uh = get_url_fh(url)
             except:
-                gadgets.touch(failure_loc(url))
+                gadgets.string_to_file(str(sys.exc_info()[1]), 
+                                        failure_loc(url))
+                return False
             fh = open(fname, 'w')
             for ln in uh:
                 fh.write(ln)
@@ -90,12 +92,9 @@ def do_page_save(url):
             move(titlename, title_loc(url))
 
 cachepath = sys.argv[1]
+if not cachepath.endswith("/"):
+    cachepath += "/"
 url = sys.stdin.next()
-print "Processing %s" % url
-fx = open("/home/ben/dump.txt", "w")
-fx.write(cachepath)
-fx.write(url)
-fx.close()
 do_page_save(url)
-
+print failure_loc(url)
 

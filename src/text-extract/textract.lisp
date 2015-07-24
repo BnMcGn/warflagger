@@ -56,6 +56,7 @@
     (save-page-to-cache url)))
 
 ;FIXME: Doesn't account for .pdf, etc
+;FIXME: SECURITY: Block file urls, at least when live
 (defun grab-page (url &key (update t))
   (when update (update-page url))
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
@@ -113,7 +114,7 @@
 (defun get-url-index (url)
   (aif2 (gethash url *byurl*)
 	it
-	(let ((newkey (apply #'max 0 (hash-table-keys *bynum*))))
+	(let ((newkey (1+ (apply #'max -1 (hash-table-keys *bynum*)))))
 	  (setf (gethash newkey *bynum*) (list url))
 	  (setf (gethash url *byurl*) newkey)
 	  (write-index-file (index-file-name) *bynum*)
