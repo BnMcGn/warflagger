@@ -12,12 +12,16 @@
                #:anaphora
                #:cl-fad
                #:external-program
-               #:thing-labels)
+               #:thing-labels
+               #:pythonic-string-reader
+               #:ratify)
   :serial t
-  :components ((:file "package")
-               (:file "warflagger")
-               (:module 
+  :components ((:module 
 		 :src
 		 :serial t
-		 :components ((:file "text-extract/textract")))))
+		 :components ((:file "text-extract/textract")
+                              (:file "local-settings")
+                              (:file "package")
+                              (:file "data")
+                              (:file "warflagger")))))
 

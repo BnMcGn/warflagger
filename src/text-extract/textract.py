@@ -96,5 +96,4 @@ if not cachepath.endswith("/"):
     cachepath += "/"
 url = sys.stdin.next()
 do_page_save(url)
-print failure_loc(url)
 
