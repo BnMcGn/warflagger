@@ -23,5 +23,6 @@
                               (:file "local-settings")
                               (:file "package")
                               (:file "data")
+                              (:file "db")
                               (:file "warflagger")))))
 
