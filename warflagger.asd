@@ -19,8 +19,9 @@
   :components ((:module 
 		 :src
 		 :serial t
-		 :components ((:file "text-extract/textract")
-                              (:file "local-settings")
+		 :components ((:file "local-settings")
+                              (:file "text-extract/textract"
+                                     :depends-on ("local-settings"))
                               (:file "package")
                               (:file "data")
                               (:file "db")

@@ -6,7 +6,7 @@
 ;;;
 
 (defpackage :wf/text-extract 
-  (:use #:cl #:gadgets #:alexandria )
+  (:use #:cl #:gadgets #:alexandria #:wf/local-settings)
   (:export
    #:grab-page
    #:grab-text
@@ -16,7 +16,7 @@
    #:is-fresh
    #:has-failure
    #:fresh-failure
-   #:is-pending
+   #:is-pending  
    #:old-page-available
    #:*cache-path*
    #:*cache-age*
@@ -28,7 +28,7 @@
 
 (in-package :wf/text-extract)
 
-(defparameter *cache-path* "/home/ben/opinml/")
+;(defparameter *cache-path* "/home/ben/opinml/")
 (defparameter *cache-age* (encode-time-delta 0 0 1 0))
 (defvar *bynum*)
 (defvar *byurl*)
