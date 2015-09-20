@@ -69,7 +69,6 @@
 ;;; - We can't tell whether an external url is a root unless we can load it.
 
 
-      
 (defun rooturl-p (url)
   "Warning: this function does not provide a definitive answer."
   (exists (select (colm 'id) :from (tabl 'rooturl)
@@ -261,7 +260,7 @@
 	  (insert-records :into 'excerpt :attributes '(:opinion :type :value)
 			  :values (list oid (to-snake-case (mkstr k)) it))))
       oid)))
-	  
+ 
 (defun delete-opinion (oid)
   (let ((rooturl (car (col-from-pkey (colm 'opinion 'rooturl) oid))))
     (with-transaction nil

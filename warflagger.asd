@@ -14,6 +14,7 @@
                #:external-program
                #:thing-labels
                #:pythonic-string-reader
+               #:cl-postgres
                #:ratify)
   :serial t
   :components ((:module 
