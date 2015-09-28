@@ -135,6 +135,14 @@
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
 
+(defun get-author-representation (aid)
+  (let ((data (get-author-data aid)))
+    (when data
+      (acond
+        ((assoc :wf-user data) (values (cdr it) (car it)))
+        ((assoc :homepage data) (values (cdr it) (car it)))
+        ((assoc :email data) (values (cdr it) (car it)))))))
+
 (defun get-excerpt-data (eid)
   (map-tuples
    (compose #'keywordize-foreign (curry #'assoc-cdr :type))
