@@ -24,7 +24,7 @@
   (add-part :@account-info "here"))
 
 (def-thing
-    user
+    'user
     (compose #'get-author-data #'get-local-user-id)
   :lister (list
            #'user-lister

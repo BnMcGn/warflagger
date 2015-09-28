@@ -21,5 +21,6 @@
    #:opinion-from-db-row
    #:opinion-from-id
    #:get-local-user-id
-   #:get-author-id))
+   #:get-author-id
+   #:user-lister))
 

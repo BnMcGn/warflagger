@@ -7,6 +7,8 @@
         #:anaphora
 	      #:gadgets
         #:clack-pretend
+        #:webhax
+        #:warflagger
         #:wf/local-settings
         #:wf/text-extract
         #:sql-stuff
