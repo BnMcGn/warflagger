@@ -4,7 +4,7 @@
 (defvar *session-store*)
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
-  (:prepend-parts 
+  (:prepend-parts
    (add-part :@css "/static/css/style.css"))
   (html-out
                                         ;Header
@@ -26,6 +26,7 @@
 (def-thing
     'user
     (compose #'get-author-data #'get-local-user-id)
+  #'get-author-representation
   :lister (list
            #'user-lister
            :sortkeys '(values id)
@@ -50,13 +51,12 @@
 (setf (ningle:route *app* "/demo2/")
       (quick-page "x"))
 
-;Code below starts server. To restart, first stop server thusly:
-;(clack:stop wf/web::*handler*)
-;Then evaluate code below.
- 
+                                        ;Code below starts server. To restart, first stop server thusly:
+                                        ;(clack:stop wf/web::*handler*)
+                                        ;Then evaluate code below.
 
 (setf *handler*
-      (clack:clackup 
+      (clack:clackup
        (clack.builder:builder
         (clack.middleware.clsql:<clack-middleware-clsql>
          :database-type :postgresql
@@ -65,12 +65,12 @@
          :path "/static/"
          :root #p"~/quicklisp/local-projects/warflagger/src/static/")
         (setf *session-store*
-              (make-instance 
+              (make-instance
                'clack.middleware.session:<clack-middleware-session>
-               :state 
-               (make-instance 
+               :state
+               (make-instance
                 'clack.session.state.cookie:<clack-session-state-cookie>)))
         (clack-pretend::clack-middleware-pretend)
         (clack.middleware.openid:<clack-middleware-openid>)
-       *app*)
+        *app*)
        :port 5000))

@@ -22,5 +22,6 @@
    #:opinion-from-id
    #:get-local-user-id
    #:get-author-id
-   #:user-lister))
+   #:user-lister
+   #:get-author-representation))
 
