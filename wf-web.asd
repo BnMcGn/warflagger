@@ -15,6 +15,7 @@
                #:cl-who
                #:anaphora
                #:thing-labels
+               #:thing-lister
                #:ratify
                #:warflagger
                #:clack-middleware-openid)
