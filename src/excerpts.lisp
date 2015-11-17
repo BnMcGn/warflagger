@@ -7,6 +7,9 @@
 ;;;"company timesheet" etc. Software that creates OpinML should therefore
 ;;;check target pages and compensate for false matches using the offset field.
 
+;;;Alternate: All contiguous whitespace characters will be matched as a single
+;;;space, both in the excerpt and in the document.
+
 (defun %is-whitespaceless-match (text pattern &optional (offset 0))
   (labels ((wht (itm) (member itm *whitespace-characters*)))
     (let ((tindex offset)
@@ -45,4 +48,33 @@
    (subseq text start (+ start length))
    (subseq text (+ start length) (max (length text) (+ start length post)))))
 
+;;;Currently used stuff below: Above is older, whitespaceless.
+(defun contiguous-whitespace? (text index)
+  (loop for i in (range index (length text))
+        for count from 0
+        until (not (member (elt text i) *whitespace-characters*))
+        finally (return count)))
 
+(defun excerpt-here? (text excerpt index)
+  (loop with tind = index
+        with eind = 0
+        with tlen = (length text)
+        with elen = (length excerpt)
+        do (progn
+             (when (= elen eind) (return tind))
+             (when (= tlen tind) (return nil))
+             (let ((ewhite (contiguous-whitespace? excerpt eind))
+                   (twhite (contiguous-whitespace? text tind)))
+               (if (and (= 0 ewhite) (= 0 twhite)
+                        (eq (elt excerpt eind) (elt text tind)))
+                   (progn (incf tind) (incf eind))
+                   (if (or (= 0 ewhite) (= 0 twhite))
+                       (return nil)
+                       (progn (incf tind twhite) (incf eind ewhite))))))))
+
+(defun find-excerpt-position (text excerpt &optional (offset 0))
+  (dotimes (i (length text))
+    (awhen (excerpt-here? text excerpt i)
+      (if (< 0 offset)
+          (decf offset)
+          (return (values i (- it i)))))))
