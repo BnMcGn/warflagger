@@ -23,5 +23,6 @@
    #:get-local-user-id
    #:get-author-id
    #:user-lister
-   #:get-author-representation))
+   #:get-author-representation
+   #:find-excerpt-position))
 

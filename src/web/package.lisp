@@ -13,4 +13,8 @@
         #:wf/text-extract
         #:sql-stuff
         #:thing-lister
-        ))
+        #:parenscript
+        #:cl-react
+        )
+  (:shadowing-import-from #:gadgets #:call)
+  (:shadowing-import-from #:parenscript #:switch))

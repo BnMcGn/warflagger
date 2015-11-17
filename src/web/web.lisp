@@ -43,23 +43,49 @@
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
 
+
+(wf/text-extract:initialize-indices)
+
 (defvar *app* (make-instance 'ningle:<app>))
 
 (setf (ningle:route *app* "/demo/")
       (quick-page "test"))
 
-(setf (ningle:route *app* "/demo2/")
-      (quick-page "x"))
+(defun test-js ()
+  (ps
+    (define-react-class thing
+        (cl-react:psx
+         (:a :href "http://www.google.com"
+             (:span :class "text-green" "Click heare!" ))))
+    (chain |ReactDOM|
+           (render (create-element thing)
+                   (chain document (get-element-by-id "things"))))))
 
-                                        ;Code below starts server. To restart, first stop server thusly:
-                                        ;(clack:stop wf/web::*handler*)
-                                        ;Then evaluate code below.
+(setf (ningle:route *app* "/demo2/")
+      (quick-page #'webhax::react
+                  (with-output-to-string (*webhax-output*)
+                    (html-out
+                      (:div :id "things")
+                      (:script
+                       :type "text/javascript"
+                       (str (test-js)))))))
+
+(setf (ningle:route *app* "/target/")
+      (quick-page #'webhax::react
+                  ))
+
+(clsql:connect wf/text-extract::*db-connect-spec*
+               :database-type :postgresql-socket3)
+
+;;;Code below starts server. To restart, first stop server thusly:
+;;;(clack:stop wf/web::*handler*)
+;;;Then evaluate code below.
 
 (setf *handler*
       (clack:clackup
-       (clack.builder:builder
+       (clack-pretend:pretend-builder (:insert 3) ;clack.builder:builder
         (clack.middleware.clsql:<clack-middleware-clsql>
-         :database-type :postgresql
+         :database-type :postgresql-socket3
          :connection-spec *db-connect-spec*)
         (clack.middleware.static:<clack-middleware-static>
          :path "/static/"
@@ -70,7 +96,8 @@
                :state
                (make-instance
                 'clack.session.state.cookie:<clack-session-state-cookie>)))
-        (clack-pretend::clack-middleware-pretend)
-        (clack.middleware.openid:<clack-middleware-openid>)
+        ;(clack-pretend::clack-middleware-pretend)
+        ;(clack.middleware.openid:<clack-middleware-openid>)
+        (json-call :login-p nil)
         *app*)
        :port 5000))
