@@ -92,7 +92,7 @@
        (mapc (lambda (x)
                (collect (cdr x) (car x)))
              data))
-     (alist-hash-table data))))
+     (alist-hash-table data :test #'equal))))
 
 (defun write-index-file (fname bynum)
   (with-open-file (s fname :direction :output :if-exists :supersede)
@@ -107,7 +107,7 @@
         (setf *byurl* byurl)
         (setf *bynum* bynum))
       (progn
-        (setf *byurl* (make-hash-table))
+        (setf *byurl* (make-hash-table :test #'equal))
         (setf *bynum* (make-hash-table)))))
 
 (defun get-url-index (url)

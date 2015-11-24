@@ -7,16 +7,16 @@
   (:prepend-parts
    (add-part :@css "/static/css/style.css"))
   (html-out
-                                        ;Header
+                                        ;;Header
     (:div :id "header_wrapper"
           (:div :id "account_bar"
                 :@notifications :@account-info))
-                                        ;Main content
+                                        ;;Main content
     (:div :id "left_side"
           :@site-search :@site-index :@side-content)
     (:div :id "content"
           :@messages :@main-content :@footnotes)
-                                        ;Footer
+                                        ;;Footer
     (:div :id "footer" :@copyright)))
 
 (define-default-parts warflagger-base
@@ -51,15 +51,6 @@
 (setf (ningle:route *app* "/demo/")
       (quick-page "test"))
 
-(defun test-js ()
-  (ps
-    (define-react-class thing
-        (cl-react:psx
-         (:a :href "http://www.google.com"
-             (:span :class "text-green" "Click heare!" ))))
-    (chain |ReactDOM|
-           (render (create-element thing)
-                   (chain document (get-element-by-id "things"))))))
 
 (setf (ningle:route *app* "/demo2/")
       (quick-page #'webhax::react
@@ -71,8 +62,28 @@
                        (str (test-js)))))))
 
 (setf (ningle:route *app* "/target/")
-      (quick-page #'webhax::react
-                  ))
+      (quick-page #'webhax::react #'target-components
+                  (with-output-to-string (*webhax-output*)
+                    (html-out
+                      (:div :id "test")
+                      (:script
+                       :type "text/javascript"
+                       (str
+                        (ps (let ((data
+                                    (lisp-raw
+                                     (target-data 7)))))
+                          (chain |ReactDOM|
+                                 (render (create-element hilited-text
+                                                         :text (@ data text))
+                                         (chain document (get-element-by-id "test")))))))))))
+
+
+
+
+
+
+
+
 
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)

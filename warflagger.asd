@@ -26,5 +26,6 @@
                               (:file "package")
                               (:file "data")
                               (:file "db")
+                              (:file "excerpts")
                               (:file "warflagger")))))
 
