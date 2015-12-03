@@ -21,7 +21,8 @@
 
 (define-default-parts warflagger-base
   (add-part :@css "/static/css/style.css")
-  (add-part :@account-info "here"))
+  (add-part :@account-info "here")
+  (add-part :@javascript #'ps-gadgets))
 
 (def-thing
     'user
@@ -43,6 +44,8 @@
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
 
+(clsql:connect wf/text-extract::*db-connect-spec*
+               :database-type :postgresql-socket3)
 
 (wf/text-extract:initialize-indices)
 
@@ -71,22 +74,19 @@
                        (str
                         (ps (let ((data
                                     (lisp-raw
-                                     (target-data 7)))))
-                          (chain |ReactDOM|
-                                 (render (create-element hilited-text
-                                                         :text (@ data text))
-                                         (chain document (get-element-by-id "test")))))))))))
+                                     (target-data 7))))
+                               (render
+                                (create-element hilited-text
+                                                (create :text (@ data text)
+                                                        :opinions
+                                                        (@ data opinions)))
+                                (chain document (get-element-by-id "test")))))))))))
 
 
 
 
 
 
-
-
-
-(clsql:connect wf/text-extract::*db-connect-spec*
-               :database-type :postgresql-socket3)
 
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)

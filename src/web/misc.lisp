@@ -37,7 +37,7 @@
                (error "Don't have that page!"))
              (collecting-string
                (do-file-by-line (ln (grab-text url))
-                 (collect ln)))))
+                 (collect (strcat ln #\Newline))))))
          (opins
            (mapleaves (rcurry #'%opinion-data text)
                       (opinion-tree-for-rooturl url))))

@@ -24,6 +24,7 @@
 		 :src
 		 :serial t
 		 :components ((:file "web/package")
+                              (:file "web/components")
                               (:file "web/misc")
                               (:file "web/web")))))
 
