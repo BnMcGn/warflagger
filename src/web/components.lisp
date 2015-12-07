@@ -50,11 +50,14 @@
                                     opins))))))))
 
        (define-react-class hilited-segment
-           (psx
-            (:span :style (if (> (@ this props opinions length) 0)
-                              (create font-weight :bold)
-                              (create font-weight :normal))
-                   (rebreak (@ this props text)))))
+           (if (> (prop opinions length) 0)
+               (psx
+                (:span (:span :style (create font-weight :bold)
+                              (rebreak (prop text)))
+                       (:span (%make-opin-popups (prop opinions)))))
+               (psx
+                (:span :style (create font-weight :bold)
+                       (rebreak (prop text))))))
 
        (define-react-class
            hilited-text
@@ -64,6 +67,26 @@
                                    (lambda (x)
                                      (chain (@ x 0) (has-own-property :excerpt)))
                                    (@ this props opinions))))))
+
+       (define-react-class flag-display
+           (psx
+            (:span (prop flag 1))))
+
+       (defun %make-opin-popups (opinions)
+         (collecting
+           (dolist (op opinions)
+             (collect
+                 (psx (:mini-opinion :opinion op :top 0 :left 0 :key (unique-id)))))))
+
+       (define-react-class
+           mini-opinion
+           (psx
+            (:div
+             :class "opinion"
+             :style (create position :absolute top (prop top) left (prop left))
+             (:b (case (prop opinion votevalue)
+                   (-1 "-") (0 "o") (1 "+")))
+             (:flag-display (create flag (prop opinion flag))))))
 
 
        ))))
