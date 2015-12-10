@@ -1,5 +1,14 @@
 (in-package :wf/web)
 
+(defparameter *preferred-space* 2)
+(defparameter *minimum-space* 1)
+(defparameter *unit-string* "em")
+(defparameter *opin-box-height* 50)
+(defparameter *opin-box-width* 10)
+(defparameter *placement-randomness* 1.0)
+(defparameter *rank-overlap* 8)
+
+
 (define-parts target-components
   (add-part
    :@javascript
@@ -52,11 +61,13 @@
        (define-react-class hilited-segment
            (if (> (prop opinions length) 0)
                (psx
-                (:span (:span :style (create font-weight :bold)
-                              (rebreak (prop text)))
-                       (:span (%make-opin-popups (prop opinions)))))
+                (:span
+                 :style (create font-weight :bold)
+                 (rebreak (prop text))
+                 (:span :style (create position :relative)
+                        (%make-opin-popups (prop opinions)))))
                (psx
-                (:span :style (create font-weight :bold)
+                (:span :style (create font-weight :normal)
                        (rebreak (prop text))))))
 
        (define-react-class
@@ -73,20 +84,78 @@
             (:span (prop flag 1))))
 
        (defun %make-opin-popups (opinions)
-         (collecting
-           (dolist (op opinions)
-             (collect
-                 (psx (:mini-opinion :opinion op :top 0 :left 0 :key (unique-id)))))))
+         (loop for op in opinions
+               for x, y in (opinion-fan (length opinions))
+               collect
+               (psx (:mini-opinion :opinion (@ op 0)
+                                   :top (+ x (lisp *unit-string*))
+                                   :left (+ x (lisp *unit-string*))
+                                   :key (unique-id)))))
 
        (define-react-class
            mini-opinion
            (psx
             (:div
              :class "opinion"
-             :style (create position :absolute top (prop top) left (prop left))
-             (:b (case (prop opinion votevalue)
+             :style (create position :absolute top (prop top) left (prop left)
+                            background :white)
+             (var vv (prop opinion votevalue))
+             (:b (case vv
                    (-1 "-") (0 "o") (1 "+")))
-             (:flag-display (create flag (prop opinion flag))))))
+             (:flag-display :flag (prop opinion flag)))))
 
+       (defun %make-sway-func (weight)
+         ;;For now, just a parabola
+         (lambda (i)
+           (1- (expt (- i 0.5) 2))))
+
+       (defun distribute-ranks-evenly (number
+                                       &optional (rankmax
+                                                  (/ *opin-box-height*
+                                                     *minimum-space*)))
+         (let* ((div (chain -math (floor (/ number rankmax))))
+                (mod (% number rankmax))
+                (ranks (+ div (if (< 0 mod) 1 0)))
+                (ranksize (chain -math (floor (/ number ranks))))
+                (longranks (% number ranks)))
+           (collecting
+             (dotimes (i (- ranks longranks))
+               (collect ranksize))
+             (dotimes (i longranks)
+               (collect (1+ ranksize))))))
+
+       (defun spread-rank (number)
+         (let* ((space (if (< (lisp *opin-box-width*)
+                              (* number (lisp *preferred-space*)))
+                           (lisp *preferred-space*)
+                           (lisp *minimum-space*)))
+                (endpoint (/ (* number space) 2)))
+           (range (- endpoint) endpoint space)))
+
+       (defun random-wiggle (x y)
+         (destructuring-bind (a b)
+             (chain (list (chain -math (random))
+                          (chain -math (random)))
+                    (sort (lambda (a b) (- a b))))
+           (list
+            (+ x
+               (* b (lisp *placement-randomness*)
+                  (chain -math (cos (* 2 (@ -math -p-i) (/ a b))))))
+            (+ y
+               (* b (lisp *placement-randomness*)
+                  (chain -math (sin (* 2 (@ -math -p-i) (/ a b)))))))))
+
+       (defun opinion-fan (item-count)
+         (let ((xpos (lambda (y &optional (sway (%make-sway-func 0.5)))
+                       (funcall sway (+ 0.5 (/ y *opin-box-height*)))))
+               (rankcount 0))
+           (collecting
+             (dolist (ranklen (distribute-ranks-evenly item-count))
+               (dolist (itempos (spread-rank ranklen))
+                 (collect
+                     (random-wiggle (+ (funcall xpos itempos)
+                                       (* rankcount *rank-overlap*))
+                                    itempos)))
+               (incf rankcount)))))
 
        ))))

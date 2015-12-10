@@ -72,15 +72,16 @@
                       (:script
                        :type "text/javascript"
                        (str
-                        (ps (let ((data
-                                    (lisp-raw
-                                     (target-data 7))))
-                               (render
-                                (create-element hilited-text
-                                                (create :text (@ data text)
-                                                        :opinions
-                                                        (@ data opinions)))
-                                (chain document (get-element-by-id "test")))))))))))
+                        (ps
+                          (var data
+                            (lisp-raw
+                             (target-data 7)))
+                          (render
+                           (create-element hilited-text
+                                           (create :text (@ data text)
+                                                   :opinions
+                                                   (@ data opinions)))
+                           (chain document (get-element-by-id "test"))))))))))
 
 
 
