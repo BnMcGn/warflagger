@@ -85,7 +85,7 @@
 
        (defun %make-opin-popups (opinions)
          (loop for op in opinions
-               for x, y in (opinion-fan (length opinions))
+               for (x y) in (opinion-fan (length opinions))
                collect
                (psx (:mini-opinion :opinion (@ op 0)
                                    :top (+ x (lisp *unit-string*))
@@ -94,15 +94,15 @@
 
        (define-react-class
            mini-opinion
-           (psx
-            (:div
-             :class "opinion"
-             :style (create position :absolute top (prop top) left (prop left)
-                            background :white)
-             (var vv (prop opinion votevalue))
-             (:b (case vv
-                   (-1 "-") (0 "o") (1 "+")))
-             (:flag-display :flag (prop opinion flag)))))
+           (let ((vv (prop opinion votevalue)))
+             (psx
+              (:div
+               :class "opinion"
+               :style (create position :absolute top (prop top) left (prop left)
+                              background :white)
+               (:b (case vv
+                     (-1 "-") (0 "o") (1 "+")))
+               (:flag-display :flag (prop opinion flag))))))
 
        (defun %make-sway-func (weight)
          ;;For now, just a parabola
@@ -111,8 +111,8 @@
 
        (defun distribute-ranks-evenly (number
                                        &optional (rankmax
-                                                  (/ *opin-box-height*
-                                                     *minimum-space*)))
+                                                  (/ (lisp *opin-box-height*)
+                                                     (lisp *minimum-space*))))
          (let* ((div (chain -math (floor (/ number rankmax))))
                 (mod (% number rankmax))
                 (ranks (+ div (if (< 0 mod) 1 0)))
@@ -147,14 +147,14 @@
 
        (defun opinion-fan (item-count)
          (let ((xpos (lambda (y &optional (sway (%make-sway-func 0.5)))
-                       (funcall sway (+ 0.5 (/ y *opin-box-height*)))))
+                       (funcall sway (+ 0.5 (/ y (lisp *opin-box-height*))))))
                (rankcount 0))
            (collecting
              (dolist (ranklen (distribute-ranks-evenly item-count))
                (dolist (itempos (spread-rank ranklen))
                  (collect
                      (random-wiggle (+ (funcall xpos itempos)
-                                       (* rankcount *rank-overlap*))
+                                       (* rankcount (lisp *rank-overlap*)))
                                     itempos)))
                (incf rankcount)))))
 
