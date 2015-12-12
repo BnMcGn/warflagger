@@ -1,12 +1,13 @@
 (in-package :wf/web)
 
-(defparameter *preferred-space* 2)
+(defparameter *preferred-space* 1.5)
 (defparameter *minimum-space* 1)
 (defparameter *unit-string* "em")
-(defparameter *opin-box-height* 50)
+(defparameter *opin-box-height* 20)
 (defparameter *opin-box-width* 10)
-(defparameter *placement-randomness* 1.0)
-(defparameter *rank-overlap* 8)
+(defparameter *placement-randomness* 0.45)
+(defparameter *rank-overlap* 2)
+(defparameter *sway-factor* (- 4))
 
 
 (define-parts target-components
@@ -84,11 +85,12 @@
             (:span (prop flag 1))))
 
        (defun %make-opin-popups (opinions)
+         (setf opinions (mock-opinions 30))
          (loop for op in opinions
                for (x y) in (opinion-fan (length opinions))
                collect
                (psx (:mini-opinion :opinion (@ op 0)
-                                   :top (+ x (lisp *unit-string*))
+                                   :top (+ y (lisp *unit-string*))
                                    :left (+ x (lisp *unit-string*))
                                    :key (unique-id)))))
 
@@ -99,7 +101,7 @@
               (:div
                :class "opinion"
                :style (create position :absolute top (prop top) left (prop left)
-                              background :white)
+                              background :tan)
                (:b (case vv
                      (-1 "-") (0 "o") (1 "+")))
                (:flag-display :flag (prop opinion flag))))))
@@ -147,8 +149,9 @@
 
        (defun opinion-fan (item-count)
          (let ((xpos (lambda (y &optional (sway (%make-sway-func 0.5)))
-                       (funcall sway (+ 0.5 (/ y (lisp *opin-box-height*))))))
-               (rankcount 0))
+                       (* (lisp *sway-factor*)
+                          (funcall sway (+ 0.5 (/ y (lisp *opin-box-height*)))))))
+               (rankcount 1))
            (collecting
              (dolist (ranklen (distribute-ranks-evenly item-count))
                (dolist (itempos (spread-rank ranklen))
@@ -159,3 +162,13 @@
                (incf rankcount)))))
 
        ))))
+
+(defpsmacro mock-opinions (quantity)
+  `(list
+    ,@(collecting
+        (dotimes (i quantity)
+          (collect
+              `(list (create :flag (list "Negative"
+                                    ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsReference" "RaiseQuestion"))
+                        
+                        :votevalue ,(whichever (- 1) 0 1))))))))

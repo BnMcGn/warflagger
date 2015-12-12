@@ -75,7 +75,7 @@
                         (ps
                           (var data
                             (lisp-raw
-                             (target-data 7)))
+                             (target-data 5)))
                           (render
                            (create-element hilited-text
                                            (create :text (@ data text)
