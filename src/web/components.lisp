@@ -66,10 +66,20 @@
                  :style (create font-weight :bold)
                  (rebreak (prop text))
                  (:span :style (create position :relative)
-                        (%make-opin-popups (prop opinions)))))
+                        :on-click (@ this handle-click)
+                        "x"
+                        (%make-opin-popups (if (and (not (prop not-viewable))
+                                                    (state viewable))
+                                               (prop opinions)
+                                               ([]))))))
                (psx
                 (:span :style (create font-weight :normal)
-                       (rebreak (prop text))))))
+                       (rebreak (prop text)))))
+         get-initial-state
+         (lambda () (create viewable false))
+         handle-click
+         (lambda () (unless (prop not-viewable)
+                      (set-state viewable (not (state viewable))))))
 
        (define-react-class
            hilited-text
@@ -85,7 +95,7 @@
             (:span (prop flag 1))))
 
        (defun %make-opin-popups (opinions)
-         (setf opinions (mock-opinions 30))
+         ;(setf opinions (mock-opinions 30))
          (loop for op in opinions
                for (x y) in (opinion-fan (length opinions))
                collect
@@ -116,10 +126,10 @@
                                                   (/ (lisp *opin-box-height*)
                                                      (lisp *minimum-space*))))
          (let* ((div (chain -math (floor (/ number rankmax))))
-                (mod (% number rankmax))
+                (mod (mod number rankmax))
                 (ranks (+ div (if (< 0 mod) 1 0)))
                 (ranksize (chain -math (floor (/ number ranks))))
-                (longranks (% number ranks)))
+                (longranks (mod number ranks)))
            (collecting
              (dotimes (i (- ranks longranks))
                (collect ranksize))
