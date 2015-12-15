@@ -64,24 +64,26 @@
                        :type "text/javascript"
                        (str (test-js)))))))
 
-(setf (ningle:route *app* "/target/")
+(setf (ningle:route *app* "/target/*")
       (quick-page #'webhax::react #'target-components
-                  (with-output-to-string (*webhax-output*)
-                    (html-out
-                      (:div :id "test")
-                      (:script
-                       :type "text/javascript"
-                       (str
-                        (ps
-                          (var data
-                            (lisp-raw
-                             (target-data 5)))
-                          (render
-                           (create-element hilited-text
-                                           (create :text (@ data text)
-                                                   :opinions
-                                                   (@ data opinions)))
-                           (chain document (get-element-by-id "test"))))))))))
+                  (lambda ()
+                    (bind-validated-input
+                        ((id (webhax-validate:ratify-wrapper :integer)))
+                      (html-out
+                       (:div :id "test")
+                       (:script
+                        :type "text/javascript"
+                        (str
+                         (ps
+                           (var data
+                                (lisp-raw
+                                 (target-data id)))
+                           (render
+                            (create-element hilited-text
+                                            (create :text (@ data text)
+                                                    :opinions
+                                                    (@ data opinions)))
+                            (chain document (get-element-by-id "test")))))))))))
 
 
 
