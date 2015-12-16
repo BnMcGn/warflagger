@@ -81,14 +81,21 @@
          (lambda () (unless (prop not-viewable)
                       (set-state viewable (not (state viewable))))))
 
+       (defun focus-p (focus-spec)
+         (and focus-spec (< 0 (@ focus-spec length))))
+
        (define-react-class
            hilited-text
            (psx
-            (:div (%make-segments (@ this props text)
-                                  (remove-if-not
-                                   (lambda (x)
-                                     (chain (@ x 0) (has-own-property :excerpt)))
-                                   (@ this props opinions))))))
+            (:div
+             :class
+             (if (focus-p (prop focus)) "hilited" "hilited-parent")
+             (%make-segments (prop text)
+                             (remove-if-not
+                              (lambda (x)
+                                (chain (@ x 0) (has-own-property :excerpt)))
+                              (prop opinions)
+                              (prop focus))))))
 
        (define-react-class flag-display
            (psx
@@ -171,6 +178,7 @@
                                     itempos)))
                (incf rankcount)))))
 
+       (defun )
        ))))
 
 (defpsmacro mock-opinions (quantity)
@@ -180,5 +188,5 @@
           (collect
               `(list (create :flag (list "Negative"
                                     ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsReference" "RaiseQuestion"))
-                        
+
                         :votevalue ,(whichever (- 1) 0 1))))))))
