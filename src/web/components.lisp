@@ -27,6 +27,9 @@
                     (collect (psx (:br :key (unique-id))))))
                 (slice 0 -1)))
 
+       (defun %overlap-p (start1 end1 start2 end2)
+         (not (or (> start1 end2) (> start2 end1))))
+
        ;;Find all the indices where excerpts start or stop.
        (defun excerpt-segment-points (opset end)
          (chain
@@ -38,10 +41,28 @@
             (collect end))
           (sort (lambda (a b) (- a b)))))
 
-       (defun %overlap-p (start1 end1 start2 end2)
-         (not (or (> start1 end2) (> start2 end1))))
+       (define-react-class hilited-segment
+           (if (> (prop opinions length) 0)
+               (psx
+                (:span
+                 :style (create font-weight :bold)
+                 :on-click (@ this handle-click)
+                 (rebreak (prop text))
+                 (:span :style (create position :relative)
+                        (%make-opin-popups (if (and (not (prop not-viewable))
+                                                    (state viewable))
+                                               (prop opinions)
+                                               ([]))))))
+               (psx
+                (:span :style (create font-weight :normal)
+                       (rebreak (prop text)))))
+         get-initial-state
+         (lambda () (create viewable false))
+         handle-click
+         (lambda () (unless (prop not-viewable)
+                      (set-state viewable (not (state viewable))))))
 
-       (defun %make-segments (text opins)
+       (defun %make-segments (text opins focus)
          (collecting
            (let ((segpoints (excerpt-segment-points
                              (collecting (dolist (op opins) (collect (@ op 0))))
@@ -57,29 +78,9 @@
                                                   (@ itm 0 'text-position 0)
                                                   (+ (@ itm 0 'text-position 0)
                                                      (@ itm 0 'text-position 1))))
-                                    opins))))))))
+                                    opins)
+                         :focus focus)))))))
 
-       (define-react-class hilited-segment
-           (if (> (prop opinions length) 0)
-               (psx
-                (:span
-                 :style (create font-weight :bold)
-                 (rebreak (prop text))
-                 (:span :style (create position :relative)
-                        :on-click (@ this handle-click)
-                        "x"
-                        (%make-opin-popups (if (and (not (prop not-viewable))
-                                                    (state viewable))
-                                               (prop opinions)
-                                               ([]))))))
-               (psx
-                (:span :style (create font-weight :normal)
-                       (rebreak (prop text)))))
-         get-initial-state
-         (lambda () (create viewable false))
-         handle-click
-         (lambda () (unless (prop not-viewable)
-                      (set-state viewable (not (state viewable))))))
 
        (defun focus-p (focus-spec)
          (and focus-spec (< 0 (@ focus-spec length))))
@@ -133,10 +134,10 @@
                                                   (/ (lisp *opin-box-height*)
                                                      (lisp *minimum-space*))))
          (let* ((div (chain -math (floor (/ number rankmax))))
-                (mod (mod number rankmax))
+                (mod (rem number rankmax))
                 (ranks (+ div (if (< 0 mod) 1 0)))
                 (ranksize (chain -math (floor (/ number ranks))))
-                (longranks (mod number ranks)))
+                (longranks (rem number ranks)))
            (collecting
              (dotimes (i (- ranks longranks))
                (collect ranksize))
@@ -178,7 +179,6 @@
                                     itempos)))
                (incf rankcount)))))
 
-       (defun )
        ))))
 
 (defpsmacro mock-opinions (quantity)
