@@ -83,7 +83,7 @@
                                             (create :text (@ data text)
                                                     :opinions
                                                     (@ data opinions)
-                                                    :focus '(17 18)))
+                                                    :focus '(20)))
                             (chain document (get-element-by-id "test")))))))))))
 
 

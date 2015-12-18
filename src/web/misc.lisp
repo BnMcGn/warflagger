@@ -29,6 +29,17 @@
          data)
         data)))
 
+(defun %fill-out-opinion-tree (tree text)
+  (if (null tree)
+      nil
+      (let ((op (%opinion-data (caar tree) text)))
+        (cons
+         (cons
+          op
+          (%fill-out-opinion-tree (cdar tree)
+                                  (aif (assoc :comment op) (cdr it) "")))
+         (%fill-out-opinion-tree (cdr tree) text)))))
+
 (defun target-data (id)
   (let* ((url (get-rooturl-by-id id))
          (text
@@ -39,7 +50,5 @@
                (do-file-by-line (ln (grab-text url))
                  (collect (strcat ln #\Newline))))))
          (opins
-           (mapleaves (rcurry #'%opinion-data text)
-                      (opinion-tree-for-rooturl url))))
+           (%fill-out-opinion-tree (opinion-tree-for-rooturl url) text)))
     (json:encode-json-to-string `((:text . ,text) (:opinions . ,opins)))))
-

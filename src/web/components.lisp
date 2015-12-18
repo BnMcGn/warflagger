@@ -74,7 +74,7 @@
        (define-react-class parent-segment
            (let ((focussed (focus-parent-p (prop opinions) (prop focus))))
              (psx
-                 (:span :style (create font-weight :bold)
+                 (:span :style (create font-weight :bold position :relative)
                         :class (if focussed "parent-active" "parent-inactive")
                         (rebreak (prop text))
                         (when (and focussed
