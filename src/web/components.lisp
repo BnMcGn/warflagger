@@ -37,7 +37,7 @@
          (dolist (o opins)
            (when (eql (@ o 0 id) (@ focus-spec 0))
              (return o))))
- 
+
        ;;Find all the indices where excerpts start or stop.
        (defun excerpt-segment-points (opset end)
          (chain
@@ -81,7 +81,8 @@
                                    (eql (prop last-char-pos)
                                         (+ (@ focussed 0 text-position 0)
                                            (@ focussed 0 text-position 1) 1)))
-                          (psx (:div "thing")))))))
+                          (psx (:opinion :opinions focussed
+                                         :focus (prop focus))))))))
 
        (defun %make-segments (text opins focus)
          (collecting
@@ -155,6 +156,21 @@
                (:b (case vv
                      (-1 "-") (0 "o") (1 "+")))
                (:flag-display :flag (prop opinion flag))))))
+
+       (define-react-class opinion
+           (let ((op (@ (prop opinions) 0)))
+             (psx
+              (:div
+               :class "opinion"
+               :style (create position :absolute
+                              top "2em"
+                              left (prop horizontal-position))
+               (:div "title placeholder")
+               (:hilited-text
+                :text (@ op comment)
+                :opinions (chain (prop opinions) (slice 1))
+                :focus (and (focus-p (prop focus))
+                            (chain (prop focus) (slice 1))))))))
 
        (defun %make-sway-func (weight)
          ;;For now, just a parabola
