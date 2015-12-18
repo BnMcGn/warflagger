@@ -77,7 +77,11 @@
                  (:span :style (create font-weight :bold)
                         :class (if focussed "parent-active" "parent-inactive")
                         (rebreak (prop text))
-                        ))))
+                        (when (and focussed
+                                   (eql (prop last-char-pos)
+                                        (+ (@ focussed 0 text-position 0)
+                                           (@ focussed 0 text-position 1) 1)))
+                          (psx (:div "thing")))))))
 
        (defun %make-segments (text opins focus)
          (collecting
