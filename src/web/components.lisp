@@ -30,6 +30,14 @@
        (defun %overlap-p (start1 end1 start2 end2)
          (not (or (> start1 end2) (> start2 end1))))
 
+       (defun focus-p (focus-spec)
+         (and focus-spec (< 0 (@ focus-spec length))))
+
+       (defun focus-parent-p (opins focus-spec)
+         (dolist (o opins)
+           (when (eql (@ o 0 id) (@ focus-spec 0))
+             (return o))))
+ 
        ;;Find all the indices where excerpts start or stop.
        (defun excerpt-segment-points (opset end)
          (chain
@@ -42,25 +50,34 @@
           (sort (lambda (a b) (- a b)))))
 
        (define-react-class hilited-segment
-           (if (> (prop opinions length) 0)
-               (psx
-                (:span
-                 :style (create font-weight :bold)
-                 :on-click (@ this handle-click)
-                 (rebreak (prop text))
-                 (:span :style (create position :relative)
-                        (%make-opin-popups (if (and (not (prop not-viewable))
-                                                    (state viewable))
-                                               (prop opinions)
-                                               ([]))))))
-               (psx
-                (:span :style (create font-weight :normal)
-                       (rebreak (prop text)))))
+           (psx
+            (:span
+             :style (create font-weight :bold)
+             :on-click (@ this handle-click)
+             (rebreak (prop text))
+             (:span :style (create position :relative)
+                    (%make-opin-popups (if (and (not (prop not-viewable))
+                                                (state viewable))
+                                           (prop opinions)
+                                           ([]))))))
          get-initial-state
          (lambda () (create viewable false))
          handle-click
          (lambda () (unless (prop not-viewable)
                       (set-state viewable (not (state viewable))))))
+
+       (define-react-class plain-segment
+           (psx
+            (:span :style (create font-weight :normal)
+                   (rebreak (prop text)))))
+
+       (define-react-class parent-segment
+           (let ((focussed (focus-parent-p (prop opinions) (prop focus))))
+             (psx
+                 (:span :style (create font-weight :bold)
+                        :class (if focussed "parent-active" "parent-inactive")
+                        (rebreak (prop text))
+                        ))))
 
        (defun %make-segments (text opins focus)
          (collecting
@@ -68,22 +85,33 @@
                              (collecting (dolist (op opins) (collect (@ op 0))))
                              (length text))))
              (do-window ((start end) segpoints)
-               (collect
-                   (psx (:hilited-segment
-                         :key (unique-id)
-                         :text (chain text (slice start end))
-                         :opinions (remove-if-not
-                                    (lambda (itm)
-                                      (%overlap-p start (1- end)
-                                                  (@ itm 0 'text-position 0)
-                                                  (+ (@ itm 0 'text-position 0)
-                                                     (@ itm 0 'text-position 1))))
-                                    opins)
-                         :focus focus)))))))
-
-
-       (defun focus-p (focus-spec)
-         (and focus-spec (< 0 (@ focus-spec length))))
+               (let ((current-opins (remove-if-not
+                                     (lambda (itm)
+                                       (%overlap-p start (1- end)
+                                                   (@ itm 0 'text-position 0)
+                                                   (+ (@ itm 0 'text-position 0)
+                                                      (@ itm 0 'text-position 1))))
+                                     opins))
+                     (current-text (chain text (slice start end))))
+                 (cond ((< (@ current-opins length) 1)
+                        (collect
+                            (psx (:plain-segment
+                                  :key (unique-id)
+                                  :text current-text))))
+                       ((focus-p focus)
+                        (collect
+                            (psx (:parent-segment
+                                  :key (unique-id)
+                                  :text current-text
+                                  :opinions current-opins
+                                  :focus focus
+                                  :last-char-pos end))))
+                       (t
+                        (collect
+                            (psx (:hilited-segment
+                                  :key (unique-id)
+                                  :text (chain text (slice start end))
+                                  :opinions current-opins))))))))))
 
        (define-react-class
            hilited-text
@@ -95,8 +123,8 @@
                              (remove-if-not
                               (lambda (x)
                                 (chain (@ x 0) (has-own-property :excerpt)))
-                              (prop opinions)
-                              (prop focus))))))
+                              (prop opinions))
+                              (prop focus)))))
 
        (define-react-class flag-display
            (psx

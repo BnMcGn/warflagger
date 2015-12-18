@@ -82,7 +82,8 @@
                             (create-element hilited-text
                                             (create :text (@ data text)
                                                     :opinions
-                                                    (@ data opinions)))
+                                                    (@ data opinions)
+                                                    :focus '(17 18)))
                             (chain document (get-element-by-id "test")))))))))))
 
 
