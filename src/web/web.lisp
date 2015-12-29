@@ -79,15 +79,25 @@
                                 (lisp-raw
                                  (target-data id)))
                            (render
-                            (create-element hilited-text
+                            (create-element target-root
                                             (create :text (@ data text)
                                                     :opinions
                                                     (@ data opinions)
                                                     :focus '(20)))
                             (chain document (get-element-by-id "test")))))))))))
 
-
-
+(setf (ningle:route *app* "/reactest/*")
+      (quick-page #'webhax::react
+                  (add-part :@javascript
+                            "https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js")
+                  (lambda ()
+                    (html-out
+                      (:div :id "content")
+                      (:script
+                       :type "text/javascript"
+                       (str
+                        (ps-compile-file (asdf:system-relative-pathname
+                                          'cl-react "tmp.lisp"))))))))
 
 
 

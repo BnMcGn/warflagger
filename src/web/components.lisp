@@ -49,7 +49,7 @@
             (collect end))
           (sort (lambda (a b) (- a b)))))
 
-       (define-react-class hilited-segment
+       (def-component hilited-segment
            (psx
             (:span
              :style (create font-weight :bold)
@@ -63,15 +63,16 @@
          get-initial-state
          (lambda () (create viewable false))
          handle-click
-         (lambda () (unless (prop not-viewable)
-                      (set-state viewable (not (state viewable))))))
+         (lambda (e) (unless (prop not-viewable)
+                       (set-state viewable (not (state viewable)))
+                       (chain e (stop-propagation)))))
 
-       (define-react-class plain-segment
+       (def-component plain-segment
            (psx
             (:span :style (create font-weight :normal)
                    (rebreak (prop text)))))
 
-       (define-react-class parent-segment
+       (def-component parent-segment
            (let ((focussed (focus-parent-p (prop opinions) (prop focus))))
              (psx
                  (:span :style (create font-weight :bold position :relative)
@@ -84,41 +85,39 @@
                           (psx (:opinion :opinions focussed
                                          :focus (prop focus))))))))
 
-       (defun %make-segments (text opins focus)
+       (defun %make-segments (text opins focus focus-func)
          (collecting
            (let ((segpoints (excerpt-segment-points
                              (collecting (dolist (op opins) (collect (@ op 0))))
                              (length text))))
              (do-window ((start end) segpoints)
-               (let ((current-opins (remove-if-not
+               (let ((common-data
+                       (create :opinions
+                               (remove-if-not
                                      (lambda (itm)
                                        (%overlap-p start (1- end)
                                                    (@ itm 0 'text-position 0)
                                                    (+ (@ itm 0 'text-position 0)
                                                       (@ itm 0 'text-position 1))))
-                                     opins))
-                     (current-text (chain text (slice start end))))
-                 (cond ((< (@ current-opins length) 1)
+                                     opins)
+                               :key (unique-id)
+                               :text (chain text (slice start end)))))
+                 (cond ((< (@ common-data :opinions length) 1)
                         (collect
                             (psx (:plain-segment
-                                  :key (unique-id)
-                                  :text current-text))))
+                                  :... common-data))))
                        ((focus-p focus)
                         (collect
                             (psx (:parent-segment
-                                  :key (unique-id)
-                                  :text current-text
-                                  :opinions current-opins
+                                  :... common-data
                                   :focus focus
                                   :last-char-pos end))))
                        (t
                         (collect
                             (psx (:hilited-segment
-                                  :key (unique-id)
-                                  :text (chain text (slice start end))
-                                  :opinions current-opins))))))))))
+                                  :... common-data))))))))))
 
-       (define-react-class
+       (def-component
            hilited-text
            (psx
             (:div
@@ -131,11 +130,11 @@
                               (prop opinions))
                               (prop focus)))))
 
-       (define-react-class flag-display
+       (def-component flag-display
            (psx
             (:span (prop flag 1))))
 
-       (defun %make-opin-popups (opinions)
+       (defun %make-opin-popups (opinions focus-func)
          ;(setf opinions (mock-opinions 30))
          (loop for op in opinions
                for (x y) in (opinion-fan (length opinions))
@@ -143,9 +142,10 @@
                (psx (:mini-opinion :opinion (@ op 0)
                                    :top (+ y (lisp *unit-string*))
                                    :left (+ x (lisp *unit-string*))
-                                   :key (unique-id)))))
+                                   :key (unique-id)
+                                   :focus-func focus-func))))
 
-       (define-react-class
+       (def-component
            mini-opinion
            (let ((vv (prop opinion votevalue)))
              (psx
@@ -157,20 +157,38 @@
                      (-1 "-") (0 "o") (1 "+")))
                (:flag-display :flag (prop opinion flag))))))
 
-       (define-react-class opinion
+       (def-component opinion
            (let ((op (@ (prop opinions) 0)))
              (psx
               (:div
                :class "opinion"
                :style (create position :absolute
-                              top "2em"
+                              top "1em"
                               left (prop horizontal-position))
                (:div "title placeholder")
                (:hilited-text
                 :text (@ op comment)
                 :opinions (chain (prop opinions) (slice 1))
                 :focus (and (focus-p (prop focus))
-                            (chain (prop focus) (slice 1))))))))
+                            (chain (prop focus) (slice 1)))
+                :focus-func (prop focus-func))))))
+
+       (def-component target-root
+           (psx
+            (:div
+             :on-click (@ this handle-click)
+             (:div "title placeholder")
+             (:hilited-text
+              :text (prop text)
+              :opinions (prop opinions)
+              :focus (state focus)
+              :focus-func (@ this focus-func))))
+         handle-click
+         (lambda () (set-state focus undefined))
+         focus-func
+         (lambda (new-focus) (set-state new-focus))
+         get-initial-state
+         (lambda () (create focus (prop focus))))
 
        (defun %make-sway-func (weight)
          ;;For now, just a parabola
