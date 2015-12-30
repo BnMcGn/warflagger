@@ -30,8 +30,23 @@
        (defun %overlap-p (start1 end1 start2 end2)
          (not (or (> start1 end2) (> start2 end1))))
 
-       (defun focus-p (focus-spec)
-         (and focus-spec (< 0 (@ focus-spec length))))
+       (defun focus-p (props?)
+         (let ((tad (@ props? tree-address))
+               (foc (@ props? focus)))
+           (when (eq (@ tad length) (@ foc length))
+             (loop for x in tad
+                   for y in foc
+                   unless (equal x y) do (return nil)
+                     finally (return t)))))
+
+       (defun focus-parent-p (props?)
+         (let ((tad (@ props? tree-address))
+               (foc (@ props? focus)))
+           (when (> (@ tad length) (@ foc length))
+             (loop for x in tad
+                   for y in foc
+                   unless (equal x y) do (return nil)
+                     finally (return t)))))
 
        (defun focus-parent-p (opins focus-spec)
          (dolist (o opins)
@@ -59,7 +74,8 @@
                     (%make-opin-popups (if (and (not (prop not-viewable))
                                                 (state viewable))
                                            (prop opinions)
-                                           ([]))))))
+                                           ([]))
+                                       (@ this props)))))
          get-initial-state
          (lambda () (create viewable false))
          handle-click
@@ -73,7 +89,7 @@
                    (rebreak (prop text)))))
 
        (def-component parent-segment
-           (let ((focussed (focus-parent-p (prop opinions) (prop focus))))
+           (let ((focussed (focus-parent-p (@ this props))))
              (psx
                  (:span :style (create font-weight :bold position :relative)
                         :class (if focussed "parent-active" "parent-inactive")
@@ -85,7 +101,7 @@
                           (psx (:opinion :opinions focussed
                                          :focus (prop focus))))))))
 
-       (defun %make-segments (text opins focus focus-func)
+       (defun %make-segments (text opins props)
          (collecting
            (let ((segpoints (excerpt-segment-points
                              (collecting (dolist (op opins) (collect (@ op 0))))
@@ -95,22 +111,25 @@
                        (create :opinions
                                (remove-if-not
                                      (lambda (itm)
-                                       (%overlap-p start (1- end)
-                                                   (@ itm 0 'text-position 0)
-                                                   (+ (@ itm 0 'text-position 0)
-                                                      (@ itm 0 'text-position 1))))
+                                       (%overlap-p
+                                        start (1- end)
+                                        (@ itm 0 'text-position 0)
+                                        (+ (@ itm 0 'text-position 0)
+                                           (@ itm 0 'text-position 1))))
                                      opins)
                                :key (unique-id)
-                               :text (chain text (slice start end)))))
+                               :text (chain text (slice start end))
+                               :focus-func (@ props focus-func)
+                               :tree-address (@ props tree-address))))
                  (cond ((< (@ common-data :opinions length) 1)
                         (collect
                             (psx (:plain-segment
                                   :... common-data))))
-                       ((focus-p focus)
+                       ((focus-p (@ this props))
                         (collect
                             (psx (:parent-segment
                                   :... common-data
-                                  :focus focus
+                                  :focus (@ props focus)
                                   :last-char-pos end))))
                        (t
                         (collect
@@ -122,28 +141,28 @@
            (psx
             (:div
              :class
-             (if (focus-p (prop focus)) "hilited" "hilited-parent")
+             (if (focus-p (@ this props)) "hilited" "hilited-parent")
              (%make-segments (prop text)
                              (remove-if-not
                               (lambda (x)
                                 (chain (@ x 0) (has-own-property :excerpt)))
                               (prop opinions))
-                              (prop focus)))))
+                             (@ this props)))))
 
        (def-component flag-display
            (psx
             (:span (prop flag 1))))
 
-       (defun %make-opin-popups (opinions focus-func)
+       (defun %make-opin-popups (opinions props)
          ;(setf opinions (mock-opinions 30))
          (loop for op in opinions
                for (x y) in (opinion-fan (length opinions))
                collect
-               (psx (:mini-opinion :opinion (@ op 0)
+               (psx (:mini-opinion :... props
+                                   :opinion (@ op 0)
                                    :top (+ y (lisp *unit-string*))
                                    :left (+ x (lisp *unit-string*))
-                                   :key (unique-id)
-                                   :focus-func focus-func))))
+                                   :key (unique-id)))))
 
        (def-component
            mini-opinion
@@ -167,11 +186,11 @@
                               left (prop horizontal-position))
                (:div "title placeholder")
                (:hilited-text
+                :... (@ this props)
                 :text (@ op comment)
                 :opinions (chain (prop opinions) (slice 1))
-                :focus (and (focus-p (prop focus))
-                            (chain (prop focus) (slice 1)))
-                :focus-func (prop focus-func))))))
+                :tree-address (chain (prop tree-address)
+                                     (concat (list (@ op id)))))))))
 
        (def-component target-root
            (psx
@@ -182,7 +201,8 @@
               :text (prop text)
               :opinions (prop opinions)
               :focus (state focus)
-              :focus-func (@ this focus-func))))
+              :focus-func (@ this focus-func)
+              :tree-address (list))))
          handle-click
          (lambda () (set-state focus undefined))
          focus-func
