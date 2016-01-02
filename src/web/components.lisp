@@ -88,20 +88,21 @@
        (def-component parent-segment
            (let ((focussed (focus-parent-p (@ this props))))
              (psx
-                 (:span :style (create font-weight :bold position :relative)
-                        :class (if focussed "parent-active" "parent-inactive")
-                        (rebreak (prop text))
-                        (when (and focussed
-                                   (eql (prop last-char-pos)
-                                        (+ (@ focussed 0 text-position 0)
-                                           (@ focussed 0 text-position 1) 1)))
-                          (psx (:opinion :opinions focussed
-                                         :focus (prop focus)
-                                         :tree-address
-                                         (chain
-                                          (prop tree-address)
-                                          (concat
-                                           (list (@ focussed 0 id)))))))))))
+              (:span :style (create font-weight :bold position :relative)
+                     :class (if focussed "parent-active" "parent-inactive")
+                     (rebreak (prop text))
+                     (when (and focussed
+                                (eql (prop last-char-pos)
+                                     (+ (@ focussed 0 text-position 0)
+                                        (@ focussed 0 text-position 1) 1)))
+                       (psx (:opinion :opinions focussed
+                                      :key (unique-id)
+                                      :focus (prop focus)
+                                      :tree-address
+                                      (chain
+                                       (prop tree-address)
+                                       (concat
+                                        (list (@ focussed 0 id)))))))))))
 
        (defun %make-segments (text opins props)
          (collecting
@@ -145,6 +146,7 @@
             (:div
              :class
              (if (focus-p (@ this props)) "hilited" "hilited-parent")
+             :key (unique-id)
              (%make-segments (prop text)
                              (remove-if-not
                               (lambda (x)
@@ -184,11 +186,13 @@
              (psx
               (:div
                :class "opinion"
+               :key (unique-id)
                :style (create position :absolute
                               top "1em"
                               left (prop horizontal-position))
-               (:div "title placeholder")
+               (:div :key (unique-id) "title placeholder")
                (:hilited-text
+                :key (unique-id)
                 :... (@ this props)
                 :text (@ op comment)
                 :opinions (prop opinions (slice 1))
@@ -199,8 +203,9 @@
            (psx
             (:div
              :on-click (@ this handle-click)
-             (:div "title placeholder")
+             (:div :key (unique-id) "title placeholder")
              (:hilited-text
+              :key (unique-id)
               :text (prop text)
               :opinions (prop opinions)
               :focus (state focus)
