@@ -36,8 +36,8 @@
            (when (eq (@ tad length) (@ foc length))
              (loop for x in tad
                    for y in foc
-                   unless (equal x y) do (return nil)
-                     finally (return t)))))
+                   unless (equal x y) do (return-from focus-p nil)
+                     finally (return-from focus-p t)))))
 
        (defun focus-parent-p (props?)
          (let ((tad (@ props? tree-address))
@@ -64,7 +64,7 @@
        (def-component hilited-segment
            (psx
             (:span
-             :style (create font-weight :bold)
+             :style (create font-weight :bold background-color :blue)
              :on-click (@ this handle-click)
              (rebreak (prop text))
              (:span :style (create position :relative)
