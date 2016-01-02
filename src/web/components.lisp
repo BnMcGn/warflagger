@@ -42,16 +42,13 @@
        (defun focus-parent-p (props?)
          (let ((tad (@ props? tree-address))
                (foc (@ props? focus)))
-           (when (> (@ tad length) (@ foc length))
+           (when (< (@ tad length) (@ foc length))
              (loop for x in tad
                    for y in foc
-                   unless (equal x y) do (return nil)
-                     finally (return t)))))
-
-       (defun focus-parent-p (opins focus-spec)
-         (dolist (o opins)
-           (when (eql (@ o 0 id) (@ focus-spec 0))
-             (return o))))
+                   unless (equal x y) do (return-from focus-parent-p nil))
+             (dolist (op (@ props? opinions))
+               (when (eq (@ op 0 id) (@ foc (@ tad length)))
+                 (return-from focus-parent-p op))))))
 
        ;;Find all the indices where excerpts start or stop.
        (defun excerpt-segment-points (opset end)
@@ -99,12 +96,18 @@
                                         (+ (@ focussed 0 text-position 0)
                                            (@ focussed 0 text-position 1) 1)))
                           (psx (:opinion :opinions focussed
-                                         :focus (prop focus))))))))
+                                         :focus (prop focus)
+                                         :tree-address
+                                         (chain
+                                          (prop tree-address)
+                                          (concat
+                                           (list (@ focussed 0 id)))))))))))
 
        (defun %make-segments (text opins props)
          (collecting
            (let ((segpoints (excerpt-segment-points
-                             (collecting (dolist (op opins) (collect (@ op 0))))
+                             (collecting (dolist (op opins)
+                                           (collect (@ op 0))))
                              (length text))))
              (do-window ((start end) segpoints)
                (let ((common-data
@@ -120,21 +123,21 @@
                                :key (unique-id)
                                :text (chain text (slice start end))
                                :focus-func (@ props focus-func)
-                               :tree-address (@ props tree-address))))
+                               tree-address (@ props tree-address))))
                  (cond ((< (@ common-data :opinions length) 1)
                         (collect
                             (psx (:plain-segment
                                   :... common-data))))
-                       ((focus-p (@ this props))
+                       ((focus-p props)
+                        (collect
+                            (psx (:hilited-segment
+                                  :... common-data))))
+                       (t
                         (collect
                             (psx (:parent-segment
                                   :... common-data
                                   :focus (@ props focus)
-                                  :last-char-pos end))))
-                       (t
-                        (collect
-                            (psx (:hilited-segment
-                                  :... common-data))))))))))
+                                  :last-char-pos end))))))))))
 
        (def-component
            hilited-text
@@ -188,7 +191,7 @@
                (:hilited-text
                 :... (@ this props)
                 :text (@ op comment)
-                :opinions (chain (prop opinions) (slice 1))
+                :opinions (prop opinions (slice 1))
                 :tree-address (chain (prop tree-address)
                                      (concat (list (@ op id)))))))))
 
@@ -204,7 +207,7 @@
               :focus-func (@ this focus-func)
               :tree-address (list))))
          handle-click
-         (lambda () (set-state focus undefined))
+         (lambda () (set-state focus (list)))
          focus-func
          (lambda (new-focus) (set-state new-focus))
          get-initial-state
