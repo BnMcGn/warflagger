@@ -76,7 +76,8 @@
          get-initial-state
          (lambda () (create viewable false))
          handle-click
-         (lambda (e) (unless (prop not-viewable)
+         (lambda (e)
+           (unless (prop not-viewable)
                        (set-state viewable (not (state viewable)))
                        (chain e (stop-propagation)))))
 
@@ -90,6 +91,7 @@
              (psx
               (:span :style (create font-weight :bold position :relative)
                      :class (if focussed "parent-active" "parent-inactive")
+                     :key (unique-id)
                      (rebreak (prop text))
                      (when (and focussed
                                 (eql (prop last-char-pos)
@@ -169,22 +171,29 @@
                                    :left (+ x (lisp *unit-string*))
                                    :key (unique-id)))))
 
-       (def-component
-           mini-opinion
+       (def-component mini-opinion
            (let ((vv (prop opinion votevalue)))
              (psx
               (:div
                :class "opinion"
+               :on-click (@ this handle-click)
                :style (create position :absolute top (prop top) left (prop left)
                               background :tan)
                (:b (case vv
                      (-1 "-") (0 "o") (1 "+")))
-               (:flag-display :flag (prop opinion flag))))))
+               (:flag-display :flag (prop opinion flag)))))
+         handle-click
+         (lambda (e)
+           (funcall (prop :focus-func)
+                    (chain (prop tree-address)
+                           (concat (list (prop opinion id)))))
+           (chain e (stop-propagation))))
 
        (def-component opinion
            (let ((op (@ (prop opinions) 0)))
              (psx
               (:div
+               :on-click (@ this handle-click)
                :class "opinion"
                :key (unique-id)
                :style (create position :absolute
@@ -197,7 +206,10 @@
                 :text (@ op comment)
                 :opinions (prop opinions (slice 1))
                 :tree-address (chain (prop tree-address)
-                                     (concat (list (@ op id)))))))))
+                                     (concat (list (@ op id))))))))
+         handle-click
+         (lambda (e)
+           (chain e (stop-propagation))))
 
        (def-component target-root
            (psx
@@ -214,7 +226,7 @@
          handle-click
          (lambda () (set-state focus (list)))
          focus-func
-         (lambda (new-focus) (set-state new-focus))
+         (lambda (new-focus) (set-state focus new-focus))
          get-initial-state
          (lambda () (create focus (prop focus))))
 
