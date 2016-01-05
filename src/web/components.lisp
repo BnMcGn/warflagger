@@ -9,6 +9,8 @@
 (defparameter *rank-overlap* 2)
 (defparameter *sway-factor* (- 4))
 
+(defparameter *grandchild-shift* 15)
+
 
 (define-parts target-components
   (add-part
@@ -193,6 +195,16 @@
            (let ((op (@ (prop opinions) 0)))
              (psx
               (:div
+               :ref
+               (lambda (el)
+                 (when el
+                   (let ((offset
+                           (+ (lisp *grandchild-shift*)
+                              (chain (position-difference
+                                      (chain el parent-element parent-element)
+                                      (chain el parent-element)) left))))
+                     (setf (chain el style left)
+                           (chain offset (to-string) (concat "px"))))))
                :on-click (@ this handle-click)
                :class "opinion"
                :key (unique-id)
