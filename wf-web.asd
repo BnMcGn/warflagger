@@ -25,6 +25,7 @@
 		 :serial t
 		 :components ((:file "web/package")
                               (:file "web/ranks")
+                              (:file "web/mood")
                               (:file "web/components")
                               (:file "web/misc")
                               (:file "web/web")))))

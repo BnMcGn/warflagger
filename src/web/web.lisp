@@ -22,7 +22,8 @@
 (define-default-parts warflagger-base
   (add-part :@css "/static/css/style.css")
   (add-part :@account-info "here")
-  (add-part :@javascript #'ps-gadgets))
+  (add-part :@javascript #'ps-gadgets)
+  (add-part :@javascript "/static/javascript/jquery/1.9.1/jquery.js"))
 
 (def-thing
     'user
@@ -65,7 +66,7 @@
                        (str (test-js)))))))
 
 (setf (ningle:route *app* "/target/*")
-      (quick-page #'webhax::react #'target-components
+      (quick-page #'webhax::react #'target-components #'mood-lib
                   (lambda ()
                     (bind-validated-input
                         ((id (webhax-validate:ratify-wrapper :integer)))
