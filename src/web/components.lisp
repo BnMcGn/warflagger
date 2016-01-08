@@ -144,12 +144,13 @@
              :class
              (if (focus-p (@ this props)) "hilited" "hilited-parent")
              :key (unique-id)
-             (%make-segments (prop text)
-                             (remove-if-not
-                              (lambda (x)
-                                (chain (@ x 0) (has-own-property :excerpt)))
-                              (prop opinions))
-                             (@ this props)))))
+             (when (prop text)
+               (%make-segments (prop text)
+                               (remove-if-not
+                                (lambda (x)
+                                  (chain (@ x 0) (has-own-property :excerpt)))
+                                (prop opinions))
+                               (@ this props))))))
 
        (def-component flag-display
            (psx
