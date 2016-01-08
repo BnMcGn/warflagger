@@ -3,6 +3,7 @@
 (defparameter *grandchild-shift* 15)
 
 (define-parts target-components
+  (add-part :@css "/static/css/target.css")
   (add-part :@javascript #'distribute-ranks)
   (add-part
    :@javascript
@@ -57,7 +58,8 @@
        (def-component hilited-segment
            (psx
             (:span
-             :style (create font-weight :bold background-color :blue)
+             :style (create font-weight :bold)
+             :class (flavor (prop opinions))
              :on-click (@ this handle-click)
              (rebreak (prop text))
              (:span :style (create position :relative)
@@ -160,6 +162,7 @@
                collect
                (psx (:mini-opinion :... props
                                    :opinion (@ op 0)
+                                   :opinions (chain op (slice 1))
                                    :top (+ y (lisp *unit-string*))
                                    :left (+ x (lisp *unit-string*))
                                    :key (unique-id)))))
@@ -168,10 +171,9 @@
            (let ((vv (prop opinion votevalue)))
              (psx
               (:div
-               :class "opinion"
+               :class (strcat "opinion " (flavor (prop opinions)))
                :on-click (@ this handle-click)
-               :style (create position :absolute top (prop top) left (prop left)
-                              background :tan)
+               :style (create position :absolute top (prop top) left (prop left))
                (:b (case vv
                      (-1 "-") (0 "o") (1 "+")))
                (:flag-display :flag (prop opinion flag)))))
