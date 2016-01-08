@@ -50,9 +50,9 @@
           (collecting-set
               (dolist (itm opset)
                 (collect (@ itm text-position 0))
-                (collect (+ (@ itm text-position 0) (@ itm text-position 1) 1)))
+                (collect (+ (@ itm text-position 0) (@ itm text-position 1))))
             (collect 0)
-            (collect end))
+            (collect (1+ end)))
           (sort (lambda (a b) (- a b)))))
 
        (def-component hilited-segment
