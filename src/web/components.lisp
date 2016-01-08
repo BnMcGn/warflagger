@@ -62,7 +62,7 @@
              :class (flavor (prop opinions))
              :on-click (@ this handle-click)
              (rebreak (prop text))
-             (:span :style (create position :relative)
+             (:span :style (create position :relative) :key (unique-id)
                     (%make-opin-popups (if (and (not (prop not-viewable))
                                                 (state viewable))
                                            (prop opinions)
@@ -175,9 +175,10 @@
                :class (strcat "opinion " (flavor (prop opinions)))
                :on-click (@ this handle-click)
                :style (create position :absolute top (prop top) left (prop left))
-               (:b (case vv
+               (:b :key (unique-id)
+                  (case vv
                      (-1 "-") (0 "o") (1 "+")))
-               (:flag-display :flag (prop opinion flag)))))
+               (:flag-display :key (unique-id) :flag (prop opinion flag)))))
          handle-click
          (lambda (e)
            (funcall (prop :focus-func)
