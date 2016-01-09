@@ -5,6 +5,7 @@
 (define-parts target-components
   (add-part :@css "/static/css/target.css")
   (add-part :@javascript #'distribute-ranks)
+  (add-part :@javascript #'titlebar-components)
   (add-part
    :@javascript
    (lambda ()
@@ -91,7 +92,7 @@
                      (when (and focussed
                                 (eql (prop last-char-pos)
                                      (+ (@ focussed 0 text-position 0)
-                                        (@ focussed 0 text-position 1) 1)))
+                                        (@ focussed 0 text-position 1))))
                        (psx (:opinion :opinions focussed
                                       :key (unique-id)
                                       :focus (prop focus)
@@ -116,7 +117,7 @@
                                         start (1- end)
                                         (@ itm 0 'text-position 0)
                                         (+ (@ itm 0 'text-position 0)
-                                           (@ itm 0 'text-position 1))))
+                                           (@ itm 0 'text-position 1) (- 1))))
                                      opins)
                                :key (unique-id)
                                :text (chain text (slice start end))
@@ -152,9 +153,6 @@
                                 (prop opinions))
                                (@ this props))))))
 
-       (def-component flag-display
-           (psx
-            (:span (prop flag 1))))
 
        (defun %make-opin-popups (opinions props)
          ;(setf opinions (mock-opinions 30))
@@ -169,16 +167,14 @@
                                    :key (unique-id)))))
 
        (def-component mini-opinion
-           (let ((vv (prop opinion votevalue)))
-             (psx
-              (:div
-               :class (strcat "opinion " (flavor (prop opinions)))
-               :on-click (@ this handle-click)
-               :style (create position :absolute top (prop top) left (prop left))
-               (:b :key (unique-id)
-                  (case vv
-                     (-1 "-") (0 "o") (1 "+")))
-               (:flag-display :key (unique-id) :flag (prop opinion flag)))))
+           (psx
+            (:div
+             :class (strcat "opinion " (flavor (prop opinions)))
+             :on-click (@ this handle-click)
+             :style (create position :absolute
+                            top (prop top) left (prop left))
+             (:vote-value :opinion (prop opinion) :key (unique-id))
+             (:flag-name :key (unique-id) :opinion (prop opinion))))
          handle-click
          (lambda (e)
            (funcall (prop :focus-func)
