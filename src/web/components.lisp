@@ -186,7 +186,9 @@
          (psx (:span " X")))
 
        (def-component opinion
-           (let ((op (@ (prop opinions) 0)))
+           (let* ((op (@ (prop opinions) 0))
+                  (tree-ad (chain (prop tree-address)
+                                  (concat (list (@ op id))))))
              (psx
               (:div
                :ref
@@ -213,14 +215,16 @@
                      (:date-stamp :key 3 :opinion op) " "
                      (:author-long :key 4 :opinion op)
                      (:general-opinion-knobdule
-                      :key 5 :opinions (prop opinions (slice 1))))
+                      :key 5
+                      :... (@ this props)
+                      :opinions (prop opinions (slice 1))
+                      :tree-address tree-ad))
                (:hilited-text
                 :key (unique-id)
                 :... (@ this props)
                 :text (@ op comment)
                 :opinions (prop opinions (slice 1))
-                :tree-address (chain (prop tree-address)
-                                     (concat (list (@ op id))))))))
+                :tree-address tree-ad))))
          handle-click
          (lambda (e)
            (chain e (stop-propagation))))
@@ -230,10 +234,15 @@
             (:div
              :on-click (@ this handle-click)
              (:div :key 1
+                   :class (flavor (prop opinions))
                    (:h3
                     "Target Page:"
                     (:a :href (prop url) :key 1 (prop title))
-                    (:general-opinion-knobdule :key 2 :opinions (prop opinions))))
+                    (:general-opinion-knobdule
+                     :key 2
+                     :... (@ this props)
+                     :opinions (prop opinions)
+                     :tree-address (list))))
              (:hilited-text
               :key 2
               :text (prop text)
