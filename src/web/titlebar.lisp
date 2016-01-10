@@ -14,27 +14,32 @@
           (psx
            (:b (case vv (-1 "-") (0 "o") (1 "+"))))))
 
+    (defun display-date-nicely (dstamp)
+      (let ((past (ago dstamp)))
+        (cond
+          ((< 0 (chain past (get-weeks)))
+           (strcat (chain dstamp (to-date-string))
+                   " "
+                   (chain dstamp (to-locale-time-string))))
+          ((< 0 (chain past (get-days)))
+           (strcat (chain past (get-days) (to-string)) " days ago"))
+          ((< 0 (chain past (get-hours)))
+           (strcat (chain past (get-hours) (to-string))
+                   " hours ago"))
+          ((< 0 (chain past (get-minutes)))
+              (strcat (chain past (get-minutes) (to-string))
+                      " minutes ago"))
+          (t (strcat (chain past (get-seconds) (to-string))
+                     " seconds ago")))))
+
     (def-component date-stamp
-        (let ((past (ago (chain -date (parse (prop opinion datestamp))))))
-          (psx
-           (:span (cond
-                    ((< 0 (chain past (get-weeks)))
-                     (strcat (chain date-stamp (to-date-string))
-                             " "
-                             (chain date-stamp (to-locale-time-string))))
-                    ((< 0 (chain past (get-days)))
-                     (strcat (chain past (get-days) (to-string)) "days ago"))
-                    ((< 0 (chain past (get-hours)))
-                     (strcat (chain past (get-hours) (to-string))
-                             "hours ago"))
-                    ((< 0 (chain past (get-minutes))
-                        (strcat (chain past (get-minutes) (to-string))
-                                "minutes ago")))
-                    (t (strcat (chain past (get-seconds) (to-string))
-                               "seconds ago")))))))
+        (psx
+         (:span
+          (display-date-nicely
+           (new (-date (chain -date (parse (prop opinion datestamp)))))))))
 
     ;;FIXME: lots of improvement here... Avatar? Stats? Faction?
     (def-component author-long
-        (:span (prop opinion author)))
+        (psx (:span (prop opinion author))))
 
     ))

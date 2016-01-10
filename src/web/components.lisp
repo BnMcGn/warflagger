@@ -202,7 +202,11 @@
                :style (create position :absolute
                               top "1em"
                               left (prop horizontal-position))
-               (:div :key (unique-id) "title placeholder")
+               (:div :key (unique-id)
+                     (:vote-value :key 1 :opinion op) " "
+                     (:flag-name :key 2 :opinion op) " "
+                     (:date-stamp :key 3 :opinion op) " "
+                     (:author-long :key 4 :opinion op))
                (:hilited-text
                 :key (unique-id)
                 :... (@ this props)
