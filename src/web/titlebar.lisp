@@ -11,8 +11,10 @@
 
     (def-component vote-value
         (let ((vv (prop opinion votevalue)))
-          (psx
-           (:b (case vv (-1 "-") (0 "o") (1 "+"))))))
+          (case vv
+            (-1 (psx (:b :style (create background "#ff0000") "-")))
+            (0 (psx (:b :style (create background "#aba3a3") "o")))
+            (1 (psx (:b :style (create background "#00ff00") "+"))))))
 
     (defun display-date-nicely (dstamp)
       (let ((past (ago dstamp)))
