@@ -70,6 +70,7 @@
                   (lambda ()
                     (bind-validated-input
                         ((id (webhax-validate:ratify-wrapper :integer)))
+                      (let ((url (get-rooturl-by-id id)))
                       (html-out
                        (:div :id "test")
                        (:script
@@ -79,13 +80,18 @@
                            (var data
                                 (lisp-raw
                                  (target-data id)))
+                           (var target-url (lisp url))
+                           (var target-title (lisp (grab-title url)))
                            (render
                             (create-element target-root
                                             (create :text (@ data text)
                                                     :opinions
                                                     (@ data opinions)
-                                                    :focus '(20)))
-                            (chain document (get-element-by-id "test")))))))))))
+                                                    :focus '(20)
+                                                    :url target-url
+                                                    :title target-title))
+                            (chain document
+                                   (get-element-by-id "test"))))))))))))
 
 
 
