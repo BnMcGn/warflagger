@@ -25,8 +25,8 @@
                (if neg "negative" "neutral"))))
 
        (defun calculate-freshness (opins)
-         (let* ((hours *js-hour*)
-                (days (* 2 *js-day*))
+         (let* ((hours (lisp *js-hour*))
+                (days (* 2 (lisp *js-day*)))
                 (now (chain -date (now)))
                 (newest))
            (mapleaves

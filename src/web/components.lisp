@@ -183,7 +183,27 @@
            (chain e (stop-propagation))))
 
        (def-component general-opinion-knobdule
-         (psx (:span " X")))
+           (let* ((all-ops (prop opinions))
+                  (opins (collecting
+                          (dolist (o all-ops)
+                            (when (and (@ o 0 excerpt)
+                                       (< 0 (@ o 0 excerpt length)))
+                              (collect o))))))
+             (psx (:span :on-click (@ this handle-click)
+                         (when opins " X")
+                         (:span :style (create position :relative) :key 1
+                                (%make-opin-popups
+                                 (if (and (not (prop not-viewable))
+                                          (state viewable))
+                                     opins ([]))
+                                 (@ this props))))))
+         get-initial-state
+         (lambda () (create viewable false))
+         handle-click
+         (lambda (e)
+           (unless (prop not-viewable)
+             (set-state viewable (not (state viewable)))
+             (chain e (stop-propagation)))))
 
        (def-component opinion
            (let* ((op (@ (prop opinions) 0))
