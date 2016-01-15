@@ -6,6 +6,10 @@
   (add-part :@css "/static/css/target.css")
   (add-part :@javascript #'distribute-ranks)
   (add-part :@javascript #'titlebar-components)
+  (add-part :@javascript "/static/javascript/jsPlumb-2.0.5.js")
+  (add-part :@javascript
+            (lambda ()
+              (ps (chain js-plumb (ready (lambda ()))))))
   (add-part
    :@javascript
    (lambda ()
@@ -59,11 +63,13 @@
        (def-component hilited-segment
            (psx
             (:span
+             ;:id (prop id)
              :style (create font-weight :bold)
              :class (flavor (prop opinions))
              :on-click (@ this handle-click)
              (rebreak (prop text))
              (:span :style (create position :relative) :key (unique-id)
+                    :id (prop id)
                     (%make-opin-popups (if (and (not (prop not-viewable))
                                                 (state viewable))
                                            (prop opinions)
@@ -74,8 +80,31 @@
          handle-click
          (lambda (e)
            (unless (prop not-viewable)
-                       (set-state viewable (not (state viewable)))
-                       (chain e (stop-propagation)))))
+             (set-state viewable (not (state viewable)))
+             (chain e (stop-propagation))))
+         display-plumbs
+         (lambda ()
+           (when (state viewable)
+             (say (prop id))
+             (let ((ops (prop opinions))
+                   (id (prop id))
+                   (plinst (chain js-plumb (get-instance))))
+               (chain plinst
+                      (batch
+                       (lambda ()
+                         (dolist (op ops)
+                           (chain plinst
+                                  (connect
+                                   (create
+                                    source
+                                    (strcat "opinid-"
+                                            (chain op 0 id (to-string)))
+                                    target id
+                                    anchors (list "Left" "Left")))))))))))
+         component-did-mount
+         (lambda () (chain this (display-plumbs)))
+         component-did-update
+         (lambda () (chain this (display-plumbs))))
 
        (def-component plain-segment
            (psx
@@ -112,16 +141,21 @@
                (let ((common-data
                        (create :opinions
                                (remove-if-not
-                                     (lambda (itm)
-                                       (%overlap-p
-                                        start (1- end)
-                                        (@ itm 0 'text-position 0)
-                                        (+ (@ itm 0 'text-position 0)
-                                           (@ itm 0 'text-position 1) (- 1))))
-                                     opins)
+                                (lambda (itm)
+                                  (%overlap-p
+                                   start (1- end)
+                                   (@ itm 0 'text-position 0)
+                                   (+ (@ itm 0 'text-position 0)
+                                      (@ itm 0 'text-position 1) (- 1))))
+                                opins)
                                :key (unique-id)
+                               :id (strcat "lvl-"
+                                           (chain props
+                                                  tree-address length (to-string))
+                                           "-pos-"
+                                           (chain end (to-string)))
                                :text (chain text (slice start end))
-                               :focus-func (@ props focus-func)
+                               :focusfunc (@ props focusfunc)
                                tree-address (@ props tree-address))))
                  (cond ((< (@ common-data :opinions length) 1)
                         (collect
@@ -155,7 +189,7 @@
 
 
        (defun %make-opin-popups (opinions props)
-         ;(setf opinions (mock-opinions 30))
+                                        ;(setf opinions (mock-opinions 30))
          (loop for op in opinions
                for (x y) in (opinion-fan (length opinions))
                collect
@@ -169,6 +203,7 @@
        (def-component mini-opinion
            (psx
             (:div
+             :id (strcat "opinid-" (prop opinion id (to-string)))
              :class (strcat "opinion " (flavor (prop opinions)))
              :on-click (@ this handle-click)
              :style (create position :absolute
@@ -177,7 +212,7 @@
              (:flag-name :key (unique-id) :opinion (prop opinion))))
          handle-click
          (lambda (e)
-           (funcall (prop :focus-func)
+           (funcall (prop focusfunc)
                     (chain (prop tree-address)
                            (concat (list (prop opinion id)))))
            (chain e (stop-propagation))))
@@ -185,12 +220,12 @@
        (def-component general-opinion-knobdule
            (let* ((all-ops (prop opinions))
                   (opins (collecting
-                          (dolist (o all-ops)
-                            (when (and (@ o 0 excerpt)
-                                       (< 0 (@ o 0 excerpt length)))
-                              (collect o))))))
+                           (dolist (o all-ops)
+                             (unless (and (@ o 0 excerpt)
+                                          (< 0 (@ o 0 excerpt length)))
+                               (collect o))))))
              (psx (:span :on-click (@ this handle-click)
-                         (when opins " X")
+                         (when (not-empty opins) " X")
                          (:span :style (create position :relative) :key 1
                                 (%make-opin-popups
                                  (if (and (not (prop not-viewable))
@@ -262,13 +297,14 @@
                      :key 2
                      :... (@ this props)
                      :opinions (prop opinions)
-                     :tree-address (list))))
+                     :tree-address (list)
+                     :focusfunc (@ this focus-func))))
              (:hilited-text
               :key 2
               :text (prop text)
               :opinions (prop opinions)
               :focus (state focus)
-              :focus-func (@ this focus-func)
+              :focusfunc (@ this focus-func)
               :tree-address (list))))
          handle-click
          (lambda () (set-state focus (list)))
@@ -276,6 +312,7 @@
          (lambda (new-focus) (set-state focus new-focus))
          get-initial-state
          (lambda () (create focus (prop focus))))
+
 
        ))))
 
@@ -285,6 +322,6 @@
         (dotimes (i quantity)
           (collect
               `(list (create :flag (list "Negative"
-                                    ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsReference" "RaiseQuestion"))
+                                         ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsReference" "RaiseQuestion"))
 
-                        :votevalue ,(whichever (- 1) 0 1))))))))
+                             :votevalue ,(whichever (- 1) 0 1))))))))
