@@ -71,19 +71,19 @@
                     (bind-validated-input
                         ((id (webhax-validate:ratify-wrapper :integer)))
                       (let ((url (get-rooturl-by-id id)))
-                      (html-out
-                       (:div :id "test")
-                       (:script
-                        :type "text/javascript"
-                        (str
-                         (ps
-                           (var data
-                                (lisp-raw
-                                 (target-data id)))
-                           (var target-url (lisp url))
-                           (var target-title (lisp (grab-title url)))
-                           (render
-                            (create-element target-root
+                        (html-out
+                          (:div :id "test")
+                          (:script
+                           :type "text/javascript"
+                           (str
+                            (ps
+                              (var data
+                                   (lisp-raw
+                                    (target-data id)))
+                              (var target-url (lisp url))
+                              (var target-title (lisp (grab-title url)))
+                              (render
+                               (create-element target-root
                                             (create :text (@ data text)
                                                     :opinions
                                                     (@ data opinions)

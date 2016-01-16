@@ -99,7 +99,7 @@
                (setf (@ this plumb-instance) plinst)
                (chain plinst (set-container
                               (chain document (get-element-by-id (prop id))
-                                     parent-element)))
+                                     parent-element parent-element)))
                (chain plinst
                       (batch
                        (lambda ()
