@@ -61,20 +61,24 @@
           (sort (lambda (a b) (- a b)))))
 
        (def-component hilited-segment
-           (psx
-            (:span
-             ;:id (prop id)
-             :style (create font-weight :bold)
-             :class (flavor (prop opinions))
-             :on-click (@ this handle-click)
-             (rebreak (prop text))
-             (:span :style (create position :relative) :key (unique-id)
-                    :id (prop id)
-                    (%make-opin-popups (if (and (not (prop not-viewable))
-                                                (state viewable))
-                                           (prop opinions)
-                                           ([]))
-                                       (@ this props)))))
+           (progn
+             (when (and (or (prop not-viewable)
+                            (not (state viewable)))
+                        (@ this plumb-instance))
+               (chain this plumb-instance (delete-every-endpoint)))
+             (psx
+              (:span
+               :style (create font-weight :bold)
+               :class (flavor (prop opinions))
+               :on-click (@ this handle-click)
+               (rebreak (prop text))
+               (:span :style (create position :relative) :key (unique-id)
+                      :id (prop id)
+                      (%make-opin-popups (if (and (not (prop not-viewable))
+                                                  (state viewable))
+                                             (prop opinions)
+                                             ([]))
+                                         (@ this props))))))
          get-initial-state
          (lambda () (create viewable false))
          handle-click
@@ -82,13 +86,20 @@
            (unless (prop not-viewable)
              (set-state viewable (not (state viewable)))
              (chain e (stop-propagation))))
+         plumb-instance nil
          display-plumbs
          (lambda ()
            (when (state viewable)
-             (say (prop id))
              (let ((ops (prop opinions))
                    (id (prop id))
                    (plinst (chain js-plumb (get-instance))))
+               ;;Clean up old plumbs
+               (when (@ this plumb-instance)
+                 (chain this plumb-instance (delete-every-endpoint)))
+               (setf (@ this plumb-instance) plinst)
+               (chain plinst (set-container
+                              (chain document (get-element-by-id (prop id))
+                                     parent-element)))
                (chain plinst
                       (batch
                        (lambda ()
