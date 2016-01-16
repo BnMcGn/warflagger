@@ -111,7 +111,8 @@
                                     (strcat "opinid-"
                                             (chain op 0 id (to-string)))
                                     target id
-                                    anchors (list "Left" "Left")))))))))))
+                                    anchors (list "Left" "Left")
+                                    connector "Straight"))))))))))
          component-did-mount
          (lambda () (chain this (display-plumbs)))
          component-did-update
