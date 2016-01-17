@@ -26,6 +26,10 @@
                     (collect (psx (:br :key (unique-id))))))
                 (slice 0 -1)))
 
+       (defun opinion-p (itm)
+         (and (not (atom itm))
+              (chain itm (has-own-property "votevalue"))))
+
        (defun %overlap-p (start1 end1 start2 end2)
          (not (or (> start1 end2) (> start2 end1))))
 
@@ -112,7 +116,9 @@
                                             (chain op 0 id (to-string)))
                                     target id
                                     anchors (list "Left" "Left")
-                                    connector "Straight"))))))))))
+                                    paint-style (stroke-intensity op)
+                                    connector "Straight"
+                                    endpoint "Blank"))))))))))
          component-did-mount
          (lambda () (chain this (display-plumbs)))
          component-did-update
