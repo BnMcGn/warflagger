@@ -82,4 +82,31 @@
                    ("neutral" "rgba(171,163,163,0.75)")
                    ("positive" "rgba(0,256,0,0.75)")
                    ("contested" "rgba(256,136,0,0.75)"))))
+
+       (defun delete-plumbs (base-obj)
+         (when (chain base-obj (has-own-property '%plumb-instance))
+           (chain base-obj %plumb-instance (delete-every-endpoint))))
+
+       (defun display-popup-plumbs (base-obj target-id container opinions)
+         (let ((plinst (chain js-plumb (get-instance))))
+           ;;Clean up old plumbs
+           (delete-plumbs base-obj)
+           (setf (@ base-obj %plumb-instance) plinst)
+           (chain plinst (set-container container))
+           (chain plinst
+                  (batch
+                   (lambda ()
+                     (dolist (op opinions)
+                       (chain plinst
+                              (connect
+                               (create
+                                source
+                                (strcat "opinid-"
+                                        (chain op 0 id (to-string)))
+                                target target-id 
+                                anchors (list "Left" "Left")
+                                paint-style (stroke-intensity op)
+                                connector "Straight"
+                                endpoint "Blank")))))))))
+
        ))))

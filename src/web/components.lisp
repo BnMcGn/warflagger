@@ -66,10 +66,8 @@
 
        (def-component hilited-segment
            (progn
-             (when (and (or (prop not-viewable)
-                            (not (state viewable)))
-                        (@ this plumb-instance))
-               (chain this plumb-instance (delete-every-endpoint)))
+             (when (or (prop not-viewable) (not (state viewable)))
+               (delete-plumbs this))
              (psx
               (:span
                :style (create font-weight :bold)
@@ -94,31 +92,12 @@
          display-plumbs
          (lambda ()
            (when (state viewable)
-             (let ((ops (prop opinions))
-                   (id (prop id))
-                   (plinst (chain js-plumb (get-instance))))
-               ;;Clean up old plumbs
-               (when (@ this plumb-instance)
-                 (chain this plumb-instance (delete-every-endpoint)))
-               (setf (@ this plumb-instance) plinst)
-               (chain plinst (set-container
-                              (chain document (get-element-by-id (prop id))
-                                     parent-element parent-element)))
-               (chain plinst
-                      (batch
-                       (lambda ()
-                         (dolist (op ops)
-                           (chain plinst
-                                  (connect
-                                   (create
-                                    source
-                                    (strcat "opinid-"
-                                            (chain op 0 id (to-string)))
-                                    target id
-                                    anchors (list "Left" "Left")
-                                    paint-style (stroke-intensity op)
-                                    connector "Straight"
-                                    endpoint "Blank"))))))))))
+             (display-popup-plumbs
+              this
+              (prop id)
+              (chain document (get-element-by-id (prop id))
+                     parent-element parent-element)
+              (prop opinions))))
          component-did-mount
          (lambda () (chain this (display-plumbs)))
          component-did-update
