@@ -88,7 +88,6 @@
            (unless (prop not-viewable)
              (set-state viewable (not (state viewable)))
              (chain e (stop-propagation))))
-         plumb-instance nil
          display-plumbs
          (lambda ()
            (when (state viewable)
@@ -214,28 +213,54 @@
                            (concat (list (prop opinion id)))))
            (chain e (stop-propagation))))
 
+       (defun %make-knob-id (treeaddress)
+         (collecting-string
+           (collect "knob")
+           (dolist (ta treeaddress)
+             (collect "-")
+             (collect (chain ta (to-string))))))
+
+       (defun %get-excerptless-opinions (opins)
+         (collecting
+           (dolist (o opins)
+             (unless (and (@ o 0 excerpt)
+                          (< 0 (@ o 0 excerpt length)))
+               (collect o)))))
+
        (def-component general-opinion-knobdule
-           (let* ((all-ops (prop opinions))
-                  (opins (collecting
-                           (dolist (o all-ops)
-                             (unless (and (@ o 0 excerpt)
-                                          (< 0 (@ o 0 excerpt length)))
-                               (collect o))))))
-             (psx (:span :on-click (@ this handle-click)
-                         (when (not-empty opins) " X")
-                         (:span :style (create position :relative) :key 1
-                                (%make-opin-popups
-                                 (if (and (not (prop not-viewable))
-                                          (state viewable))
-                                     opins ([]))
-                                 (@ this props))))))
+           (progn
+             (delete-plumbs this)
+             (let ((opins (%get-excerptless-opinions (prop opinions))))
+               (psx (:span :on-click (@ this handle-click)
+                           :id (%make-knob-id (prop tree-address))
+                           (when (not-empty opins) " X")
+                           (:span :style (create position :relative) :key 1
+                                  (%make-opin-popups
+                                   (if (and (not (prop not-viewable))
+                                            (state viewable))
+                                       opins ([]))
+                                   (@ this props)))))))
          get-initial-state
          (lambda () (create viewable false))
          handle-click
          (lambda (e)
            (unless (prop not-viewable)
              (set-state viewable (not (state viewable)))
-             (chain e (stop-propagation)))))
+             (chain e (stop-propagation))))
+         display-plumbs
+         (lambda ()
+           (let ((id (%make-knob-id (prop tree-address))))
+             (when (state viewable)
+               (display-popup-plumbs
+                this
+                id
+                (chain document (get-element-by-id id) get-parent)
+                (%get-excerptless-opinions (prop opinions))))))
+         component-did-mount
+         (lambda () (chain this (display-plumbs)))
+         component-did-update
+         (lambda () (chain this (display-plumbs))))
+
 
        (def-component opinion
            (let* ((op (@ (prop opinions) 0))

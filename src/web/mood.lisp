@@ -72,10 +72,11 @@
        (defun stroke-intensity (opins)
          (create line-width
                  (let ((q (calculate-intensity opins)))
-                   (do-keyvalue (k v (lisp (alist->ps-object-code
-                                            *intensity-thresholds*)))
-                     (when (< k q)
-                       (return v))))
+                   (block found
+                     (do-keyvalue (k v (lisp (alist->ps-object-code
+                                             *intensity-thresholds*)))
+                      (when (< k q)
+                        (return-from found v)))))
                  stroke-style
                  (case (calculate-direction opins)
                    ("negative" "rgba(256,0,0,0.75)")
