@@ -254,7 +254,7 @@
                (display-popup-plumbs
                 this
                 id
-                (chain document (get-element-by-id id) get-parent)
+                (chain document (get-element-by-id id) parent-element)
                 (%get-excerptless-opinions (prop opinions))))))
          component-did-mount
          (lambda () (chain this (display-plumbs)))
