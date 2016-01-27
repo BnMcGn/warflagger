@@ -37,7 +37,8 @@
                     (when (< newest dt)
                       (setf newest dt))
                     (setf newest dt))))
-            opins)
+            opins
+            :test #'opinion-p)
            (cond ((< newest (- now days)) "old")
                  ((< newest (- now hours)) "recent")
                  (t "new"))))
