@@ -117,6 +117,6 @@
                 'clack.session.state.cookie:<clack-session-state-cookie>)))
         ;(clack-pretend::clack-middleware-pretend)
         ;(clack.middleware.openid:<clack-middleware-openid>)
-        (json-call :login-p nil)
+        ;(json-call :login-p nil)
         *app*)
        :port 5000))

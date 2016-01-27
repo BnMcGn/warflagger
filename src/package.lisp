@@ -24,5 +24,6 @@
    #:get-author-id
    #:user-lister
    #:get-author-representation
-   #:find-excerpt-position))
+   #:find-excerpt-position
+   #:create-textdata))
 

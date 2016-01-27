@@ -37,7 +37,8 @@
          (cons
           op
           (%fill-out-opinion-tree (cdar tree)
-                                  (aif (assoc :comment op) (cdr it) "")))
+                                  (create-textdata
+                                   (aif (assoc :comment op) (cdr it) ""))))
          (%fill-out-opinion-tree (cdr tree) text)))))
 
 (defun target-data (id)
@@ -50,5 +51,6 @@
                (do-file-by-line (ln (grab-text url))
                  (collect (strcat ln #\Newline))))))
          (opins
-           (%fill-out-opinion-tree (opinion-tree-for-rooturl url) text)))
+           (%fill-out-opinion-tree
+            (opinion-tree-for-rooturl url) (create-textdata text))))
     (json:encode-json-to-string `((:text . ,text) (:opinions . ,opins)))))

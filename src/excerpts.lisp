@@ -49,32 +49,49 @@
    (subseq text (+ start length) (max (length text) (+ start length post)))))
 
 ;;;Currently used stuff below: Above is older, whitespaceless.
-(defun contiguous-whitespace? (text index)
-  (loop for i in (range index (length text))
-        for count from 0
-        until (not (member (elt text i) *whitespace-characters*))
-        finally (return count)))
 
-(defun excerpt-here? (text excerpt index)
-  (loop with tind = index
-        with eind = 0
-        with tlen = (length text)
-        with elen = (length excerpt)
-        do (progn
-             (when (= elen eind) (return tind))
-             (when (= tlen tind) (return nil))
-             (let ((ewhite (contiguous-whitespace? excerpt eind))
-                   (twhite (contiguous-whitespace? text tind)))
-               (if (and (= 0 ewhite) (= 0 twhite)
-                        (eq (elt excerpt eind) (elt text tind)))
-                   (progn (incf tind) (incf eind))
-                   (if (or (= 0 ewhite) (= 0 twhite))
-                       (return nil)
-                       (progn (incf tind twhite) (incf eind ewhite))))))))
+(defstruct tdat text whitespace)
 
-(defun find-excerpt-position (text excerpt &optional (offset 0))
-  (dotimes (i (length text))
-    (awhen (excerpt-here? text excerpt i)
+(defun create-textdata (text)
+  (ret data (make-tdat)
+    (setf (tdat-text data) text)
+    (setf (tdat-whitespace data)
+          (collecting-hash-table (:mode :tally)
+              (let ((found nil))
+                (dotimes (i (length text))
+                  (if (member (elt text i) *whitespace-characters*)
+                      (progn
+                        (unless found (setf found i))
+                        (dolist (j (range found (1+ i)))
+                          (collect j t)))
+                      (setf found nil))))))))
+
+(defun contiguous-whitespace? (tdat index)
+  (gethash index (tdat-whitespace tdat) 0))
+
+(defun excerpt-here? (tdat excerpt index)
+  (declare (inline contiguous-whitespace?)) 
+  (let ((exdat (create-textdata excerpt))
+        (text (tdat-text tdat)))
+    (loop with tind = index
+          with eind = 0
+          with tlen = (length text)
+          with elen = (length excerpt)
+          do (progn
+               (when (= elen eind) (return tind))
+               (when (= tlen tind) (return nil))
+               (let ((ewhite (contiguous-whitespace? exdat eind))
+                     (twhite (contiguous-whitespace? tdat tind)))
+                 (if (and (= 0 ewhite) (= 0 twhite)
+                          (eq (elt excerpt eind) (elt text tind)))
+                     (progn (incf tind) (incf eind))
+                     (if (or (= 0 ewhite) (= 0 twhite))
+                         (return nil)
+                         (progn (incf tind twhite) (incf eind ewhite)))))))))
+
+(defun find-excerpt-position (tdat excerpt &optional (offset 0))
+  (dotimes (i (length (tdat-text tdat)))
+    (awhen (excerpt-here? tdat excerpt i)
       (if (< 0 offset)
           (decf offset)
           (return (values i (- it i)))))))
