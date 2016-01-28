@@ -121,12 +121,8 @@
                        (psx (:opinion :opinions focussed
                                       :key (unique-id)
                                       :focus (prop focus)
-                                      :tree-address
-                                      (chain
-                                       (prop tree-address)
-                                       (concat
-                                        (list (@ focussed 0 id)))))))))))
-
+                                      :tree-address (prop tree-address))))))))
+                                  
        (defun %make-segments (text opins props)
          (collecting
            (let ((segpoints (excerpt-segment-points
