@@ -47,9 +47,9 @@
            (progn
              (unless (is-cached url)
                (error "Don't have that page!"))
-             (collecting-string
+             (gadgets:collecting-string
                (do-file-by-line (ln (grab-text url))
-                 (collect (strcat ln #\Newline))))))
+                 (gadgets:collect (gadgets:strcat ln #\Newline))))))
          (opins
            (%fill-out-opinion-tree
             (opinion-tree-for-rooturl url) (create-textdata text))))

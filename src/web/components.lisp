@@ -122,7 +122,7 @@
                                       :key (unique-id)
                                       :focus (prop focus)
                                       :tree-address (prop tree-address))))))))
-                                  
+ 
        (defun %make-segments (text opins props)
          (collecting
            (let ((segpoints (excerpt-segment-points
@@ -178,7 +178,6 @@
                                   (chain (@ x 0) (has-own-property :excerpt)))
                                 (prop opinions))
                                (@ this props))))))
-
 
        (defun %make-opin-popups (opinions props)
                                         ;(setf opinions (mock-opinions 30))
@@ -336,9 +335,9 @@
 
 (defpsmacro mock-opinions (quantity)
   `(list
-    ,@(collecting
+    ,@(gadgets:collecting
         (dotimes (i quantity)
-          (collect
+          (gadgets:collect
               `(list (create :flag (list "Negative"
                                          ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsReference" "RaiseQuestion"))
 

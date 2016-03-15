@@ -18,7 +18,8 @@
                #:thing-lister
                #:ratify
                #:warflagger
-               #:clack-middleware-openid)
+               #:ps-gadgets)
+               ;#:clack-middleware-openid)
   :serial t
   :components ((:module 
 		 :src

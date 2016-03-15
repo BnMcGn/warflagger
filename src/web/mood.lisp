@@ -12,7 +12,7 @@
 ;;;FIXME: Implementation of flavor is naive and slow.
 ;;; Should account for different values placed on opinions.
 ;;; Should use cached results from database
-       
+ 
        (defun calculate-flavor (opins)
          (let ((pos nil)
                (neg nil)
