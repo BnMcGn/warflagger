@@ -18,7 +18,9 @@
                #:thing-lister
                #:ratify
                #:warflagger
-               #:ps-gadgets)
+               #:ps-gadgets
+               #:lack-middleware-mount
+               #:clack-openid-connect)
                ;#:clack-middleware-openid)
   :serial t
   :components ((:module 
