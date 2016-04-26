@@ -93,35 +93,35 @@
                             (chain document
                                    (get-element-by-id "test"))))))))))))
 
-
-
+(setf (ningle:route *app* "/")
+      (lambda (params)
+        (declare (ignore params))
+        (clack-openid-connect::logged-in-page)))
 
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)
 ;;;Then evaluate code below.
 
-(setf *handler*
-      (clack:clackup
-       (clack-pretend:pretend-builder (:insert 2) ;clack.builder:builder
-        (clack.middleware.clsql:<clack-middleware-clsql>
-         :database-type :postgresql-socket3
-         :connection-spec *db-connect-spec*)
-        (clack.middleware.static:<clack-middleware-static>
-         :path "/static/"
-         :root #p"~/quicklisp/local-projects/warflagger/src/static/")
-        :session
-        ;(setf *session-store*
-         ;     (make-instance
-          ;     'clack.middleware.session:<clack-middleware-session>
-           ;    :state
-            ;   (make-instance
-             ;   'clack.session.state.cookie:<clack-session-state-cookie>)))
-        (:mount
-         "/oid_connect"
-         (clack-openid-connect:app
-          "http://logintest.warflagger.com:5000/oid_connect/"))
-        ;(clack-pretend::clack-middleware-pretend)
-        ;(clack.middleware.openid:<clack-middleware-openid>)
-        ;(json-call :login-p nil)
-        *app*)
-       :port 5000))
+(defparameter *userfig-fieldspecs*
+  '(:test-value
+    (:type :string
+     :initial "a value")))
+
+(clack-server-manager
+ *handler*
+ (clack-pretend:pretend-builder
+  (:insert 2) ;clack.builder:builder
+  (clack.middleware.clsql:<clack-middleware-clsql>
+   :database-type :postgresql-socket3
+   :connection-spec *db-connect-spec*)
+  (clack.middleware.static:<clack-middleware-static>
+   :path "/static/"
+   :root #p"~/quicklisp/local-projects/warflagger/src/static/")
+  :session
+  (:mount
+   "/oid_connect"
+   (clack-openid-connect:app
+    "http://logintest.warflagger.com:5000/oid_connect/"))
+  (userfig:userfig-component *userfig-fieldspecs*)
+  *app*)
+ :port 5000)

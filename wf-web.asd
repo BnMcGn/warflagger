@@ -20,8 +20,8 @@
                #:warflagger
                #:ps-gadgets
                #:lack-middleware-mount
-               #:clack-openid-connect)
-               ;#:clack-middleware-openid)
+               #:clack-openid-connect
+               #:userfig)
   :serial t
   :components ((:module 
 		 :src
