@@ -1,7 +1,7 @@
 ;;;
-                                        ; textract.lisp
-                                        ;
-                                        ; Service to extract and cache the text content of web pages.
+;;; textract.lisp
+;;;
+;;; Service to extract and cache the text content of web pages.
 ;;;
 
 (defpackage :wf/text-extract
@@ -23,7 +23,8 @@
    #:*byurl*
    #:*extractor-script*
    #:initialize-indices
-   #:update-page))
+   #:update-page
+   #:text-server))
 
 (in-package :wf/text-extract)
 
@@ -160,3 +161,26 @@
 
 (defun old-page-available (url)
   (and (is-cached url) (probe-file (page-loc url))))
+
+(defun text-server (url)
+  "The results of this function, served as JSON, are the text server. Url is the address of the desired text"
+  (cl-hash-util:collecting-hash-table (:mode :replace)
+    (labels ((get-old ()
+               (if (old-page-available url)
+                   (grab-text url :update nil)
+                   "")))
+      (cond
+        ((is-fresh url)
+         (cl-hash-util:collect :text (grab-text url))
+         (cl-hash-util:collect :status "success")
+         (cl-hash-util:collect :message ""))
+        ((fresh-failure url)
+         (cl-hash-util:collect :text (get-old))
+         (cl-hash-util:collect :status "failure")
+         (cl-hash-util:collect :message "Failed to load URL"))
+        (t
+         (unless (is-pending url) (update-page url))
+         (cl-hash-util:collect :text (get-old))
+         (cl-hash-util:collect :status "wait")
+         (cl-hash-util:collect :message "Loading page text..."))))))
+

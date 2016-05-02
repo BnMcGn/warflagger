@@ -118,10 +118,8 @@
    :path "/static/"
    :root #p"~/quicklisp/local-projects/warflagger/src/static/")
   :session
-  (:mount
-   "/oid_connect"
-   (clack-openid-connect:app
-    "http://logintest.warflagger.com:5000/oid_connect/"))
+  (clack-openid-connect:component
+   "http://logintest.warflagger.com:5000/oid_connect/")
   (userfig:userfig-component *userfig-fieldspecs*)
   *app*)
  :port 5000)
