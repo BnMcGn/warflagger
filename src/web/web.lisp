@@ -52,18 +52,11 @@
 
 (defvar *app* (make-instance 'ningle:<app>))
 
-(setf (ningle:route *app* "/demo/")
-      (quick-page "test"))
-
-
-(setf (ningle:route *app* "/demo2/")
-      (quick-page #'webhax::react
-                  (with-output-to-string (*webhax-output*)
-                    (html-out
-                      (:div :id "things")
-                      (:script
-                       :type "text/javascript"
-                       (str (test-js)))))))
+(setf (ningle:route *app* "/text-server/")
+      (lambda (params)
+        (list 200 '(:content-type "application/json")
+              (wf/text-extract:text-server
+               (cdr (assoc "url" params :test #'string=))))))
 
 (setf (ningle:route *app* "/target/*")
       (quick-page #'webhax::react #'target-components #'mood-lib

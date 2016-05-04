@@ -6,6 +6,7 @@
         #:alexandria
         #:anaphora
 	      #:gadgets
+        #:cl-hash-util
         #:clack-pretend
         #:webhax
         #:warflagger
@@ -21,4 +22,5 @@
   (:shadowing-import-from #:ps-gadgets #:collecting-set #:strcat
                           #:collecting-string #:collecting #:do-window
                           #:collect)
-  (:shadowing-import-from #:parenscript #:switch #:call))
+  (:shadowing-import-from #:parenscript #:switch #:call)
+  (:shadowing-import-from #:anaphora #:it))
