@@ -32,5 +32,6 @@
                               (:file "web/mood")
                               (:file "web/components")
                               (:file "web/misc")
+                              (:file "web/opinion-form")
                               (:file "web/web")))))
 

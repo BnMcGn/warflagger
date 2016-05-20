@@ -25,5 +25,9 @@
    #:user-lister
    #:get-author-representation
    #:find-excerpt-position
-   #:create-textdata))
+   #:create-textdata
+   #:*flag-categories*
+   #:*flag-labels*
+   #:*vote-ranges*
+   #:*flag-types-source*))
 

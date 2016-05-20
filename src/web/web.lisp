@@ -55,8 +55,14 @@
 (setf (ningle:route *app* "/text-server/")
       (lambda (params)
         (list 200 '(:content-type "application/json")
-              (wf/text-extract:text-server
-               (cdr (assoc "url" params :test #'string=))))))
+              (list
+               (json:encode-json-to-string
+                (wf/text-extract:text-server
+                 (cdr (assoc "url" params :test #'string=))))))))
+
+(setf (ningle:route *app* "/opinion/")
+      (quick-page #'webhax::react #'webhax::redux #'opinion-components
+                  #'opinion-form-page))
 
 (setf (ningle:route *app* "/target/*")
       (quick-page #'webhax::react #'target-components #'mood-lib
