@@ -170,6 +170,10 @@
                    (grab-text url :update nil)
                    "")))
       (cond
+        ((or (null url) (eq 0 (length url)))
+         (cl-hash-util:collect :text "")
+         (cl-hash-util:collect :status "failure")
+         (cl-hash-util:collect :message "No URL provided"))
         ((is-fresh url)
          (cl-hash-util:collect :text (grab-text url))
          (cl-hash-util:collect :status "success")
