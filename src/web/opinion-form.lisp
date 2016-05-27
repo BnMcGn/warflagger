@@ -2,19 +2,19 @@
 
 (defun format-flags ()
   (gadgets:collecting
-      (gadgets:collect (cons nil "--Choose a Flag--"))
+      (gadgets:collect (list nil "--Choose a Flag--"))
     (loop for cat in *flag-categories*
        for flags in *flag-labels*
        do (dolist (flag flags)
             (let ((flagstring (format nil "~a: ~a" cat flag)))
-              (gadgets:collect (cons flagstring flagstring)))))))
+              (gadgets:collect (list flagstring flagstring)))))))
 
 (defun format-flag-descriptions ()
   (cl-hash-util:collecting-hash-table (:mode :replace)
     (loop for cat in *flag-categories*
        for descs in *flag-types-source*
        for flags in *flag-labels*
-       do (loop for desc in descs
+       do (loop for (k desc) on descs by #'cddr
              for flag in flags
              do (cl-hash-util:collect (format nil "~a: ~a" cat flag) desc)))))
 
@@ -28,7 +28,8 @@
      :excerpt-offset
      (:type :integer :description "Excerpt Offset")
      :flag
-     (:type (:pickone :options ,(format-flags) :notnull))
+     (:type (:pickone :options ,(format-flags) :notnull)
+            :widget pickone-long)
      :votevalue
      (:type (:pickone :options (("-1" "-1") ("0" "0") ("1" "1"))
                       :notnull)
@@ -85,7 +86,7 @@
                            :height "15em" :width "40em" :cursor "text")
             :on-mouse-up (@ this selection-change)
             :on-key-press (@ this selection-change)
-            (prop text)))
+            :value (prop text)))
         selection-change
         (lambda (ev)
           (say ev)))
@@ -100,6 +101,9 @@
         get-initial-state
         (lambda ()
           (create :text "" :url "" :timeout nil))
+        get-default-props
+        (lambda ()
+          (create :url ""))
         component-will-mount
         (lambda ()
           (chain this (start-load-from-server (prop url))))
@@ -140,7 +144,7 @@
 
       (def-component opform-item
           (psx
-           (:tr
+           (:tr :key (unique-id)
             (:td (or (prop description) (prop name)))
             (children-map (prop children)
                           (lambda (child)
@@ -170,7 +174,7 @@
                        ("flag"
                         (psx
                          (:flag-description :formdata (@ props formdata)))))))))
-                (:tr
+                (:tr :key "user1"
                  (:td
                   (:input :type "button" :value "Post"
                           :on-click (@ this post-form)))))))))
