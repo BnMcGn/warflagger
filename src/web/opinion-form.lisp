@@ -76,7 +76,7 @@
           (let ((descs (lisp-raw (json:encode-json-to-string
                                   (format-flag-descriptions)))))
             (psx (:div
-                  (:h5 "Flag Info:")
+                  (:h5 :key 1 "Flag Info:")
                   (getprop descs (prop formdata flag))))))
 
       (def-component text-sample-core
@@ -143,16 +143,19 @@
                                 (@ this load-from-server) 2000 url)))))))))
 
       (def-component opform-item
-          (psx
-           (:tr :key (unique-id)
-            (:td (or (prop description) (prop name)))
-            (children-map (prop children)
-                          (lambda (child)
-                            (psx (:td child)))))))
+          (let ((count 0)) 
+            (psx
+             (:tr :key (prop keydata)
+                  (:td :key "m1"
+                       (or (prop description) (prop name)))
+                  (children-map (prop children)
+                                (lambda (child)
+                                  (psx (:td :key (incf count) child))))))))
 
       (def-component custom-opform-layout
           (let ((state (@ this :state))
-                (props (@ this props)))
+                (props (@ this props))
+                (count 0))
             (psx
              (:form
               (:table
@@ -162,22 +165,25 @@
                  (lambda (child)
                    (psx
                     (:opform-item
+                     :keydata (incf count)
                      :description (@ child props description)
                      :name (@ child props name)
                      child
                      (case (@ child props name)
                        ("target"
-                        (psx (:message :message (@ state message))))
+                        (psx (:message :message (@ state message) :key 1)))
                        ("excerpt"
                         (psx (:text-sample
-                              :... props)))
+                              :... props :key 1)))
                        ("flag"
                         (psx
-                         (:flag-description :formdata (@ props formdata)))))))))
-                (:tr :key "user1"
+                         (:flag-description :formdata (@ props formdata)
+                                            :key 1))))))))
+                (:tr
+                 :key "user1"
                  (:td
                   (:input :type "button" :value "Post"
-                          :on-click (@ this post-form)))))))))
+                              :on-click (@ this post-form)))))))))
         get-initial-state
         (lambda ()
           (create :message "")))
