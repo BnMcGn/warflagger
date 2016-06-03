@@ -111,14 +111,20 @@
         (setf *byurl* (make-hash-table :test #'equal))
         (setf *bynum* (make-hash-table)))))
 
+;;;FIXME: More checking of urls required. No file/local urls.
+(defun valid-url-p (url)
+  (ratify:url-p url))
+
 (defun get-url-index (url)
   (aif2 (gethash url *byurl*)
         it
-        (let ((newkey (1+ (apply #'max -1 (hash-table-keys *bynum*)))))
-          (setf (gethash newkey *bynum*) (list url))
-          (setf (gethash url *byurl*) newkey)
-          (write-index-file (index-file-name) *bynum*)
-          newkey)))
+        (if (valid-url-p url)
+            (let ((newkey (1+ (apply #'max -1 (hash-table-keys *bynum*)))))
+              (setf (gethash newkey *bynum*) (list url))
+              (setf (gethash url *byurl*) newkey)
+              (write-index-file (index-file-name) *bynum*)
+              newkey)
+            (error "Not a url"))))
 
 (defun save-page-to-cache (url)
   (let ((index (get-url-index url)))
