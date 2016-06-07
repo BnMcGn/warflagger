@@ -118,13 +118,11 @@
 (defun get-url-index (url)
   (aif2 (gethash url *byurl*)
         it
-        (if (valid-url-p url)
-            (let ((newkey (1+ (apply #'max -1 (hash-table-keys *bynum*)))))
-              (setf (gethash newkey *bynum*) (list url))
-              (setf (gethash url *byurl*) newkey)
-              (write-index-file (index-file-name) *bynum*)
-              newkey)
-            (error "Not a url"))))
+        (let ((newkey (1+ (apply #'max -1 (hash-table-keys *bynum*)))))
+          (setf (gethash newkey *bynum*) (list url))
+          (setf (gethash url *byurl*) newkey)
+          (write-index-file (index-file-name) *bynum*)
+          newkey)))
 
 (defun save-page-to-cache (url)
   (let ((index (get-url-index url)))
@@ -169,7 +167,7 @@
   (and (is-cached url) (probe-file (page-loc url))))
 
 (defun text-server (url)
-  "The results of this function, served as JSON, are the text server. Url is the address of the desired text"
+  "This function, served as JSON, is the text server. Url is the address of the desired text"
   (cl-hash-util:collecting-hash-table (:mode :replace)
     (labels ((get-old ()
                (if (old-page-available url)
@@ -180,6 +178,10 @@
          (cl-hash-util:collect :text "")
          (cl-hash-util:collect :status "failure")
          (cl-hash-util:collect :message "No URL provided"))
+        ((not (valid-url-p url))
+         (cl-hash-util:collect :text "")
+         (cl-hash-util:collect :status "failure")
+         (cl-hash-util:collect :message "Not a valid URL"))
         ((is-fresh url)
          (cl-hash-util:collect :text (grab-text url))
          (cl-hash-util:collect :status "success")
