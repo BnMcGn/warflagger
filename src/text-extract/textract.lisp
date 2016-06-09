@@ -65,7 +65,8 @@
 (defun grab-text (url &key (update t))
   (when update (update-page url))
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
-    (open (make-pathname :directory (cache-loc url) :name "text"))))
+    (read-file-into-string
+     (make-pathname :directory (cache-loc url) :name "text"))))
 
 (defun grab-title (url &key (alternate "[No Title]") (update t))
   (when update (update-page url))
