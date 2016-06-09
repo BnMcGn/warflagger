@@ -91,6 +91,7 @@
         (lambda (ev)
           (say ev)))
 
+      ;;FIXME: Find a way to make this not pound the server per keystroke.
       (def-component text-sample
           (psx
            (:text-sample-core
@@ -124,11 +125,14 @@
             (set-state url url)
             (set-state text "")
             (chain this (reset-timeout))
-            (chain this (load-from-server url))))
+            (set-state timeout
+                       (set-timeout
+                        (@ this load-from-server)
+                        1000 url))))
         load-from-server
         (lambda (url)
           (let ((msgfunc (@ this set-message)))
-            (json-bind (results "/text-server/" :url (prop url))
+            (json-bind (results "/text-server/" :url url)
                (case (@ results status)
                  ("success"
                   (set-state text (@ results text))
@@ -140,7 +144,8 @@
                   (when (equal url (state url))
                     (set-state timeout
                                (set-timeout
-                                (@ this load-from-server) 2000 url)))))))))
+                                (@ component-this-ref load-from-server)
+                                2000 url)))))))))
 
       (def-component opform-item
           (let ((count 0)) 
@@ -155,7 +160,8 @@
       (def-component custom-opform-layout
           (let ((state (@ this :state))
                 (props (@ this props))
-                (count 0))
+                (count 0)
+                (cdispatch (@ this custom-dispatch)))
             (psx
              (:form
               (:table
@@ -174,7 +180,12 @@
                         (psx (:message :message (@ state message) :key 1)))
                        ("excerpt"
                         (psx (:text-sample
-                              :... props :key 1)))
+                              :key 1
+                              :url (@ props formdata target)
+                              :excerpt (@ props formdata excerpt)
+                              :excerpt-offset
+                              (@ props formdata excerpt-offset)
+                              :dispatch cdispatch)))
                        ("flag"
                         (psx
                          (:flag-description :formdata (@ props formdata)
@@ -186,7 +197,12 @@
                               :on-click (@ this post-form)))))))))
         get-initial-state
         (lambda ()
-          (create :message "")))
+          (create :message ""))
+        custom-dispatch
+        (lambda (data)
+          (if (eql :message (@ data :type))
+              (set-state :message (@ data :message))
+              (funcal (prop dispatch) data))))
 
       ))))
 
