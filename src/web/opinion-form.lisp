@@ -68,7 +68,54 @@
   (add-part
    :@javascript
    (lambda ()
-    (ps
+     (ps
+
+       ;;FIXME: Duplicate of lisp functions in excerpt.lisp
+       ;;Would be nice to only implement once.
+       (defun create-textdata (text)
+         (let ((res (create :text text :whitespace (create)))
+               (found nil))
+           (dotimes (i (length text))
+             (if (member (elt text i) *whitespace-characters*)
+                 (progn
+                   (unless found (setf found i))
+                   (dolist (j (range found (1+ i)))
+                     (incf (getprop res 'whitespace j)))
+                   (setf found nil))))
+           res))
+
+       (defun contiguous-whitespace? (tdat index)
+         (or (getprop tdat 'whitespace index) 0))
+
+       (defun excerpt-here? (tdat excerpt index)
+         (let ((exdat (create-textdata excerpt))
+               (text (@ tdat text)))
+           (loop with tind = index
+              with eind = 0
+              with tlen = (length text)
+              with elen = (length excerpt)
+              do (progn
+                   (when (eq elen eind) (return tind))
+                   (when (eq tlen tind) (return nil))
+                   (let ((ewhite (contiguous-whitespace? exdat eind))
+                         (twhite (contiguous-whitespace? tdat tind)))
+                     (if (and (eq 0 ewhite) (eq 0 twhite)
+                              (eq (elt excerpt eind) (elt text tind)))
+                         (progn (incf tind) (incf eind))
+                         (if (or (eq 0 ewhite) (eq 0 twhite))
+                             (return nil)
+                             (progn (incf tind twhite) (incf eind ewhite)))))))))
+
+       (defun find-excerpt-position (tdat excerpt &optional (offset 0))
+         (dotimes (i (length (@ tdat text)))
+           (let ((loc (excerpt-here? tdat excerpt i)))
+             (when loc
+               (if (< 0 offset)
+                   (decf offset)
+                   (return (list i (- loc i))))))))
+
+       ;;End of duplicate functions
+
       (def-component message
           (psx (:span (prop message))))
 
