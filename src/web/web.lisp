@@ -52,50 +52,51 @@
 
 (defvar *app* (make-instance 'ningle:<app>))
 
-(setf (ningle:route *app* "/text-server/")
-      (lambda (params)
-        (list 200 '(:content-type "application/json")
-              (list
-               (json:encode-json-to-string
-                (wf/text-extract:text-server
-                 (cdr (assoc "url" params :test #'string=))))))))
+(dependency-auto-watcher routes
+  (setf (ningle:route *app* "/text-server/")
+        (lambda (params)
+          (list 200 '(:content-type "application/json")
+                (list
+                 (json:encode-json-to-string
+                  (wf/text-extract:text-server
+                   (cdr (assoc "url" params :test #'string=))))))))
 
-(setf (ningle:route *app* "/opinion/")
-      (quick-page #'webhax::react #'webhax::redux #'opinion-components
-                  #'opinion-form-page))
+  (setf (ningle:route *app* "/opinion/")
+        (quick-page #'webhax::react #'webhax::redux #'opinion-components
+                    #'opinion-form-page))
 
-(setf (ningle:route *app* "/target/*")
-      (quick-page #'webhax::react #'target-components #'mood-lib
-                  (lambda ()
-                    (bind-validated-input
-                        ((id (webhax-validate:ratify-wrapper :integer)))
-                      (let ((url (get-rooturl-by-id id)))
-                        (html-out
-                          (:div :id "test")
-                          (:script
-                           :type "text/javascript"
-                           (str
-                            (ps
-                              (var data
-                                   (lisp-raw
-                                    (target-data id)))
-                              (var target-url (lisp url))
-                              (var target-title (lisp (grab-title url)))
-                              (render
-                               (create-element target-root
-                                            (create :text (@ data text)
-                                                    :opinions
-                                                    (@ data opinions)
-                                                    :focus '(20)
-                                                    :url target-url
-                                                    :title target-title))
-                            (chain document
-                                   (get-element-by-id "test"))))))))))))
+  (setf (ningle:route *app* "/target/*")
+        (quick-page #'webhax::react #'target-components #'mood-lib
+                    (lambda ()
+                      (bind-validated-input
+                          ((id (webhax-validate:ratify-wrapper :integer)))
+                        (let ((url (get-rooturl-by-id id)))
+                          (html-out
+                            (:div :id "test")
+                            (:script
+                             :type "text/javascript"
+                             (str
+                              (ps
+                                (var data
+                                     (lisp-raw
+                                      (target-data id)))
+                                (var target-url (lisp url))
+                                (var target-title (lisp (grab-title url)))
+                                (render
+                                 (create-element target-root
+                                                 (create :text (@ data text)
+                                                         :opinions
+                                                         (@ data opinions)
+                                                         :focus '(20)
+                                                         :url target-url
+                                                         :title target-title))
+                                 (chain document
+                                        (get-element-by-id "test"))))))))))))
 
-(setf (ningle:route *app* "/")
-      (lambda (params)
-        (declare (ignore params))
-        (clack-openid-connect::logged-in-page)))
+  (setf (ningle:route *app* "/")
+        (lambda (params)
+          (declare (ignore params))
+          (clack-openid-connect::logged-in-page))))
 
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)
