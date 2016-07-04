@@ -76,12 +76,11 @@
          (let ((res (create :text text :whitespace (create)))
                (found nil))
            (dotimes (i (length text))
-             (if (member (elt text i) *whitespace-characters*)
-                 (progn
-                   (unless found (setf found i))
-                   (dolist (j (range found (1+ i)))
-                     (incf (getprop res 'whitespace j)))
-                   (setf found nil))))
+             (when (member (elt text i) *whitespace-characters*)
+               (unless found (setf found i))
+               (dolist (j (range found (1+ i)))
+                 (incf (getprop res 'whitespace j)))
+               (setf found nil)))
            res))
 
        (defun contiguous-whitespace? (tdat index)
@@ -104,7 +103,8 @@
                          (progn (incf tind) (incf eind))
                          (if (or (eq 0 ewhite) (eq 0 twhite))
                              (return nil)
-                             (progn (incf tind twhite) (incf eind ewhite)))))))))
+                             (progn (incf tind twhite)
+                                    (incf eind ewhite)))))))))
 
        (defun find-excerpt-position (tdat excerpt &optional (offset 0))
          (dotimes (i (length (@ tdat text)))
@@ -115,6 +115,40 @@
                    (return (list i (- loc i))))))))
 
        ;;End of duplicate functions
+
+       (defun clean-string-for-excerpt (the-string)
+         (collecting-string
+           (let ((last-was-white nil))
+             (dotimes (i (length the-string))
+               (if (member (elt the-string i) *whitespace-character*)
+                   (unless last-was-white
+                     (setf last-was-white t)
+                     (collect #\ ))
+                   (progn
+                     (setf last-was-white nil)
+                     (collect (elt the-string i))))))))
+
+       (defun calculate-offset (tdat excerpt startloc)
+         ((let ((res 0))
+            (dotimes (i startloc)
+              (when (excerpt-here? tdat excerpt i)
+                (incf res)))
+            res)))
+
+       (defun get-location-excerpt (tdat start end)
+         (let* ((excerpt (chain tdat text (slice start end)))
+                (excerpt (clean-string-for-excerpt excerpt))
+                (offset (calculate-offset tdat excerpt start)))
+           (values excerpt offset)))
+
+       (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
+         (let ((start (find-excerpt-position tdat excerpt offset))
+               (elength 0))
+           (dotimes (i (length excerpt))
+             (if (eq (elt excerpt i) #\ )
+                 (incf elength (chain tdat whitespace (+ start elength)))
+                 (incf elength)))
+           (values start (+ start elength))))
 
       (def-component message
           (psx (:span (prop message))))
@@ -136,6 +170,8 @@
             :value (prop text)))
         selection-change
         (lambda (ev)
+          (let ((target (@ ev target)))
+            )
           (say ev)))
 
       ;;FIXME: Find a way to make this not pound the server per keystroke.
@@ -144,11 +180,12 @@
            (:text-sample-core
             :dispatch (prop dispatch)
             :text (state text)
+            :textdata (state textdata)
             :excerpt (prop excerpt)
             :excerpt-offset (prop excerpt-offset)))
         get-initial-state
         (lambda ()
-          (create :text "" :url "" :timeout nil))
+          (create :text "" :url "" :timeout nil :textdata []))
         get-default-props
         (lambda ()
           (create :url ""))
@@ -183,6 +220,7 @@
                (case (@ results status)
                  ("success"
                   (set-state text (@ results text))
+                  (set-state textdata (create-textdata (@ results text)))
                   (msgfunc (@ results message)))
                  ("failure"
                   (msgfunc (@ results message)))
@@ -241,7 +279,7 @@
                  :key "user1"
                  (:td
                   (:input :type "button" :value "Post"
-                              :on-click (@ this post-form)))))))))
+                          :on-click (@ this post-form)))))))))
         get-initial-state
         (lambda ()
           (create :message ""))
