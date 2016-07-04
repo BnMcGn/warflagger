@@ -94,15 +94,15 @@
               with tlen = (length text)
               with elen = (length excerpt)
               do (progn
-                   (when (eq elen eind) (return tind))
-                   (when (eq tlen tind) (return nil))
+                   (when (eq elen eind) (return-from excerpt-here? tind))
+                   (when (eq tlen tind) (return-from excerpt-here? nil))
                    (let ((ewhite (contiguous-whitespace? exdat eind))
                          (twhite (contiguous-whitespace? tdat tind)))
                      (if (and (eq 0 ewhite) (eq 0 twhite)
                               (eq (elt excerpt eind) (elt text tind)))
                          (progn (incf tind) (incf eind))
                          (if (or (eq 0 ewhite) (eq 0 twhite))
-                             (return nil)
+                             (return-from excerpt-here? nil)
                              (progn (incf tind twhite)
                                     (incf eind ewhite)))))))))
 
@@ -120,7 +120,7 @@
          (collecting-string
            (let ((last-was-white nil))
              (dotimes (i (length the-string))
-               (if (member (elt the-string i) *whitespace-character*)
+               (if (member (elt the-string i) *whitespace-characters*)
                    (unless last-was-white
                      (setf last-was-white t)
                      (collect #\ ))
@@ -129,26 +129,22 @@
                      (collect (elt the-string i))))))))
 
        (defun calculate-offset (tdat excerpt startloc)
-         ((let ((res 0))
-            (dotimes (i startloc)
-              (when (excerpt-here? tdat excerpt i)
-                (incf res)))
-            res)))
+         (let ((res 0))
+           (dotimes (i startloc)
+             (when (excerpt-here? tdat excerpt i)
+               (incf res)))
+           res))
 
        (defun get-location-excerpt (tdat start end)
          (let* ((excerpt (chain tdat text (slice start end)))
                 (excerpt (clean-string-for-excerpt excerpt))
                 (offset (calculate-offset tdat excerpt start)))
-           (values excerpt offset)))
+           (list excerpt offset)))
 
        (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
-         (let ((start (find-excerpt-position tdat excerpt offset))
-               (elength 0))
-           (dotimes (i (length excerpt))
-             (if (eq (elt excerpt i) #\ )
-                 (incf elength (chain tdat whitespace (+ start elength)))
-                 (incf elength)))
-           (values start (+ start elength))))
+         (let ((pos (find-excerpt-position tdat excerpt offset)))
+           (when pos
+             (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
 
       (def-component message
           (psx (:span (prop message))))
