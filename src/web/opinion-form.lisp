@@ -177,23 +177,28 @@
                              (create))))
                      (create))))
             (psx
-            (:textarea
-             :style (create :overflow "auto" :background "lightgrey" :border "1px"
+             (:pre
+              :style (create :overflow "auto" :background "lightgrey"
+                             'white-space "pre-wrap":border "1px"
                             :height "15em" :width "40em" :cursor "text")
-             :on-mouse-up (@ this selection-change)
-             :on-key-press (@ this selection-change)
-             :value (prop text)
-             :... seldat)))
+              :on-mouse-up (@ this selection-change)
+              :on-key-press (@ this selection-change)
+              :... seldat
+              (prop text))))
         selection-change
         (lambda (ev)
-          (destructuring-bind (excerpt offset)
-              (get-location-excerpt (prop textdata)
-                                    (@ ev target selection-start)
-                                    (@ ev target selection-end))
-            (funcall (prop dispatch)
-                     (create :type :edit
-                             :data (create :excerpt excerpt
-                                           'excerpt-offset offset))))
+          (let ((targ (@ ev target))
+                (range (when (< 0 (chain window (get-selection) range-count))
+                         (chain window (get-selection) (get-range-at 0)))))
+            (when range
+              (destructuring-bind (excerpt offset)
+                  (get-location-excerpt (prop textdata)
+                                        (@ range start-offset)
+                                        (@ range end-offset))
+                (funcall (prop dispatch)
+                         (create :type :edit
+                                 :data (create :excerpt excerpt
+                                               'excerpt-offset offset))))))
           (say ev)))
 
       ;;FIXME: Find a way to make this not pound the server per keystroke.
