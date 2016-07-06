@@ -129,11 +129,13 @@
                      (collect (elt the-string i))))))))
 
        (defun calculate-offset (tdat excerpt startloc)
-         (let ((res 0))
-           (dotimes (i startloc)
-             (when (excerpt-here? tdat excerpt i)
-               (incf res)))
-           res))
+         (if (not-empty excerpt)
+             (let ((res 0))
+               (dotimes (i startloc)
+                 (when (excerpt-here? tdat excerpt i)
+                   (incf res)))
+               res)
+             nil))
 
        (defun get-location-excerpt (tdat start end)
          (let* ((excerpt (chain tdat text (slice start end)))
@@ -157,17 +159,41 @@
                   (getprop descs (prop formdata flag))))))
 
       (def-component text-sample-core
-          (psx
-           (:textarea
-            :style (create :overflow "auto" :background "lightgrey" :border "1px"
-                           :height "15em" :width "40em" :cursor "text")
-            :on-mouse-up (@ this selection-change)
-            :on-key-press (@ this selection-change)
-            :value (prop text)))
+          (let ((seldat
+                 (if (not-empty (prop excerpt))
+                     (let ((bounds
+                            (find-excerpt-start/end
+                             (prop textdata) (prop excerpt)
+                             (or (prop excerpt-offset) 0))))
+                       (if bounds
+                           (create 'selection-start (elt bounds 0)
+                                   'selection-end (elt bounds 1))
+                           (progn
+                             (say "Excerpt not found")
+                             ;;FIXME: Display warning for user
+                             ;(funcall (prop dispatch)
+                             ;         (create :type "message"
+                             ;                 :message "Excerpt not found"))
+                             (create))))
+                     (create))))
+            (psx
+            (:textarea
+             :style (create :overflow "auto" :background "lightgrey" :border "1px"
+                            :height "15em" :width "40em" :cursor "text")
+             :on-mouse-up (@ this selection-change)
+             :on-key-press (@ this selection-change)
+             :value (prop text)
+             :... seldat)))
         selection-change
         (lambda (ev)
-          (let ((target (@ ev target)))
-            )
+          (destructuring-bind (excerpt offset)
+              (get-location-excerpt (prop textdata)
+                                    (@ ev target selection-start)
+                                    (@ ev target selection-end))
+            (funcall (prop dispatch)
+                     (create :type :edit
+                             :data (create :excerpt excerpt
+                                           'excerpt-offset offset))))
           (say ev)))
 
       ;;FIXME: Find a way to make this not pound the server per keystroke.
@@ -283,42 +309,7 @@
         (lambda (data)
           (if (eql :message (@ data :type))
               (set-state :message (@ data :message))
-              (funcal (prop dispatch) data))))
+              (funcall (prop dispatch) data))))
 
       ))))
 
-#|
-function set_target_text(url) {
-	if ($("#target").val().length > 0) {
-  $.getJSON("/opinion/get_text.json", {url: url},
-		function(data) {
-			if (data['status']=='success') {
-				$('#textsample').val(data['text']);
-				$('#message').html(data['message']);
-				window.whiteless = $.grep(data['text'], complement(is_white_char));
-				window.whiteless = window.whiteless.join("");
-				window.white_indices = indexes(data['text'], is_white_char);
-			}
-			else if (data['status']=='failure') {
-				$('#message').html(data['message']);
-			} else if (data['status']=='wait') {
-			  $('#message').html(data['message']);
-				window.textTimeout = 
-				  window.setTimeout(set_target_text, 2000, url);
-		}})}
-}
-
-function string_locs_in_text(st) {
-	wst = $.grep(st, complement(is_white_char)).join("");
-	var locs = locations(window.whiteless, wst);
-	return _.map(locs,
-		function(itm) {
-			return [itm, itm+wst.length];
-		});
-}
-
-//ts.val().substring(ts[0].selectionStart, ts[0].selectionEnd)
-//.replace(/\s+/g, ' ');
-	
-//-->
-  |#
