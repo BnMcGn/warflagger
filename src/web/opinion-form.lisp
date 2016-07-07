@@ -148,6 +148,26 @@
            (when pos
              (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
 
+       (defun hilite-a-slice (text start end)
+         (list
+          (chain text (slice 0 start))
+          (psx (:span :class "hilited"
+                      :style (create 'background-color "orange")
+                      (chain text (slice start end))))
+          (chain text (slice end))))
+
+       (defun hilite-excerpt (textdata excerpt offset)
+         (if (not-empty excerpt)
+             (let ((bounds
+                    (find-excerpt-start/end textdata excerpt (or offset 0))))
+               (if bounds
+                   (hilite-a-slice (@ textdata text)
+                                   (elt bounds 0) (elt bounds 1))
+                   (progn
+                     (say "Excerpt not found")
+                     (@ textdata text)))
+               (@ textdata text))))
+
       (def-component message
           (psx (:span (prop message))))
 
@@ -159,32 +179,16 @@
                   (getprop descs (prop formdata flag))))))
 
       (def-component text-sample-core
-          (let ((seldat
-                 (if (not-empty (prop excerpt))
-                     (let ((bounds
-                            (find-excerpt-start/end
-                             (prop textdata) (prop excerpt)
-                             (or (prop excerpt-offset) 0))))
-                       (if bounds
-                           (create 'selection-start (elt bounds 0)
-                                   'selection-end (elt bounds 1))
-                           (progn
-                             (say "Excerpt not found")
-                             ;;FIXME: Display warning for user
-                             ;(funcall (prop dispatch)
-                             ;         (create :type "message"
-                             ;                 :message "Excerpt not found"))
-                             (create))))
-                     (create))))
-            (psx
-             (:pre
-              :style (create :overflow "auto" :background "lightgrey"
-                             'white-space "pre-wrap":border "1px"
-                            :height "15em" :width "40em" :cursor "text")
-              :on-mouse-up (@ this selection-change)
-              :on-key-press (@ this selection-change)
-              :... seldat
-              (prop text))))
+          (psx
+           (:pre
+            :style (create :overflow "auto" :background "lightgrey"
+                           'white-space "pre-wrap":border "1px"
+                           :height "15em" :width "40em" :cursor "text")
+            :on-mouse-up (@ this selection-change)
+            :on-key-press (@ this selection-change)
+            :ref (lambda (ref)
+                   (setf (@ component-this-ref sample-element) ref))
+            (prop text)))
         selection-change
         (lambda (ev)
           (let ((targ (@ ev target))
@@ -199,7 +203,32 @@
                          (create :type :edit
                                  :data (create :excerpt excerpt
                                                'excerpt-offset offset))))))
-          (say ev)))
+          (say ev))
+        component-did-mount
+        (lambda ()
+          (chain this (set-selection-from-prop)))
+        component-did-update
+        (lambda ()
+          (chain this (set-selection-from-prop)))
+        set-selection-from-prop
+        (lambda ()
+          (say "in set-sel...")
+          (say component-this-ref)
+          (chain window (get-selection) (remove-all-ranges))
+          (when (not-empty (prop excerpt))
+            (say "hear")
+            (let ((elem (@ component-this-ref sample-element))
+                  (bounds
+                     (find-excerpt-start/end
+                      (prop textdata) (prop excerpt)
+                      (or (prop excerpt-offset) 0)))
+                  (range (new -range)))
+                (if bounds
+                    (progn
+                      (chain range (set-start elem (elt bounds 0)))
+                      (chain range (set-end elem (elt bounds 1)))
+                      (chain window (get-selection) (add-range range)))
+                    (say "Excerpt not found"))))))
 
       ;;FIXME: Find a way to make this not pound the server per keystroke.
       (def-component text-sample
