@@ -37,31 +37,39 @@
      :reference (:type :url :description "Reference URL")
      :comment (:type :string))))
 
-(defun opinion-form-page ()
-  (html-out
-    (:h2 "Enter an opinion")
-    (:div :id "opform")
-    (:script
-     :type "text/javascript"
-     (str
-      (ps
-        (render
-         (create-element
-          webhax-form
-          (create :fieldspecs
-                  (lisp-raw
-                   (json:encode-json-to-string
-                    (cl-hash-util:collecting-hash-table (:mode :replace)
-                      (gadgets:map-by-2
-                      (lambda (k v)
-                        (cl-hash-util:collect k
-                          (webhax-validate:prep-fieldspec-body-for-json v)))
-                      *opinion-form-specs*))))
-                  :data (create) ;FIXME: add prefills here
-                  :layout custom-opform-layout
-                  :wrapwidget false))
-         (chain document
-                (get-element-by-id "opform"))))))))
+(watch-for-recompile
+  (defun opinion-form-page ()
+    (bind-validated-input
+        ((target :url :key t)
+         (excerpt :string :key t)
+         (offset :unsigned-integer :key t))
+      (html-out
+        (:h2 "Enter an opinion")
+        (:div :id "opform")
+        (:script
+         :type "text/javascript"
+         (str
+          (ps
+            (render
+             (create-element
+              webhax-form
+              (create :fieldspecs
+                      (lisp-raw
+                       (json:encode-json-to-string
+                        (cl-hash-util:collecting-hash-table (:mode :replace)
+                          (gadgets:map-by-2
+                           (lambda (k v)
+                             (cl-hash-util:collect k
+                               (webhax-validate:prep-fieldspec-body-for-json
+                                v)))
+                           *opinion-form-specs*))))
+                      :data (create :target (lisp target)
+                                    :excerpt (lisp excerpt)
+                                    :excerpt-offset (lisp offset))
+                      :layout custom-opform-layout
+                      :wrapwidget false))
+             (chain document
+                    (get-element-by-id "opform"))))))))))
 
 (define-parts opinion-components
   (add-part :@javascript #'webhax-widgets:ps-widgets)
@@ -159,8 +167,7 @@
           (chain text (slice end))))
 
        (defun hilite-excerpt (textdata excerpt offset)
-         (say "here")
-         (if (not-empty excerpt)
+         (if (and (not-empty excerpt) (not-empty (@ textdata text)))
              (let ((bounds
                     (find-excerpt-start/end textdata excerpt (or offset 0))))
                (if bounds
@@ -189,22 +196,23 @@
                            :height "15em" :width "40em" :cursor "text")
             :on-mouse-up (@ this selection-change)
             :on-key-press (@ this selection-change)
-            (hilite-excerpt (prop textdata) (prop excerpt) (prop offset))))
+            (hilite-excerpt (prop textdata) (prop excerpt)
+                            (prop excerpt-offset))))
         selection-change
         (lambda (ev)
-          (let ((targ (@ ev target))
-                (range (when (< 0 (chain window (get-selection) range-count))
-                         (chain window (get-selection) (get-range-at 0)))))
+          (let* ((tsample (chain document (get-element-by-id "textsample")))
+                 (range (when (< 0 (chain rangy (get-selection) range-count))
+                          (chain rangy (get-selection) (get-range-at 0)
+                                 (to-character-range tsample)))))
             (when range
               (destructuring-bind (excerpt offset)
                   (get-location-excerpt (prop textdata)
-                                        (@ range start-offset)
-                                        (@ range end-offset))
+                                        (@ range start)
+                                        (@ range end))
                 (funcall (prop dispatch)
                          (create :type :edit
                                  :data (create :excerpt excerpt
-                                               'excerpt-offset offset))))))
-          (say ev)))
+                                               'excerpt-offset offset))))))))
 
       ;;FIXME: Find a way to make this not pound the server per keystroke.
       (def-component text-sample
@@ -272,7 +280,9 @@
                        (or (prop description) (prop name)))
                   (children-map (prop children)
                                 (lambda (child)
-                                  (psx (:td :key (incf count) child))))))))
+                                  (psx (:td :key (incf count)
+                                            :style (create padding-left "1em")
+                                            child))))))))
 
       (def-component custom-opform-layout
           (let ((state (@ this :state))
