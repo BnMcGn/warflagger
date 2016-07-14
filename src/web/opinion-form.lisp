@@ -40,9 +40,10 @@
 (watch-for-recompile
   (defun opinion-form-page ()
     (bind-validated-input
-        ((target :url :key t)
-         (excerpt :string :key t)
-         (offset :unsigned-integer :key t))
+        (&key
+         (target :url)
+         (excerpt :string)
+         (offset :unsigned-integer))
       (html-out
         (:h2 "Enter an opinion")
         (:div :id "opform")
