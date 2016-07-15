@@ -46,31 +46,15 @@
          (offset :unsigned-integer))
       (html-out
         (:h2 "Enter an opinion")
-        (:div :id "opform")
-        (:script
-         :type "text/javascript"
-         (str
-          (ps
-            (render
-             (create-element
-              webhax-form
-              (create :fieldspecs
-                      (lisp-raw
-                       (json:encode-json-to-string
-                        (cl-hash-util:collecting-hash-table (:mode :replace)
-                          (gadgets:map-by-2
-                           (lambda (k v)
-                             (cl-hash-util:collect k
-                               (webhax-validate:prep-fieldspec-body-for-json
-                                v)))
-                           *opinion-form-specs*))))
-                      :data (create :target (lisp target)
-                                    :excerpt (lisp excerpt)
-                                    :excerpt-offset (lisp offset))
-                      :layout custom-opform-layout
-                      :wrapwidget false))
-             (chain document
-                    (get-element-by-id "opform"))))))))))
+        (mount-component (webhax-form)
+          :fieldspecs
+          (lisp-raw
+           (webhax-validate:convert-fieldspecs-to-json *opinion-form-specs*))
+          :data (create :target (lisp target)
+                        :excerpt (lisp excerpt)
+                        :excerpt-offset (lisp offset))
+          :layout custom-opform-layout
+          :wrapwidget false)))))
 
 (define-parts opinion-components
   (add-part :@javascript #'webhax-widgets:ps-widgets)

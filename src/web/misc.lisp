@@ -47,10 +47,11 @@
            (progn
              (unless (is-cached url)
                (error "Don't have that page!"))
-             (gadgets:collecting-string
-               (do-file-by-line (ln (grab-text url))
-                 (gadgets:collect (gadgets:strcat ln #\Newline))))))
+             (grab-text url)))
          (opins
            (%fill-out-opinion-tree
             (opinion-tree-for-rooturl url) (create-textdata text))))
-    (json:encode-json-to-string `((:text . ,text) (:opinions . ,opins)))))
+    (values
+     (json:encode-json-to-string text)
+     (json:encode-json-to-string opins))))
+
