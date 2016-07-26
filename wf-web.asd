@@ -33,5 +33,6 @@
                               (:file "web/components")
                               (:file "web/misc")
                               (:file "web/opinion-form")
+                              (:file "web/account")
                               (:file "web/web")))))
 

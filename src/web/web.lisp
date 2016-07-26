@@ -79,7 +79,9 @@
                               :url (lisp url)
                               :title (lisp (grab-title url))
                               :focus '(20))))))))
-  
+
+  (setf (ningle:route *app* "/signup/") #'signup-page)
+
   (setf (ningle:route *app* "/")
         (lambda (params)
           (declare (ignore params))

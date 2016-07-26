@@ -143,6 +143,10 @@
         ((assoc :homepage data) (values (cdr it) (car it)))
         ((assoc :email data) (values (cdr it) (car it)))))))
 
+(defun get-users ()
+  (mapcar #'car (select (colm 'value) :from (tabl 'author)
+           :where (sql-= (colm 'type) "wf_user"))))
+
 (defun get-excerpt-data (eid)
   (map-tuples
    (compose #'keywordize-foreign (curry #'assoc-cdr :type))

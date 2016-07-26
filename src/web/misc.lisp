@@ -55,3 +55,13 @@
      (json:encode-json-to-string text)
      (json:encode-json-to-string opins))))
 
+(defun signup-page ()
+  (let ((username (get-user-name)))
+    (unless username
+      (error "User is not signed in at signup-page"))
+    (if (new-user-p username)
+        ))
+  (unless
+      (get-user-name)
+    (error "User is not signed in at signup-page"))
+  (if ))
