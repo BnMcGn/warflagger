@@ -82,6 +82,22 @@
 
   (setf (ningle:route *app* "/signup/") #'signup-page)
 
+  (setf (ningle:route *app* "/demo/")
+        (quick-page #'webhax::react #'webhax::webhax-ask
+                    (add-part :@javascript #'webhax-widgets:ps-widgets)
+                    #'demo-pages))
+
+  ;;FIXME: Should be handled internally by webhax service middleware
+  (setf (ningle:route *app* "/ask-data/*" :method :POST)
+        (quick-page
+         (lambda ()
+           (list 200 '(:content-type "application/json")
+                 (bind-validated-input
+                     ((askid :overlength))
+                   (json:encode-json-alist-to-string
+                    (webhax:call-ask-manager
+                     askid :update webhax:*key-web-input*)))))))
+
   (setf (ningle:route *app* "/")
         (lambda (params)
           (declare (ignore params))
@@ -93,7 +109,7 @@
 
 (defparameter *userfig-fieldspecs*
   '(:test-value
-    (:type :string
+    (:string
      :initial "a value")))
 
 (clack-server-manager

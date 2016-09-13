@@ -29,5 +29,6 @@
    #:*flag-categories*
    #:*flag-labels*
    #:*vote-ranges*
-   #:*flag-types-source*))
+   #:*flag-types-source*
+   #:get-users))
 

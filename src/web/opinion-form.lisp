@@ -21,21 +21,21 @@
 (defparameter *opinion-form-specs*
   (gadgets:mapcan-by-2
    (lambda (k v) (list k (webhax-validate:normalize-fieldspec-body v)))
-   `(:target 
-     (:type (:url :notnull) :description "Target URL")
+   `(:target
+     ((:url :notnull) :description "Target URL")
      :excerpt
-     (:type :string)
+     (:string)
      :excerpt-offset
-     (:type :integer :description "Excerpt Offset")
+     (:integer :description "Excerpt Offset")
      :flag
-     (:type (:pickone :options ,(format-flags) :notnull)
+     ((:pickone :options ,(format-flags) :notnull)
             :widget pickone-long)
      :votevalue
-     (:type (:pickone :options (("-1" "-1") ("0" "0") ("1" "1"))
+     ((:pickone :options (("-1" "-1") ("0" "0") ("1" "1"))
                       :notnull)
             :description "Vote Value")
-     :reference (:type :url :description "Reference URL")
-     :comment (:type :string))))
+     :reference (:url :description "Reference URL")
+     :comment (:string))))
 
 (watch-for-recompile
   (defun opinion-form-page ()
@@ -50,9 +50,9 @@
           :fieldspecs
           (lisp-raw
            (webhax-validate:convert-fieldspecs-to-json *opinion-form-specs*))
-          :data (create :target (lisp target)
-                        :excerpt (lisp excerpt)
-                        :excerpt-offset (lisp offset))
+          :prefill (create :target (lisp target)
+                           :excerpt (lisp excerpt)
+                           :excerpt-offset (lisp offset))
           :layout custom-opform-layout
           :wrapwidget false)))))
 
