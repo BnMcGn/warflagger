@@ -89,14 +89,15 @@
 
   ;;FIXME: Should be handled internally by webhax service middleware
   (setf (ningle:route *app* "/ask-data/*" :method :POST)
-        (quick-page
+        (input-function-wrapper
          (lambda ()
-           (list 200 '(:content-type "application/json")
-                 (bind-validated-input
-                     ((askid :overlength))
-                   (json:encode-json-alist-to-string
-                    (webhax:call-ask-manager
-                     askid :update webhax:*key-web-input*)))))))
+           (bind-validated-input
+               ((askid :overlength))
+             (print (json:encode-json-alist-to-string
+                     (webhax:call-ask-manager
+                      askid :update webhax:*key-web-input*))
+                    *webhax-output*)))
+         :content-type "application/json"))
 
   (setf (ningle:route *app* "/")
         (lambda (params)
