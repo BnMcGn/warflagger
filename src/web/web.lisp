@@ -126,6 +126,6 @@
   :session
   (clack-openid-connect:component
    "http://logintest.warflagger.com:5000/oid_connect/")
-  (userfig:userfig-component *userfig-fieldspecs*)
+  (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
   *app*)
  :port 5000)
