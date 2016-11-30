@@ -5,6 +5,7 @@
   :author "Your Name <your.name@example.com>"
   :license "Specify license here"
   :depends-on (#:webhax
+               #:webhax-user
                #:gadgets
                #:sql-stuff
                #:alexandria

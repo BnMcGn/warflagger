@@ -48,6 +48,11 @@
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)
 
+(defun warflagger-user-info-bundle ()
+  (cons
+   (cons :user-url "")
+   (webhax-user:user-info-bundle)))
+
 (wf/text-extract:initialize-indices)
 
 (defvar *app* (make-instance 'ningle:<app>))
@@ -80,7 +85,7 @@
                               :title (lisp (grab-title url))
                               :focus '(20))))))))
 
-  (setf (ningle:route *app* "/signup/") #'signup-page)
+  ;;(setf (ningle:route *app* "/signup/") #'signup-page)
 
   (setf (ningle:route *app* "/demo/")
         (quick-page #'webhax::react #'webhax::webhax-ask
@@ -116,7 +121,7 @@
 (clack-server-manager
  *handler*
  (clack-pretend:pretend-builder
-  (:insert 2) ;clack.builder:builder
+  (:insert 3) ;clack.builder:builder
   (clack.middleware.clsql:<clack-middleware-clsql>
    :database-type :postgresql-socket3
    :connection-spec *db-connect-spec*)
