@@ -16,6 +16,7 @@
                #:anaphora
                #:thing-labels
                #:thing-lister
+               #:html-thing-lister
                #:ratify
                #:warflagger
                #:ps-gadgets

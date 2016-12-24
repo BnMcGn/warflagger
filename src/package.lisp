@@ -30,5 +30,6 @@
    #:*flag-labels*
    #:*vote-ranges*
    #:*flag-types-source*
-   #:get-users))
+   #:get-users
+   #:author-representation-from-row))
 
