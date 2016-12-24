@@ -28,7 +28,7 @@
 (def-thing
     'user
     (compose #'get-author-data #'get-local-user-id)
-  #'get-author-representation
+  #'author-representation-from-row
   :lister (list
            #'user-lister
            :sortkeys '(values id)
@@ -40,7 +40,9 @@
 (def-db-thing
     'opinion
   'opinion
-  #'print
+  (lambda (x)
+    (with-output-to-string (s)
+      (print x s)))
   :keyfunc (lambda (id)
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
@@ -121,7 +123,7 @@
 (clack-server-manager
  *handler*
  (clack-pretend:pretend-builder
-  (:insert 3) ;clack.builder:builder
+  (:insert 4) ;clack.builder:builder
   (clack.middleware.clsql:<clack-middleware-clsql>
    :database-type :postgresql-socket3
    :connection-spec *db-connect-spec*)
@@ -132,5 +134,6 @@
   (clack-openid-connect:component
    "http://logintest.warflagger.com:5000/oid_connect/")
   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+  (html-thing-lister:thing-component)
   *app*)
  :port 5000)
