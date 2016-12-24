@@ -135,13 +135,15 @@
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
 
+(defun author-representation-from-row (data)
+  (when data
+    (acond
+      ((assoc :wf-user data) (values (cdr it) (car it)))
+      ((assoc :homepage data) (values (cdr it) (car it)))
+      ((assoc :email data) (values (cdr it) (car it))))))
+
 (defun get-author-representation (aid)
-  (let ((data (get-author-data aid)))
-    (when data
-      (acond
-        ((assoc :wf-user data) (values (cdr it) (car it)))
-        ((assoc :homepage data) (values (cdr it) (car it)))
-        ((assoc :email data) (values (cdr it) (car it)))))))
+  (author-representation-from-row (get-author-data aid)))
 
 (defun get-users ()
   (mapcar #'car (select (colm 'value) :from (tabl 'author)
