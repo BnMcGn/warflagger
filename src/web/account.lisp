@@ -1,5 +1,12 @@
 (in-package #:wf/web)
 
+(defun login-link-js (url)
+  (ps-inline
+    (setf (@ window location href)
+          (strcat
+           (lisp (concatenate 'string url "?destination="))
+           (@ window location href)))))
+
 (defun account-bar ()
   (let ((info (warflagger-user-info-bundle)))
     (html-out
@@ -15,5 +22,10 @@
            (:span
             (:span "WarFlagger")
             (:span "Not Signed In")
-            (:a :href (assoc-cdr :login-url info) "Log In")
-            (:a :href (assoc-cdr :login-url info) "Sign Up")))))))
+            (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
+                :href "#" "Log In")
+            (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
+                :href "#" "Sign Up")))))))
+
+
+
