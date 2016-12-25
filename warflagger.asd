@@ -27,5 +27,6 @@
                               (:file "data")
                               (:file "db")
                               (:file "excerpts")
-                              (:file "warflagger")))))
+                              (:file "warflagger")
+                              (:file "ranking")))))
 

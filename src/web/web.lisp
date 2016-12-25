@@ -47,6 +47,8 @@
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
 
+
+
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)
 
