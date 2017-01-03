@@ -31,5 +31,6 @@
    #:*vote-ranges*
    #:*flag-types-source*
    #:get-users
-   #:author-representation-from-row))
+   #:author-representation-from-row
+   #:warstats-for-target))
 

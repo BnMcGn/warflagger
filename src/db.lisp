@@ -51,6 +51,10 @@
                         :where (sql-and (sql-= url (colm 'target))
                                         (sql-> 0 (colm 'votevalue)))))))
 
+(defun warstats-for-target (target)
+  (declare (ignore target))
+  nil)
+
 ;;;
 ;;; Rooturl utilities
 ;;;
@@ -112,7 +116,7 @@ the page text can be found in the cache."
 ;; on all those opinions?
 (defun make-rooturl-real (root-id)
   (let ((url (get-rooturl-by-id root-id)))
-    (or (rooturl-real-p url)
+    (or (rooturl-real-p root-id)
         (and (is-cached url) (old-page-available url)
              (update-record 'rooturl  root-id `((:rooturl-real . t))))
         ;;FIXME: Implement offsite opinml hunting
