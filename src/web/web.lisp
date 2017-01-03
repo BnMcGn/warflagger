@@ -47,6 +47,31 @@
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
 
+(def-thing
+    'target
+    (lambda (rootid)
+      ;;FIXME: maybe should check that page is extracted/available
+      (let ((url (get-rooturl-by-id rootid)))
+        (list
+         :id rootid
+         :title (grab-title url)
+         :text (grab-text url)
+         :url url
+         :warstats (warstats-for-target url))))
+  (lambda (targdata)
+    (concatenate 'string
+                 (truncate-string (getf targdata :title) :length 30)
+                 " - "
+                 (truncate-string (getf targdata :text) :length 30)))
+  :lister
+  (list
+   (wrap-with-paging-handler
+    (lambda (&key order-by)
+      (declare (ignore order-by))
+      ;;Only have relevance for now
+      (get-ranked-rootids)))
+   :sortkeys '(relevance)))
+
 
 
 (clsql:connect wf/text-extract::*db-connect-spec*

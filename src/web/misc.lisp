@@ -47,6 +47,8 @@
            (progn
              (unless (is-cached url)
                (error "Don't have that page!"))
+             ;;FIXME: Suboptimal place, but somebody has to do it...
+             (make-rooturl-real id)
              (grab-text url)))
          (opins
            (%fill-out-opinion-tree
