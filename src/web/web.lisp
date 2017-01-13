@@ -70,9 +70,8 @@
       (declare (ignore order-by))
       ;;Only have relevance for now
       (get-ranked-rootids)))
-   :sortkeys '(relevance)))
-
-
+   :sortkeys '(relevance))
+  :html-thing-link (lambda (id) (format nil "/target/~a" id)))
 
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)

@@ -32,5 +32,6 @@
    #:*flag-types-source*
    #:get-users
    #:author-representation-from-row
-   #:warstats-for-target))
+   #:warstats-for-target
+   #:get-ranked-rootids))
 
