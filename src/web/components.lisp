@@ -198,7 +198,8 @@
              :class (strcat "opinion " (flavor (prop opinions)))
              :on-click (@ this handle-click)
              :style (create position :absolute
-                            top (prop top) left (prop left))
+                            top (prop top) left (prop left)
+                            box-shadow "4px 4px 20px -2px #000")
              (:vote-value :opinion (prop opinion) :key (unique-id))
              (:flag-name :key (unique-id) :opinion (prop opinion))))
          handle-click
