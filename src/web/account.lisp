@@ -12,20 +12,21 @@
     (html-out
       (if (webhax-user:signed-up?)
           (htm
-           (:span
+           (:div
             (:span "WarFlagger")
             (:a :href (assoc-cdr :user-url info)
                 (userfig:userfig-value :screen-name))
-            (:a :href (assoc-cdr :settings-url info) "Settings")
-            (:a :href (assoc-cdr :logout-url info) "Sign out")))
+            (:div :style "float: right; margin-right: 180px;"
+                  (:a :href (assoc-cdr :settings-url info) "Settings")
+                  (:a :href (assoc-cdr :logout-url info) "Sign out"))))
           (htm
-           (:span
+           (:div
             (:span "WarFlagger")
             (:span "Not Signed In")
-            (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
-                :href "#" "Log In")
-            (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
-                :href "#" "Sign Up")))))))
-
+            (:div :style "float: right; margin-right: 180px;"
+                  (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
+                   :href "#" "Sign Up")
+                  (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
+                   :href "#" "Log In"))))))))
 
 
