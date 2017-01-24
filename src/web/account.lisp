@@ -7,23 +7,29 @@
            (lisp (concatenate 'string url "?destination="))
            (@ window location href)))))
 
+(defun %logo ()
+  (html-out
+    (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"
+          :style "position: absolute; top: 2px;")))
+
 (defun account-bar ()
   (let ((info (warflagger-user-info-bundle)))
     (html-out
       (if (webhax-user:signed-up?)
           (htm
            (:div
-            (:span "WarFlagger")
-            (:a :href (assoc-cdr :user-url info)
+            (%logo)
+            (:a :style "position:relative; left: 180px;"
+                :href (assoc-cdr :user-url info)
                 (userfig:userfig-value :screen-name))
-            (:div :style "float: right; margin-right: 180px;"
+            (:div :style "float: right; margin-right: 30px;"
                   (:a :href (assoc-cdr :settings-url info) "Settings")
                   (:a :href (assoc-cdr :logout-url info) "Sign out"))))
           (htm
            (:div
-            (:span "WarFlagger")
-            (:span "Not Signed In")
-            (:div :style "float: right; margin-right: 180px;"
+            (%logo)
+            (:span :style "position:relative; left: 180px;" "Not Signed In")
+            (:div :style "float: right; margin-right: 30px;"
                   (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
                    :href "#" "Sign Up")
                   (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
