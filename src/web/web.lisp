@@ -149,7 +149,7 @@
 (clack-server-manager
  *handler*
  (clack-pretend:pretend-builder
-  (:insert 4) ;clack.builder:builder
+  (:insert 3) ;clack.builder:builder
   (clack.middleware.clsql:<clack-middleware-clsql>
    :database-type :postgresql-socket3
    :connection-spec *db-connect-spec*)
@@ -163,3 +163,4 @@
   (html-thing-lister:thing-component)
   *app*)
  :port 5000)
+

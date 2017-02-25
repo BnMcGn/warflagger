@@ -1,11 +1,14 @@
 (in-package #:wf/web)
 
 (defun login-link-js (url)
-  (ps-inline
-    (setf (@ window location href)
-          (strcat
-           (lisp (concatenate 'string url "?destination="))
-           (@ window location href)))))
+  (if webhax:*should-login-return*
+      (ps-inline
+       (setf (@ window location href)
+             (strcat
+              (lisp (concatenate 'string url "?destination="))
+              (@ window location href))))
+      (ps-inline
+       (setf (@ window location href) (lisp url)))))
 
 (defun %logo ()
   (html-out
