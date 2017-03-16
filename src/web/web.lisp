@@ -5,7 +5,7 @@
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
-   (add-part :@css "/static/css/style.css"))
+   :@css-link "/static/css/style.css")
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"
@@ -15,15 +15,14 @@
     (:div :id "left_side"
           :@site-search :@site-index :@side-content)
     (:div :id "content"
-          :@messages :@main-content :@footnotes)
+          :@messages :@inner :@footnotes)
                                         ;;Footer
     (:div :id "footer" :@copyright)))
 
 (define-default-parts warflagger-base
-  (add-part :@css "/static/css/style.css")
-  (add-part :@account-info #'account-bar)
-  (add-part :@javascript #'ps-gadgets)
-  (add-part :@javascript "/static/javascript/jquery/1.9.1/jquery.js"))
+  :@account-info #'account-bar
+  :@javascript #'ps-gadgets
+  :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js")
 
 (def-thing
     'user
@@ -95,30 +94,31 @@
                    (cdr (assoc "url" params :test #'string=))))))))
 
   (setf (ningle:route *app* "/opinion/")
-        (quick-page #'webhax::react #'webhax::redux #'opinion-components
-                    #'opinion-form-page))
+        (quick-page (#'webhax:react-parts #'webhax:redux-parts
+                     #'opinion-components #'opinion-form-page)))
 
   (setf (ningle:route *app* "/target/*")
-        (quick-page #'webhax::react #'target-components #'mood-lib
-                    (lambda ()
-                      (bind-validated-input
-                          ((id :integer))
-                        (let ((url (get-rooturl-by-id id)))
-                          (multiple-value-bind (text opinions)
-                              (target-data id)
-                            (mount-component (target-root)
-                              :text (lisp-raw text)
-                              :opinions (lisp-raw opinions)
-                              :url (lisp url)
-                              :title (lisp (grab-title url))
-                              :focus '(20))))))))
+        (quick-page (#'webhax:react-parts #'target-components #'mood-lib)
+          (lambda ()
+            (bind-validated-input
+                ((id :integer))
+              (let ((url (get-rooturl-by-id id)))
+                (multiple-value-bind (text opinions)
+                    (target-data id)
+                  (mount-component (target-root)
+                    :text (lisp-raw text)
+                    :opinions (lisp-raw opinions)
+                    :url (lisp url)
+                    :title (lisp (grab-title url))
+                    :focus '(20))))))))
 
   ;;(setf (ningle:route *app* "/signup/") #'signup-page)
 
   (setf (ningle:route *app* "/demo/")
-        (quick-page #'webhax::react #'webhax::webhax-ask
-                    (add-part :@javascript #'webhax-widgets:ps-widgets)
-                    #'demo-pages))
+        (quick-page (#'webhax:react-parts
+                     #'webhax::webhax-ask
+                     :@javascript #'webhax-widgets:ps-widgets)
+          (demo-pages)))
 
   ;;FIXME: Should be handled internally by webhax service middleware
   (setf (ningle:route *app* "/ask-data/*" :method :POST)
