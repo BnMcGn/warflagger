@@ -99,18 +99,17 @@
 
   (setf (ningle:route *app* "/target/*")
         (quick-page (#'webhax:react-parts #'target-components #'mood-lib)
-          (lambda ()
-            (bind-validated-input
-                ((id :integer))
-              (let ((url (get-rooturl-by-id id)))
-                (multiple-value-bind (text opinions)
-                    (target-data id)
-                  (mount-component (target-root)
-                    :text (lisp-raw text)
-                    :opinions (lisp-raw opinions)
-                    :url (lisp url)
-                    :title (lisp (grab-title url))
-                    :focus '(20))))))))
+          (bind-validated-input
+              ((id :integer))
+            (let ((url (get-rooturl-by-id id)))
+              (multiple-value-bind (text opinions)
+                  (target-data id)
+                (mount-component (target-root)
+                  :text (lisp-raw text)
+                  :opinions (lisp-raw opinions)
+                  :url (lisp url)
+                  :title (lisp (grab-title url))
+                  :focus '(20)))))))
 
   ;;(setf (ningle:route *app* "/signup/") #'signup-page)
 
