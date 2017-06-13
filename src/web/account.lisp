@@ -24,7 +24,7 @@
             (%logo)
             (:a :style "position:relative; left: 180px;"
                 :href (assoc-cdr :user-url info)
-                (userfig:userfig-value :screen-name))
+                (str (userfig:userfig-value 'webhax-user:screen-name)) )
             (:div :style "float: right; margin-right: 30px;"
                   (:a :href (assoc-cdr :settings-url info) "Settings")
                   (:a :href (assoc-cdr :logout-url info) "Sign out"))))
@@ -33,9 +33,11 @@
             (%logo)
             (:span :style "position:relative; left: 180px;" "Not Signed In")
             (:div :style "float: right; margin-right: 30px;"
-                  (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
+                  (:a :onclick
+                      (login-link-js (assoc-cdr :login-url info))
                    :href "#" "Sign Up")
-                  (:a :onclick (lisp (login-link-js (assoc-cdr :login-url info)))
-                   :href "#" "Log In"))))))))
+                  (:a :onclick
+                      (login-link-js (assoc-cdr :login-url info))
+                      :href "#" "Log In"))))))))
 
 
