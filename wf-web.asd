@@ -28,6 +28,7 @@
 		 :src
 		 :serial t
 		 :components ((:file "web/package")
+                              (:file "web/things")
                               (:file "web/ranks")
                               (:file "web/titlebar")
                               (:file "web/mood")
