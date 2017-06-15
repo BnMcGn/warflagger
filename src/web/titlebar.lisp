@@ -20,9 +20,10 @@
       (let ((past (ago dstamp)))
         (cond
           ((< 0 (chain past (get-weeks)))
-           (strcat (chain dstamp (to-date-string))
-                   " "
-                   (chain dstamp (to-locale-time-string))))
+           (chain dstamp (to-date-string)))
+           ;(strcat (chain dstamp (to-date-string))
+           ;        " "
+           ;        (chain dstamp (to-locale-time-string))))
           ((< 0 (chain past (get-days)))
            (strcat (chain past (get-days) (to-string)) " days ago"))
           ((< 0 (chain past (get-hours)))
@@ -43,5 +44,9 @@
     ;;FIXME: lots of improvement here... Avatar? Stats? Faction?
     (def-component author-long
         (psx (:span (prop opinion author))))
+
+    (def-component comment-summary
+        (psx
+         (:span "x")))
 
     ))

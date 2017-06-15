@@ -1,5 +1,28 @@
 (in-package :wf/web)
 
+;;; Definitions for the thing-lister
+
+(define-parts warflagger-things
+  :@javascript
+  (titlebar-components)
+  :@javascript
+  (ps
+    (def-component opinion-line
+        (psx (:div
+              (:vote-value :opinion (prop opinion))
+              (:flag-name :opinion (prop opinion))
+              (:date-stamp :opinion (prop opinion))
+              (:author-long :opinion (prop opinion))
+                                        ;(:target-short :target)
+              (:comment-summary :opinion (prop opinion) :length 40))))))
+
+(setf html-thing-lister:*html-thing-user-parts* nil)
+(push #'warflagger-things html-thing-lister:*html-thing-user-parts*)
+(push #'webhax:react-parts html-thing-lister:*html-thing-user-parts*)
+
+(defun display-opinion-line (opinion)
+  (mount-component (opinion-line)
+    :opinion (lisp-raw (json:encode-json-alist-to-string opinion))))
 
 (def-thing
     'user
@@ -15,10 +38,11 @@
 
 (def-db-thing
     'opinion
-  'opinion
-  (lambda (x)
-    (with-output-to-string (s)
-      (print x s)))
+    'opinion
+  #'display-opinion-line
+  ;(lambda (x)
+  ;  (with-output-to-string (s)
+  ;    (print x s)))
   :keyfunc (lambda (id)
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
