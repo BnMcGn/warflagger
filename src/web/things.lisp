@@ -22,7 +22,7 @@
 
 (defun display-opinion-line (opinion)
   (let ((line-id (gadgets:mkstr (gensym "mount-opinion-"))))
-    (html-out
+    (webhax-core:html-out-str
       (:div :id line-id)
       (mount-component (opinion-line :mount-id (lisp line-id))
         :opinion (lisp-raw (json:encode-json-alist-to-string opinion))))))
