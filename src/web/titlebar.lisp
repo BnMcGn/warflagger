@@ -28,13 +28,10 @@
           ((< 0 (chain past (get-days)))
            (strcat (chain past (get-days) (to-string)) " days ago"))
           ((< 0 (chain past (get-hours)))
-           (strcat (chain past (get-hours) (to-string))
-                   " hours ago"))
+           (strcat (chain past (get-hours) (to-string)) " hours ago"))
           ((< 0 (chain past (get-minutes)))
-              (strcat (chain past (get-minutes) (to-string))
-                      " minutes ago"))
-          (t (strcat (chain past (get-seconds) (to-string))
-                     " seconds ago")))))
+              (strcat (chain past (get-minutes) (to-string)) " minutes ago"))
+          (t (strcat (chain past (get-seconds) (to-string)) " seconds ago")))))
 
     (def-component date-stamp
         (psx
@@ -47,7 +44,12 @@
         (psx (:span (prop opinion author))))
 
     (def-component comment-summary
-        (psx
-         (:span "x")))
+        (let* ((opin (prop opinion))
+               (comment (if (chain opin (has-own-property 'comment))
+                            (@ opin comment)
+                            nil)))
+          (if (> (prop trimto) (@ comment length))
+              (psx (:span comment))
+              (psx (:span (chain comment (slice 0 (prop trimto))) "…")))))
 
     ))

@@ -14,7 +14,7 @@
               (:date-stamp :opinion (prop opinion))
               (:author-long :opinion (prop opinion))
                                         ;(:target-short :target)
-              (:comment-summary :opinion (prop opinion) :length 40))))))
+              (:comment-summary :opinion (prop opinion) :trimto 40))))))
 
 (setf html-thing-lister:*html-thing-user-parts* nil)
 (push #'warflagger-things html-thing-lister:*html-thing-user-parts*)
