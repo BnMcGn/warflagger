@@ -48,8 +48,10 @@
                (comment (if (chain opin (has-own-property 'comment))
                             (@ opin comment)
                             nil)))
-          (if (> (prop trimto) (@ comment length))
-              (psx (:span comment))
-              (psx (:span (chain comment (slice 0 (prop trimto))) "…")))))
+          (if comment
+              (if (> (prop trimto) (@ comment length))
+                  (psx (:span comment))
+                  (psx (:span (chain comment (slice 0 (prop trimto))) "…")))
+              (psx (:span "")))))
 
     ))
