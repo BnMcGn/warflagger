@@ -19,11 +19,12 @@
     (defun display-date-nicely (dstamp)
       (let ((past (ago dstamp)))
         (cond
+          ((< 1 (chain past (get-years)))
+           (strcat (chain past (get-years) (to-string)) " years ago"))
+          ((< 0 (chain past (get-months)))
+           (strcat (chain past (get-months) (to-string)) " months ago"))
           ((< 0 (chain past (get-weeks)))
-           (chain dstamp (to-date-string)))
-           ;(strcat (chain dstamp (to-date-string))
-           ;        " "
-           ;        (chain dstamp (to-locale-time-string))))
+           (strcat (chain past (get-weeks) (to-string)) " weeks ago"))
           ((< 0 (chain past (get-days)))
            (strcat (chain past (get-days) (to-string)) " days ago"))
           ((< 0 (chain past (get-hours)))
