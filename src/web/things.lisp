@@ -21,8 +21,11 @@
 (push #'webhax:react-parts html-thing-lister:*html-thing-user-parts*)
 
 (defun display-opinion-line (opinion)
-  (mount-component (opinion-line)
-    :opinion (lisp-raw (json:encode-json-alist-to-string opinion))))
+  (let ((line-id (gadgets:mkstr (gensym "mount-opinion-"))))
+    (html-out
+      (:div :id line-id)
+      (mount-component (opinion-line :mount-id (lisp line-id))
+        :opinion (lisp-raw (json:encode-json-alist-to-string opinion))))))
 
 (def-thing
     'user
@@ -40,9 +43,6 @@
     'opinion
     'opinion
   #'display-opinion-line
-  ;(lambda (x)
-  ;  (with-output-to-string (s)
-  ;    (print x s)))
   :keyfunc (lambda (id)
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
   :sortkeys '(target author datestamp excerpt rooturl))
