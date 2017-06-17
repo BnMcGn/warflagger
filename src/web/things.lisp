@@ -77,4 +77,5 @@
     'opinion
     'opinion
   (lambda (&rest x)
-    (mapcar #'car (apply #'opinion-tree-for-rooturl x))))
+    (mapcar #'car (opinion-tree-for-target
+                   (assoc-cdr :url (opinion-from-id (car x)))))))
