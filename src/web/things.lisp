@@ -9,6 +9,7 @@
   (ps
     (def-component opinion-line
         (psx (:div
+              :class "summary_line"
               (:vote-value :key 1 :opinion (prop opinion))
               (:flag-name :key 2 :opinion (prop opinion))
               (:date-stamp :key 3 :opinion (prop opinion))
