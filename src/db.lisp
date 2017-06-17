@@ -74,8 +74,8 @@
 
 (defun rooturl-p (url)
   "Warning: this function does not provide a definitive answer."
-  (exists (select (colm 'id) :from (tabl 'rooturl)
-                             :where (sql-= (colm 'rooturl) url))))
+  (select (colm 'id) :from (tabl 'rooturl)
+          :where (sql-= (colm 'rooturl) url)))
 
 (defun all-rooturls ()
   (get-column (tabl 'rooturl) (colm 'rooturl)))
@@ -84,17 +84,18 @@
   "Tries to find the url at the root of a tree of comments. The primary value will always be a guess at the url. The second value tells whether get-rooturl is sure of its result. Get-rooturl does not do network lookups."
   (block top
     (awhen (get-assoc-by-col (colm 'rooturl 'rooturl) url)
-           (return-from top (values (assoc-cdr :rooturl it)
-                                    (ratify:parse-boolean
-                                     (assoc-cdr :rooturl-real it)))))
+      (return-from top (values (assoc-cdr :rooturl it)
+                               ;Evidently some bit rot here
+                                    ;(ratify:parse-boolean
+                                     (assoc-cdr :rooturl-real it))))
     (awhen (select (colm 'rooturl 'rooturl) (colm 'rooturl 'rooturl-real)
                    :from (list (tabl 'rooturl) (tabl 'opinion))
                    :where
                    (sql-and
                     (sql-= (colm 'opinion 'url) url)
                     (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))))
-           (return-from top (values (caar it)
-                                    (ratify:parse-boolean (second (car it))))))
+      (return-from top (values (caar it) (second (car it)))))
+                                    ;(ratify:parse-boolean (second (car it))))))
     (values nil nil)))
 
 (defun get-rooturl-id (rurl)

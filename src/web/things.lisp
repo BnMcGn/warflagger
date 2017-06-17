@@ -72,3 +72,9 @@
       (get-ranked-rootids)))
    :sortkeys '(relevance))
   :html-thing-link (lambda (id) (format nil "/target/~a" id)))
+
+(def-thing-connector
+    'opinion
+    'opinion
+  (lambda (&rest x)
+    (mapcar #'car (apply #'opinion-tree-for-rooturl x))))
