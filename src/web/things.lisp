@@ -105,3 +105,13 @@
       (assoc-cdr :rooturl
                  (get-assoc-by-pkey 'opinion (string-unless-number (car x)))))))
   :other-thing 'author)
+
+(def-thing-connector
+    'author
+    'opinion
+  (lambda (&rest id)
+    (mapcar #'car
+            (clsql:select (colm 'opinion 'id)
+                          :from (tabl 'opinion)
+                          :where
+                          (clsql:sql-= (colm 'id) (car id))))))
