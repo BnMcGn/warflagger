@@ -8,16 +8,19 @@
 ;;;
 
 
+(defun for-rooturl-mixin (rurl)
+  (list :from (list (tabl 'opinion) (tabl 'rooturl))
+        :where
+        (sql-and (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))
+                 (sql-= (colm 'rooturl 'rooturl) rurl))))
+
 (def-query opinion-ids-for-rooturl (rurl)
   (mapcar
    #'car
    (query-marker
-    (select (colm 'opinion 'id) :from (list (tabl 'opinion) (tabl 'rooturl))
-                                :where
-                                (sql-and (sql-= (colm 'opinion 'rooturl)
-                                                (colm 'rooturl 'id))
-                                         (sql-= (colm 'rooturl 'rooturl)
-                                                rurl))))))
+    (merge-query
+     (select (colm 'opinion 'id))
+     (for-rooturl-mixin rurl)))))
 
 (defun opinion-tree-for-rooturl (rurl)
   ;;FIXME: fails to check for loops and dead trees.
@@ -196,12 +199,12 @@ the page text can be found in the cache."
                                          :from (tabl 'opinion)
                                          :where (sql-= (colm 'url) o-url)))))))
 
-(defun get-local-user-id (user)
+(defun get-local-user-id (wf-user)
   (let ((res (select (colm 'author 'id) :from (tabl 'author)
                                         :where
                                         (sql-and
                                           (sql-= (colm 'author 'type) "wf_user")
-                                          (sql-= (colm 'author 'value) user))
+                                          (sql-= (colm 'author 'value) wf-user))
                                         :flatp t)))
     (when (< 1 (length res))
       (error "Integrity Breach in the author table!"))

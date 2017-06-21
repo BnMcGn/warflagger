@@ -29,8 +29,8 @@
         :opinion (lisp-raw (json:encode-json-alist-to-string opinion))))))
 
 (def-thing
-    'user
-    (compose #'get-author-data #'get-local-user-id)
+    'author
+    #'get-author-data
   #'author-representation-from-row
   :lister (list
            #'user-lister
@@ -76,7 +76,32 @@
 
 (def-thing-connector
     'opinion
-    'opinion
+    'replies
   (lambda (&rest x)
     (mapcar #'car (opinion-tree-for-target
-                   (assoc-cdr :url (opinion-from-id (car x)))))))
+                   (assoc-cdr :url (opinion-from-id (car x))))))
+  :other-thing 'opinion)
+
+;;FIXME: Should all be done in query or else with something like an ordered
+;; hash table.
+(defun flaggers-for-rooturl (rooturl)
+  (let ((found (make-hash-table :test #'equal)))
+    (gadgets:collecting
+        (dolist (key (mapcar #'car
+                          (merge-query
+                           (clsql:select (colm 'opinion 'author))
+                           (for-rooturl-mixin rooturl)
+                           (order-by-mixin (colm 'opinion 'datestamp)))))
+          (unless (gethash key found)
+            (setf (gethash key found) t)
+            (gadgets:collect key))))))
+
+(def-thing-connector
+    'opinion
+    'participants
+  (lambda (&rest x)
+    (flaggers-for-rooturl
+     (get-rooturl-by-id
+      (assoc-cdr :rooturl
+                 (get-assoc-by-pkey 'opinion (string-unless-number (car x)))))))
+  :other-thing 'author)

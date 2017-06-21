@@ -199,6 +199,7 @@ body {
   font-size: 11px;
   line-height: 18px;
   color: #333333;
+  border: 1px;
 }
 
 .summary_line {
