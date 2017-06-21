@@ -114,4 +114,4 @@
             (clsql:select (colm 'opinion 'id)
                           :from (tabl 'opinion)
                           :where
-                          (clsql:sql-= (colm 'id) (car id))))))
+                          (clsql:sql-= (colm 'author) (car id))))))
