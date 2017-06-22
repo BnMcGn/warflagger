@@ -8,6 +8,20 @@
   :@javascript
   (ps
     (def-component opinion-line
+        (if (< (prop trim) 20)
+            (psx (:opinion-line-short
+                  :... (@ this props)))
+            (psx (:opinion-line-long
+                  :... (@ this props)))))
+
+    (def-component opinion-line-short
+        (psx (:div
+              :class "summary_line"
+              (:vote-value :key 1 :opinion (prop opinion))
+              (:flag-name :key 2 :opinion (prop opinion))
+              (:author-long :key 4 :opinion (prop opinion)))))
+
+    (def-component opinion-line-long
         (psx (:div
               :class "summary_line"
               (:vote-value :key 1 :opinion (prop opinion))
@@ -21,12 +35,15 @@
 (push #'warflagger-things html-thing-lister:*html-thing-user-parts*)
 (push #'webhax:react-parts html-thing-lister:*html-thing-user-parts*)
 
+(setf html-thing-lister:*thing-summary-sidebar-width* 18)
+
 (defun display-opinion-line (opinion)
   (let ((line-id (gadgets:mkstr (gensym "mount-opinion-"))))
     (webhax-core:html-out-str
       (:div :id line-id)
       (mount-component (opinion-line :mount-id (lisp line-id))
-        :opinion (lisp-raw (json:encode-json-alist-to-string opinion))))))
+        :opinion (lisp-raw (json:encode-json-alist-to-string opinion))
+        :trim (lisp thing-lister:*thing-summary-width*)))))
 
 (def-thing
     'author
