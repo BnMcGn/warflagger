@@ -78,9 +78,9 @@
          :warstats (warstats-for-target url))))
   (lambda (targdata)
     (concatenate 'string
-                 (truncate-string (getf targdata :title) :length 30)
+                 (truncate-string (getf targdata :title) :length 15)
                  " - "
-                 (truncate-string (getf targdata :text) :length 30)))
+                 (truncate-string (getf targdata :text) :length 15)))
   :lister
   (list
    (wrap-with-paging-handler
