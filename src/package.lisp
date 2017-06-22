@@ -33,5 +33,7 @@
    #:get-users
    #:author-representation-from-row
    #:warstats-for-target
-   #:get-ranked-rootids))
+   #:get-ranked-rootids
+   #:opinion-tree-for-target
+   #:for-rooturl-mixin))
 

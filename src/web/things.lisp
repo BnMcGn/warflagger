@@ -85,16 +85,13 @@
 ;;FIXME: Should all be done in query or else with something like an ordered
 ;; hash table.
 (defun flaggers-for-rooturl (rooturl)
-  (let ((found (make-hash-table :test #'equal)))
-    (gadgets:collecting
-        (dolist (key (mapcar #'car
-                          (merge-query
-                           (clsql:select (colm 'opinion 'author))
-                           (for-rooturl-mixin rooturl)
-                           (order-by-mixin (colm 'opinion 'datestamp)))))
-          (unless (gethash key found)
-            (setf (gethash key found) t)
-            (gadgets:collect key))))))
+  (ordered-unique
+   (mapcar #'car
+           (merge-query
+            (clsql:select (colm 'opinion 'author))
+            (for-rooturl-mixin rooturl)
+            (order-by-mixin (colm 'opinion 'datestamp))))
+   :test #'eq))
 
 (def-thing-connector
     'opinion
@@ -115,3 +112,16 @@
                           :from (tabl 'opinion)
                           :where
                           (clsql:sql-= (colm 'author) (car id))))))
+
+(def-thing-connector
+    'author
+    'discussions
+  (lambda (&rest id)
+    (ordered-unique
+     (mapcar #'car
+             (clsql:select (colm 'opinion 'rooturl)
+                           :from (tabl 'opinion)
+                           :where
+                           (clsql:sql-= (colm 'author) (car id))))
+     :test #'eq))
+  :other-thing 'target)
