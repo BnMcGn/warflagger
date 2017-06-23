@@ -22,7 +22,8 @@
                #:ps-gadgets
                #:lack-middleware-mount
                #:clack-openid-connect
-               #:userfig)
+               #:userfig
+               #:cl-markdown)
   :serial t
   :components ((:module 
 		 :src

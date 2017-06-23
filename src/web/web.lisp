@@ -61,7 +61,14 @@
                   :opinions (lisp-raw opinions)
                   :url (lisp url)
                   :title (lisp (grab-title url))
-                  :focus '(20)))))))
+                  ;;:focus '(20) ; for testing
+                  ))))))
+
+  (setf (ningle:route *app* "/faq/")
+        (quick-page ()
+            (markdown:markdown
+             (asdf:system-relative-pathname 'warflagger "src/faq.md")
+             :stream webhax:*webhax-output*)))
 
   ;;(setf (ningle:route *app* "/signup/") #'signup-page)
 
