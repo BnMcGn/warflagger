@@ -66,7 +66,7 @@ exploration."
      :interesting
      "Use this when you wish to indicate that something is worth noting, even if you aren't ready to agree with it. Interesting flags used with a negative vote value will still raise the profile of a target. It can be used to point out negative examples.")
 
-;;; SpecialClaims
+;;; Statements
 
     (:eye-witness
      "You are declaring yourself to be a firsthand witness to a statement. You may set your VoteValue to register confirmation or contradiction of the
@@ -80,6 +80,12 @@ it serves as an invitation for the community to verify your qualifications."
 
      :second-hand
      "This is meant for situations where you have spoken to a witness of an event. If a NeedsReference or RaiseQuestion flag has been raised on a point and you are able to interview a source first hand knowledge to resolve the question, then you can use this flag to indicate that you have done so."
+
+     :anecdotal
+     "Indicates that a certain argument or piece of evidence is a one-off experience, and should be taken with a grain of salt. You may use this flag on other peoples' submissions, or to flag your own statements."
+
+     :evidence
+     "You are presenting evidence, either to support or rebut an item, or in response to a NeedsEvidence flag. Use this flag when none of the more specific evidence flags fits."
 
      :dislosure
      "If you wish to let people know that you have a possible conflict of interest that could inform your perspective. In general, this should not be too
@@ -132,14 +138,14 @@ throw the discussion tree out of whack."
      "This flag ties two URLs with identical content together. Use the SameThing on the mirror URL. Place the URL which you believe to be the authorative source in the Reference field.")))
 
 (defparameter *flag-categories*
- '("Negative" "Positive" "SpecialClaims" "Custodial"))
+ '("Negative" "Positive" "Statements" "Custodial"))
 
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing"
      "AlreadyAnswered" "FromAuthority"
      "NeedsReference" "RaiseQuestion" "OutOfBounds")
     ("Funny" "Agree" "Like" "Interesting")
-    ("EyeWitness" "AmQualified" "SecondHand" "Disclosure")
+    ("EyeWitness" "AmQualified" "SecondHand" "Anecdotal" "Evidence" "Disclosure")
     ("Redundant" "OutOfDate" "Retraction" "Correction" "Update" "IncorrectFlag"
      "FlagAbuse" "Offtopic" "Arcane" "SameThing")))
 
