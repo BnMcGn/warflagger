@@ -9,8 +9,7 @@
      "For the obvious use on any comments that contain out of place marketing. It can also be used on URLs that are referred to by spam emails. Don't use it for offtopic posts. There is a flag for that."
 
      :inflammatory
-     "For content that is inflammatory or offensive in tone, 
-especially if you feel that its point could have been made more gently."
+     "For content that is inflammatory or offensive in tone, especially if you feel that its point could have been made more gently. Name-calling should be labelled with this flag."
 
      :disagree
      "A generic way to say \"I think you are wrong\"."
@@ -18,8 +17,8 @@ especially if you feel that its point could have been made more gently."
      :dislike
      "The most generic downvote. This one should not be taken too seriously. Some people will use it for decluttering and other sorting tasks."
 
-     :obscene
-     "For off-color or coarse language."
+     :language-warning
+     "For offensive or off-color language."
 
      :disturbing
      "Warning that a link is pornographic, disturbing, or otherwise not safe for work."
@@ -113,10 +112,6 @@ used for cleaning up accidental posts."
 the purpose of this flag. It is meant for innocuous changes. Subversive use may
 result in the censure of the community!"
 
-     :update
-     "Add information to an opinion, for example, additional reference fields or
-excerpt fields."
-
      :incorrect-flag
      "Use this when someone has misused a flag or votevalue, and has evidently done
 so out of ignorance. This warns reader systems to ignore comments that might
@@ -141,12 +136,12 @@ throw the discussion tree out of whack."
  '("Negative" "Positive" "Statements" "Custodial"))
 
 (defparameter *flag-labels*
-  '(("Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing"
+  '(("Spam" "Inflammatory" "Disagree" "Dislike" "LanguageWarning" "Disturbing"
      "AlreadyAnswered" "FromAuthority"
      "NeedsReference" "RaiseQuestion" "OutOfBounds")
     ("Funny" "Agree" "Like" "Interesting")
     ("EyeWitness" "AmQualified" "SecondHand" "Anecdotal" "Evidence" "Disclosure")
-    ("Redundant" "OutOfDate" "Retraction" "Correction" "Update" "IncorrectFlag"
+    ("Redundant" "OutOfDate" "Retraction" "Correction" "IncorrectFlag"
      "FlagAbuse" "Offtopic" "Arcane" "SameThing")))
 
 ;;; for each type: whether respectively, negative, neutral, positive vote values
