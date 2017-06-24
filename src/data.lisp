@@ -27,13 +27,11 @@ especially if you feel that its point could have been made more gently."
      :already-answered
      "If you feel that a point has been answered well in another place, use this flag's reference field to point to the existing answer, rather than restating it
 in place. Argument can continue at the site of the existing answer. Using this
-tag will help prevent redundant discussions all over the place."
+flag will help prevent redundant discussions all over the place."
 
      :logical-fallacy
      "Use this to point out a logical fallacy. It's good form to explain the
-problem in your comment. Note that there are individual flags for some of the
-more common logical fallacies. Try to use them where appropriate instead of this
-one."
+problem in your comment."
 
      :ad-hominem
      "Identifies cases where a personal attack is being used to avoid an opponent's
@@ -57,7 +55,10 @@ angle that would derail an argument has been avoided. With the VoteValue set to
 neutral (0) this flag can indicate simple curiousity; this can be the voice of
 the child asking \"Why?\" or a launch into \"I wonder if...\" type of speculation.
 Applied to research articles it is a way to denote areas of possible future
-exploration.")
+exploration."
+
+     :out-of-bounds
+     "Meant to restrain some of the worst of online forum behavior. Specifically, when you see someone post immediately damaging information, this is a request for its prompt removal. For example, when someone has posted another person's home address, or is using the forum to directly organize a physical attack. This flag is for serious situations only. If you don't understand it, don't use it.")
 
 ;;; Positive:
 
@@ -137,9 +138,7 @@ throw the discussion tree out of whack."
  deteriorating into name calling or getting trapped in details."
 
      :same-thing
-     "This flag ties two URLs with identical or similar content together. It
- merges the discussions under them so that points don't have to be restated in
- multiple places all over the internet.")))
+     "This flag ties two URLs with identical content together. Use the SameThing on the mirror URL. Place the URL which you believe to be the authorative source in the Reference field.")))
 
 (defparameter *flag-categories*
  '("Negative" "Positive" "SpecialClaims" "Custodial"))
@@ -147,7 +146,7 @@ throw the discussion tree out of whack."
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing"
      "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority"
-     "NeedsReference" "RaiseQuestion")
+     "NeedsReference" "RaiseQuestion" "OutOfBounds")
     ("Funny" "Agree" "Like" "Interesting")
     ("EyeWitness" "AmQualified" "SecondHand" "Disclosure")
     ("Redundant" "OutOfDate" "Retraction" "Correction" "Update" "IncorrectFlag"
