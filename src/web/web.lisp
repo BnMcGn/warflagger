@@ -70,6 +70,23 @@
              (asdf:system-relative-pathname 'warflagger "src/faq.md")
              :stream webhax:*webhax-output*)))
 
+  (setf (ningle:route *app* "/flags/")
+        (quick-page ()
+          (loop
+             for category in *flag-categories*
+             for labels in *flag-labels*
+             for sources in *flag-types-source*
+             do
+               (html-out
+                 (:h2 (str category))
+                 (loop
+                    for lab in labels
+                    for (labsym description) on sources by #'cddr
+                    do
+                      (progn
+                        (htm (:h3 (str lab)))
+                        (htm (:p (str description)))))))))
+
   ;;(setf (ningle:route *app* "/signup/") #'signup-page)
 
   (setf (ningle:route *app* "/demo/")
