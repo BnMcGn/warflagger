@@ -137,7 +137,7 @@ throw the discussion tree out of whack."
 
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "LanguageWarning" "Disturbing"
-     "AlreadyAnswered" "FromAuthority"
+     "AlreadyAnswered" "LogicalFallacy"
      "NeedsReference" "RaiseQuestion" "OutOfBounds")
     ("Funny" "Agree" "Like" "Interesting")
     ("EyeWitness" "AmQualified" "SecondHand" "Anecdotal" "Evidence" "Disclosure")
