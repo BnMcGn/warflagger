@@ -33,15 +33,6 @@ flag will help prevent redundant discussions all over the place."
      "Use this to point out a logical fallacy. It's good form to explain the
 problem in your comment."
 
-     :ad-hominem
-     "Identifies cases where a personal attack is being used to avoid an opponent's
-point."
-
-     :from-authority
-     "When a person is presenting a source as authorative without questioning its
-statements. Also when a source is being dismissed because it is not a recognized
-authority."
-
      :needs-reference
      "Any time that a vague claim has been made, such as \"Studies indicate...\".
 This is your way of saying \"Put up or shut up\" to an opponent. It is a way
@@ -145,7 +136,7 @@ throw the discussion tree out of whack."
 
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing"
-     "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority"
+     "AlreadyAnswered" "FromAuthority"
      "NeedsReference" "RaiseQuestion" "OutOfBounds")
     ("Funny" "Agree" "Like" "Interesting")
     ("EyeWitness" "AmQualified" "SecondHand" "Disclosure")
