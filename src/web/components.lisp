@@ -35,7 +35,7 @@
       (defun focus-p (props?)
         (let ((tad (@ props? tree-address))
               (foc (@ props? focus)))
-          (when (eq (@ tad length) (@ foc length))
+          (when (and tad foc (eq (@ tad length) (@ foc length)))
             (loop for x in tad
                for y in foc
                unless (equal x y) do (return-from focus-p nil)
@@ -44,7 +44,7 @@
       (defun focus-parent-p (props?)
         (let ((tad (@ props? tree-address))
               (foc (@ props? focus)))
-          (when (< (@ tad length) (@ foc length))
+          (when (and tad foc (< (@ tad length) (@ foc length)))
             (loop for x in tad
                for y in foc
                unless (equal x y) do (return-from focus-parent-p nil))
