@@ -12,7 +12,7 @@
   (list :from (list (tabl 'opinion) (tabl 'rooturl))
         :where
         (sql-and (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))
-                 (sql-= (colm 'rooturl 'rooturl) rurl))))
+                 (sql-= (colm 'rooturl 'rooturl) (sql-escape rurl)))))
 
 (def-query opinion-ids-for-rooturl (rurl)
   (mapcar
@@ -51,8 +51,8 @@
   (exists
    (unexecuted
      (select (colm 'id) :from (tabl 'opinion)
-                        :where (sql-and (sql-= url (colm 'target))
-                                        (sql-> 0 (colm 'votevalue)))))))
+             :where (sql-and (sql-= (sql-escape url) (colm 'target))
+                             (sql-> 0 (colm 'votevalue)))))))
 
 (defun warstats-for-target (target)
   (declare (ignore target))
@@ -78,7 +78,7 @@
 (defun rooturl-p (url)
   "Warning: this function does not provide a definitive answer."
   (select (colm 'id) :from (tabl 'rooturl)
-          :where (sql-= (colm 'rooturl) url)))
+          :where (sql-= (colm 'rooturl) (sql-escape url))))
 
 (defun all-rooturls ()
   (get-column (tabl 'rooturl) (colm 'rooturl)))
@@ -95,7 +95,7 @@
                    :from (list (tabl 'rooturl) (tabl 'opinion))
                    :where
                    (sql-and
-                    (sql-= (colm 'opinion 'url) url)
+                    (sql-= (colm 'opinion 'url) (sql-escape url))
                     (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))))
       (return-from top (values (caar it) (second (car it)))))
                                     ;(ratify:parse-boolean (second (car it))))))
@@ -197,15 +197,16 @@ the page text can be found in the cache."
                        (sql-= (colm 'target)
                               (sql-query (colm 'target)
                                          :from (tabl 'opinion)
-                                         :where (sql-= (colm 'url) o-url)))))))
+                                         :where (sql-= (colm 'url)
+                                                       (sql-escape o-url))))))))
 
 (defun get-local-user-id (wf-user)
   (let ((res (select (colm 'author 'id) :from (tabl 'author)
-                                        :where
-                                        (sql-and
-                                          (sql-= (colm 'author 'type) "wf_user")
-                                          (sql-= (colm 'author 'value) wf-user))
-                                        :flatp t)))
+                     :where
+                     (sql-and
+                      (sql-= (colm 'author 'type) "wf_user")
+                      (sql-= (colm 'author 'value) (sql-escape wf-user)))
+                     :flatp t)))
     (when (< 1 (length res))
       (error "Integrity Breach in the author table!"))
     (car res)))
@@ -227,10 +228,12 @@ the page text can be found in the cache."
      (get-local-user-id author))
     ((or :homepage :email)
      (awhen (select (colm 'id) :from 'author
-                               :where (sql-and (sql-= (colm 'type) atype)
-                                               (sql-= (colm 'value) author))
-                               :flatp t)
-            (car it)))))
+                    :where (sql-and (sql-= (colm 'type)
+                                           (sql-escape atype))
+                                    (sql-= (colm 'value)
+                                           (sql-escape author)))
+                    :flatp t)
+       (car it)))))
 
 (defun insert-new-author (atype value)
   (let ((aid (next-val "author_id_seq"))
@@ -289,20 +292,22 @@ the page text can be found in the cache."
                 (collect (cons :author aid))))))
       (when (and (stringp comment) (string-true comment))
         (insert-records :into 'comment :attributes '(:opinion :comment)
-                        :values (list oid comment)))
+                        :values (list oid (sql-escape comment))))
       (when (and (stringp reference) (string-true reference))
         (insert-records :into 'reference :attributes '(:opinion :comment)
-                        :values (list oid reference)))
+                        :values (list oid (sql-escape reference))))
       (dolist (k '(:excerpt :excerpt-offset :time-excerpt :excerpt-length))
         (awhen (aand (assoc k opin) (string-true (cdr it)))
                (insert-records :into 'excerpt
                                :attributes '(:opinion :type :value)
                                :values (list oid
-                                             (to-snake-case (mkstr k)) it))))
+                                             (to-snake-case (mkstr k))
+                                             (sql-escape it)))))
       oid)))
 
 (defun delete-opinion (oid)
-  (let ((rooturl (car (col-from-pkey (colm 'opinion 'rooturl) oid))))
+  (let* ((oid (if (numberp oid) oid (parse-integer oid)))
+         (rooturl (car (col-from-pkey (colm 'opinion 'rooturl) oid))))
     (with-transaction nil
       (delete-records :from 'comment :where (sql-= (colm 'opinion) oid))
       (delete-records :from 'excerpt :where (sql-= (colm 'opinion) oid))

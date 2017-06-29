@@ -128,7 +128,7 @@
             (clsql:select (colm 'opinion 'id)
                           :from (tabl 'opinion)
                           :where
-                          (clsql:sql-= (colm 'author) (car id))))))
+                          (clsql:sql-= (colm 'author) (sql-escape (car id)))))))
 
 (def-thing-connector
     'author
@@ -139,6 +139,6 @@
              (clsql:select (colm 'opinion 'rooturl)
                            :from (tabl 'opinion)
                            :where
-                           (clsql:sql-= (colm 'author) (car id))))
+                           (clsql:sql-= (colm 'author) (sql-escape (car id)))))
      :test #'eq))
   :other-thing 'target)
