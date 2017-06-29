@@ -50,118 +50,117 @@
           :fieldspecs
           (lisp-raw
            (webhax-validate:convert-fieldspecs-to-json *opinion-form-specs*))
-          :prefill (create :target (lisp target)
+          :data (create :target (lisp target)
                            :excerpt (lisp excerpt)
                            :excerpt-offset (lisp offset))
           :layout custom-opform-layout
           :wrapwidget false)))))
 
 (define-parts opinion-components
-  (add-part :@javascript #'webhax-widgets:ps-widgets)
-  (add-part :@javascript "/static/node_modules/rangy/lib/rangy-core.js")
-  (add-part :@javascript "/static/node_modules/rangy/lib/rangy-textrange.js")
-  (add-part
-   :@javascript
-   (lambda ()
-     (ps
+  :@javascript #'webhax-widgets:ps-widgets
+  :@javascript-link "/static/node_modules/rangy/lib/rangy-core.js"
+  :@javascript-link "/static/node_modules/rangy/lib/rangy-textrange.js"
+  :@javascript
+  (lambda ()
+    (ps
 
-       ;;FIXME: Duplicate of lisp functions in excerpt.lisp
-       ;;Would be nice to only implement once.
-       (defun create-textdata (text)
-         (let ((res (create :text text :whitespace (create)))
-               (found nil))
-           (dotimes (i (length text))
-             (when (member (elt text i) *whitespace-characters*)
-               (unless found (setf found i))
-               (dolist (j (range found (1+ i)))
-                 (incf (getprop res 'whitespace j)))
-               (setf found nil)))
-           res))
+      ;;FIXME: Duplicate of lisp functions in excerpt.lisp
+      ;;Would be nice to only implement once.
+      (defun create-textdata (text)
+        (let ((res (create :text text :whitespace (create)))
+              (found nil))
+          (dotimes (i (length text))
+            (when (member (elt text i) *whitespace-characters*)
+              (unless found (setf found i))
+              (dolist (j (range found (1+ i)))
+                (incf (getprop res 'whitespace j)))
+              (setf found nil)))
+          res))
 
-       (defun contiguous-whitespace? (tdat index)
-         (or (getprop tdat 'whitespace index) 0))
+      (defun contiguous-whitespace? (tdat index)
+        (or (getprop tdat 'whitespace index) 0))
 
-       (defun excerpt-here? (tdat excerpt index)
-         (let ((exdat (create-textdata excerpt))
-               (text (@ tdat text)))
-           (loop with tind = index
-              with eind = 0
-              with tlen = (length text)
-              with elen = (length excerpt)
-              do (progn
-                   (when (eq elen eind) (return-from excerpt-here? tind))
-                   (when (eq tlen tind) (return-from excerpt-here? nil))
-                   (let ((ewhite (contiguous-whitespace? exdat eind))
-                         (twhite (contiguous-whitespace? tdat tind)))
-                     (if (and (eq 0 ewhite) (eq 0 twhite)
-                              (eq (elt excerpt eind) (elt text tind)))
-                         (progn (incf tind) (incf eind))
-                         (if (or (eq 0 ewhite) (eq 0 twhite))
-                             (return-from excerpt-here? nil)
-                             (progn (incf tind twhite)
-                                    (incf eind ewhite)))))))))
+      (defun excerpt-here? (tdat excerpt index)
+        (let ((exdat (create-textdata excerpt))
+              (text (@ tdat text)))
+          (loop with tind = index
+             with eind = 0
+             with tlen = (length text)
+             with elen = (length excerpt)
+             do (progn
+                  (when (eq elen eind) (return-from excerpt-here? tind))
+                  (when (eq tlen tind) (return-from excerpt-here? nil))
+                  (let ((ewhite (contiguous-whitespace? exdat eind))
+                        (twhite (contiguous-whitespace? tdat tind)))
+                    (if (and (eq 0 ewhite) (eq 0 twhite)
+                             (eq (elt excerpt eind) (elt text tind)))
+                        (progn (incf tind) (incf eind))
+                        (if (or (eq 0 ewhite) (eq 0 twhite))
+                            (return-from excerpt-here? nil)
+                            (progn (incf tind twhite)
+                                   (incf eind ewhite)))))))))
 
-       (defun find-excerpt-position (tdat excerpt &optional (offset 0))
-         (dotimes (i (length (@ tdat text)))
-           (let ((loc (excerpt-here? tdat excerpt i)))
-             (when loc
-               (if (< 0 offset)
-                   (decf offset)
-                   (return (list i (- loc i))))))))
+      (defun find-excerpt-position (tdat excerpt &optional (offset 0))
+        (dotimes (i (length (@ tdat text)))
+          (let ((loc (excerpt-here? tdat excerpt i)))
+            (when loc
+              (if (< 0 offset)
+                  (decf offset)
+                  (return (list i (- loc i))))))))
 
-       ;;End of duplicate functions
+      ;;End of duplicate functions
 
-       (defun clean-string-for-excerpt (the-string)
-         (collecting-string
-           (let ((last-was-white nil))
-             (dotimes (i (length the-string))
-               (if (member (elt the-string i) *whitespace-characters*)
-                   (unless last-was-white
-                     (setf last-was-white t)
-                     (collect #\ ))
-                   (progn
-                     (setf last-was-white nil)
-                     (collect (elt the-string i))))))))
+      (defun clean-string-for-excerpt (the-string)
+        (collecting-string
+          (let ((last-was-white nil))
+            (dotimes (i (length the-string))
+              (if (member (elt the-string i) *whitespace-characters*)
+                  (unless last-was-white
+                    (setf last-was-white t)
+                    (collect #\ ))
+                  (progn
+                    (setf last-was-white nil)
+                    (collect (elt the-string i))))))))
 
-       (defun calculate-offset (tdat excerpt startloc)
-         (if (not-empty excerpt)
-             (let ((res 0))
-               (dotimes (i startloc)
-                 (when (excerpt-here? tdat excerpt i)
-                   (incf res)))
-               res)
-             nil))
+      (defun calculate-offset (tdat excerpt startloc)
+        (if (not-empty excerpt)
+            (let ((res 0))
+              (dotimes (i startloc)
+                (when (excerpt-here? tdat excerpt i)
+                  (incf res)))
+              res)
+            nil))
 
-       (defun get-location-excerpt (tdat start end)
-         (let* ((excerpt (chain tdat text (slice start end)))
-                (excerpt (clean-string-for-excerpt excerpt))
-                (offset (calculate-offset tdat excerpt start)))
-           (list excerpt offset)))
+      (defun get-location-excerpt (tdat start end)
+        (let* ((excerpt (chain tdat text (slice start end)))
+               (excerpt (clean-string-for-excerpt excerpt))
+               (offset (calculate-offset tdat excerpt start)))
+          (list excerpt offset)))
 
-       (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
-         (let ((pos (find-excerpt-position tdat excerpt offset)))
-           (when pos
-             (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
+      (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
+        (let ((pos (find-excerpt-position tdat excerpt offset)))
+          (when pos
+            (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
 
-       (defun hilite-a-slice (text start end)
-         (list
-          (chain text (slice 0 start))
-          (psx (:span :class "hilited" :key 1
-                      :style (create 'background-color "orange")
-                      (chain text (slice start end))))
-          (chain text (slice end))))
+      (defun hilite-a-slice (text start end)
+        (list
+         (chain text (slice 0 start))
+         (psx (:span :class "hilited" :key 1
+                     :style (create 'background-color "orange")
+                     (chain text (slice start end))))
+         (chain text (slice end))))
 
-       (defun hilite-excerpt (textdata excerpt offset)
-         (if (and (not-empty excerpt) (not-empty (@ textdata text)))
-             (let ((bounds
-                    (find-excerpt-start/end textdata excerpt (or offset 0))))
-               (if bounds
-                   (hilite-a-slice (@ textdata text)
-                                   (elt bounds 0) (elt bounds 1))
-                   (progn
-                     (say "Excerpt not found")
-                     (@ textdata text))))
-             (@ textdata text)))
+      (defun hilite-excerpt (textdata excerpt offset)
+        (if (and (not-empty excerpt) (not-empty (@ textdata text)))
+            (let ((bounds
+                   (find-excerpt-start/end textdata excerpt (or offset 0))))
+              (if bounds
+                  (hilite-a-slice (@ textdata text)
+                                  (elt bounds 0) (elt bounds 1))
+                  (progn
+                    (say "Excerpt not found")
+                    (@ textdata text))))
+            (@ textdata text)))
 
       (def-component message
           (psx (:span (prop message))))
@@ -176,13 +175,13 @@
       (def-component text-sample-core
           (psx
            (:pre :id "textsample"
-            :style (create :overflow "auto" :background "lightgrey"
-                           'white-space "pre-wrap":border "1px"
-                           :height "15em" :width "40em" :cursor "text")
-            :on-mouse-up (@ this selection-change)
-            :on-key-press (@ this selection-change)
-            (hilite-excerpt (prop textdata) (prop excerpt)
-                            (prop excerpt-offset))))
+                 :style (create :overflow "auto" :background "lightgrey"
+                                'white-space "pre-wrap":border "1px"
+                                :height "15em" :width "40em" :cursor "text")
+                 :on-mouse-up (@ this selection-change)
+                 :on-key-press (@ this selection-change)
+                 (hilite-excerpt (prop textdata) (prop excerpt)
+                                 (prop excerpt-offset))))
         selection-change
         (lambda (ev)
           (let* ((tsample (chain document (get-element-by-id "textsample")))
@@ -242,23 +241,23 @@
         (lambda (url)
           (let ((msgfunc (@ this set-message)))
             (json-bind (results "/text-server/" :url url)
-               (case (@ results status)
-                 ("success"
-                  (set-state text (@ results text))
-                  (set-state textdata (create-textdata (@ results text)))
-                  (msgfunc (@ results message)))
-                 ("failure"
-                  (msgfunc (@ results message)))
-                 ("wait"
-                  (msgfunc (@ results message))
-                  (when (equal url (state url))
-                    (set-state timeout
-                               (set-timeout
-                                (@ component-this-ref load-from-server)
-                                2000 url)))))))))
+                (case (@ results status)
+                  ("success"
+                   (set-state text (@ results text))
+                   (set-state textdata (create-textdata (@ results text)))
+                   (msgfunc (@ results message)))
+                  ("failure"
+                   (msgfunc (@ results message)))
+                  ("wait"
+                   (msgfunc (@ results message))
+                   (when (equal url (state url))
+                     (set-state timeout
+                                (set-timeout
+                                 (@ component-this-ref load-from-server)
+                                 2000 url)))))))))
 
       (def-component opform-item
-          (let ((count 0)) 
+          (let ((count 0))
             (psx
              (:tr :key (prop keydata)
                   (:td :key "m1"
@@ -316,5 +315,5 @@
               (set-state :message (@ data :message))
               (funcall (prop dispatch) data))))
 
-      ))))
+      )))
 
