@@ -54,7 +54,8 @@
                            :excerpt (lisp excerpt)
                            :excerpt-offset (lisp offset))
           :layout custom-opform-layout
-          :wrapwidget false)))))
+          :wrapwidget false
+          'validation-url "/opinion-post/")))))
 
 (define-parts opinion-components
   :@javascript #'webhax-widgets:ps-widgets
@@ -313,7 +314,11 @@
         (lambda (data)
           (if (eql :message (@ data :type))
               (set-state :message (@ data :message))
-              (funcall (prop dispatch) data))))
+              (funcall (prop dispatch) data)))
+        post-form
+        (lambda (data)
+          (funcall (prop dispatch)
+                   (create :type :submit))))
 
       )))
 
