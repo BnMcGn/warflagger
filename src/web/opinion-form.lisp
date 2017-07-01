@@ -57,6 +57,17 @@
           :wrapwidget false
           'validation-url "/opinion-post/")))))
 
+(watch-for-recompile
+  (defun opinion-post-response ()
+    (multiple-value-bind (values sig)
+        (webhax-validate:validate-batch
+         *key-web-input*
+         *opinion-form-specs*)
+      (when sig
+        )
+      (list 200 '(:content-type "text/json")
+            (list (webhax-validate:batch-response-json values sig))))))
+
 (define-parts opinion-components
   :@javascript #'webhax-widgets:ps-widgets
   :@javascript-link "/static/node_modules/rangy/lib/rangy-core.js"

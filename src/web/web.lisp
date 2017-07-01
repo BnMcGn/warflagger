@@ -53,10 +53,7 @@
   (setf (ningle:route *app* "/opinion-post/" :method :POST)
         (lambda (x)
           (declare (ignore x))
-          (print "in /opinion-post/ handler")
-          (print *regular-web-input*)
-          (print *key-web-input*)
-          "here"))
+          (opinion-post-response)))
 
   (setf (ningle:route *app* "/target/*")
         (quick-page (#'webhax:react-parts #'target-components #'mood-lib)

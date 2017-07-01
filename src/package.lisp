@@ -30,7 +30,6 @@
    #:*flag-labels*
    #:*vote-ranges*
    #:*flag-types-source*
-   #:get-users
    #:author-representation-from-row
    #:warstats-for-target
    #:get-ranked-rootids

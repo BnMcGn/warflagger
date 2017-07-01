@@ -45,6 +45,7 @@
         :opinion (lisp-raw (json:encode-json-alist-to-string opinion))
         :trim (lisp thing-lister:*thing-summary-width*)))))
 
+;;FIXME: User-lister does not result in a list of authors! Not same thing.
 (def-thing
     'author
     #'get-author-data
