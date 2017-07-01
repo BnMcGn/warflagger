@@ -141,26 +141,6 @@ the page text can be found in the cache."
 (defun opinion-exists-p (url)
   (get-assoc-by-col (colm 'opinion 'url) url))
 
-(defun get-author-data (aid)
-  (map-tuples
-   (compose #'keywordize-foreign (curry #'assoc-cdr :type))
-   (curry #'assoc-cdr :value)
-   (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
-
-(defun author-representation-from-row (data)
-  (when data
-    (acond
-      ((assoc :wf-user data) (values (cdr it) (car it)))
-      ((assoc :homepage data) (values (cdr it) (car it)))
-      ((assoc :email data) (values (cdr it) (car it))))))
-
-(defun get-author-representation (aid)
-  (author-representation-from-row (get-author-data aid)))
-
-(defun get-users ()
-  (mapcar #'car (select (colm 'value) :from (tabl 'author)
-           :where (sql-= (colm 'type) "wf_user"))))
-
 (defun get-excerpt-data (eid)
   (map-tuples
    (compose #'keywordize-foreign (curry #'assoc-cdr :type))
@@ -200,6 +180,37 @@ the page text can be found in the cache."
                                          :where (sql-= (colm 'url)
                                                        (sql-escape o-url))))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Users and Authors
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;
+;; Difficulties:
+;;
+;; - Users and authors are not always the same thing.
+;; - Not all authors will have a login at warflagger.
+;; - If a user logs in to warflagger and claims an email or web address as his own,
+;; we don't have a way to verify that claim. Therefore we allow a user to possibly
+;; lay claim to someone else's authorship.
+;; - There is currently a disjunction between OpinML, Warflagger and OpenID
+;; user attributes.
+
+(defun get-author-data (aid)
+  (map-tuples
+   (compose #'keywordize-foreign (curry #'assoc-cdr :type))
+   (curry #'assoc-cdr :value)
+   (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
+
+(defun author-representation-from-row (data)
+  (when data
+    (acond
+      ((assoc :wf-user data) (values (cdr it) (car it)))
+      ((assoc :homepage data) (values (cdr it) (car it)))
+      ((assoc :email data) (values (cdr it) (car it))))))
+
+(defun get-author-representation (aid)
+  (author-representation-from-row (get-author-data aid)))
+
 (defun get-local-user-id (wf-user)
   (let ((res (select (colm 'author 'id) :from (tabl 'author)
                      :where
@@ -236,11 +247,12 @@ the page text can be found in the cache."
        (car it)))))
 
 (defun insert-new-author (atype value)
+  "Why only one atype/value?"
   (let ((aid (next-val "author_id_seq"))
         (atype (kebab:to-snake-case (mkstr atype))))
     (insert-records :into 'author
                     :attributes '(:id :type :value)
-                    :values (list aid atype value))
+                    :values (list aid atype (sql-escape value)))
     aid))
 
 (def-query user-lister (&key limit offset order-by)
@@ -254,6 +266,8 @@ the page text can be found in the cache."
 
 (defun make-user-url (username)
   (strcat *base-url* "u/" username "/"))
+
+
 
 (defun make-opinion-url (username opinid)
   (format nil "~a~d" (make-user-url username) opinid))
@@ -270,6 +284,7 @@ the page text can be found in the cache."
                   opinion))))
 
 (defun save-opinion (opin)
+  "Stores the opinion, represented as an alist, in the database"
   (with-keys (:author :target :id :votevalue :datestamp :url :comment
                       :reference :flag) (alist->hash opin)
     (let* ((user (assoc-cdr :author opin))
