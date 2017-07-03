@@ -18,6 +18,7 @@
         #:parenscript
         #:cl-react
         #:ps-gadgets
+        #:webhax-user
         )
   ;;(:shadowing-import-from #:gadgets #:call)
   (:shadowing-import-from #:ps-gadgets #:collecting-set #:strcat

@@ -147,6 +147,14 @@ the page text can be found in the cache."
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'excerpt 'opinion) eid))))
 
+(defun flag-to-lisp (dbflag)
+  (mapcar (compose #'make-keyword #'string-upcase #'to-lisp-case)
+          (split-sequence #\  dbflag)))
+
+(defun flag-to-db (lispflag)
+  (apply #'format nil "~a ~a"
+         (mapcar (compose #'sql-escape #'to-pascal-case #'mkstr) lispflag)))
+
 (defun opinion-from-db-row (row)
   (let ((res (alist->hash row)))
     (with-keys (:id :author :flag :votevalue :target :datestamp :url
@@ -157,8 +165,7 @@ the page text can be found in the cache."
                               (assoc :homepage authdata)
                               (assoc :email authdata)
                               (error "Can't find author")))))
-      (setf flag
-            (mapcar #'keywordize-foreign (split-sequence #\  flag)))
+      (setf flag (flag-to-lisp flag))
       (setf comment (car (col-from-pkey (colm 'comment 'comment) id)))
       (setf reference (car (col-from-pkey (colm 'reference 'reference) id))))
     (concatenate 'list
@@ -222,6 +229,7 @@ the page text can be found in the cache."
       (error "Integrity Breach in the author table!"))
     (car res)))
 
+;;FIXME: doesn't look like a very reliable way to do things.
 (defun author-type (author)
   (cond
     ((integerp author) :id)
@@ -246,13 +254,18 @@ the page text can be found in the cache."
                     :flatp t)
        (car it)))))
 
-(defun insert-new-author (atype value)
-  "Why only one atype/value?"
-  (let ((aid (next-val "author_id_seq"))
-        (atype (kebab:to-snake-case (mkstr atype))))
-    (insert-records :into 'author
-                    :attributes '(:id :type :value)
-                    :values (list aid atype (sql-escape value)))
+(defun insert-new-author (&rest atypes-and-values)
+  (let ((aid (next-val "author_id_seq")))
+    (insert-records
+     :into 'author
+     :av-pairs
+     (map-by-2
+      (lambda (atype value)
+        (list
+         (cons :id aid)
+         (cons :type (kebab:to-snake-case (mkstr atype)))
+         (cons :value (sql-escape value))))
+      atypes-and-values))
     aid))
 
 (def-query user-lister (&key limit offset order-by)
@@ -267,58 +280,54 @@ the page text can be found in the cache."
 (defun make-user-url (username)
   (strcat *base-url* "u/" username "/"))
 
+;;FIXME: URL should have username, shorter formatting.
+;;(defun make-opinion-url (userid opinid)
+;;  (format nil "~a~d" (make-user-url userid) opinid))
 
+(defun make-opinion-url (userid opinid)
+  (declare (ignore userid))
+  (strcat *base-url* "things/thing/opinion/" (princ-to-string opinid)))
 
-(defun make-opinion-url (username opinid)
-  (format nil "~a~d" (make-user-url username) opinid))
-
-(defun save-new-opinion (opinion user &key (opinurl #'make-opinion-url)
-                                        (userurl #'make-user-url))
+(defun save-opinion-from-user (opinion authorid
+                               &key (opinurl #'make-opinion-url))
+  "Opinions need to be set up with some stuff."
   (let ((id (next-val "opinion_id_seq")))
-    (save-opinion
-     (concatenate 'list
-                  (collecting
-                    (collect (cons :author (funcall userurl user)))
-                    (collect (cons :id id))
-                    (collect (cons :url (funcall opinurl user id))))
-                  opinion))))
+    (insert-opinion
+     (cons (cons :url (funcall opinurl authorid id)) opinion)
+     authorid
+     id)))
 
-(defun save-opinion (opin)
+(defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
-  (with-keys (:author :target :id :votevalue :datestamp :url :comment
-                      :reference :flag) (alist->hash opin)
-    (let* ((user (assoc-cdr :author opin))
-           (atype (author-type user))
-           (aid (or (get-author-id user atype)
-                    (insert-new-author
-                     (if (eq atype :string) "wf_user" atype) user)))
-           (oid
-             (insert-record
-              'opinion
-              (collecting
+  (with-keys (:target :votevalue :datestamp :url :comment :reference :flag)
+      (alist->hash opin)
+    (let ((id
+           (insert-record
+            'opinion
+            (collecting
                 (collect
                     (cons :rooturl (find/store-root-url target)))
-                (dolist (k '(:id :votevalue :target :datestamp :url))
-                  (awhen (assoc k opin) (collect it)))
-                (collect (cons :flag
-                               (apply #'format nil "~a ~a"
-                                      (mapcar (compose #'to-pascal-case
-                                                       #'mkstr) flag))))
-                (collect (cons :author aid))))))
-      (when (and (stringp comment) (string-true comment))
+              (dolist (k '(:votevalue :target :datestamp :url))
+                (when-let ((field (assoc k opin)))
+                  (collect (cons (car field) (sql-escape (cdr field))))))
+              (when id
+                (collect (cons :id id)))
+              (collect (cons :flag (flag-to-db flag)))
+              (collect (cons :author authorid))))))
+      (when (and (stringp comment) (not-empty comment))
         (insert-records :into 'comment :attributes '(:opinion :comment)
-                        :values (list oid (sql-escape comment))))
-      (when (and (stringp reference) (string-true reference))
+                        :values (list id (sql-escape comment))))
+      (when (and (stringp reference) (not-empty reference))
         (insert-records :into 'reference :attributes '(:opinion :comment)
-                        :values (list oid (sql-escape reference))))
+                        :values (list id (sql-escape reference))))
       (dolist (k '(:excerpt :excerpt-offset :time-excerpt :excerpt-length))
-        (awhen (aand (assoc k opin) (string-true (cdr it)))
+        (awhen (aand (assoc k opin) (not-empty (cdr it)))
                (insert-records :into 'excerpt
                                :attributes '(:opinion :type :value)
-                               :values (list oid
+                               :values (list id
                                              (to-snake-case (mkstr k))
                                              (sql-escape it)))))
-      oid)))
+      id)))
 
 (defun delete-opinion (oid)
   (let* ((oid (if (numberp oid) oid (parse-integer oid)))
@@ -331,6 +340,7 @@ the page text can be found in the cache."
     (unless (exists (get-assoc-by-col (colm 'opinion 'rooturl) rooturl))
       (delete-records :from 'rooturl :where (sql-= (colm 'id) rooturl)))))
 
+;;FIXME: rethink user urls
 (defun warflagger-user-from-url (url)
   (aref (nth-value
          1 (ppcre:scan-to-strings (strcat *base-url* "u/([^/]+)/") url))

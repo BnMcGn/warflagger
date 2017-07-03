@@ -57,6 +57,16 @@
           :wrapwidget false
           'validation-url "/opinion-post/")))))
 
+
+(defun create-author-spec-from-current-user ()
+  (list
+   :wf-user (get-user-name)
+   :display-name (get-display-name)
+   ;;:homepage (make-user-url (get-display-name))
+   ))
+
+;;insert-new-author
+
 (watch-for-recompile
   (defun opinion-post-response ()
     (multiple-value-bind (values sig)
@@ -64,7 +74,10 @@
          *key-web-input*
          *opinion-form-specs*)
       (when sig
-        )
+        (let ((aid (get-local-user-id (get-user-name))))
+          (unless aid
+            (setf aid (insert-new-author (create-author-spec-from-current-user))))
+          (save-opinion-from-user values aid)))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
 

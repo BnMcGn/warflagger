@@ -40,4 +40,3 @@
                       (login-link-js (assoc-cdr :login-url info))
                       :href "#" "Log In"))))))))
 
-
