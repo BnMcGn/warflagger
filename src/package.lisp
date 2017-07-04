@@ -34,5 +34,7 @@
    #:warstats-for-target
    #:get-ranked-rootids
    #:opinion-tree-for-target
-   #:for-rooturl-mixin))
+   #:for-rooturl-mixin
+   #:insert-new-author
+   #:save-opinion-from-user))
 

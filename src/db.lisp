@@ -85,6 +85,7 @@
 
 (defun get-rooturl-for-url (url)
   "Tries to find the url at the root of a tree of comments. The primary value will always be a guess at the url. The second value tells whether get-rooturl is sure of its result. Get-rooturl does not do network lookups."
+  (declare (type string url))
   (block top
     (awhen (get-assoc-by-col (colm 'rooturl 'rooturl) url)
       (return-from top (values (assoc-cdr :rooturl it)
@@ -256,16 +257,11 @@ the page text can be found in the cache."
 
 (defun insert-new-author (&rest atypes-and-values)
   (let ((aid (next-val "author_id_seq")))
-    (insert-records
-     :into 'author
-     :av-pairs
-     (map-by-2
-      (lambda (atype value)
-        (list
-         (cons :id aid)
-         (cons :type (kebab:to-snake-case (mkstr atype)))
-         (cons :value (sql-escape value))))
-      atypes-and-values))
+    (do-window ((atype value) atypes-and-values :step 2)
+      (insert-records
+       :into 'author
+       :attributes (list (colm :id) (colm :type) (colm :value))
+       :values (list aid (kebab:to-snake-case (mkstr atype)) (sql-escape value))))
     aid))
 
 (def-query user-lister (&key limit offset order-by)
@@ -290,6 +286,8 @@ the page text can be found in the cache."
 
 (defun save-opinion-from-user (opinion authorid
                                &key (opinurl #'make-opinion-url))
+  (unless (listp opinion)
+    (error "Opinion needs to be an alist"))
   "Opinions need to be set up with some stuff."
   (let ((id (next-val "opinion_id_seq")))
     (insert-opinion

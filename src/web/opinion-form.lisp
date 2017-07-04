@@ -65,8 +65,6 @@
    ;;:homepage (make-user-url (get-display-name))
    ))
 
-;;insert-new-author
-
 (watch-for-recompile
   (defun opinion-post-response ()
     (multiple-value-bind (values sig)
@@ -76,8 +74,9 @@
       (when sig
         (let ((aid (get-local-user-id (get-user-name))))
           (unless aid
-            (setf aid (insert-new-author (create-author-spec-from-current-user))))
-          (save-opinion-from-user values aid)))
+            (setf aid (apply #'insert-new-author
+                             (create-author-spec-from-current-user))))
+          (save-opinion-from-user (hu:hash->alist values) aid)))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
 
