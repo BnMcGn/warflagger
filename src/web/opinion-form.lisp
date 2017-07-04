@@ -31,7 +31,7 @@
      ((:pickone :options ,(format-flags) :notnull)
             :widget pickone-long)
      :votevalue
-     ((:pickone :options (("-1" "-1") ("0" "0") ("1" "1"))
+     ((:pickone :options ((-1 "-1") (0 "0") (1 "1"))
                       :notnull)
             :description "Vote Value")
      :reference (:url :description "Reference URL")
