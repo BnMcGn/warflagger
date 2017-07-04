@@ -76,6 +76,8 @@
           (unless aid
             (setf aid (apply #'insert-new-author
                              (create-author-spec-from-current-user))))
+          (setf (gethash :flag values)
+                (split-sequence-on-subseq ": " (gethash :flag values)))
           (save-opinion-from-user (hu:hash->alist values) aid)))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))

@@ -133,7 +133,8 @@ the page text can be found in the cache."
       (return-from top it))
     (awhen (get-rooturl-for-url rurl)
            (return-from top (get-rooturl-id it)))
-    (insert-record 'rooturl `((:rooturl . ,rurl) (:rooturl-real . nil)))))
+    (insert-record 'rooturl
+                   `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . nil)))))
 
 ;;;
 ;;; Other accessors
