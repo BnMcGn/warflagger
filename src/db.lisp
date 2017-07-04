@@ -123,7 +123,7 @@ the page text can be found in the cache."
   (let ((url (get-rooturl-by-id root-id)))
     (or (rooturl-real-p root-id)
         (and (is-cached url) (old-page-available url)
-             (update-record 'rooturl  root-id `((:rooturl-real . t))))
+             (update-record 'rooturl  root-id `((,(colm :rooturl-real) . t))))
         ;;FIXME: Implement offsite opinml hunting
         t)))
 
@@ -134,7 +134,7 @@ the page text can be found in the cache."
     (awhen (get-rooturl-for-url rurl)
            (return-from top (get-rooturl-id it)))
     (insert-record 'rooturl
-                   `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . nil)))))
+                   `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . 'false)))))
 
 ;;;
 ;;; Other accessors
@@ -305,27 +305,31 @@ the page text can be found in the cache."
             'opinion
             (collecting
                 (collect
-                    (cons :rooturl (find/store-root-url target)))
+                    (cons (colm :rooturl) (find/store-root-url target)))
               (dolist (k '(:votevalue :target :datestamp :url))
                 (when-let ((field (assoc k opin)))
-                  (collect (cons (car field) (sql-escape (cdr field))))))
+                  (collect (cons (colm (car field)) (sql-escape (cdr field))))))
               (when id
-                (collect (cons :id id)))
-              (collect (cons :flag (flag-to-db flag)))
-              (collect (cons :author authorid))))))
+                (collect (cons (colm :id) id)))
+              (collect (cons (colm :flag) (flag-to-db flag)))
+              (collect (cons (colm :author) authorid))))))
       (when (and (stringp comment) (not-empty comment))
-        (insert-records :into 'comment :attributes '(:opinion :comment)
+        (insert-records :into 'comment :attributes
+                        (list (colm :opinion) (colm :comment))
                         :values (list id (sql-escape comment))))
       (when (and (stringp reference) (not-empty reference))
-        (insert-records :into 'reference :attributes '(:opinion :comment)
+        (insert-records :into 'reference :attributes
+                        (list (colm :opinion) (colm :comment))
                         :values (list id (sql-escape reference))))
       (dolist (k '(:excerpt :excerpt-offset :time-excerpt :excerpt-length))
-        (awhen (aand (assoc k opin) (not-empty (cdr it)))
-               (insert-records :into 'excerpt
-                               :attributes '(:opinion :type :value)
-                               :values (list id
-                                             (to-snake-case (mkstr k))
-                                             (sql-escape it)))))
+        (when-let* ((pair (assoc k opin))
+                    (val (not-empty (cdr pair))))
+          (insert-records :into 'excerpt
+                          :attributes
+                          (list (colm :opinion) (colm :type) (colm :value))
+                          :values (list id
+                                        (to-snake-case (mkstr k))
+                                        (sql-escape val)))))
       id)))
 
 (defun delete-opinion (oid)
