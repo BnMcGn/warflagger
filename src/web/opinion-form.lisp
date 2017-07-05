@@ -39,6 +39,7 @@
 
 (watch-for-recompile
   (defun opinion-form-page ()
+    (check-signed-up)
     (bind-validated-input
         (&key
          (target :url)
@@ -61,12 +62,14 @@
 (defun create-author-spec-from-current-user ()
   (list
    :wf-user (get-user-name)
-   :display-name (get-display-name)
+   :screen-name (userfig:userfig-value 'screen-name)
+   ;;:display-name (get-display-name)
    ;;:homepage (make-user-url (get-display-name))
    ))
 
 (watch-for-recompile
   (defun opinion-post-response ()
+    (check-signed-up)
     (multiple-value-bind (values sig)
         (webhax-validate:validate-batch
          *key-web-input*

@@ -37,5 +37,7 @@
    #:for-rooturl-mixin
    #:insert-new-author
    #:save-opinion-from-user
-   #:author-lister))
+   #:author-lister
+   #:author-identification-from-row
+   #:get-author-identification))
 
