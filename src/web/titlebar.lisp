@@ -41,7 +41,7 @@
 
     ;;FIXME: lots of improvement here... Avatar? Stats? Faction?
     (def-component author-long
-        (psx (:span (prop opinion author))))
+        (psx (:span (prop opinion authorname))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))

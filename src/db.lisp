@@ -161,13 +161,11 @@ the page text can be found in the cache."
 (defun opinion-from-db-row (row)
   (let ((res (alist->hash row)))
     (with-keys (:id :author :flag :votevalue :target :datestamp :url
-                    :comment :reference)
+                    :comment :reference :authorname)
         res
       (let ((authdata (get-author-data author)))
-        (setf author (cdr (or (assoc :wf-user authdata)
-                              (assoc :homepage authdata)
-                              (assoc :email authdata)
-                              (error "Can't find author")))))
+        (setf author (author-identification-from-row authdata))
+        (setf authorname (author-representation-from-row authdata)))
       (setf flag (flag-to-lisp flag))
       (setf comment (car (col-from-pkey (colm 'comment 'comment) id)))
       (setf reference (car (col-from-pkey (colm 'reference 'reference) id))))
@@ -214,12 +212,22 @@ the page text can be found in the cache."
 (defun author-representation-from-row (data)
   (when data
     (acond
-      ((assoc :wf-user data) (values (cdr it) (car it)))
+      ((assoc :screen-name data) (values (cdr it) (car it)))
+      ((assoc :display-name data) (values (cdr it) (car it)))
       ((assoc :homepage data) (values (cdr it) (car it)))
       ((assoc :email data) (values (cdr it) (car it))))))
 
 (defun get-author-representation (aid)
   (author-representation-from-row (get-author-data aid)))
+
+(defun author-identification-from-row (data)
+  (when data
+    (acond
+      ((assoc :homepage data) (values (cdr it) (car it)))
+      ((assoc :email data) (values (cdr it) (car it))))))
+
+(defun get-author-identification (aid)
+  (author-identification-from-row (get-author-data aid)))
 
 (defun get-local-user-id (wf-user)
   (let ((res (select (colm 'author 'id) :from (tabl 'author)

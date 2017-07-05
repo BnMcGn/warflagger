@@ -36,5 +36,6 @@
    #:opinion-tree-for-target
    #:for-rooturl-mixin
    #:insert-new-author
-   #:save-opinion-from-user))
+   #:save-opinion-from-user
+   #:author-lister))
 
