@@ -134,7 +134,7 @@ the page text can be found in the cache."
     (awhen (get-rooturl-for-url rurl)
            (return-from top (get-rooturl-id it)))
     (insert-record 'rooturl
-                   `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . 'false)))))
+                   `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false)))))
 
 ;;;
 ;;; Other accessors
@@ -265,6 +265,14 @@ the page text can be found in the cache."
        :values (list aid (kebab:to-snake-case (mkstr atype)) (sql-escape value))))
     aid))
 
+(def-query author-lister (&key limit offset order-by)
+  (mapcar #'car
+          (query-marker
+           (merge-query
+            (select (colm 'id) :from (tabl 'author) :distinct t)
+            (order-by-mixin order-by)
+            (limit-mixin limit offset)))))
+
 (def-query user-lister (&key limit offset order-by)
   (mapcar #'car
           (query-marker
@@ -340,7 +348,7 @@ the page text can be found in the cache."
       (delete-records :from 'excerpt :where (sql-= (colm 'opinion) oid))
       (delete-records :from 'reference :where (sql-= (colm 'opinion) oid))
       (delete-records :from 'opinion :where (sql-= (colm 'id) oid)))
-    (unless (exists (get-assoc-by-col (colm 'opinion 'rooturl) rooturl))
+    (unless (get-assoc-by-col (colm 'opinion 'rooturl) rooturl)
       (delete-records :from 'rooturl :where (sql-= (colm 'id) rooturl)))))
 
 ;;FIXME: rethink user urls

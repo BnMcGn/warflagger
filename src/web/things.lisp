@@ -51,12 +51,12 @@
     #'get-author-data
   #'author-representation-from-row
   :lister (list
-           #'user-lister
+           #'author-lister
            :sortkeys '(values id)
            :length (lambda (&rest params)
                      (get-count
                       (unexecuted
-                        (apply #'user-lister params))))))
+                        (apply #'author-lister params))))))
 
 (def-db-thing
     'opinion
