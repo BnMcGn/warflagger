@@ -78,6 +78,8 @@
                              (create-author-spec-from-current-user))))
           (setf (gethash :flag values)
                 (split-sequence-on-subseq ": " (gethash :flag values)))
+          (setf (gethash :datestamp values)
+                (clsql:get-time))
           (save-opinion-from-user (hu:hash->alist values) aid)))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
