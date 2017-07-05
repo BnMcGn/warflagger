@@ -58,7 +58,8 @@
           :wrapwidget false
           'validation-url "/opinion-post/")))))
 
-
+;;FIXME: Needs to update automatically from any updates to the userfig, as per
+;; userfig settings. Also, need default homepage url + provision for override.
 (defun create-author-spec-from-current-user ()
   (list
    :wf-user (get-user-name)
@@ -337,7 +338,10 @@
                  :key "user1"
                  (:td
                   (:input :type "button" :value "Post"
-                          :on-click (@ this post-form)))))))))
+                          :on-click (@ this post-form))))
+                (:tr
+                 :key "user0"
+                 (:td (if (@ props success) "Opinion Posted" ""))))))))
         get-initial-state
         (lambda ()
           (create :message ""))
