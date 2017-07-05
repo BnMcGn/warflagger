@@ -125,16 +125,17 @@ the page text can be found in the cache."
         (and (is-cached url) (old-page-available url)
              (update-record 'rooturl  root-id `((,(colm :rooturl-real) . t))))
         ;;FIXME: Implement offsite opinml hunting
-        t)))
+        t))) ;Why the T here?
 
 (defun find/store-root-url (rurl)
-  (block top
-    (awhen2 (tryit (get-rooturl-id rurl))
-      (return-from top it))
-    (awhen (get-rooturl-for-url rurl)
-           (return-from top (get-rooturl-id it)))
-    (insert-record 'rooturl
-                   `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false)))))
+  (make-rooturl-real ;worth a try: might have been fetched by opinion page.
+   (block top
+     (awhen2 (tryit (get-rooturl-id rurl))
+       (return-from top it))
+     (awhen (get-rooturl-for-url rurl)
+       (return-from top (get-rooturl-id it)))
+     (insert-record 'rooturl
+                    `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false))))))
 
 ;;;
 ;;; Other accessors
