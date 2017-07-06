@@ -39,11 +39,13 @@
 (dependency-auto-watcher routes
   (setf (ningle:route *app* "/text-server/")
         (lambda (params)
-          (list 200 '(:content-type "application/json")
-                (list
-                 (json:encode-json-to-string
-                  (wf/text-extract:text-server
-                   (cdr (assoc "url" params :test #'string=))))))))
+          (let ((url (cdr (assoc "url" params :test #'string=))))
+            (list 200 '(:content-type "application/json")
+                  (list
+                   (json:encode-json-to-string
+                    (if (opinion-exists-p url)
+                        (warflagger:opinion-text-server url)
+                        (wf/text-extract:text-server url))))))))
 
   (setf (ningle:route *app* "/opinion/")
         (quick-page (#'webhax:react-parts #'webhax:redux-parts

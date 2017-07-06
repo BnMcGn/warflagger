@@ -188,6 +188,25 @@ the page text can be found in the cache."
                                          :where (sql-= (colm 'url)
                                                        (sql-escape o-url))))))))
 
+(defun opinion-text-server (url)
+  (hu:plist->hash
+   (if (opinion-exists-p url)
+       (let ((res (select (colm 'comment 'comment)
+                          :from (list (tabl 'opinion) (tabl 'comment))
+                          :where (sql-and (sql-= (colm 'opinion 'url) url)
+                                          (sql-= (colm 'opinion 'id)
+                                                 (colm 'comment 'opinion))))))
+         (if res
+             (list :text (caar res)
+                   :status "success"
+                   :message "")
+             (list :text ""
+                   :status "success"
+                   :message "[No comment text]"))
+         (list :text
+               :status "failure"
+               :message "Opinion not found")))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
