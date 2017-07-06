@@ -43,6 +43,22 @@
     (def-component author-long
         (psx (:span (prop opinion authorname))))
 
+    (def-component reply-link
+        (let ((excerpt (if (prop excerpt)
+                           (strcat "&excerpt="
+                                   (encode-u-r-i-component (prop excerpt)))
+                           ""))
+              (offset (if (prop offset)
+                          (strcat "&offset=" (chain (prop offset) (to-string)))
+                          ""))
+              (url (if (prop url)
+                       (strcat "url="
+                               (encode-u-r-i-component (prop url)))
+                       "")))
+          (psx
+           (:form :action (strcat "/opinion/?" url excerpt offset)
+                  (:input :type "submit" :value "Reply")))))
+
     (def-component comment-summary
         (let* ((opin (prop opinion))
                (comment (if (chain opin (has-own-property 'comment))
