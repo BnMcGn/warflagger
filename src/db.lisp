@@ -337,6 +337,7 @@ the page text can be found in the cache."
 
 (defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
+  (print "in insert-opinion")
   (with-keys (:target :votevalue :datestamp :url :comment :reference :flag)
       (alist->hash opin)
     (let ((id
@@ -355,11 +356,11 @@ the page text can be found in the cache."
       (when (and (stringp comment) (not-empty comment))
         (insert-records :into 'comment :attributes
                         (list (colm :opinion) (colm :comment))
-                        :values (list id (sql-escape comment))))
+                        :values (list id comment)))
       (when (and (stringp reference) (not-empty reference))
         (insert-records :into 'reference :attributes
                         (list (colm :opinion) (colm :comment))
-                        :values (list id (sql-escape reference))))
+                        :values (list id reference)))
       (dolist (k '(:excerpt :excerpt-offset :time-excerpt :excerpt-length))
         (when-let* ((pair (assoc k opin))
                     (val (not-empty (cdr pair))))
@@ -368,7 +369,7 @@ the page text can be found in the cache."
                           (list (colm :opinion) (colm :type) (colm :value))
                           :values (list id
                                         (to-snake-case (mkstr k))
-                                        (sql-escape val)))))
+                                        val))))
       id)))
 
 (defun delete-opinion (oid)
