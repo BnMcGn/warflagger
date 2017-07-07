@@ -42,8 +42,7 @@
     (check-signed-up)
     (bind-validated-input
         (&key
-         ;;(target :url) ;FIXME: ratify's idea of url doesn't include port number?
-         (target :string)
+         (target :url)
          (excerpt :string)
          (offset :unsigned-integer))
       (html-out
