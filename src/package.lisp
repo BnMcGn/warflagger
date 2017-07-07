@@ -39,5 +39,7 @@
    #:save-opinion-from-user
    #:author-lister
    #:author-identification-from-row
-   #:get-author-identification))
+   #:get-author-identification
+   #:opinion-exists-p
+   #:opinion-text-server))
 

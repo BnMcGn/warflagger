@@ -44,20 +44,19 @@
         (psx (:span (prop opinion authorname))))
 
     (def-component reply-link
-        (let ((excerpt (if (prop excerpt)
-                           (strcat "&excerpt="
-                                   (encode-u-r-i-component (prop excerpt)))
-                           ""))
-              (offset (if (prop offset)
-                          (strcat "&offset=" (chain (prop offset) (to-string)))
-                          ""))
-              (url (if (prop url)
-                       (strcat "url="
-                               (encode-u-r-i-component (prop url)))
-                       "")))
+        (let ((excerpt (prop excerpt))
+              (offset (prop offset)))
           (psx
-           (:form :action (strcat "/opinion/?" url excerpt offset)
-                  (:input :type "submit" :value "Reply")))))
+           (:form :action "/opinion/" :method "GET"
+                  (:input :type "hidden" :name "target" :key 1
+                          :value (prop url))
+                  (when excerpt
+                    (psx (:input :type "hidden" :name "excerpt" :key 3
+                                 :value (encode-u-r-i-component excerpt))))
+                  (when offset
+                    (psx (:input :type "hidden" :name "excerpt" :key 3
+                                 :value (encode-u-r-i-component offset))))
+                  (:input :type "submit" :value "Reply" :key 2)))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))

@@ -202,10 +202,10 @@ the page text can be found in the cache."
                    :message "")
              (list :text ""
                    :status "success"
-                   :message "[No comment text]"))
-         (list :text
-               :status "failure"
-               :message "Opinion not found")))))
+                   :message "[No comment text]")))
+       (list :text
+             :status "failure"
+             :message "Opinion not found"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors

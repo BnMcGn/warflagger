@@ -286,7 +286,7 @@
                     (:flag-name :key 2 :opinion op) " "
                     (:date-stamp :key 3 :opinion op) " "
                     (:author-long :key 4 :opinion op) " "
-                    (:reply-link :key 5 :url (@ op url))
+                    (:reply-link :key 6 :url (@ op url))
                     (:general-opinion-knobdule
                      :key 5
                      :... (@ this props)
