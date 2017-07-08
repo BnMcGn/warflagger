@@ -337,7 +337,6 @@ the page text can be found in the cache."
 
 (defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
-  (print "in insert-opinion")
   (with-keys (:target :votevalue :datestamp :url :comment :reference :flag)
       (alist->hash opin)
     (let ((id

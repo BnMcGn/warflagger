@@ -22,10 +22,28 @@
 (define-default-parts warflagger-base
   :@account-info #'account-bar
   :@javascript #'ps-gadgets
-  :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js")
+  :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
+  :@head #'favicon-links)
 
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)
+
+
+(defun favicon-links ()
+  (html-out
+    (:link :rel "apple-touch-icon" :sizes "180x180"
+           :href "/static/img/apple-touch-icon.png")
+    (:link :rel "icon" :type "image/png" :sizes "32x32"
+           :href "/static/img/favicon-32x32.png")
+    (:link :rel "icon" :type "image/png" :sizes "16x16"
+           :href "/static/img/favicon-16x16.png")
+    (:link :rel "manifest" :href "/static/img/manifest.json")
+    (:link :rel "mask-icon" :href "/static/img/safari-pinned-tab.svg"
+           :color "#f46a25")
+    (:link :rel "shortcut icon" :href "/static/img/favicon.ico")
+    (:meta :name "msapplication-config" :content "/static/img/browserconfig.xml")
+    (:meta :name "theme-color" :content "#ffffff")))
+
 
 (defun warflagger-user-info-bundle ()
   (cons
