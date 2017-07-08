@@ -96,7 +96,7 @@
                   :opinions (lisp-raw opinions)
                   :url (lisp url)
                   :title (lisp (grab-title url))
-                  ;;:focus '(20) ; for testing
+                  :focus '()
                   ))))))
 
   (setf (ningle:route *app* "/faq/")

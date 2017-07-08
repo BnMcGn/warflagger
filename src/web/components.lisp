@@ -121,7 +121,7 @@
                                      :key (unique-id)
                                      :focus (prop focus)
                                      :tree-address (prop tree-address))))))))
- 
+
       (defun %make-segments (text opins props)
         (collecting
             (let ((segpoints (excerpt-segment-points
