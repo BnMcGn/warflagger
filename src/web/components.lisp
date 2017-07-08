@@ -316,7 +316,8 @@
                     :... (@ this props)
                     :opinions (prop opinions)
                     :tree-address (list)
-                    :focusfunc (@ this focus-func))))
+                    :focusfunc (@ this focus-func))
+                   (:reply-link :url (prop url))))
             (:hilited-text
              :key 2
              :text (prop text)
