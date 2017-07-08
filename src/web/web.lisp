@@ -74,7 +74,18 @@
           (opinion-post-response)))
 
   (setf (ningle:route *app* "/target/*")
-        (quick-page (#'webhax:react-parts #'target-components #'mood-lib)
+        (quick-page
+            (#'webhax:react-parts
+             #'target-components
+             #'mood-lib
+             :@side-content
+             (lambda ()
+               (bind-validated-input
+                   ((id :integer))
+                 (funcall
+                  (html-thing-lister:connection-display-func
+                   'target 'participants)
+                  id))))
           (bind-validated-input
               ((id :integer))
             (let ((url (get-rooturl-by-id id)))

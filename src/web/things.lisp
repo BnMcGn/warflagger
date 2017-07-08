@@ -146,3 +146,12 @@
                            (clsql:sql-= (colm 'author) (sql-escape (car id)))))
      :test #'eq))
   :other-thing 'target)
+
+(def-thing-connector
+    'target
+    'participants
+  (lambda (&rest x)
+    (flaggers-for-rooturl
+     (get-rooturl-by-id (car x))))
+  :other-thing 'author)
+
