@@ -2,11 +2,13 @@
 .parent-active {
     background: white;
     font-weight: bold;
+    z-index: 20;
     }
 
 .parent-inactive {
     background: #aaa;
     font-weight: bold;
+    z-index: 10;
     }
 
 .hilited {
