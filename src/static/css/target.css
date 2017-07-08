@@ -1,0 +1,43 @@
+
+.parent-active {
+    background: white;
+    font-weight: bold;
+    }
+
+.parent-inactive {
+    background: #aaa;
+    font-weight: bold;
+    }
+
+.hilited {
+    background: white;
+    color: black;
+}
+
+.hilited-parent {
+    background: #ccc;
+    color: #222;
+    }
+
+.opinion {
+    background: white;
+    margin: 3px;
+    padding: 3px;
+    box-shadow: 3px 3px 10px 1px #000;
+    }
+
+.contested-old {background: #ffc380;}
+.positive-old {background: #80ff80;}
+.negative-old {background: #ff8080;}
+.neutral-old {background: #d1cfcf;}
+
+.contested-recent {background: #ffab4d;}
+.positive-recent {background: #66ff66;}
+.negative-recent {background: #ff6666;}
+.neutral-recent {background: #c4bcbc;}
+
+.contested-new {background: #ff8800;}
+.positive-new {background: #00ff00;}
+.negative-new {background: #ff0000;}
+.neutral-new {background: #aba3a3;}
+
