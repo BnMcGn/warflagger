@@ -92,6 +92,9 @@
    :sortkeys '(relevance))
   :html-thing-link (lambda (id) (format nil "/target/~a" id)))
 
+(html-thing-lister:def-thing-action 'opinion 'reply
+  '(lambda (id) (setf (@ window location href) (+ "/opinion/?opinion-id=" id))))
+
 (def-thing-connector
     'opinion
     'replies

@@ -28,7 +28,6 @@
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)
 
-
 (defun favicon-links ()
   (html-out
     (:link :rel "apple-touch-icon" :sizes "180x180"
@@ -43,7 +42,6 @@
     (:link :rel "shortcut icon" :href "/static/img/favicon.ico")
     (:meta :name "msapplication-config" :content "/static/img/browserconfig.xml")
     (:meta :name "theme-color" :content "#ffffff")))
-
 
 (defun warflagger-user-info-bundle ()
   (cons

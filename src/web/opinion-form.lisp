@@ -43,20 +43,26 @@
     (bind-validated-input
         (&key
          (target :url)
+         (target-id :unsigned-integer)
+         (opinion-id :unsigned-integer)
          (excerpt :string)
          (offset :unsigned-integer))
-      (html-out
-        (:h2 "Enter an opinion")
-        (mount-component (webhax-form)
-          :fieldspecs
-          (lisp-raw
-           (webhax-validate:convert-fieldspecs-to-json *opinion-form-specs*))
-          :data (create :target (lisp target)
-                           :excerpt (lisp excerpt)
-                           :excerpt-offset (lisp offset))
-          :layout custom-opform-layout
-          :wrapwidget false
-          'validation-url "/opinion-post/")))))
+      (let ((target (cond
+                      (target target)
+                      (target-id (get-rooturl-by-id target-id))
+                      (opinion-id (assoc-cdr :url (opinion-from-id opinion-id))))))
+        (html-out
+         (:h2 "Enter an opinion")
+         (mount-component (webhax-form)
+           :fieldspecs
+           (lisp-raw
+            (webhax-validate:convert-fieldspecs-to-json *opinion-form-specs*))
+           :data (create :target (lisp target)
+                         :excerpt (lisp excerpt)
+                         :excerpt-offset (lisp offset))
+           :layout custom-opform-layout
+           :wrapwidget false
+           'validation-url "/opinion-post/"))))))
 
 ;;FIXME: Needs to update automatically from any updates to the userfig, as per
 ;; userfig settings. Also, need default homepage url + provision for override.
