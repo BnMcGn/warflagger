@@ -120,6 +120,7 @@
                       (psx (:opinion :opinions focussed
                                      :key (unique-id)
                                      :focus (prop focus)
+                                     :focusfunc (prop focusfunc)
                                      :tree-address (prop tree-address))))))))
 
       (defun %make-segments (text opins props)
@@ -251,6 +252,9 @@
                id
                (chain document (get-element-by-id id) parent-element)
                (%get-excerptless-opinions (prop opinions))))))
+        component-will-receive-props
+        (lambda (_)
+          (set-state viewable nil))
         component-did-mount
         (lambda () (chain this (display-plumbs)))
         component-did-update
@@ -314,6 +318,7 @@
                    (:general-opinion-knobdule
                     :key 2
                     :... (@ this props)
+                    :focus (state focus)
                     :opinions (prop opinions)
                     :tree-address (list)
                     :focusfunc (@ this focus-func))

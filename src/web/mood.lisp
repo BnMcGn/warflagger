@@ -104,7 +104,7 @@
                                source
                                (strcat "opinid-"
                                        (chain op 0 id (to-string)))
-                               target target-id 
+                               target target-id
                                anchors (list "Left" "Left")
                                paint-style (stroke-intensity op)
                                connector "Straight"
