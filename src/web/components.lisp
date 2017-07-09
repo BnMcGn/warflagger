@@ -223,19 +223,28 @@
                            (< 0 (@ o 0 excerpt length)))
                 (collect o)))))
 
+      ;;FIXME: this is getting too large & complicated
       (def-component general-opinion-knobdule
-          (progn
+          (let ((opins (%get-excerptless-opinions (prop opinions))))
             (delete-plumbs this)
-            (let ((opins (%get-excerptless-opinions (prop opinions))))
-              (psx (:span :on-click (@ this handle-click)
-                          :id (%make-knob-id (prop tree-address))
-                          (when (not-empty opins) " X")
-                          (:span :style (create position :relative) :key 1
-                                 (%make-opin-popups
-                                  (if (and (not (prop not-viewable))
-                                           (state viewable))
-                                      opins ([]))
-                                  (@ this props)))))))
+            (psx (:span :on-click (@ this handle-click)
+                        :id (%make-knob-id (prop tree-address))
+                        (when (not-empty opins) " X")
+                        (let ((focussed (focus-parent-p (@ this props))))
+                          (if focussed
+                              (psx (:opinion :opinions focussed
+                                             :key (unique-id)
+                                             :focus (prop focus)
+                                             :focusfunc (prop focusfunc)
+                                             :tree-address (prop tree-address)))
+                              (when (focus-p (@ this props))
+                                (psx (:span :style (create position :relative) :key 1
+                                            (%make-opin-popups
+                                             (if (and (not (prop not-viewable))
+                                                      (state viewable))
+                                                 opins
+                                                 ([]))
+                                             (@ this props))))))))))
         get-initial-state
         (lambda () (create viewable false))
         handle-click
@@ -259,7 +268,6 @@
         (lambda () (chain this (display-plumbs)))
         component-did-update
         (lambda () (chain this (display-plumbs))))
-
 
       (def-component opinion
           (let* ((op (@ (prop opinions) 0))
