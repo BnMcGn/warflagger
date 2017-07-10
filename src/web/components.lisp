@@ -228,6 +228,7 @@
           (let ((opins (%get-excerptless-opinions (prop opinions))))
             (delete-plumbs this)
             (psx (:span :on-click (@ this handle-click)
+                        :style (create position :relative)
                         :id (%make-knob-id (prop tree-address))
                         (when (not-empty opins) " X")
                         (let ((focussed (focus-parent-p (@ this props))))
