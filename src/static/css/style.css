@@ -214,3 +214,7 @@ body {
     margin-left:2px;
     background-color: #eee;
 }
+
+.thing_lister span a {
+    display: inline-block;
+}
