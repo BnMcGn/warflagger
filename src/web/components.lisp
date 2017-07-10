@@ -232,7 +232,9 @@
                         :id (%make-knob-id (prop tree-address))
                         (when (not-empty opins) " X")
                         (let ((focussed (focus-parent-p (@ this props))))
-                          (if focussed
+                          (if (and focussed
+                                   (not (and (@ focussed 0 excerpt)
+                                             (< 0 (@ focussed 0 excerpt length)))))
                               (psx (:opinion :opinions focussed
                                              :key (unique-id)
                                              :focus (prop focus)
