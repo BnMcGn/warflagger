@@ -1,11 +1,11 @@
 (in-package :wf/web)
 
-(defparameter *preferred-space* 1.5)
-(defparameter *minimum-space* 1)
+(defparameter *preferred-space* 2.5)
+(defparameter *minimum-space* 1.5)
 (defparameter *unit-string* "em")
 (defparameter *opin-box-height* 20)
 (defparameter *opin-box-width* 10)
-(defparameter *placement-randomness* 0.45)
+(defparameter *placement-randomness* 0.25)
 (defparameter *rank-overlap* 2)
 (defparameter *sway-factor* (- 4))
 
@@ -33,7 +33,7 @@
             (collect (1+ ranksize))))))
 
     (defun spread-rank (number)
-      (let* ((space (if (< (lisp *opin-box-width*)
+      (let* ((space (if (< (lisp *opin-box-height*)
                            (* number (lisp *preferred-space*)))
                         (lisp *preferred-space*)
                         (lisp *minimum-space*)))
@@ -62,8 +62,11 @@
           (dolist (ranklen (distribute-ranks-evenly item-count))
             (dolist (itempos (spread-rank ranklen))
               (collect
+                  ;;(list (+ (funcall xpos itempos)
+                  ;;         (* rankcount (lisp *rank-overlap*)))
+                  ;;      itempos)))
                   (random-wiggle (+ (funcall xpos itempos)
-                                    (* rankcount (lisp *rank-overlap*)))
+                                  (* rankcount (lisp *rank-overlap*)))
                                  itempos)))
             (incf rankcount)))))
 
