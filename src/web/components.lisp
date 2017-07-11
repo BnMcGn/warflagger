@@ -64,22 +64,19 @@
          (sort (lambda (a b) (- a b)))))
 
       (def-component hilited-segment
-          (progn
-            (when (or (prop not-viewable) (not (state viewable)))
-              (delete-plumbs this))
-            (psx
-             (:span
-              :style (create font-weight :bold)
-              :class (flavor (prop opinions))
-              :on-click (@ this handle-click)
-              (rebreak (prop text))
-              (:span :style (create position :relative) :key (unique-id)
-                     :id (prop id)
-                     (%make-opin-popups (if (and (not (prop not-viewable))
-                                                 (state viewable))
-                                            (prop opinions)
-                                            ([]))
-                                        (@ this props))))))
+          (psx
+           (:span
+            :style (create font-weight :bold)
+            :class (flavor (prop opinions))
+            :on-click (@ this handle-click)
+            (rebreak (prop text))
+            (:span :style (create position :relative) :key (unique-id)
+                   :id (prop id)
+                   (%make-opin-popups (if (and (not (prop not-viewable))
+                                               (state viewable))
+                                          (prop opinions)
+                                          ([]))
+                                      (@ this props)))))
         get-initial-state
         (lambda () (create viewable false))
         handle-click
@@ -94,12 +91,14 @@
              this
              (prop id)
              (chain document (get-element-by-id (prop id))
-                    parent-element parent-element)
+                    parent-element parent-element parent-element)
              (prop opinions))))
         component-did-mount
         (lambda () (chain this (display-plumbs)))
         component-did-update
-        (lambda () (chain this (display-plumbs))))
+        (lambda () (chain this (display-plumbs)))
+        component-will-unmount
+        (lambda () (delete-plumbs this)))
 
       (def-component plain-segment
           (psx
@@ -241,7 +240,7 @@
                                              :focusfunc (prop focusfunc)
                                              :tree-address (prop tree-address)))
                               (when (focus-p (@ this props))
-                                (psx (:span :style (create position :relative) :key 1
+                                (psx (:span :style (create position :absolute) :key 1
                                             (%make-opin-popups
                                              (if (and (not (prop not-viewable))
                                                       (state viewable))
@@ -262,7 +261,9 @@
               (display-popup-plumbs
                this
                id
-               (chain document (get-element-by-id id) parent-element)
+               ;;FIXME: Looks a little shaky
+               (chain document (get-element-by-id id)
+                      parent-element parent-element parent-element)
                (%get-excerptless-opinions (prop opinions))))))
         component-will-receive-props
         (lambda (_)
@@ -319,7 +320,7 @@
 
       (def-component target-root
           (psx
-           (:div
+           (:div :style (create position :absolute width "80%")
             :on-click (@ this handle-click)
             (:div :key 1
                   :class (flavor (prop opinions))
