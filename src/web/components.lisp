@@ -229,7 +229,7 @@
             (psx (:span :on-click (@ this handle-click)
                         :style (create position :relative)
                         :id (%make-knob-id (prop tree-address))
-                        (when (not-empty opins) " X")
+                        (:knobdule-display :opinions opins)
                         (let ((focussed (focus-parent-p (@ this props))))
                           (if (and focussed
                                    (not (and (@ focussed 0 excerpt)
@@ -272,6 +272,23 @@
         (lambda () (chain this (display-plumbs)))
         component-did-update
         (lambda () (chain this (display-plumbs))))
+
+      (def-component knobdule-display
+          (let* ((immed (chain (prop opinions) length))
+                 (all
+                  (labels ((counter (things)
+                             (let ((ln (chain things length)))
+                               (if (= 1 ln)
+                                   1
+                                   (chain (mapcar #'counter things)
+                                          (reduce (lambda (a b) (+ a b))
+                                                  0))))))
+                    (counter (prop opinions))))
+                 (allstr (if (< immed all)
+                             (strcat "/" (chain all (to-string)))
+                             "")))
+            (psx (:span :class "knobdule"
+                        (strcat (chain immed (to-string)) allstr)))))
 
       (def-component opinion
           (let* ((op (@ (prop opinions) 0))

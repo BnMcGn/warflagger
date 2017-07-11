@@ -85,10 +85,7 @@
                   ("contested" "rgba(256,136,0,0.75)"))))
 
       (defun delete-plumbs (base-obj)
-        (say "in delete-plums")
-        (say base-obj)
         (when (chain base-obj (has-own-property '%plumb-instance))
-          (say "deleting")
           (chain base-obj %plumb-instance (delete-every-endpoint))))
 
       (defun display-popup-plumbs (base-obj target-id container opinions)
