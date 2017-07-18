@@ -21,7 +21,7 @@
                #:warflagger
                #:ps-gadgets
                #:lack-middleware-mount
-               #:clack-openid-connect
+               #:clath
                #:userfig
                #:cl-markdown)
   :serial t

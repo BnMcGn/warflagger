@@ -145,7 +145,7 @@
   (setf (ningle:route *app* "/")
         (lambda (params)
           (declare (ignore params))
-          (clack-openid-connect::logged-in-page))))
+          (clath::logged-in-page))))
 
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)
@@ -170,8 +170,8 @@
    :path "/static/"
    :root #p"~/quicklisp/local-projects/warflagger/src/static/")
   :session
-  (clack-openid-connect:component
-   "http://logintest.warflagger.com:5000/oid_connect/")
+  (clath:component
+   "http://logintest.warflagger.com:5000/clath/")
   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
   (html-thing-lister:thing-component)
   *app*)
