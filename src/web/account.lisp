@@ -24,7 +24,9 @@
             (%logo)
             (:a :style "position:relative; left: 180px;"
                 :href (assoc-cdr :user-url info)
-                (str (userfig:userfig-value 'webhax-user:screen-name)) )
+                (str (let ((userfig:*userfig-user*
+                            (gethash :username webhax:*session*)))
+                       (userfig:userfig-value 'webhax-user:screen-name))))
             (:div :style "float: right; margin-right: 30px;"
                   (:a :href (assoc-cdr :settings-url info) "Settings")
                   (:a :href (assoc-cdr :logout-url info) "Sign out"))))
