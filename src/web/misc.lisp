@@ -6,6 +6,11 @@
   (clsql:format-time stream object :format :iso8601)
   (write-char #\" stream))
 
+(defmethod json:encode-json ((object local-time:timestamp) &optional stream)
+  (write-char #\" stream)
+  (local-time:format-timestring stream object)
+  (write-char #\" stream))
+
 (defun test-js ()
   (ps
     (define-react-class thing

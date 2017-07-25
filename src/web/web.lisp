@@ -153,7 +153,7 @@
 
 ;;FIXME: Need to handle the user information that will be passed out in OpinML
 ;; exports. User needs to be able to specify a homepage, whether email address
-;; should go out in the data. 
+;; should go out in the data.
 (defparameter *userfig-fieldspecs*
   '(:test-value
     (:string
