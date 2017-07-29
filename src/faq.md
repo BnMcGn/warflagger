@@ -5,48 +5,15 @@ Hi friends,
 Thank you for participating in the warflagger project beta.
 
 ## General
+
 ### What is warflagger?
 
 Warflagger is an attempt to tame acrimonious debate on the internet. It takes inspiration from user moderated sites such as slashdot, stackexchange and reddit.
 
-### How does it differ from these sites?
-(Warning: I'm not as familiar with some of these sites as I should be. In some cases I'm going on what other people have said about them.)
+### How does it differ from other forum software?
 
-Stackexchange: Stackexchange is designed for clear questions with a single best answer. Warflagger will tackle messier discussions. 
+The [Other Sites](https://github.com/BnMcGn/warflagger/wiki/Other-Sites) section of the WarFlagger Wiki has a comparison with other forum sites.
 
-Slashdot: The slashdot comment system comes close to the goals of warflagger. Warflagger could be described as slashdot comments for the whole internet. Warflagger differs from slashdot by being based on an open, distributable comment format called OpinML. This allows for the complete detachment of discussion from any single owning entity. It will allow you, the end user, to refactor the raw debate by selecting your own trusted moderators and meta-moderators.
-
-Reddit: Reddit is based on a straight forward up/down vote system. Warflagger is at the other end of the complexity spectrum. OpinML comments have an excerpt field to allow commenters to pinpoint the item of discussion in the source text. There is a flag field - like that of slashdot - to specify the nature of your disagreement or approval. There is also a votevalue field, to further tune what you mean to say.
-Reddit, on the vote scoring side, is (AFAIK) a simple democracy. If the majority vote something up it goes up. If most people dislike it, it disappears. Warflagger acknowledges that some discussions will never reach consensus and that the minority should be heard. It is meant for cases of idealogical dispute, where partisan debaters are expected not only to eternally disagree, but also to maliciously sabotage the debate. (Note: at the time of this writing, the warflagger scoring system has not been implemented. Even when implemented, I don't expect it to be initially invulnerable.)
-
-Wikipedia: Wikipedia's goal is to present all the facts on a topic in a professional manner, ie. with neutrality of tone and proper references. Unfortunately it has suffered claims of inaccuracy and bias. Warflagger can act as a layer on top of wikipedia pages. It can present a precise view of the level of agreement, verification, conflict or doubt about each statement on a page. Users can drill down to the best arguments that each side of a conflict makes, and to the best rebuttals of those arguments.
-
-Snopes: Warflagger could be described as a crowdsourced snopes.
-
-### What does OpinML look like?
-
-Here's a sample:
-
-
-    @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix owl:  <http://www.w3.org/2002/07/owl#> .
-    
-    @prefix opinneg: <http://opinml.org/2013/01/opinML/opinions/negative#> .
-    @prefix opin: <http://opinml.org/2013/01/opinML/util#> .
-    @prefix : <http://warflagger.net/sample/sample.n3#> .
-    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-    
-    <mailto:sample@warflagger.net> opin:opinion :osn-12345 .
-    :osn-12345 opin:target <http://asdf.com/whatisasdf.html> ;
-    	opin:excerpt "asdf is a four letter word." ;
-    	opin:flag opinneg:Disagree ;
-    	opin:votevalue -1 ;
-    	opin:datestamp "2013-09-03 12:50:23.077589" ;
-    	opin:comment "asdf is not a word" .
-
-
-OpinML is a species of RDF, preferably in N3 format. The first two blocks above are header. The actual opinion starts with the mailto on the third line. OpinML files can contain multiple opinions.
 
 ## Usage
 
