@@ -1,19 +1,34 @@
-## Welcome to Warflagger
+## Welcome to WarFlagger
 
-Hi friends,
 
-Thank you for participating in the warflagger project beta.
 
 ## General
 
-### What is warflagger?
+### What is WarFlagger?
 
-Warflagger is an attempt to tame acrimonious debate on the internet. It takes inspiration from user moderated sites such as slashdot, stackexchange and reddit.
+WarFlagger is an attempt to tame acrimonious debate on the internet. It takes inspiration from user moderated sites such as slashdot, stackexchange and reddit.
 
-### How does it differ from other forum software?
+### What does WarFlagger have to offer that other sites do not?
+
+WarFlagger is built on an open, distruted (or distributable) debate language called [OpinML][1]. OpinML, a species of RDF, has an annotation feature that allows users to point exactly to portions of a text that are causing agreement or contention. WarFlagger can use this information to highlight source texts with appropriate indications of emotional intensity. Opinml also has a flag field modeled after slashdot's comment system that allows users to specify the nature of their objections and approvals.
+
+[1]:  https://github.com/BnMcGn/warflagger/wiki/OpinML
 
 The [Other Sites](https://github.com/BnMcGn/warflagger/wiki/Other-Sites) section of the WarFlagger Wiki has a comparison with other forum sites.
 
+### Why are distributed, open standard comments important?
+
+OpinML is as open as the internet. You may choose to host your opinml comments on your own server as a feed, host them on WarFlagger or an alternate service, publish them - digitally signed - on freenet or torrents, email them to friends, or keep them private.
+WarFlagger - and its owners - are not critical to OpinML. It is an opinml authoring tool, hosting site and aggregator. If the community begins to feel that we are behaving in an unfair manner, it can create and switch to other aggregators.
+Our intent is to create a system where all parties feels that their points of view can be fairly represented, each with all of it best arguments - and their rebuttals - presented clearly.
+
+### How do I know that WarFlagger isn't censoring stuff?
+
+You don't, on our say so. Some things, such as illegal or pornographic material, we have no intention of hosting. If we go beyond this and interfere with legitimate discussion, we are breaking trust with the community. At the end of the day it is up to you, user and community, to decide whether the trust you have loaned to us should be left with us. If not, you should migrate.
+
+### What if people post intolerant/irreverent/unkind things on WarFlagger?
+
+Our default filters (will be) set up to remove unnecessarily rude or abusive comments. However, we intend to tune our filters to find "voices in the wilderness". If one individual asks a hard question, we want to give him a voice even if 100 people downvote him. Having our cherished beliefs questioned often feels like unkindness, and it has often been the case that charges of intolerance or irreverence have been used to silence legitimate questions.
 
 ## Usage
 
@@ -37,11 +52,11 @@ Examples:
 
 Possibly. This would require investigation by people familiar with the needs of the scientific community.
 
-### Can Warflagger be used in place of the legal system for trying cases and evaluating evidence?
+### Can WarFlagger be used in place of the legal system for trying cases and evaluating evidence?
 
 While it's goals are analogous to some things in the court system, OpinML is not intended for any such use. For one, it will take significant effort to work out all the possible methods of subversion and causes of inaccuracy in OpinML evidence. Perhaps it will some day provide the inspiration for a legal evidence markup system.
 
-### What other possible uses do you forsee for Warflagger/OpinML?
+### What other possible uses do you forsee for WarFlagger/OpinML?
 
 Citizen reporting and media verification. The **EyeWitness** and **SecondHand** flags were made with this use in mind.
 
