@@ -19,12 +19,13 @@ The [Other Sites](https://github.com/BnMcGn/warflagger/wiki/Other-Sites) section
 ### Why are distributed, open standard comments important?
 
 OpinML is as open as the internet. You may choose to host your opinml comments on your own server as a feed, host them on WarFlagger or an alternate service, publish them - digitally signed - on freenet or torrents, email them to friends, or keep them private.
-WarFlagger - and its owners - are not critical to OpinML. It is an opinml authoring tool, hosting site and aggregator. If the community begins to feel that we are behaving in an unfair manner, it can create and switch to other aggregators.
-Our intent is to create a system where all parties feels that their points of view can be fairly represented, each with all of it best arguments - and their rebuttals - presented clearly.
+Our intent is to create a system where all parties feel that their points of view can be fairly represented, each with all of it best arguments - and their rebuttals - presented clearly.
+If a discussion is not completely open, you can't be sure that all points of view have been adequately represented. Someone may be censoring things. WarFlagger intends to remove this excuse: if you have the evidence, present it! 
 
 ### How do I know that WarFlagger isn't censoring stuff?
 
-You don't, on our say so. Some things, such as illegal or pornographic material, we have no intention of hosting. If we go beyond this and interfere with legitimate discussion, we are breaking trust with the community. At the end of the day it is up to you, user and community, to decide whether the trust you have loaned to us should be left with us. If not, you should migrate.
+You don't, on our say so. Some things, such as illegal or pornographic material, we have no intention of hosting. If we go beyond this and interfere with legitimate discussion, we are breaking trust with the community.
+WarFlagger - and its owners - are not critical to OpinML discussion. At the end of the day it is up to you, user and community, to decide whether the trust that you have loaned to us should be left with us. If not, you can and should migrate.
 
 ### What if people post intolerant/irreverent/unkind things on WarFlagger?
 
@@ -35,6 +36,10 @@ Our default filters (will be) set up to remove unnecessarily rude or abusive com
 ### What flags are available in OpinML?
 
 They can be found [here](/flag_descriptions/) with descriptions.
+
+### Why are there so many flags? Do I have to learn what they are all for?
+
+If in doubt, you are fine to just use the Like and Dislike flags.
 
 ### What is the reference field for?
 
@@ -59,10 +64,4 @@ While it's goals are analogous to some things in the court system, OpinML is not
 ### What other possible uses do you forsee for WarFlagger/OpinML?
 
 Citizen reporting and media verification. The **EyeWitness** and **SecondHand** flags were made with this use in mind.
-
-### What features do you plan to add in the future?
-
-- A user definable filtering system. You should be able to specify what users you respect on what issues. Ie. You might find that for UserA you want to see what he flags **Interesting**, but that he is being too picky about **Inflammatory** or **Obscene**. Perhaps he is filtering for his children. Yet when UserB says **Obscene**, you know you don't want to see it. You should be able to select who you are going to respect and how you are going to respect them. User filters should be shareable, so that I can, for example, switch over to my opponents' viewpoint and see how they are seeing the accumulated facts. This should also allow curated collections of opinions to be made by trusted community members.
-- Browser extensions that show you if a page has opinions attached, and whether serious debate is raging about its content. Also the possibility of viewing the whole web with OpinML highlighting overlaid on it.
-- Some form of trust network, perhaps based on [FOAF](http://foaf-project.org/) to cut down on sockpuppeting
 
