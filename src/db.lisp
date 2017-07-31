@@ -107,8 +107,8 @@
        (assoc-cdr :id it)
        (error "Root url not found")))
 
-(defun get-rooturl-by-id (id)
-  (aif (get-assoc-by-pkey 'rooturl id)
+(defun get-rooturl-by-id (rootid)
+  (aif (get-assoc-by-pkey 'rooturl rootid)
        (assoc-cdr :rooturl it)
        (error "Rooturl ID not found")))
 
@@ -387,3 +387,37 @@ the page text can be found in the cache."
   (aref (nth-value
          1 (ppcre:scan-to-strings (strcat *base-url* "u/([^/]+)/") url))
         0))
+
+
+;;;;;;;;;;;;;;
+;; Looks stuff
+;;;;;;;;;;;;;;
+
+;; Looks table is used to store whether a user has read an item.
+;; Columns: firstlook userid rootid opinionid
+;; If the opinionid is null, the record refers to a view of the rootid item
+
+(defun get-looks (user rootid)
+  (declare (type integer user rootid))
+  (select (colm :firstlook) (colm :opinionid)
+          :from (tabl :looks)
+          :where (sql-and (sql-= (colm :userid) user)
+                          (sql-= (colm :rootid) rootid))))
+
+(defun set-look (user &key rootid opinionid)
+  (let ((rootid (or rootid
+                    (assoc-cdr :rooturl
+                               (opinion-from-id opinionid)))))
+    (unless (integerp rootid)
+      (error "Unable to find rootid"))
+    (when (emptyp (select (colm :*) :from (tabl :looks)
+                           :where
+                           (sql-and (sql-= (colm :userid) user)
+                                    (sql-= (colm :rootid) rootid)
+                                    (sql-= (colm :opinionid) opinionid))))
+      (insert-records :into 'looks :attributes
+                      (list (colm :firstlook) (colm :userid)
+                            (colm :rootid) (colm :opinionid))
+                      :values
+                      (list (clsql:get-time)
+                            user rootid opinionid)))))
