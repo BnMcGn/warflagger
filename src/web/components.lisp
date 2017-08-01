@@ -120,6 +120,8 @@
                                      :key (unique-id)
                                      :focus (prop focus)
                                      :focusfunc (prop focusfunc)
+                                     :looks (prop looks)
+                                     :look-handler (prop look-handler)
                                      :tree-address (prop tree-address))))))))
 
       (defun %make-segments (text opins props)
@@ -147,6 +149,8 @@
                                            (chain end (to-string)))
                                :text (chain text (slice start end))
                                :focusfunc (@ props focusfunc)
+                               :looks (@ props looks)
+                               :look-handler (@ props :look-handler)
                                tree-address (@ props tree-address))))
                   (cond ((< (@ common-data :opinions length) 1)
                          (collect
@@ -238,7 +242,10 @@
                                              :key (unique-id)
                                              :focus (prop focus)
                                              :focusfunc (prop focusfunc)
-                                             :tree-address (prop tree-address)))
+                                             :tree-address (prop tree-address)
+                                             :looks (prop looks)
+                                             :look-handler
+                                             (prop look-handler)))
                               (when (focus-p (@ this props))
                                 (psx (:span :style (create position :absolute) :key 1
                                             (%make-opin-popups
@@ -335,9 +342,9 @@
         (lambda (e)
           (chain e (stop-propagation))))
 
-      (def-component look-tracker
+      (def-component target-root
           (psx
-           (:hilited-text
+           (:target-root-inner
             :... (@ this props)
             :looks (state looks)
             :look-handler (@ this look-handler)))
@@ -350,10 +357,10 @@
             (json-post-bind (res "/look-post/" (create :opinion opinid)))
             (set-state looks (set-copy (state looks) opinid t)))))
 
-      (def-component target-root
+      (def-component target-root-inner
           (psx
            (:div :style (create position :absolute width "80%")
-            :on-click (@ this handle-click)
+                 :on-click (@ this handle-click)
             (:div :key 1
                   :class (flavor (prop opinions))
                   (:h3
@@ -367,14 +374,15 @@
                     :tree-address (list)
                     :focusfunc (@ this focus-func))
                    (:reply-link :url (prop url))))
-            (:look-tracker
+            (:hilited-text
              :key 2
              :text (prop text)
              :opinions (prop opinions)
              :focus (state focus)
              :focusfunc (@ this focus-func)
              :tree-address (list)
-             :looks (prop looks))))
+             :looks (prop looks)
+             :look-handler (prop :look-handler))))
         handle-click
         (lambda () (set-state focus (list)))
         focus-func
