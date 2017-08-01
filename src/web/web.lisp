@@ -89,13 +89,14 @@
           (bind-validated-input
               ((id :integer))
             (let ((url (get-rooturl-by-id id)))
-              (multiple-value-bind (text opinions)
+              (multiple-value-bind (text opinions looks)
                   (target-data id)
                 (mount-component (target-root)
                   :text (lisp-raw text)
                   :opinions (lisp-raw opinions)
                   :url (lisp url)
                   :title (lisp (grab-title url))
+                  :looks (lisp-raw looks)
                   :focus '()
                   ))))))
 

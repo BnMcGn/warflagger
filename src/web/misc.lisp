@@ -57,10 +57,12 @@
              (grab-text url)))
          (opins
            (%fill-out-opinion-tree
-            (opinion-tree-for-rooturl url) (create-textdata text))))
+            (opinion-tree-for-rooturl url) (create-textdata text)))
+         (looks (get-looks (get-user-name) id)))
     (values
      (json:encode-json-to-string text)
-     (json:encode-json-to-string opins))))
+     (json:encode-json-to-string opins)
+     (json:encode-json-to-string looks))))
 
 (defun signup-page ())
 '(defun signup-page ()
