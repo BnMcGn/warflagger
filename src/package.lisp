@@ -41,5 +41,7 @@
    #:author-identification-from-row
    #:get-author-identification
    #:opinion-exists-p
-   #:opinion-text-server))
+   #:opinion-text-server
+   #:get-looks
+   #:set-look))
 

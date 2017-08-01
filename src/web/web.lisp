@@ -73,6 +73,18 @@
           (declare (ignore x))
           (opinion-post-response)))
 
+  (setf (ningle:route *app* "/look-post/" :method :POST)
+        (input-function-wrapper
+         (lambda ()
+           (bind-validated-input
+               (&key
+                (root :integer)
+                (opinion :integer))
+             (check-signed-up)
+             (set-look (get-user-name) :rootid root
+                                   :opinionid opinion)))
+         :content-type "application/json"))
+
   (setf (ningle:route *app* "/target/*")
         (quick-page
             (#'webhax:react-parts
