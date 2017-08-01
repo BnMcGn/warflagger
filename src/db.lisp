@@ -398,10 +398,10 @@ the page text can be found in the cache."
 ;; If the opinionid is null, the record refers to a view of the rootid item
 
 (defun get-looks (user rootid)
-  (declare (type integer user rootid))
+  (declare (type integer rootid))
   (select (colm :firstlook) (colm :opinionid)
           :from (tabl :looks)
-          :where (sql-and (sql-= (colm :userid) user)
+          :where (sql-and (sql-= (colm :wf_user) (sql-escape user))
                           (sql-= (colm :rootid) rootid))))
 
 (defun set-look (user &key rootid opinionid)
@@ -412,12 +412,12 @@ the page text can be found in the cache."
       (error "Unable to find rootid"))
     (when (emptyp (select (colm :*) :from (tabl :looks)
                            :where
-                           (sql-and (sql-= (colm :userid) user)
+                           (sql-and (sql-= (colm :wf_user) (sql-escape user))
                                     (sql-= (colm :rootid) rootid)
                                     (sql-= (colm :opinionid) opinionid))))
       (insert-records :into 'looks :attributes
-                      (list (colm :firstlook) (colm :userid)
+                      (list (colm :firstlook) (colm :wf_user)
                             (colm :rootid) (colm :opinionid))
                       :values
                       (list (clsql:get-time)
-                            user rootid opinionid)))))
+                            (sql-escape user) rootid opinionid)))))
