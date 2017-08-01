@@ -335,6 +335,21 @@
         (lambda (e)
           (chain e (stop-propagation))))
 
+      (def-component look-tracker
+          (psx
+           (:hilited-text
+            :... (@ this props)
+            :looks (state looks)
+            :look-handler (@ this look-handler)))
+        get-initial-state
+        (lambda ()
+          (create looks (prop looks)))
+        look-handler
+        (lambda (opinid)
+          (unless (getprop (state looks) opinid)
+            (json-post-bind (res "/look-post/" (create :opinion opinid)))
+            (set-state looks (set-copy (state looks) opinid t)))))
+
       (def-component target-root
           (psx
            (:div :style (create position :absolute width "80%")
@@ -352,13 +367,14 @@
                     :tree-address (list)
                     :focusfunc (@ this focus-func))
                    (:reply-link :url (prop url))))
-            (:hilited-text
+            (:look-tracker
              :key 2
              :text (prop text)
              :opinions (prop opinions)
              :focus (state focus)
              :focusfunc (@ this focus-func)
-             :tree-address (list))))
+             :tree-address (list)
+             :looks (prop looks))))
         handle-click
         (lambda () (set-state focus (list)))
         focus-func
