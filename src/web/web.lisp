@@ -82,7 +82,8 @@
                 (opinion :integer))
              (check-signed-up)
              (set-look (get-user-name) :rootid root
-                                   :opinionid opinion)))
+                       :opinionid opinion))
+           (print (json:encode-json-to-string "OK") *webhax-output*))
          :content-type "application/json"))
 
   (setf (ningle:route *app* "/target/*")

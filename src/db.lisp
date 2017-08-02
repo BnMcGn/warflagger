@@ -410,7 +410,7 @@ the page text can be found in the cache."
                                (opinion-from-id opinionid)))))
     (unless (integerp rootid)
       (error "Unable to find rootid"))
-    (when (emptyp (select (colm :*) :from (tabl :looks)
+    (when (emptyp (select (colm :wf_user) :from (tabl :looks)
                            :where
                            (sql-and (sql-= (colm :wf_user) (sql-escape user))
                                     (sql-= (colm :rootid) rootid)

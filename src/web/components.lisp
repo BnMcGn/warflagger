@@ -210,7 +210,13 @@
           (funcall (prop focusfunc)
                    (chain (prop tree-address)
                           (concat (list (prop opinion id)))))
-          (chain e (stop-propagation))))
+          (chain e (stop-propagation)))
+        component-did-mount
+        (lambda ()
+          (unless ;;Leave unread if has comment text or replies
+              (or (prop opinion comment)
+                  (< 0 (prop opinions length)))
+            (funcall (prop look-handler) (prop opinion id)))))
 
       (defun %make-knob-id (treeaddress)
         (collecting-string
@@ -233,7 +239,7 @@
             (psx (:span :on-click (@ this handle-click)
                         :style (create position :relative)
                         :id (%make-knob-id (prop tree-address))
-                        (:knobdule-display :opinions opins)
+                        (:knobdule-display :opinions opins :key "x")
                         (let ((focussed (focus-parent-p (@ this props))))
                           (if (and focussed
                                    (not (and (@ focussed 0 excerpt)
@@ -247,7 +253,8 @@
                                              :look-handler
                                              (prop look-handler)))
                               (when (focus-p (@ this props))
-                                (psx (:span :style (create position :absolute) :key 1
+                                (psx (:span :style (create position :absolute)
+                                            :key 1
                                             (%make-opin-popups
                                              (if (and (not (prop not-viewable))
                                                       (state viewable))
@@ -340,7 +347,10 @@
                :tree-address tree-ad))))
         handle-click
         (lambda (e)
-          (chain e (stop-propagation))))
+          (chain e (stop-propagation)))
+        component-did-mount
+        (lambda ()
+          (funcall (prop look-handler) (@ (prop opinions) 0 id))))
 
       (def-component target-root
           (psx
@@ -350,7 +360,7 @@
             :look-handler (@ this look-handler)))
         get-initial-state
         (lambda ()
-          (create looks (prop looks)))
+          (create looks (or (prop looks) (create))))
         look-handler
         (lambda (opinid)
           (unless (getprop (state looks) opinid)
@@ -373,7 +383,7 @@
                     :opinions (prop opinions)
                     :tree-address (list)
                     :focusfunc (@ this focus-func))
-                   (:reply-link :url (prop url))))
+                   (:reply-link :url (prop url) :key 3)))
             (:hilited-text
              :key 2
              :text (prop text)
