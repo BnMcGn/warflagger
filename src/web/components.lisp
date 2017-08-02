@@ -150,7 +150,7 @@
                                :text (chain text (slice start end))
                                :focusfunc (@ props focusfunc)
                                :looks (@ props looks)
-                               :look-handler (@ props :look-handler)
+                               'look-handler (@ props look-handler)
                                tree-address (@ props tree-address))))
                   (cond ((< (@ common-data :opinions length) 1)
                          (collect
@@ -382,7 +382,7 @@
              :focusfunc (@ this focus-func)
              :tree-address (list)
              :looks (prop looks)
-             :look-handler (prop :look-handler))))
+             :look-handler (prop look-handler))))
         handle-click
         (lambda () (set-state focus (list)))
         focus-func
