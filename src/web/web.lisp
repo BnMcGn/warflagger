@@ -108,6 +108,7 @@
                   :text (lisp-raw text)
                   :opinions (lisp-raw opinions)
                   :url (lisp url)
+                  :rootid (lisp id)
                   :title (lisp (grab-title url))
                   :looks (lisp-raw looks)
                   :focus '()

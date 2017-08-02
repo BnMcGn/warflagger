@@ -352,6 +352,14 @@
         (lambda ()
           (funcall (prop look-handler) (@ (prop opinions) 0 id))))
 
+      (defun %format-looks (looks)
+        (let ((res (create)))
+          (dolist (itm looks)
+            (when (@ itm 1)
+              (setf (getprop res (@ itm 1))
+                    (@ itm 0))))
+          res))
+
       (def-component target-root
           (psx
            (:target-root-inner
@@ -360,12 +368,15 @@
             :look-handler (@ this look-handler)))
         get-initial-state
         (lambda ()
-          (create looks (or (prop looks) (create))))
+          (create looks (%format-looks (prop looks))))
         look-handler
         (lambda (opinid)
           (unless (getprop (state looks) opinid)
             (json-post-bind (res "/look-post/" (create :opinion opinid)))
-            (set-state looks (set-copy (state looks) opinid t)))))
+            (set-state looks (set-copy (state looks) opinid t))))
+        component-did-mount
+        (lambda ()
+          (json-post-bind (res "/look-post/" (create :root (prop rootid))))))
 
       (def-component target-root-inner
           (psx
