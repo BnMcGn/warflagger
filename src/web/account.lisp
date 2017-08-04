@@ -42,3 +42,8 @@
                       (login-link-js (assoc-cdr :login-url info))
                       :href "#" "Log In"))))))))
 
+(defun user-home-page ()
+  (check-signed-up)
+  (funcall
+   (html-thing-lister:connection-display-func 'user 'recently-viewed)
+   (get-user-name)))

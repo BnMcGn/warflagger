@@ -155,3 +155,16 @@
      (get-rooturl-by-id (car x))))
   :other-thing 'author)
 
+(def-thing-connector
+    'user
+    'recently-viewed
+  (gadgets:print-lambda (&rest x)
+    (mapcar
+     (lambda (row)
+       (destructuring-bind (root opin) row
+         (list (or opin root) (if opin 'opinion 'target))))
+     (clsql:select
+      (colm :rootid) (colm :opinionid) :from (tabl :looks)
+      :where (clsql:sql-= (colm :wf_user) (sql-escape (car x)))
+      :order-by (colm :firstlook))))
+  :other-thing :multiple)
