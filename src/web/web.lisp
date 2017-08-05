@@ -96,7 +96,7 @@
                (bind-validated-input
                    ((id :integer))
                  (funcall
-                  (html-thing-lister:connection-display-func
+                  (html-thing-lister:connector-display-func
                    'target 'participants)
                   id))))
           (bind-validated-input

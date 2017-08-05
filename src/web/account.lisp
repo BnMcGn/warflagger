@@ -45,5 +45,5 @@
 (defun user-home-page ()
   (check-signed-up)
   (funcall
-   (html-thing-lister:connection-display-func 'user 'recently-viewed)
+   (html-thing-lister:connector-display-func 'user 'recently-viewed)
    (get-user-name)))
