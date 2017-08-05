@@ -44,6 +44,9 @@
 
 (defun user-home-page ()
   (check-signed-up)
-  (funcall
-   (html-thing-lister:connector-display-func 'user 'recently-viewed)
-   (get-user-name)))
+  (html-thing-lister:render-list-for-sidebar
+   (list :lister-type :connector :thing 'user :name 'recently-viewed
+         :lister-param (get-user-name))
+   :label "Recently Viewed:"
+   :summary-width 40
+   :pagequantity 20))
