@@ -158,7 +158,7 @@
 (def-thing-connector
     'user
     'recently-viewed
-  (gadgets:print-lambda (&rest x)
+  (lambda (&rest x)
     (mapcar
      (lambda (row)
        (destructuring-bind (root opin) row
@@ -168,3 +168,22 @@
       :where (clsql:sql-= (colm :wf_user) (sql-escape (car x)))
       :order-by (colm :firstlook))))
   :other-thing :multiple)
+
+(def-thing-connector
+    'user
+    'replies
+  (lambda (&rest x)
+    (mapcar
+     #'car
+     (clsql:select
+      (colm :id) :from (tabl :opinion)
+      :where
+      (clsql:sql-in
+       (colm :target)
+       (clsql:sql-query
+        (colm :opinion :url) :from (list (tabl :author) (tabl :opinion))
+        :where (clsql:sql-and
+                (clsql:sql-= (colm :author :id) (colm :opinion :author))
+                (clsql:sql-= (colm :author :type) "wf_user")
+                (clsql:sql-= (colm :author :value) (sql-escape (car x)))))))))
+  :other-thing 'opinion)
