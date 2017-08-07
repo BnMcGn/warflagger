@@ -50,6 +50,8 @@
 
 (wf/text-extract:initialize-indices)
 
+(setf (webhax-user::login-destination) "/home/")
+
 (defvar *app* (make-instance 'ningle:<app>))
 
 (dependency-auto-watcher routes
