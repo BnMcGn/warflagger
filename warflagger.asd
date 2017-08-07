@@ -24,7 +24,7 @@
                               (:file "text-extract/textract"
                                      :depends-on ("local-settings"))
                               (:file "package")
-                              (:file "data")
+                              (:file "constants")
                               (:file "db")
                               (:file "excerpts")
                               (:file "warflagger")
