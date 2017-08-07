@@ -4,3 +4,14 @@
 *.swp
 src/local-settings.lisp
 warflagger.wiki/
+src/static/img/android-chrome-192x192.png
+src/static/img/android-chrome-256x256.png
+src/static/img/apple-touch-icon.png
+src/static/img/browserconfig.xml
+src/static/img/favicon-16x16.png
+src/static/img/favicon-32x32.png
+src/static/img/favicon.ico
+src/static/img/manifest.json
+src/static/img/mstile-150x150.png
+src/static/img/safari-pinned-tab.svg
+

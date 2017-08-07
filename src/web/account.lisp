@@ -44,6 +44,15 @@
 
 (defun user-home-page ()
   (check-signed-up)
+  (let ((since (userfig:userfig-value 'signed-up)))
+    (html-out
+      (:h3
+       (format *webhax-output* "User: ~a" (userfig:userfig-value 'screen-name)))
+      (:h4 (format
+            *webhax-output* "Member since ~a ~a"
+            (elt local-time:+month-names+ (local-time:timestamp-month since))
+            (local-time:timestamp-year since)))
+      (:br)))
   (html-thing-lister:render-list-for-sidebar
    (list :lister-type :connector :thing 'user :name 'recently-viewed
          :lister-param (get-user-name))
