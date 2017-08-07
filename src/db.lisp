@@ -313,16 +313,6 @@ the page text can be found in the cache."
             (order-by-mixin order-by)
             (limit-mixin limit offset)))))
 
-(defun make-user-url (username)
-  (strcat *base-url* "u/" username "/"))
-
-;;FIXME: URL should have username, shorter formatting.
-;;(defun make-opinion-url (userid opinid)
-;;  (format nil "~a~d" (make-user-url userid) opinid))
-
-(defun make-opinion-url (userid opinid)
-  (declare (ignore userid))
-  (strcat *base-url* "things/thing/opinion/" (princ-to-string opinid)))
 
 (defun save-opinion-from-user (opinion authorid
                                &key (opinurl #'make-opinion-url))
@@ -381,12 +371,6 @@ the page text can be found in the cache."
       (delete-records :from 'opinion :where (sql-= (colm 'id) oid)))
     (unless (get-assoc-by-col (colm 'opinion 'rooturl) rooturl)
       (delete-records :from 'rooturl :where (sql-= (colm 'id) rooturl)))))
-
-;;FIXME: rethink user urls
-(defun warflagger-user-from-url (url)
-  (aref (nth-value
-         1 (ppcre:scan-to-strings (strcat *base-url* "u/([^/]+)/") url))
-        0))
 
 
 ;;;;;;;;;;;;;;

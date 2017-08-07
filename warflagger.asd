@@ -25,8 +25,8 @@
                                      :depends-on ("local-settings"))
                               (:file "package")
                               (:file "constants")
+                              (:file "warflagger")
                               (:file "db")
                               (:file "excerpts")
-                              (:file "warflagger")
                               (:file "ranking")))))
 
