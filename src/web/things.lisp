@@ -45,7 +45,18 @@
         :opinion (lisp-raw (json:encode-json-alist-to-string opinion))
         :trim (lisp thing-lister:*thing-summary-width*)))))
 
-;;FIXME: User-lister does not result in a list of authors! Not same thing.
+;;; FIXME: If reasonable, this should move to the rest of the URL stuff in
+;; warflagger.lisp
+(defun author-thing-link (authid)
+  #|
+  ;;;FIXME: User link not implemented because we need to be sure that there is a 2 way link between screen-name and author id. Should be in db table somewhere but might not be. So only author URL for now.
+  (if-let
+      ((uname (assoc :wf-user (get-author-data authid))))
+    (make-user-url (userfig:userfig-value-for (cdr uname) 'screen-name))
+    (format nil "/author/~a" authid)))
+  |#
+  (format nil "/author/~a" authid))
+
 (def-thing
     'author
     #'get-author-data
@@ -56,7 +67,8 @@
            :length (lambda (&rest params)
                      (get-count
                       (unexecuted
-                        (apply #'author-lister params))))))
+                        (apply #'author-lister params)))))
+  :html-thing-link #'author-thing-link)
 
 (def-db-thing
     'opinion
@@ -133,6 +145,8 @@
                           :from (tabl 'opinion)
                           :where
                           (clsql:sql-= (colm 'author) (sql-escape (car id)))))))
+
+
 
 (def-thing-connector
     'author

@@ -75,3 +75,40 @@
    :class "featurebox"
    :summary-width 40
    :pagequantity 20))
+
+(define-parts author-page-parts
+  :@side-content
+  (lambda ()
+    (bind-validated-input
+        ((authid :integer))
+      (dolist (name (hash-table-keys
+                     (gethash 'author *thing-connector-set*)))
+        (funcall (connector-display-func 'author name) authid))))
+  :@inner
+  (lambda ()
+    (bind-validated-input
+        ((authid :integer))
+      (let* ((auth-data (get-author-data authid))
+             (user (get-local-user-from-id authid))
+             (screen-name (if user
+                              (userfig:userfig-value-for user 'screen-name)
+                              (author-representation-from-row auth-data)))
+             (num (get-count
+                   (unexecuted (clsql:select
+                                (colm 'author)
+                                :from (tabl 'opinion)
+                                :where (clsql:sql-= (colm 'author) authid)))))
+             (since (when user
+                      (userfig:userfig-value-for user 'signed-up))))
+        (html-out
+          (:h3 (format *webhax-output*
+                       "User: ~a" screen-name))
+          (when user
+            (htm
+             (:h4 (format
+                   *webhax-output*
+                   "WarFlagger member since ~a ~a"
+                   (elt local-time:+month-names+
+                        (local-time:timestamp-month since))
+                   (local-time:timestamp-year since)))))
+          (:h4 (format *webhax-output* "Opinions Posted: ~a" num)))))))

@@ -149,6 +149,11 @@
         (quick-page (#'webhax:react-parts #'warflagger-things)
           (user-home-page)))
 
+  (setf (ningle:route *app* "/author/*")
+        (quick-page (#'webhax:react-parts
+                     #'warflagger-things
+                     #'author-page-parts)))
+
   ;;(setf (ningle:route *app* "/signup/") #'signup-page)
 
   (setf (ningle:route *app* "/demo/")
