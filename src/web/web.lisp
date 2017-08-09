@@ -154,8 +154,6 @@
                      #'warflagger-things
                      #'author-page-parts)))
 
-  ;;(setf (ningle:route *app* "/signup/") #'signup-page)
-
   (setf (ningle:route *app* "/demo/")
         (quick-page (#'webhax:react-parts
                      #'webhax::webhax-ask
