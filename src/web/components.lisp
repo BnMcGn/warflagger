@@ -75,7 +75,7 @@
                    (%make-opin-popups (if (and (not (prop not-viewable))
                                                (state viewable))
                                           (prop opinions)
-                                          ([]))
+                                          (list))
                                       (@ this props)))))
         get-initial-state
         (lambda () (create viewable false))
@@ -259,7 +259,7 @@
                                              (if (and (not (prop not-viewable))
                                                       (state viewable))
                                                  opins
-                                                 ([]))
+                                                 (list))
                                              (@ this props))))))))))
         get-initial-state
         (lambda () (create viewable false))
@@ -354,10 +354,11 @@
 
       (defun %format-looks (looks)
         (let ((res (create)))
-          (dolist (itm looks)
-            (when (@ itm 1)
-              (setf (getprop res (@ itm 1))
-                    (@ itm 0))))
+          (when looks
+            (dolist (itm looks)
+              (when (@ itm 1)
+                (setf (getprop res (@ itm 1))
+                      (@ itm 0)))))
           res))
 
       (def-component target-root
