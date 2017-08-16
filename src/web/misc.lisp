@@ -64,3 +64,24 @@
      (json:encode-json-to-string opins)
      (json:encode-json-to-string looks))))
 
+(define-parts main-page-parts
+  :@css-link "/static/css/push_button.css"
+  :@notifications
+  (lambda ()
+    (unless (signed-up?)
+      (html-out
+        (:div :class "featurebox_side"
+              (:h3 "Not logged in")
+              (:a :href "#" :class "push_button pb_red" "Sign up")))))
+  :@inner
+  (lambda ()
+    (html-out
+      (:img :src "/static/img/wf_logo_large.png"
+            :alt "[WarFlagger: Because someone is wrong on the internet]"
+            :style "display: block; margin-left: auto; margin-right: auto; margin-top: 3em; margin-bottom: 3em;"))
+    (html-thing-lister:render-list-for-sidebar
+     (list :lister-type :thing :thing 'target)
+     :label "Active targets:"
+     :class "featurebox"
+     :summary-width 40
+     :pagequantity 20)))

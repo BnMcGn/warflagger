@@ -10,12 +10,14 @@
                                         ;;Header
     (:div :id "header_wrapper"
           (:div :id "account_bar"
-                :@notifications :@account-info))
+                :@account-info))
                                         ;;Main content
     (:div :id "left_side"
-          :@site-search :@site-index :@side-content)
+          :@site-index :@side-content)
     (:div :id "content"
           :@messages :@inner :@footnotes)
+    (:div :id "right_side"
+          :@site-search :@notifications)
                                         ;;Footer
     (:div :id "footer" :@copyright)))
 
@@ -173,9 +175,7 @@
          :content-type "application/json"))
 
   (setf (ningle:route *app* "/")
-        (lambda (params)
-          (declare (ignore params))
-          (clath::logged-in-page))))
+        (quick-page (#'main-page-parts))))
 
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)

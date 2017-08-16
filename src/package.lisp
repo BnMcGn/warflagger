@@ -43,5 +43,7 @@
    #:opinion-exists-p
    #:opinion-text-server
    #:get-looks
-   #:set-look))
+   #:set-look
+   #:make-user-url
+   #:get-local-user-from-id))
 

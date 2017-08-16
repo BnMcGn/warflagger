@@ -68,7 +68,8 @@
                      (get-count
                       (unexecuted
                         (apply #'author-lister params)))))
-  :html-thing-link #'author-thing-link)
+  :html-thing-link #'author-thing-link
+  :limitable t)
 
 (def-db-thing
     'opinion
