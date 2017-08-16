@@ -67,12 +67,15 @@
 (define-parts main-page-parts
   :@css-link "/static/css/push_button.css"
   :@notifications
-  (lambda ()
-    (unless (signed-up?)
-      (html-out
-        (:div :class "featurebox_side"
-              (:h3 "Not logged in")
-              (:a :href "#" :class "push_button pb_red" "Sign up")))))
+  (let ((info (warflagger-user-info-bundle)))
+    (lambda ()
+      (unless (signed-up?)
+        (html-out
+          (:div :class "featurebox_side"
+                (:h3 "Account")
+                (:a :href (assoc-cdr :login-url info)
+                    :class "push_button pb_green" "Sign Up")
+                (:a :href (assoc-cdr :login-url info) "Log In"))))))
   :@inner
   (lambda ()
     (html-out
