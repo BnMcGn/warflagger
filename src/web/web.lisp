@@ -25,7 +25,19 @@
   :@account-info #'account-bar
   :@javascript #'ps-gadgets
   :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
-  :@head #'favicon-links)
+  :@head #'favicon-links
+  :@site-index
+  (lambda ()
+    (html-out
+      (:div
+       :class "featurebox_side"
+       (:h3 "Index")
+       (:div (:a :href "/" "Home"))
+       (:div (:a :href "/things/things/opinion" "Recent Opinions"))
+       (:div (:a :href "/things/things/target" "Current Targets"))
+       (:div (:a :href "/opinion/" "Write an Opinion"))
+       (:div (:a :href "/faq/" "FAQ"))
+       (:div (:a :href "/documentation/" "About"))))))
 
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)
