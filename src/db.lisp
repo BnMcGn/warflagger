@@ -164,9 +164,10 @@ the page text can be found in the cache."
 (defun opinion-from-db-row (row)
   (let ((res (alist->hash row)))
     (with-keys (:id :author :flag :votevalue :target :datestamp :url
-                    :comment :reference :authorname)
+                    :comment :reference :authorname :author-id)
         res
       (let ((authdata (get-author-data author)))
+        (setf author-id author)
         (setf author (author-identification-from-row authdata))
         (setf authorname (author-representation-from-row authdata)))
       (setf flag (flag-to-lisp flag))
@@ -398,13 +399,32 @@ the page text can be found in the cache."
     (unless (integerp rootid)
       (error "Unable to find rootid"))
     (when (emptyp (select (colm :wf_user) :from (tabl :looks)
-                           :where
-                           (sql-and (sql-= (colm :wf_user) (sql-escape user))
-                                    (sql-= (colm :rootid) rootid)
-                                    (sql-equal/null (colm :opinionid) opinionid))))
+                          :where
+                          (sql-and (sql-= (colm :wf_user) (sql-escape user))
+                                   (sql-= (colm :rootid) rootid)
+                                   (sql-equal/null (colm :opinionid) opinionid))))
       '(insert-records :into 'looks :attributes
-                      (list (colm :firstlook) (colm :wf_user)
-                            (colm :rootid) (colm :opinionid))
-                      :values
-                      (list (clsql:get-time)
-                            (sql-escape user) rootid opinionid)))))
+        (list (colm :firstlook) (colm :wf_user)
+         (colm :rootid) (colm :opinionid))
+        :values
+        (list (clsql:get-time)
+         (sql-escape user) rootid opinionid)))))
+
+(defun get-rooturl-looks (rootid)
+  (declare (type integer rootid))
+  (select (colm :wf_user) (colm :firstlook)
+          :from (tabl :looks)
+          :where (sql-and (sql-is (colm :opinionid) nil)
+                          (sql-= (colm :rootid) rootid))))
+
+(defun get-opinion-looks (opinid)
+  (declare (type integer opinid))
+  (select (colm :wf_user) (colm :firstlook)
+          :from (tabl :looks)
+          :where (sql-= (colm :opinionid) opinid)))
+
+(defun get-target-looks (target-url)
+  (if (rooturl-p target-url)
+      (get-rooturl-looks (get-rooturl-id target-url))
+      (get-opinion-looks)))
+
