@@ -282,11 +282,22 @@ Some of these factors will obviously affect the respect points more than others.
 
 ;;FIXME: Opinion-effect is recurrent. Eventually a discussion will be larger than
 ;; the stack limit.
+(defun %opinion-effect (optree &key opinion)
+  (let* ((opinion (or opinion (opinion-from-id (car optree))))
+         (axdat (opinion-axis-data optree))
+         (effect (calculate-opinion-effect axdat opinion))
+         (controv (calculate-opinion-controversy axdat)))
+    (when (hash-table-p *opinion-effect-cache*)
+      (setf (gethash (car optree) *opinion-effect-cache*)
+            (list* :effect effect :controversy controv axdat)))
+    (values effect controv)))
+
+(defparameter *opinion-effect-cache* nil)
 (defun opinion-effect (optree &key opinion)
-  (let ((opinion (or opinion (opinion-from-id (car optree))))
-        (axdat (opinion-axis-data (cdr optree))))
-    (values (calculate-opinion-effect axdat opinion)
-            (calculate-opinion-controversy axdat))))
+  (if (hash-table-p *opinion-effect-cache*)
+      (if-let ((dat (gethash (car optree) *opinion-effect-cache*)))
+        (values (getf dat :effect) (getf dat :controversy))
+        (%opinion-effect optree :opinion opinion))))
 
 (defun opinion-axis-data (optree)
   (list

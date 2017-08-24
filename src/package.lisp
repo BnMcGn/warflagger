@@ -45,5 +45,6 @@
    #:get-looks
    #:set-look
    #:make-user-url
-   #:get-local-user-from-id))
+   #:get-local-user-from-id
+   #:opinion-effect))
 
