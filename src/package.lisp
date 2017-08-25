@@ -46,5 +46,7 @@
    #:set-look
    #:make-user-url
    #:get-local-user-from-id
-   #:opinion-effect))
+   #:opinion-effect
+   #:*opinion-effect-cache*
+   #:generate-rooturl-warstats))
 

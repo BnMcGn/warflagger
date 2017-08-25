@@ -58,11 +58,14 @@
          (opins
            (%fill-out-opinion-tree
             (opinion-tree-for-rooturl url) (create-textdata text)))
-         (looks (get-looks (get-user-name) id)))
+         (looks (get-looks (get-user-name) id))
+         (warstats (generate-rooturl-warstats url)))
+
     (values
      (json:encode-json-to-string text)
      (json:encode-json-to-string opins)
-     (json:encode-json-to-string looks))))
+     (json:encode-json-to-string looks)
+     (json:encode-json-to-string warstats))))
 
 (define-parts main-page-parts
   :@css-link "/static/css/push_button.css"

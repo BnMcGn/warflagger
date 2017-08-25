@@ -118,7 +118,7 @@
           (bind-validated-input
               ((id :integer))
             (let ((url (get-rooturl-by-id id)))
-              (multiple-value-bind (text opinions looks)
+              (multiple-value-bind (text opinions looks warstats)
                   (target-data id)
                 (mount-component (target-root)
                   :text (lisp-raw text)
@@ -127,6 +127,7 @@
                   :rootid (lisp id)
                   :title (lisp (grab-title url))
                   :looks (lisp-raw looks)
+                  :warstats (lisp-raw warstats)
                   :focus '()
                   ))))))
 

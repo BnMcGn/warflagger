@@ -310,9 +310,14 @@ Some of these factors will obviously affect the respect points more than others.
    :x-irrelevant (collect-axis-sum #'filter-irrelevant (cdr optree))
    :replies-total (length (flatten (cdr optree)))
    :replies-immediate (length (cdr optree))
-   :looks (length (get-opinion-looks (car optree)))
+   :looks (when (car optree) ;nil if root isn't an opinion.
+            (length (get-opinion-looks (car optree))))
    ;;FIXME: Implement the factoring-in of references.
    :referenced 0))
 
-
-(defun create-target-warstats )
+(defun generate-rooturl-warstats (rooturl &key tree)
+  (let* ((tree (or tree (opinion-tree-for-rooturl rooturl)))
+         (*opinion-effect-cache* (make-hash-table))
+         (root-ax (opinion-axis-data (list* nil tree))))
+    (setf (gethash :root *opinion-effect-cache*) root-ax)
+    *opinion-effect-cache*))
