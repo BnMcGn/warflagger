@@ -189,9 +189,9 @@
     (:circle :class "donut-segment" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
              :fill "transparent" :stroke color
              :stroke-dasharray
-             (format *webhax-output* "~a ~a" length (- 100 length))
-             :stroke-dashoffset (princ-to-string (+ 25 offset))
-             :stroke-width (princ-to-string width))))
+             (format nil "~a ~a" length (- 100 length))
+             :stroke-dashoffset (princ-to-string (float (+ 25 offset)))
+             :stroke-width (princ-to-string (float width)))))
 
 (defun draw-hole (color)
   (html-out
@@ -209,29 +209,33 @@
   (if
    (< (getf warstats :effect) (getf warstats :controversy))
    :contested
-   (three-way (assoc-cdr :vote-value opinion) :negative :neutral :positive)))
+   (three-way (assoc-cdr :votevalue opinion) :negative :neutral :positive)))
 
 (defun draw-opinion-badge (opinion reply-tree warstats)
   (let* ((this-stats (gethash (assoc-cdr :id opinion) warstats))
          (reply-count (getf this-stats :replies-immediate))
          (intervals (intervals reply-count))
          (reply-ids (mapcar #'car reply-tree))
-         (max-effect (apply #'max (mapcar (lambda (id)
-                                            (getf (gethash id warstats)
-                                                  :effect))
-                                          reply-ids)))
-         (min-effect (apply #'min (mapcar (lambda (id)
-                                            (getf (gethash id warstats)
-                                                  :effect))
-                                          reply-ids)))
-         (max-controv (apply #'max (mapcar (lambda (id)
-                                            (getf (gethash id warstats)
-                                                  :controversy))
-                                          reply-ids)))
-         (min-controv (apply #'min (mapcar (lambda (id)
-                                            (getf (gethash id warstats)
-                                                  :controversy))
-                                           reply-ids))))
+         (max-effect (when reply-ids
+                       (apply #'max (mapcar (lambda (id)
+                                              (getf (gethash id warstats)
+                                                    :effect))
+                                            reply-ids))))
+         (min-effect (when reply-ids
+                       (apply #'min (mapcar (lambda (id)
+                                              (getf (gethash id warstats)
+                                                    :effect))
+                                            reply-ids))))
+         (max-controv (when reply-ids
+                        (apply #'max (mapcar (lambda (id)
+                                               (getf (gethash id warstats)
+                                                     :controversy))
+                                             reply-ids))))
+         (min-controv (when reply-ids
+                        (apply #'min (mapcar (lambda (id)
+                                               (getf (gethash id warstats)
+                                                     :controversy))
+                                             reply-ids)))))
     (labels ((scale-effect (num)
                (if (< min-effect max-effect)
                    (as-in-range 2 10
@@ -258,4 +262,22 @@
                                  (scale-controv (getf warstat :controversy))
                                  (scale-effect (getf warstat :effect))))))))))
 
-
+(defun create-badges-for-rootid (rootid storage-dir)
+  (let* ((rooturl (get-rooturl-by-id rootid))
+         (main-tree (opinion-tree-for-rooturl rooturl))
+         (warstats (generate-rooturl-warstats rooturl :tree main-tree)))
+    (labels ((proc (tree)
+               (dolist (node tree)
+                 (let ((fname (merge-pathnames
+                               storage-dir
+                               (format nil "~a.svg" (car node)))))
+                   (when (probe-file fname)
+                     (delete-file fname))
+                   (write-html-file
+                       fname
+                     (draw-opinion-badge (opinion-from-id (car node))
+                                         (cdr node)
+                                         warstats)))
+                 (when (cdr node)
+                   (proc (cdr node))))))
+      (proc main-tree))))

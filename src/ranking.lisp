@@ -157,6 +157,9 @@ Some of these factors will obviously affect the respect points more than others.
 ;; things like the score of the opinion and reputation of the author to come up
 ;; with the effect that the opinion will have on its target.
 
+(defun all-flags ()
+  (remove-if-not #'keywordp (alexandria:flatten *flag-types-source*)))
+
 (defun filter-supported (opinion)
   (let ((vv (assoc-cdr :votevalue opinion))
         (flag (third (assoc :flag opinion))))
@@ -165,6 +168,8 @@ Some of these factors will obviously affect the respect points more than others.
       ((and (member flag '(:interesting :anecdotal))
             (< 0 vv))
        1)
+      ((and (not (member flag (all-flags)))
+            (< 0 vv)))
       (t 0))))
 
 (defun filter-dissed (opinion)
@@ -201,7 +206,8 @@ Some of these factors will obviously affect the respect points more than others.
   (let ((flag (third (assoc :flag opinion))))
     (cond
       ((member flag '(:incorrect-flag :language-warning :disclosure)) 1)
-      ((eq flag :Inflammatory) 0.5) ;because half goes under dissed
+      ((eq flag :spam) 2)
+      ((eq flag :inflammatory) 0.5) ;because half goes under dissed
       ((member flag '(:flag-abuse :disturbing)) 4)
       ((eq flag :out-of-bounds) 8)
       (t 0))))
@@ -232,7 +238,9 @@ Some of these factors will obviously affect the respect points more than others.
     (dolist (op optree)
       (let* ((opinion (opinion-from-id (car op)))
              (factor (funcall filter opinion)))
-        (when (< 0 factor)
+        ;;FIXME: This is inefficient, but makes sure all opinions in tree get
+        ;; processed. Find better way.
+        (when t ;(< 0 factor)
           (multiple-value-bind (e c) (opinion-effect op :opinion opinion)
             (incf effect (* factor e))
             (incf controversy (* factor c))))))
