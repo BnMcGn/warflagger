@@ -4,6 +4,7 @@
 *.swp
 src/local-settings.lisp
 warflagger.wiki/
+src/static/targinfo/
 src/static/img/android-chrome-192x192.png
 src/static/img/android-chrome-256x256.png
 src/static/img/apple-touch-icon.png

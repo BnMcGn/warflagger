@@ -3,6 +3,12 @@
 (defparameter *intensity-thresholds*
   '((0 . 2) (5 . 4) (20 . 6) (50 . 8) (100 . 16)))
 
+(defparameter *direction-colors*
+  (list :negative "rgba(256,0,0,0.75)"
+        :neutral "rgba(171,163,163,0.75)"
+        :positive "rgba(0,256,0,0.75)"
+        :contested "rgba(256,136,0,0.75)"))
+
 (define-parts mood-lib
   :@javascript
   (lambda ()
@@ -79,10 +85,10 @@
                         (return-from found v)))))
                 stroke-style
                 (case (calculate-direction opins)
-                  ("negative" "rgba(256,0,0,0.75)")
-                  ("neutral" "rgba(171,163,163,0.75)")
-                  ("positive" "rgba(0,256,0,0.75)")
-                  ("contested" "rgba(256,136,0,0.75)"))))
+                  ("negative" (lisp (getf *direction-colors* :negative)))
+                  ("neutral" (lisp (getf *direction-colors* :neutral)))
+                  ("positive" (lisp (getf *direction-colors* :positive)))
+                  ("contested" (lisp (getf *direction-colors* :negative))))))
 
       (defun delete-plumbs (base-obj)
         (when (chain base-obj (has-own-property '%plumb-instance))
@@ -111,3 +117,145 @@
                                endpoint "Blank")))))))))
 
       )))
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; SVG badge generator
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *flag-colors*
+  (list :spam "#f00"
+        :inflammatory "#ff8137"
+        :disagree "#ff8137"
+        :dislike "#ff8137"
+        :language-warning "#ffe843"
+        :disturbing "#f00"
+        :already-answered "#ffe843"
+        :logical-fallacy "#ff8137"
+        :needs-reference "#6ffee4"
+        :raise-question "#6ffee4"
+        :out-of-bounds "#f00"
+        :funny "#1cff00"
+        :agree "#1cff00"
+        :like "#1cff00"
+        :interesting "#6ce9d2"
+        :eye-witness "#6ffee4"
+        :am-qualified "#6ffee4"
+        :second-hand "#6ffee4"
+        :anecdotal "#6ffee4"
+        :evidence "#6ffee4"
+        :disclosure "#9a12c6"
+        :redundant "#ffe843"
+        :out-of-date "#ffe843"
+        :retraction "#560272"
+        :correction "#ffe843"
+        :incorrect-flag "#ffe843"
+        :flag-abuse "#f00"
+        :offtopic "#ffe843"
+        :arcane "#ffe843"
+        :same-thing "#ffe843"))
+
+(defun flag-color-page (&rest params)
+  (declare (ignore params))
+  (html-out-str
+    (:html
+     (:head
+      (:title "Flag colors"))
+     (:body)
+     (:div
+      (mapcan-by-2
+       (lambda (tag col)
+         (html-out
+           (:div (:span
+                  :style (format nil "background-color: ~a" col)
+                  "____")
+                 (str tag))))
+       *flag-colors*)))))
+
+(defparameter *ring-cx* "21")
+(defparameter *ring-cy* "21")
+(defparameter *ring-r* "15.91549430918954")
+
+(defun draw-ring (hole-func content-func)
+  (html-out
+    (:svg
+     :width "100%" :height "100%" :|viewBox| "0 0 42 42" :class "donut"
+     (funcall hole-func)
+     (:circle :class "donut-ring" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
+              :fill "transparent" :stroke "#d2d3d4" :stroke-width "3")
+     (funcall content-func))))
+
+(defun draw-segment (color offset length width)
+  (html-out
+    (:circle :class "donut-segment" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
+             :fill "transparent" :stroke color
+             :stroke-dasharray
+             (format *webhax-output* "~a ~a" length (- 100 length))
+             :stroke-dashoffset (princ-to-string (+ 25 offset))
+             :stroke-width (princ-to-string width))))
+
+(defun draw-hole (color)
+  (html-out
+    (:circle :class "donut-hole" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
+             :fill color)))
+
+(defun intervals (num)
+  (unless (zerop num)
+    (let ((len (/ 100 num)))
+      (gadgets:collecting
+          (dotimes (i num)
+            (gadgets:collect (cons (* i len) len)))))))
+
+(defun calculate-direction-from-axis (opinion warstats)
+  (if
+   (< (getf warstats :effect) (getf warstats :controversy))
+   :contested
+   (three-way (assoc-cdr :vote-value opinion) :negative :neutral :positive)))
+
+(defun draw-opinion-badge (opinion reply-tree warstats)
+  (let* ((this-stats (gethash (assoc-cdr :id opinion) warstats))
+         (reply-count (getf this-stats :replies-immediate))
+         (intervals (intervals reply-count))
+         (reply-ids (mapcar #'car reply-tree))
+         (max-effect (apply #'max (mapcar (lambda (id)
+                                            (getf (gethash id warstats)
+                                                  :effect))
+                                          reply-ids)))
+         (min-effect (apply #'min (mapcar (lambda (id)
+                                            (getf (gethash id warstats)
+                                                  :effect))
+                                          reply-ids)))
+         (max-controv (apply #'max (mapcar (lambda (id)
+                                            (getf (gethash id warstats)
+                                                  :controversy))
+                                          reply-ids)))
+         (min-controv (apply #'min (mapcar (lambda (id)
+                                            (getf (gethash id warstats)
+                                                  :controversy))
+                                           reply-ids))))
+    (labels ((scale-effect (num)
+               (if (< min-effect max-effect)
+                   (as-in-range 2 10
+                                (relative-to-range min-effect max-effect num))
+                   4))
+             (scale-controv (num)
+               (if (< min-controv max-controv)
+                   (as-in-range 2 10
+                                (relative-to-range min-controv max-controv num))
+                   4)))
+      (draw-ring
+       (lambda ()
+         (draw-hole (getf *flag-colors* (second (assoc-cdr :flag opinion)))))
+       (lambda ()
+         (loop
+            for (offset . length) in intervals
+            for id in reply-ids
+            for opinion = (opinion-from-id id)
+            for warstat = (gethash id warstats)
+            for direction = (calculate-direction-from-axis opinion warstat)
+            do (draw-segment (getf *direction-colors* direction)
+                             offset length
+                             (if (eq direction :contested)
+                                 (scale-controv (getf warstat :controversy))
+                                 (scale-effect (getf warstat :effect))))))))))
+
+

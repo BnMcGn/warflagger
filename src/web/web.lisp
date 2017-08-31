@@ -160,6 +160,9 @@
                         (htm (:h3 (str lab)))
                         (htm (:p (str description)))))))))
 
+  (setf (ningle:route *app* "/flag-color/")
+        #'flag-color-page)
+
   (setf (ningle:route *app* "/home/")
         (quick-page (#'webhax:react-parts #'warflagger-things)
           (user-home-page)))

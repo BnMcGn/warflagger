@@ -86,7 +86,7 @@ it serves as an invitation for the community to verify your qualifications."
      :evidence
      "You are presenting evidence, either to support or rebut an item, or in response to a NeedsEvidence flag. Use this flag when none of the more specific evidence flags fits."
 
-     :dislosure
+     :disclosure
      "If you wish to let people know that you have a possible conflict of interest that could inform your perspective. In general, this should not be too
 important. Everyone should assume that any poster may have undisclosed
 biases and should evaluate statements on their own merit. Disclosure is
