@@ -178,6 +178,7 @@
 (defun draw-ring (hole-func content-func)
   (html-out
     (:svg
+     :xmlns "http://www.w3.org/2000/svg"
      :width "100" :height "100" :|viewBox| "0 0 42% 42%" :class "donut"
      (funcall hole-func)
      (:circle :class "donut-ring" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
@@ -189,7 +190,7 @@
     (:circle :class "donut-segment" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
              :fill "none" :stroke color
              :stroke-dasharray
-             (format nil "~a ~a" length (- 100 length))
+             (format nil "~a ~a" (float length) (float (- 100 length)))
              :stroke-dashoffset (princ-to-string (float (+ 25 offset)))
              :stroke-width (princ-to-string (float width)))))
 
