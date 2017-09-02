@@ -183,6 +183,19 @@
          (funcall body-fn body)
          (list "</radialGradient>")))
 
+#|
+;; A more generic solution to the case thing
+(defmethod convert-tag-to-string-list :around ((tag t) attr-list body body-fn)
+  (if (find-if #'lower-case-p (symbol-name tag))
+      (nconc (list* "<"
+                    (symbol-name tag)
+                    (convert-attributes attr-list))
+             (list ">")
+             (funcall body-fn body)
+             (list (format nil "</~a>" (symbol-name tag))))
+      (call-next-method)))
+|#
+
 (defun draw-gradients (color)
   (html-out
     (:defs

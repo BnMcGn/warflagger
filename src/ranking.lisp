@@ -169,7 +169,7 @@ Some of these factors will obviously affect the respect points more than others.
             (< 0 vv))
        1)
       ((and (not (member flag (all-flags)))
-            (< 0 vv)))
+            (< 0 vv)) 1)
       (t 0))))
 
 (defun filter-dissed (opinion)
