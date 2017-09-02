@@ -175,6 +175,25 @@
 (defparameter *ring-cy* "21")
 (defparameter *ring-r* "15.91549430918954")
 
+(defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
+                                       attr-list body body-fn)
+  (nconc (cons "<radialGradient"
+               (convert-attributes attr-list))
+         (list ">")
+         (funcall body-fn body)
+         (list "</radialGradient>")))
+
+(defun draw-gradients (color)
+  (html-out
+    (:defs
+        (:radialGradient :id "grad1" :cy *ring-cy* :fx "10%" :fy "50%" :r "8"
+          (:stop :offset "0%" :stop-color color)
+          (:stop
+           :offset "100%"
+           :stop-color (simple-rgb:xmlify-rgb
+                        (simple-rgb:darken-rgb
+                         (simple-rgb::parse color))))))))
+
 (defun draw-ring (hole-func content-func)
   (html-out
     (:svg
@@ -196,8 +215,9 @@
 
 (defun draw-hole (color)
   (html-out
+    (draw-gradients color)
     (:circle :class "donut-hole" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
-             :fill color)))
+             :fill "url(#grad1)")))
 
 (defun intervals (num)
   (unless (zerop num)
@@ -249,7 +269,8 @@
                    4)))
       (draw-ring
        (lambda ()
-         (draw-hole (getf *flag-colors* (second (assoc-cdr :flag opinion)))))
+         (draw-hole
+          (getf *flag-colors* (second (assoc-cdr :flag opinion)) "#fff")))
        (lambda ()
          (loop
             for (offset . length) in intervals
