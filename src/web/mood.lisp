@@ -175,6 +175,8 @@
 (defparameter *ring-cy* "21")
 (defparameter *ring-r* "15.91549430918954")
 
+;; https://stackoverflow.com/questions/46010186/mixed-case-tag-names-in-cl-who/
+;; has a more generic solution
 (defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
                                        attr-list body body-fn)
   (nconc (cons "<radialGradient"
@@ -183,29 +185,26 @@
          (funcall body-fn body)
          (list "</radialGradient>")))
 
-#|
-;; A more generic solution to the case thing
-(defmethod convert-tag-to-string-list :around ((tag t) attr-list body body-fn)
-  (if (find-if #'lower-case-p (symbol-name tag))
-      (nconc (list* "<"
-                    (symbol-name tag)
-                    (convert-attributes attr-list))
-             (list ">")
-             (funcall body-fn body)
-             (list (format nil "</~a>" (symbol-name tag))))
-      (call-next-method)))
-|#
-
 (defun draw-gradients (color)
   (html-out
     (:defs
-        (:radialGradient :id "grad1" :cy *ring-cy* :fx "10%" :fy "50%" :r "8"
-          (:stop :offset "0%" :stop-color color)
-          (:stop
-           :offset "100%"
-           :stop-color (simple-rgb:xmlify-rgb
-                        (simple-rgb:darken-rgb
-                         (simple-rgb::parse color))))))))
+        (:radialGradient
+         :id "grad1" ;:cy *ring-cy*
+         ;;:fx "10%" :fy "50%" :r "8"
+         :fx "50%" :fy "30%" :r "1"
+         (:stop :offset "0%" :stop-color color)
+         (:stop
+          :offset "100%"
+          :stop-color (simple-rgb:xmlify-rgb
+                       (simple-rgb:darken-rgb
+                        (simple-rgb::parse color) :alpha 0.75))))
+        (:radialGradient
+         :id "grad2" :cx "21" :cy "10.5"
+         :fx "21" :fy "10.5" :r "5.08"
+         :|gradientTransform| "matrix(1.66,0.04,-0.03,1.25, -15.43,-0.099)"
+         :|gradientUnits| "userSpaceOnUse"
+         (:stop :offset "0%" :stop-color "#fff" :stop-opacity "1")
+         (:stop :offset "100%" :stop-color "#fff" :stop-opacity "0")))))
 
 (defun draw-ring (hole-func content-func)
   (html-out
@@ -230,7 +229,10 @@
   (html-out
     (draw-gradients color)
     (:circle :class "donut-hole" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
-             :fill "url(#grad1)")))
+             :fill "url(#grad1)")
+    ;;spectral highlight
+    (:ellipse :fill "url(#grad2)" :style "opacity:0.8;" :fill-opacity "1"
+              :cx "19.5" :cy "14.0" :rx "8.68" :ry "8.36")))
 
 (defun intervals (num)
   (unless (zerop num)
