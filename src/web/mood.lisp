@@ -180,10 +180,22 @@
 (defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
                                        attr-list body body-fn)
   (nconc (cons "<radialGradient"
-               (convert-attributes attr-list))
+               (let ((*downcase-tokens-p* nil))
+                 (convert-attributes (recasify-attributes attr-list))))
          (list ">")
          (funcall body-fn body)
          (list "</radialGradient>")))
+
+(defun recasify-attributes (attr-list)
+  "Get around cl-who trying to upcase everything or nothing."
+  (mapcar
+   (lambda (attr)
+     (cons
+      (if (find-if #'lower-case-p (symbol-name (car attr)))
+          (string (car attr))
+          (string-downcase (string (car attr))))
+      (cdr attr)))
+   attr-list))
 
 (defun draw-gradients (color)
   (html-out
