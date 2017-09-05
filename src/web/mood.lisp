@@ -233,7 +233,7 @@
      :width "42" :height "42" :|viewBox| "0 0 42 42" :class "donut"
      (funcall hole-func)
      (:circle :class "donut-ring" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
-              :fill "none" :stroke "#d2d3d4" :stroke-width "2")
+              :fill "none" :stroke "#525354" :stroke-width "2")
      (funcall content-func))))
 
 (defun draw-segment (color offset length width)
@@ -322,6 +322,7 @@
                                  (scale-controv (getf warstat :controversy))
                                  (scale-effect (getf warstat :effect))))))))))
 
+;;FIXME: eventually might not want a flat directory space for these
 (defun create-badges-for-rootid (rootid storage-dir)
   (let* ((rooturl (get-rooturl-by-id rootid))
          (main-tree (opinion-tree-for-rooturl rooturl))

@@ -91,7 +91,10 @@
           ;;FIXME: db needs a constraint for this
           (setf (gethash :datestamp values)
                 (clsql:get-time))
-          (save-opinion-from-user (hu:hash->alist values) aid)))
+          (let ((newid (save-opinion-from-user (hu:hash->alist values) aid)))
+            ;;Update badges
+            (create-badges-for-rootid
+             (assoc-cdr :rooturl (opinion-from-id newid)) *targinfo-path*))))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
 

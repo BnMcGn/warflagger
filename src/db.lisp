@@ -327,7 +327,8 @@ the page text can be found in the cache."
     (insert-opinion
      (cons (cons :url (funcall opinurl authorid id)) opinion)
      authorid
-     id)))
+     id)
+    id))
 
 (defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
