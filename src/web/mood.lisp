@@ -230,10 +230,10 @@
   (html-out
     (:svg
      :xmlns "http://www.w3.org/2000/svg"
-     :width "100" :height "100" :|viewBox| "0 0 42% 42%" :class "donut"
+     :width "75" :height "75" :|viewBox| "0 0 50 50" :class "donut"
      (funcall hole-func)
      (:circle :class "donut-ring" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
-              :fill "none" :stroke "#d2d3d4" :stroke-width "3")
+              :fill "none" :stroke "#d2d3d4" :stroke-width "2")
      (funcall content-func))))
 
 (defun draw-segment (color offset length width)
@@ -241,8 +241,8 @@
     (:circle :class "donut-segment" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
              :fill "none" :stroke color
              :stroke-dasharray
-             (format nil "~a ~a" (float length) (float (- 100 length)))
-             :stroke-dashoffset (princ-to-string (float (+ 25 offset)))
+             (format nil "~a, ~a" (float length) (float (- 100 length)))
+             :stroke-dashoffset (princ-to-string (float (+ 25 (- 100 offset))))
              :stroke-width (princ-to-string (float width)))))
 
 (defun draw-hole (color)
@@ -294,12 +294,12 @@
                                              reply-ids)))))
     (labels ((scale-effect (num)
                (if (< min-effect max-effect)
-                   (as-in-range 2 10
+                   (as-in-range 3 15
                                 (relative-to-range min-effect max-effect num))
                    4))
              (scale-controv (num)
                (if (< min-controv max-controv)
-                   (as-in-range 2 10
+                   (as-in-range 3 15
                                 (relative-to-range min-controv max-controv num))
                    4)))
       (draw-ring
