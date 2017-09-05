@@ -10,11 +10,16 @@
                      (chain label (slice 1)))))))
 
     (def-component vote-value
+        (psx (:img :src (strcat "/static/targinfo/" (prop opinion id) ".svg"))))
+
+#|
+    (def-component vote-value
         (let ((vv (prop opinion votevalue)))
           (case vv
             (-1 (psx (:b :style (create background "#ff0000") "-")))
             (0 (psx (:b :style (create background "#aba3a3") "o")))
             (1 (psx (:b :style (create background "#00ff00") "+"))))))
+|#
 
     (defun display-date-nicely (dstamp)
       (let ((past (ago dstamp)))
