@@ -124,29 +124,29 @@
 
 (defparameter *flag-colors*
   (list :spam "#f00"
-        :inflammatory "#ff8137"
-        :disagree "#ff8137"
-        :dislike "#ff8137"
+        :inflammatory "#ff8100"
+        :disagree "#ff8100"
+        :dislike "#ff8100"
         :language-warning "#ffe843"
         :disturbing "#f00"
         :already-answered "#ffe843"
-        :logical-fallacy "#ff8137"
-        :needs-reference "#6ffee4"
-        :raise-question "#6ffee4"
+        :logical-fallacy "#ff8100"
+        :needs-reference "#4f41c8"
+        :raise-question "#4f41c8"
         :out-of-bounds "#f00"
         :funny "#1cff00"
         :agree "#1cff00"
         :like "#1cff00"
-        :interesting "#6ce9d2"
-        :eye-witness "#6ffee4"
-        :am-qualified "#6ffee4"
-        :second-hand "#6ffee4"
-        :anecdotal "#6ffee4"
-        :evidence "#6ffee4"
+        :interesting "#00adff"
+        :eye-witness "#00adff"
+        :am-qualified "#00adff"
+        :second-hand "#00adff"
+        :anecdotal "#00adff"
+        :evidence "#00adff"
         :disclosure "#9a12c6"
         :redundant "#ffe843"
         :out-of-date "#ffe843"
-        :retraction "#560272"
+        :retraction "#9a12c6"
         :correction "#ffe843"
         :incorrect-flag "#ffe843"
         :flag-abuse "#f00"
@@ -230,7 +230,7 @@
   (html-out
     (:svg
      :xmlns "http://www.w3.org/2000/svg"
-     :width "75" :height "75" :|viewBox| "0 0 50 50" :class "donut"
+     :width "42" :height "42" :|viewBox| "0 0 42 42" :class "donut"
      (funcall hole-func)
      (:circle :class "donut-ring" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
               :fill "none" :stroke "#d2d3d4" :stroke-width "2")
@@ -292,6 +292,9 @@
                                                (getf (gethash id warstats)
                                                      :controversy))
                                              reply-ids)))))
+    ;;FIXME: These values are only calculated on opins that have replies. Some
+    ;; Opins have more effect even if they don't have replies. Effect calculation
+    ;; mechanism may need some rethinking.
     (labels ((scale-effect (num)
                (if (< min-effect max-effect)
                    (as-in-range 3 15
