@@ -13,8 +13,8 @@
 
 (defun ratio-of-recentness-factor (ratio)
   "An arbitrary formula to reduce the hotness of a large, older discussion
-that is winding down."
-  (- 1 (* 0.01 (expt 1.55 (* 100 (- ratio 0.9))))))
+that is winding down. Drops hotness if less than 10% of opinions are new."
+  (min 1 (* ratio (+ 10 ratio))))
 
 (defun calculate-age-ranking (dates)
   ;;FIXME: Should ensure no future dates
@@ -31,7 +31,7 @@ that is winding down."
          (rec-fact
           (ratio-of-recentness-factor (if (zerop (length recent))
                                           0
-                                          (/ total (length recent))))))
+                                          (/ (length recent) total)))))
     (* rec-fact
        (apply #'+ recent))))
 
