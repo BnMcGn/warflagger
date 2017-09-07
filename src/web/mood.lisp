@@ -209,8 +209,7 @@
   (html-out
     (:defs
         (:radialGradient
-         :id "grad1" ;:cy *ring-cy*
-         ;;:fx "10%" :fy "50%" :r "8"
+         :id "grad1" 
          :fx "50%" :fy "30%" :r "1"
          (:stop :offset "0%" :stop-color color)
          (:stop
@@ -230,7 +229,7 @@
   (html-out
     (:svg
      :xmlns "http://www.w3.org/2000/svg"
-     :width "42" :height "42" :|viewBox| "0 0 42 42" :class "donut"
+     :width "25" :height "25" :|viewBox| "0 0 42 42" :class "donut"
      (funcall hole-func)
      (:circle :class "donut-ring" :cx *ring-cx* :cy *ring-cy* :r *ring-r*
               :fill "none" :stroke "#525354" :stroke-width "2")
