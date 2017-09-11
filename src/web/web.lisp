@@ -217,7 +217,7 @@
    :root #p"~/quicklisp/local-projects/warflagger/src/static/")
   :session
   (clath:component
-   "http://logintest.warflagger.com:5000/clath/")
+   "http://logintest.warflagger.com:5000/")
   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
   (html-thing-lister:thing-component)
   *app*)
