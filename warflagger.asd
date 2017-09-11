@@ -13,7 +13,6 @@
                #:anaphora
                #:cl-fad
                #:external-program
-               #:thing-labels
                #:cl-postgres
                #:ratify)
   :serial t

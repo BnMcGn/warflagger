@@ -14,7 +14,6 @@
                #:alexandria
                #:cl-who
                #:anaphora
-               #:thing-labels
                #:thing-lister
                #:html-thing-lister
                #:ratify
