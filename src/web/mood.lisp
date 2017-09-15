@@ -209,7 +209,7 @@
   (html-out
     (:defs
         (:radialGradient
-         :id "grad1" 
+         :id "grad1"
          :fx "50%" :fy "30%" :r "1"
          (:stop :offset "0%" :stop-color color)
          (:stop
