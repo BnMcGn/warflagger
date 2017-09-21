@@ -25,3 +25,5 @@
 (defparameter *db-connect-type* nil)
 (defparameter *db-connect-spec* nil)
 (defparameter *targinfo-path* "")
+
+(defparameter *production* nil)

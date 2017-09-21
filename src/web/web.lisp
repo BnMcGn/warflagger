@@ -200,26 +200,38 @@
 ;;FIXME: Need to handle the user information that will be passed out in OpinML
 ;; exports. User needs to be able to specify a homepage, whether email address
 ;; should go out in the data.
-(defparameter *userfig-fieldspecs*
-  '(:test-value
-    (:string
-     :initial "a value")))
+(defparameter *userfig-fieldspecs* nil)
 
-(clack-server-manager
- *handler*
- (clack-pretend:pretend-builder
-  (:insert 3) ;clack.builder:builder
-  (clack.middleware.clsql:<clack-middleware-clsql>
-   :database-type :postgresql-socket3
-   :connection-spec *db-connect-spec*)
-  (clack.middleware.static:<clack-middleware-static>
-   :path "/static/"
-   :root #p"~/quicklisp/local-projects/warflagger/src/static/")
-  :session
-  (clath:component
-   "http://logintest.warflagger.com:5000/")
-  (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-  (html-thing-lister:thing-component)
-  *app*)
- :port 5000)
+(if-production
+ (clack-server-manager
+  *handler*
+  (lack:builder
+   (clack.middleware.clsql:<clack-middleware-clsql>
+    :database-type :postgresql-socket3
+    :connection-spec *db-connect-spec*)
+   (clath:component
+    *base-url*)
+   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+   (html-thing-lister:thing-component)
+   *app*)
+  :server :fcgi
+  :use-thread nil
+  :fd 0)
+ (clack-server-manager
+  *handler*
+  (clack-pretend:pretend-builder
+   (:insert 3) ;clack.builder:builder
+   (clack.middleware.clsql:<clack-middleware-clsql>
+    :database-type :postgresql-socket3
+    :connection-spec *db-connect-spec*)
+   (clack.middleware.static:<clack-middleware-static>
+    :path "/static/"
+    :root #p"~/quicklisp/local-projects/warflagger/src/static/")
+   :session
+   (clath:component
+    *base-url*)
+   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+   (html-thing-lister:thing-component)
+   *app*)
+  :port 5000))
 

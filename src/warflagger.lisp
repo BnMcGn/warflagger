@@ -28,3 +28,11 @@
          1 (ppcre:scan-to-strings (strcat *base-url* "u/([^/]+)/") url))
         0))
 
+(defmacro if-production (true-clause false-clause)
+  (if *production* true-clause false-clause))
+
+(defmacro when-production (clause)
+  (when *production* clause))
+
+(defmacro unless-production (clause)
+  (unless *production* clause))

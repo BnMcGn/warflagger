@@ -48,5 +48,8 @@
    #:get-local-user-from-id
    #:opinion-effect
    #:*opinion-effect-cache*
-   #:generate-rooturl-warstats))
+   #:generate-rooturl-warstats
+   #:if-production
+   #:when-production
+   #:unless-production))
 
