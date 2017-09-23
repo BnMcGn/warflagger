@@ -203,20 +203,21 @@
 (defparameter *userfig-fieldspecs* nil)
 
 (if-production
- (clack-server-manager
-  *handler*
-  (lack:builder
-   (clack.middleware.clsql:<clack-middleware-clsql>
-    :database-type :postgresql-socket3
-    :connection-spec *db-connect-spec*)
-   (clath:component
-    *base-url*)
-   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-   (html-thing-lister:thing-component)
-   *app*)
-  :server :fcgi
-  :use-thread nil
-  :fd 0)
+ (defun run-server ()
+   (clack-server-manager
+    *handler*
+    (lack:builder
+     (clack.middleware.clsql:<clack-middleware-clsql>
+      :database-type :postgresql-socket3
+      :connection-spec *db-connect-spec*)
+     (clath:component
+      *base-url*)
+     (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+     (html-thing-lister:thing-component)
+     *app*)
+    :server :fcgi
+    :use-thread nil
+    :fd 0))
  (clack-server-manager
   *handler*
   (clack-pretend:pretend-builder
