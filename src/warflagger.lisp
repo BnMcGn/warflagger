@@ -29,10 +29,10 @@
         0))
 
 (defmacro if-production (true-clause false-clause)
-  (if *production* true-clause false-clause))
+  (if wf/local-settings:*production* true-clause false-clause))
 
 (defmacro when-production (clause)
-  (when *production* clause))
+  (when wf/local-settings:*production* clause))
 
 (defmacro unless-production (clause)
-  (unless *production* clause))
+  (unless wf/local-settings:*production* clause))
