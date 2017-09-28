@@ -16,7 +16,9 @@
    #:*base-url*
    #:*cache-path*
    #:*db-connect-type*
-   #:*db-connect-spec*))
+   #:*db-connect-spec*
+   #:*targinfo-path*
+   #:*production*))
 
 (in-package :wf/local-settings)
 
