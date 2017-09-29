@@ -217,7 +217,7 @@
      *app*)
     :server :fcgi
     :use-thread nil
-    :fd 0))
+    :port 5005))
  (clack-server-manager
   *handler*
   (clack-pretend:pretend-builder
