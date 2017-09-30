@@ -217,7 +217,12 @@
      *app*)
     ;:server :fcgi
     ;:use-thread nil
-    :port 5005))
+    :port 5005)
+   (sb-thread:join-thread
+    (find-if
+     (lambda (th)
+       (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
+     (sb-thread:list-all-threads))))
  (clack-server-manager
   *handler*
   (clack-pretend:pretend-builder
