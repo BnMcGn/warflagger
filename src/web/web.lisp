@@ -215,8 +215,8 @@
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
      (html-thing-lister:thing-component)
      *app*)
-    :server :fcgi
-    :use-thread nil
+    ;:server :fcgi
+    ;:use-thread nil
     :port 5005))
  (clack-server-manager
   *handler*
