@@ -210,6 +210,7 @@
      (clack.middleware.clsql:<clack-middleware-clsql>
       :database-type :postgresql-socket3
       :connection-spec *db-connect-spec*)
+     :session
      (clath:component
       *base-url*)
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
