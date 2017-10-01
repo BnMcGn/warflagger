@@ -233,7 +233,7 @@
     :connection-spec *db-connect-spec*)
    (clack.middleware.static:<clack-middleware-static>
     :path "/static/"
-    :root #p"~/quicklisp/local-projects/warflagger/src/static/")
+    :root #p"~/quicklisp/local-projects/wf-static/")
    :session
    (clath:component
     *base-url*)
