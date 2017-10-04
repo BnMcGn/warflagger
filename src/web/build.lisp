@@ -11,4 +11,4 @@
   (wf/web::run-server))
 
 (sb-ext:save-lisp-and-die
- "warflagger-server.fcgi" :toplevel #'main :executable t)
+ "wf-server.img" :toplevel #'main :executable t)

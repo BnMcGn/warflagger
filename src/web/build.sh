@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mv warflagger-server.old warflagger-server.older
-mv warflagger-server.fcgi warflagger-server.old
+mv wf-server.old wf-server.older
+mv wf-server.img wf-server.old
 
 sbcl --load build.lisp
