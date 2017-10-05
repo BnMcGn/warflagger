@@ -3,6 +3,7 @@
 ;(ql:quickload 'clack-handler-fcgi :silent t)
 
 (defun main ()
+  (swank:create-server :port 4004 :dont-close t)
   (clack:clackup
    (lambda (env)
      (declare (ignore env))
