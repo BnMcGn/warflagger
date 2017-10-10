@@ -2,7 +2,10 @@
 ;;; Script to build a lisp server image for warflagger.net
 ;;;
 
-(ql:quickload 'wf-web :silent nil
+(pushnew (truename "/home/ben/quicklisp/local-projects/")
+         ql:*local-project-directories* )
+
+(ql:quickload 'wf-web :silent nil)
 (ql:quickload 'swank)
 
 (defun main ()
