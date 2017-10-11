@@ -211,6 +211,13 @@ the page text can be found in the cache."
              :status "failure"
              :message "Opinion not found"))))
 
+(defun get-target-id-from-url (url)
+  (if-let ((id (rooturl-p url)))
+    (values id :rooturl)
+    (if-let ((op (opinion-exists-p url)))
+      (values (assoc-cdr :id op) :opinion)
+      (error "URL not found as rootURL or as opinion."))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -425,7 +432,8 @@ the page text can be found in the cache."
           :where (sql-= (colm :opinionid) opinid)))
 
 (defun get-target-looks (target-url)
-  (if (rooturl-p target-url)
-      (get-rooturl-looks (get-rooturl-id target-url))
-      (get-opinion-looks)))
+  (multiple-value-bind (id type) (get-target-id-from-url target-url)
+    (case type
+      (:rooturl (get-rooturl-looks id))
+      (:opinion (get-opinion-looks id)))))
 
