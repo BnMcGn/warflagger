@@ -133,15 +133,11 @@
 
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
-            (markdown:markdown
-             (asdf:system-relative-pathname 'warflagger "src/faq.md")
-             :stream webhax:*webhax-output*)))
+          (named-text :faq)))
 
   (setf (ningle:route *app* "/documentation/")
         (quick-page ()
-          (markdown:markdown
-           (asdf:system-relative-pathname 'warflagger "src/documentation.md")
-           :stream webhax:*webhax-output*)))
+          (named-text :documentation)))
 
   (setf (ningle:route *app* "/flags/")
         (quick-page ()

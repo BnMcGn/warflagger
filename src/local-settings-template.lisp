@@ -29,3 +29,5 @@
 (defparameter *targinfo-path* "")
 
 (defparameter *production* nil)
+
+(pushnew #p"" webhax:*named-text-locations*)
