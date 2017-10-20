@@ -156,8 +156,9 @@
                         (htm (:h3 (str lab)))
                         (htm (:p (str description)))))))))
 
-  (setf (ningle:route *app* "/flag-color/")
-        #'flag-color-page)
+  (unless-production
+   (setf (ningle:route *app* "/flag-color/")
+         #'flag-color-page))
 
   (setf (ningle:route *app* "/home/")
         (quick-page (#'webhax:react-parts #'warflagger-things)
@@ -168,11 +169,12 @@
                      #'warflagger-things
                      #'author-page-parts)))
 
-  (setf (ningle:route *app* "/demo/")
-        (quick-page (#'webhax:react-parts
-                     #'webhax::webhax-ask
-                     :@javascript #'webhax-widgets:ps-widgets)
-          (demo-pages)))
+  (unless-production
+   (setf (ningle:route *app* "/demo/")
+         (quick-page (#'webhax:react-parts
+                      #'webhax::webhax-ask
+                      :@javascript #'webhax-widgets:ps-widgets)
+           (demo-pages))))
 
   ;;FIXME: Should be handled internally by webhax service middleware
   (setf (ningle:route *app* "/ask-data/*" :method :POST)
