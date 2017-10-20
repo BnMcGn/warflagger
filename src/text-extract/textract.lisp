@@ -21,7 +21,7 @@
    #:*cache-age*
    #:*bynum*
    #:*byurl*
-   #:*extractor-script*
+   #:*text-extractor-script*
    #:initialize-indices
    #:update-page
    #:text-server))
@@ -32,8 +32,8 @@
 (defparameter *cache-age* (encode-time-delta 0 0 1 0))
 (defvar *bynum*)
 (defvar *byurl*)
-(defparameter *extractor-script*
-  "/home/ben/quicklisp/local-projects/warflagger/src/text-extract/textract.py")
+;;(defparameter *text-extractor-script*
+;;  "/home/ben/quicklisp/local-projects/warflagger/src/text-extract/textract.py")
 
 (defun cache-loc (url)
   (concatenate
@@ -130,7 +130,7 @@
     (ensure-directories-exist (make-pathname :directory (cache-loc url)))
 ;;;FIXME: external-program:start is exceeding erratic. Investigate.
 ;;;Fails to report non-existent script.
-    (let ((process (external-program:start *extractor-script*
+    (let ((process (external-program:start *text-extractor-script*
                                            (list (cache-loc url))
                                            :input :stream)))
       (write-line url (external-program:process-input-stream process))

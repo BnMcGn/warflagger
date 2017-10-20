@@ -15,6 +15,7 @@
   (:export
    #:*base-url*
    #:*cache-path*
+   #:*text-extractor-script*
    #:*db-connect-type*
    #:*db-connect-spec*
    #:*targinfo-path*
@@ -24,6 +25,7 @@
 
 (defparameter *base-url* "")
 (defparameter *cache-path* "")
+(defparameter *text-extractor-script* "")
 (defparameter *db-connect-type* nil)
 (defparameter *db-connect-spec* nil)
 (defparameter *targinfo-path* "")

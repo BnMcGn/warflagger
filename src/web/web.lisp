@@ -232,7 +232,7 @@
     :root #p"~/quicklisp/local-projects/wf-static/")
    :session
    (clath:component
-    *base-url*)
+    "http://logintest.warflagger.com:5000/")
    (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
    (html-thing-lister:thing-component)
    *app*)

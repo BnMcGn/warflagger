@@ -22,7 +22,6 @@
                #:lack-middleware-mount
                #:clath
                #:userfig
-               #:cl-markdown
                #:simple-rgb)
   :serial t
   :components ((:module 
