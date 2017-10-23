@@ -128,8 +128,8 @@
 (defun save-page-to-cache (url)
   (let ((index (get-url-index url)))
     (ensure-directories-exist (make-pathname :directory (cache-loc url)))
-;;;FIXME: external-program:start is exceeding erratic. Investigate.
-;;;Fails to report non-existent script.
+    (unless (probe-file *text-extractor-script*)
+      (error "Couldn't find text extractor script."))
     (let ((process (external-program:start *text-extractor-script*
                                            (list (cache-loc url))
                                            :input :stream)))
