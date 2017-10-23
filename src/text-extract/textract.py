@@ -7,10 +7,12 @@ from BeautifulSoup import BeautifulSoup
 import os 
 from pattern.web import plaintext
 from shutil import move
+from syslog import syslog, openlog, LOG_DEBUG, LOG_INFO
 
 import gadgets
 from filelock import FileLock, FailLock
 
+openlog(ident="WF:Textract")
 
 #FIXME: At least mildly evil...
 cache_tmp = ''
@@ -95,5 +97,7 @@ cachepath = sys.argv[1]
 if not cachepath.endswith("/"):
     cachepath += "/"
 url = sys.stdin.next()
+syslog(LOG_INFO, "Called for URL:{0}".format(url))
+syslog(LOG_DEBUG, "Cachepath: {0}".format(cachepath))
 do_page_save(url)
 
