@@ -295,7 +295,7 @@
                    (when (equal url (state url))
                      (set-state timeout
                                 (set-timeout
-                                 (@ component-this-ref load-from-server)
+                                 (@ %thisref load-from-server)
                                  2000 url)))))))))
 
       (def-component opform-item
