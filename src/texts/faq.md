@@ -1,36 +1,30 @@
 ## Welcome to WarFlagger
 
-
-
 ## General
 
 ### What is WarFlagger?
 
-WarFlagger is an attempt to tame acrimonious debate on the internet. It takes inspiration from user moderated sites such as slashdot, stackexchange and reddit.
+WarFlagger is your chance to correct the internet. It allows you to comment on any site on the internet without censorship from the owners.
 
-### What does WarFlagger have to offer that other sites do not?
+### How does it work?
 
-WarFlagger is built on an open, distributed (or distributable) debate language called [OpinML][1]. OpinML, a species of RDF, has an annotation feature that allows users to point exactly to portions of a text that are causing agreement or contention. WarFlagger can use this information to highlight source texts with appropriate indications of emotional intensity. Opinml also has a flag field modeled after slashdot's comment system that allows users to specify the nature of their objections and approvals. On top of all this, it has a user hackable moderation and meta-moderation system.
+WarFlagger is based on OpinML, an open standard file format. It allows you to own your own content, pass it around to others and host it, all without the permission of WarFlagger's owners. 
 
-[1]:  https://github.com/BnMcGn/warflagger/wiki/OpinML
+OpinML is published in units called opinions. With an opinion you can vote or comment on targets. Targets can be other opinions or web pages in general.
 
-The [Other Sites](https://github.com/BnMcGn/warflagger/wiki/Other-Sites) section of the WarFlagger Wiki has a comparison with other forum sites.
+Each OpinML opinion has a [Flag](https://github.com/BnMcGn/warflagger/wiki/Flags) field to indicate your intention and an optional [Excerpt](https://github.com/BnMcGn/warflagger/wiki/Excerpts) specifier for annotation of the target.
 
-### Why are distributed, open standard comments important?
+### Can I post anything that I like?
 
-OpinML is as open as the internet. You may choose to host your opinml comments on your own server as a feed, host them on WarFlagger or an alternate service, publish them - digitally signed - on freenet or torrents, email them to friends, or keep them private.
-Our intent is to create a system where all parties feel that their points of view can be fairly represented, each with all of it best arguments - and their rebuttals - presented clearly.
-If a discussion is not completely open, you can't be sure that all points of view have been adequately represented. Someone may be censoring things. WarFlagger intends to remove this excuse: if you have the evidence, present it! 
+Yes, if you are self-hosting your content, but expect to be called on it by other community members if you post irresponsibly. WarFlagger reserves the right to refuse to host and/or retransmit content at its sole discretion.
 
-### How do I know that WarFlagger isn't censoring stuff?
+### Won't WarFlagger turn into an echo chamber or get taken over by correctness nazis or voting blocs or be bought out by Big Money?
 
-We don't promise not to. There are things that we certainly don't want to host. In exchange, we give you the raw material of the discussion, the ability to host your own content, and the source code to our software.
+All of these are valid concerns. For more things to worry about, plus possible solutions to them, please see the [scenarios](https://github.com/BnMcGn/warflagger/wiki/Scenarios) section of the WarFlagger Wiki.
 
-We may be evil, but you can migrate.
+WarFlagger is designed to extract useful discussion from knock-down-drag-out internet flame wars. It aims to be resilient to all sorts of partisan savagery and dirty tricks. It has a few layers of defense.
 
-### What if people post intolerant/irreverent/unkind things on WarFlagger?
-
-Our default filters (will be) set up to remove unnecessarily rude or abusive comments. However, we intend to tune our filters to find "voices in the wilderness". If one individual asks a hard question, we want to give him a voice even if 100 people downvote him. Having our cherished beliefs questioned often feels like unkindness, and it has often been the case that charges of intolerance or irreverence have been used to silence legitimate questions.
+The final defense is a ranking and moderation system that is completely open and hackable. You can choose which community members you respect, choose your own ranking algorithm, or ultimately download the raw source of the discussion and process it on your own machine. [[Note: not implemented at this point.]]
 
 ## Usage
 
