@@ -128,6 +128,8 @@
 (defun save-page-to-cache (url)
   (let ((index (get-url-index url)))
     (ensure-directories-exist (make-pathname :directory (cache-loc url)))
+    ;;FIXME: Need a way to not cache non-existent urls. Otherwise will get major clutter
+    ;; from half-typed urls and malicious users.
     (unless (probe-file *text-extractor-script*)
       (error "Couldn't find text extractor script."))
     (let ((process (external-program:start *text-extractor-script*

@@ -10,7 +10,7 @@ WarFlagger is an attempt to tame acrimonious debate on the internet. It takes in
 
 ### What does WarFlagger have to offer that other sites do not?
 
-WarFlagger is built on an open, distruted (or distributable) debate language called [OpinML][1]. OpinML, a species of RDF, has an annotation feature that allows users to point exactly to portions of a text that are causing agreement or contention. WarFlagger can use this information to highlight source texts with appropriate indications of emotional intensity. Opinml also has a flag field modeled after slashdot's comment system that allows users to specify the nature of their objections and approvals. On top of all this, it has a user hackable moderation and meta-moderation system.
+WarFlagger is built on an open, distributed (or distributable) debate language called [OpinML][1]. OpinML, a species of RDF, has an annotation feature that allows users to point exactly to portions of a text that are causing agreement or contention. WarFlagger can use this information to highlight source texts with appropriate indications of emotional intensity. Opinml also has a flag field modeled after slashdot's comment system that allows users to specify the nature of their objections and approvals. On top of all this, it has a user hackable moderation and meta-moderation system.
 
 [1]:  https://github.com/BnMcGn/warflagger/wiki/OpinML
 
@@ -24,8 +24,9 @@ If a discussion is not completely open, you can't be sure that all points of vie
 
 ### How do I know that WarFlagger isn't censoring stuff?
 
-You don't, on our say so. Some things, such as illegal or pornographic material, we have no intention of hosting. If we go beyond this and interfere with legitimate discussion, we are breaking trust with the community.
-WarFlagger - and its owners - are not critical to OpinML discussion. At the end of the day it is up to you, user and community, to decide whether the trust that you have loaned to us should be left with us. If not, you can and should migrate.
+We don't promise not to. There are things that we certainly don't want to host. In exchange, we give you the raw material of the discussion, the ability to host your own content, and the source code to our software.
+
+We may be evil, but you can migrate.
 
 ### What if people post intolerant/irreverent/unkind things on WarFlagger?
 
