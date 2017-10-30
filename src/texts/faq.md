@@ -54,23 +54,12 @@ Possibly. This would require investigation by people familiar with the needs of 
 
 ### Can WarFlagger be used in place of the legal system for trying cases and evaluating evidence?
 
-While it's goals are analogous to some things in the court system, OpinML is not intended for any such use. For one, it will take significant effort to work out all the possible methods of subversion and causes of inaccuracy in OpinML evidence. Perhaps it will some day provide the inspiration for a legal evidence markup system.
+While its goals are analogous to some things in the court system, OpinML is not intended for any such use. For one, it will take significant effort to work out all the possible methods of subversion and causes of inaccuracy in OpinML evidence. Perhaps it will some day provide the inspiration for a legal evidence markup system.
 
-### What other possible uses do you forsee for WarFlagger/OpinML?
+### What other possible uses do you foresee for WarFlagger/OpinML?
 
 Citizen reporting and media verification. The **EyeWitness** and **SecondHand** flags were made with this use in mind.
 
 
-### If the moderation system is hackable, won't people just use it to form their own echo chambers?
-
-Short answer: Yes.
-
-WarFlagger is designed to break down echo chambers. It's dedicated to those who wish to get to the bottom of things, even when that's not comfortable. However, there are reasons to allow some flex on this point.
-
-Hackability is important. Every moderation system implemented thus far has had shortcomings. So will WarFlagger. The best way to arrive at a significantly better system is to allow a number of people with different perspectives to work on the problem. Hence, hackability is more important than the strict lack of echo chambers.
-
-Second, there are people who are never going to be able to handle completely open conversation. While we may see these people as deficient, we can't be sure that they have nothing to contribute. Leave them their echo chambers.
-
-I suspect that biased moderation systems will end up being reasonably detectable. The average user may not see it right away, but more experienced users will be able to point out the flaws. Further discussion can be found in the wiki under [Scenarios](https://github.com/BnMcGn/warflagger/wiki/Scenarios) 
 
 
