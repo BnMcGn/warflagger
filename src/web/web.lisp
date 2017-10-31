@@ -14,10 +14,10 @@
                                         ;;Main content
     (:div :id "left_side"
           :@site-index :@side-content)
-    (:div :id "content"
-          :@messages :@inner :@footnotes)
     (:div :id "right_side"
           :@site-search :@notifications)
+    (:div :id "content"
+          :@messages :@inner :@footnotes)
                                         ;;Footer
     (:div :id "footer" :@copyright)))
 
@@ -133,7 +133,9 @@
 
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
-          (named-text :faq)))
+          (html-out
+            (:div :class "featurebox"
+                  (named-text :faq)))))
 
   (setf (ningle:route *app* "/documentation/")
         (quick-page ()
