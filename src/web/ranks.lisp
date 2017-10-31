@@ -1,9 +1,9 @@
 (in-package :wf/web)
 
-(defparameter *preferred-space* 2.5)
-(defparameter *minimum-space* 1.5)
+(defparameter *preferred-space* 3)
+(defparameter *minimum-space* 2.5)
 (defparameter *unit-string* "em")
-(defparameter *opin-box-height* 20)
+(defparameter *opin-box-height* 25)
 (defparameter *opin-box-width* 10)
 (defparameter *placement-randomness* 0.25)
 (defparameter *rank-overlap* 2)
