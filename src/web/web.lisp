@@ -39,6 +39,12 @@
        (:div (:a :href "/faq/" "FAQ"))
        (:div (:a :href "/documentation/" "About"))))))
 
+(defun clath:clath-page-wrapper (title body-func)
+  (funcall
+   (webhax-route:quick-page
+       (:@title title)
+     (princ (funcall body-func) *webhax-output*))))
+
 (clsql:connect wf/text-extract::*db-connect-spec*
                :database-type :postgresql-socket3)
 
