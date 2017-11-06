@@ -141,6 +141,7 @@
         (quick-page ()
           (html-out
             (:div :class "featurebox"
+                  (error "Eeeeeek!")
                   (named-text :faq)))))
 
   (setf (ningle:route *app* "/documentation/")
@@ -213,6 +214,9 @@
    (clack-server-manager
     *handler*
     (lack:builder
+     (:backtrace
+      :output #p"/var/log/warflagger.err"
+      :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
      (clack.middleware.clsql:<clack-middleware-clsql>
       :database-type :postgresql-socket3
       :connection-spec *db-connect-spec*)
@@ -233,7 +237,7 @@
  (clack-server-manager
   *handler*
   (clack-pretend:pretend-builder
-   (:insert 3) ;clack.builder:builder
+   (:insert 0) ;clack.builder:builder
    (clack.middleware.clsql:<clack-middleware-clsql>
     :database-type :postgresql-socket3
     :connection-spec *db-connect-spec*)
