@@ -30,7 +30,7 @@ The final defense is a ranking and moderation system that is completely open and
 
 ### What flags are available in OpinML?
 
-They can be found [here](/flag_descriptions/) with descriptions.
+They can be found [here](/flags/) with descriptions.
 
 ### Why are there so many flags? Do I have to learn what they are all for?
 
