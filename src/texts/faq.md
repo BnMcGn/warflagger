@@ -24,7 +24,7 @@ All of these are valid concerns. For more things to worry about, plus possible s
 
 WarFlagger is designed to extract useful discussion from knock-down-drag-out internet flame wars. It aims to be resilient to all sorts of partisan savagery and dirty tricks. It has a few layers of defense.
 
-The final defense is a ranking and moderation system that is completely open and hackable. You can choose which community members you respect, choose your own ranking algorithm, or ultimately download the raw source of the discussion and process it on your own machine. [[Note: not implemented at this point.]]
+The final defense is a ranking and moderation system that is completely open and hackable. You can choose which community members you respect, choose your own ranking algorithm, or ultimately download the raw source of the discussion and process it on your own machine. \[Note: not implemented at this point.\]
 
 ## Usage
 
