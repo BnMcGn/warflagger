@@ -141,12 +141,17 @@
         (quick-page ()
           (html-out
             (:div :class "featurebox"
-                  (error "Eeeeeek!")
                   (named-text :faq)))))
 
   (setf (ningle:route *app* "/documentation/")
         (quick-page ()
           (named-text :documentation)))
+
+  (setf (ningle:route *app* "/introduction/")
+        (quick-page ()
+          :@inner
+          (large-logo)
+          (named-text :introduction)))
 
   (setf (ningle:route *app* "/flags/")
         (quick-page ()

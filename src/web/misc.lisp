@@ -67,6 +67,12 @@
      (json:encode-json-to-string looks)
      (json:encode-json-to-string warstats))))
 
+(defun large-logo ()
+  (html-out
+    (:img :src "/static/img/wf_logo_large.png"
+          :alt "[WarFlagger: Because someone is wrong on the internet]"
+          :style "display: block; margin-left: auto; margin-right: auto; margin-top: 3em; margin-bottom: 3em;")))
+
 (define-parts main-page-parts
   :@css-link "/static/css/push_button.css"
   :@notifications
@@ -81,10 +87,7 @@
                 (:a :href (assoc-cdr :login-url info) "Log In"))))))
   :@inner
   (lambda ()
-    (html-out
-      (:img :src "/static/img/wf_logo_large.png"
-            :alt "[WarFlagger: Because someone is wrong on the internet]"
-            :style "display: block; margin-left: auto; margin-right: auto; margin-top: 3em; margin-bottom: 3em;"))
+    (large-logo)
     (html-thing-lister:render-list-for-sidebar
      (list :lister-type :thing :thing 'target)
      :label "Active targets:"
