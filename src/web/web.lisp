@@ -37,7 +37,7 @@
        (:div (:a :href "/things/things/target" "Current Targets"))
        (:div (:a :href "/opinion/" "Write an Opinion"))
        (:div (:a :href "/faq/" "FAQ"))
-       (:div (:a :href "/documentation/" "About"))))))
+       (:div (:a :href "/introduction/" "Introduction"))))))
 
 (defun clath:clath-page-wrapper (title body-func)
   (funcall
@@ -142,10 +142,6 @@
           (html-out
             (:div :class "featurebox"
                   (named-text :faq)))))
-
-  (setf (ningle:route *app* "/documentation/")
-        (quick-page ()
-          (named-text :documentation)))
 
   (setf (ningle:route *app* "/introduction/")
         (quick-page ()
