@@ -1,7 +1,7 @@
 # Welcome to Warflagger
 
 
-
+Ready to help make the internet a more accurate place? Read this quick guide to start posting.
 
 
 ## Getting started

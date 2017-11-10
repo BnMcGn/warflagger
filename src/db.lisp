@@ -282,6 +282,7 @@ the page text can be found in the cache."
     (t :string)))
 
 (defun get-author-id (author atype)
+  "Get the PKey of the author given any type of author identifier. Mostly for RDF input."
   (case atype
     (:id (when (exists (select (colm 'author 'id)
                                :where (sql-= (colm 'author 'id)

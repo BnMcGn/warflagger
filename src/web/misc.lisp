@@ -88,6 +88,14 @@
   :@inner
   (lambda ()
     (large-logo)
+    (unless (warflagger:get-local-user-id (gethash :username webhax:*session*))
+      ;;Local user won't have an entry in DB if hasn't posted yet.
+      (html-out
+        ;;FIXME: find a proper way to style/display notifications
+        (:div :style "margin: 4px; background-color: lightgreen; text-align: center"
+         "You don't seem to have posted on WarFlagger yet."
+         (:a :href "/introduction/" "See here")
+         " for a guide to posting.")))
     (html-thing-lister:render-list-for-sidebar
      (list :lister-type :thing :thing 'target)
      :label "Active targets:"
