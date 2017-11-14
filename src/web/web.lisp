@@ -149,6 +149,12 @@
           (large-logo)
           (named-text :introduction)))
 
+  (setf (ningle:route *app* "/bookmarklet/")
+        (quick-page ()
+          (html-out
+            (:div :class "featurebox"
+                  (named-text :bookmarklet)))))
+
   (setf (ningle:route *app* "/flags/")
         (quick-page ()
           (loop
