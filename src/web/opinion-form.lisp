@@ -303,7 +303,8 @@
             (psx
              (:tr :key (prop keydata)
                   (:td :key "m1"
-                       (or (prop description) (prop name)))
+                       (or (prop description)
+                           (capitalize-first (ensure-string (prop name)))))
                   (children-map (prop children)
                                 (lambda (child)
                                   (psx (:td :key (incf count)
@@ -325,7 +326,7 @@
                    (psx
                     (:opform-item
                      :keydata (incf count)
-                     :description (@ child props description)
+                     :description (@ child props fieldspec description)
                      :name (@ child props name)
                      child
                      (case (@ child props name)
