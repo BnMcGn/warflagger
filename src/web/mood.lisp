@@ -177,22 +177,25 @@
 
 ;; https://stackoverflow.com/questions/46010186/mixed-case-tag-names-in-cl-who/
 ;; has a more generic solution
-(defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
-                                       attr-list body body-fn)
-  (nconc (cons "<radialGradient"
-               (let ((*downcase-tokens-p* nil))
-                 (convert-attributes (recasify-attributes attr-list))))
-         (list ">")
-         (funcall body-fn body)
-         (list "</radialGradient>")))
 
-(defmethod convert-tag-to-string-list ((tag (eql :svg)) attr-list body body-fn)
-  (nconc (cons "<svg"
-               (let ((*downcase-tokens-p* nil))
-                 (convert-attributes (recasify-attributes attr-list))))
-         (list ">")
-         (funcall body-fn body)
-         (list "</svg>")))
+
+(eval-always
+  (defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
+                                         attr-list body body-fn)
+    (nconc (cons "<radialGradient"
+                 (let ((*downcase-tokens-p* nil))
+                   (convert-attributes (recasify-attributes attr-list))))
+           (list ">")
+           (funcall body-fn body)
+           (list "</radialGradient>")))
+
+  (defmethod convert-tag-to-string-list ((tag (eql :svg)) attr-list body body-fn)
+    (nconc (cons "<svg"
+                 (let ((*downcase-tokens-p* nil))
+                   (convert-attributes (recasify-attributes attr-list))))
+           (list ">")
+           (funcall body-fn body)
+           (list "</svg>"))))
 
 (defun recasify-attributes (attr-list)
   "Get around cl-who trying to upcase everything or nothing."
