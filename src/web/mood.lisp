@@ -195,18 +195,18 @@
                    (convert-attributes (recasify-attributes attr-list))))
            (list ">")
            (funcall body-fn body)
-           (list "</svg>"))))
+           (list "</svg>")))
 
-(defun recasify-attributes (attr-list)
-  "Get around cl-who trying to upcase everything or nothing."
-  (mapcar
-   (lambda (attr)
-     (cons
-      (if (find-if #'lower-case-p (symbol-name (car attr)))
-          (string (car attr))
-          (string-downcase (string (car attr))))
-      (cdr attr)))
-   attr-list))
+  (defun recasify-attributes (attr-list)
+    "Get around cl-who trying to upcase everything or nothing."
+    (mapcar
+     (lambda (attr)
+       (cons
+        (if (find-if #'lower-case-p (symbol-name (car attr)))
+            (string (car attr))
+            (string-downcase (string (car attr))))
+        (cdr attr)))
+     attr-list)))
 
 (defun draw-gradients (color)
   (html-out
