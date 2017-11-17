@@ -19,7 +19,8 @@
     (:div :id "content"
           :@messages :@inner :@footnotes)
                                         ;;Footer
-    (:div :id "footer" :@copyright)))
+    (:div :id "footer" :@copyright)
+    (str (tracking-code))))
 
 (define-default-parts warflagger-base
   :@account-info #'account-bar
