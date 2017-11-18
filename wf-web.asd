@@ -3,7 +3,7 @@
 (asdf:defsystem #:wf-web
   :description "Warflagger web application"
   :author "Ben McGunigle <bnmcgn@gmail.com>"
-  :license "Specify license here"
+  :license "Apache License, version 2.0"
   :depends-on (#:webhax
                #:clack
                #:clack-middleware-clsql

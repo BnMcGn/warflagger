@@ -1,9 +1,9 @@
 ;;;; warflagger.asd
 
 (asdf:defsystem #:warflagger
-  :description "Describe warflagger here"
-  :author "Your Name <your.name@example.com>"
-  :license "Specify license here"
+  :description "The warflagger.net website"
+  :author "Ben McGunigle <bnmcgn@gmail.com>"
+  :license "Apache License, version 2.0"
   :depends-on (#:webhax
                #:webhax-user
                #:gadgets

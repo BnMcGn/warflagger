@@ -2,8 +2,8 @@
 
 (asdf:defsystem #:test-warflagger
   :description "Test suite for warflagger functionality."
-  :author "Your Name <your.name@example.com>"
-  :license "Specify license here"
+  :author "Ben McGunigle <bnmcgn@gmail.com>"
+  :license "Apache License, version 2.0"
   :depends-on (#:warflagger
                #:alexandria
                #:gadgets
