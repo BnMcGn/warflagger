@@ -344,3 +344,7 @@
                  (when (cdr node)
                    (proc (cdr node))))))
       (proc main-tree))))
+
+(defun redraw-all-badges (&optional (storage-dir wf/local-settings:*targinfo-path*))
+  (dolist (id (sql-stuff:get-column 'rooturl 'id))
+    (create-badges-for-rootid id storage-dir)))
