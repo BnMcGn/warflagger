@@ -103,9 +103,7 @@ field."
 
      :retraction
      "This flag is only valid for use against your own posts. Use it to acknowledge
-that you were wrong or out of line about something. This is a little stronger
-than using PointTaken, which might indicate partial agreement. It can also be
-used for cleaning up accidental posts."
+that you were wrong or out of line about something. It can also be used for cleaning up accidental posts."
 
      :correction
      "Use this on spelling and grammatical errors. WARNING: some reader systems may use this flag to automatically update other people's posts. It is therefore possible to use this flag to tamper with the meaning of them. This is not

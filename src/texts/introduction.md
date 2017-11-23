@@ -9,7 +9,7 @@ To participate in WarFlagger debates and discussions you will need a username. W
 
 Once signed in, you will be asked to choose a username.
 
-Now you may proceed to creating an opinion. If you wish to respond to a target that is already on WarFlagger, you may click the reply button on that target. 
+Now you may proceed to creating an opinion. If you wish to respond to a target that is already on WarFlagger, you may click the `Reply` button on that target. 
 
 Otherwise click on [Write an Opinion](http://warflagger.net/opinion/). There you will need to supply the URL of the page that you wish to target. (For a more convenient option, try the [WarFlagger Bookmarklet](http://warflagger.net/bookmarklet/))
 
@@ -21,13 +21,15 @@ Select a VoteValue. For now, use 1 with Like and -1 with Dislike.
 
 Fill out the optional Comment field, if you wish.
 
+Click `Post` to finish.
+
 ## More documentation
 
-There is a [FAQ](http://warflagger.net/faq/)
-
-Most of the documentation is in the [WarFlagger Wiki](https://github.com/BnMcGn/warflagger/wiki/).
-
-For an introduction to WarFlagger usage, you will want to read these pages:
+For more tips on getting started, you will want to read these pages from the [WarFlagger Wiki](https://github.com/BnMcGn/warflagger/wiki/):
 
 - [Checking the News](https://github.com/BnMcGn/warflagger/wiki/Checking-the-News)
 - [Guidelines For Moderating](https://github.com/BnMcGn/warflagger/wiki/Guidelines-for-Moderating)
+
+There is also a [FAQ](http://warflagger.net/faq/)
+
+

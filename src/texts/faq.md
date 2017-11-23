@@ -20,7 +20,7 @@ Yes, if you are self-hosting your content, but expect to be called on it by othe
 
 ### Won't WarFlagger turn into an echo chamber or get taken over by correctness nazis or voting blocs or be bought out by Big Money?
 
-All of these are valid concerns. For more things to worry about, plus possible solutions to them, please see the [scenarios](https://github.com/BnMcGn/warflagger/wiki/Scenarios) section of the WarFlagger Wiki.
+All of these are valid concerns. For more things to worry about, plus possible solutions to them, please see tHE [Scenarios](https://github.com/BnMcGn/warflagger/wiki/Scenarios) section of the WarFlagger Wiki.
 
 WarFlagger is designed to extract useful discussion from knock-down-drag-out internet flame wars. It aims to be resilient to all sorts of partisan savagery and dirty tricks. It has a few layers of defense.
 
@@ -34,7 +34,7 @@ They can be found [here](/flags/) with descriptions.
 
 ### Why are there so many flags? Do I have to learn what they are all for?
 
-If in doubt, you are fine to just use the Like and Dislike flags.
+If in doubt, you are fine to just use the **Like** and **Dislike** flags.
 
 ### What is the reference field for?
 
@@ -54,9 +54,9 @@ Possibly. This would require investigation by people familiar with the needs of 
 
 ### Can WarFlagger be used in place of the legal system for trying cases and evaluating evidence?
 
-While its goals are analogous to some things in the court system, OpinML is not intended for any such use. For one, it will take significant effort to work out all the possible methods of subversion and causes of inaccuracy in OpinML evidence. Perhaps it will some day provide the inspiration for a legal evidence markup system.
+While its goals are analogous to some things in the court system, OpinML is not currently intended for legal use. For one, it will take significant effort to work out all the possible methods of subversion and causes of inaccuracy in OpinML evidence. Perhaps it will some day provide the inspiration for a legal evidence markup system.
 
-### What other possible uses do you foresee for WarFlagger/OpinML?
+### What other possible uses will WarFlagger/OpinML find?
 
 Citizen reporting and media verification. The **EyeWitness** and **SecondHand** flags were made with this use in mind.
 
