@@ -423,6 +423,6 @@
         (dotimes (i quantity)
           (gadgets:collect
               `(list (create :flag (list "Negative"
-                                         ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsReference" "RaiseQuestion"))
+                                         ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsEvidence" "RaiseQuestion"))
 
                              :votevalue ,(whichever (- 1) 0 1))))))))

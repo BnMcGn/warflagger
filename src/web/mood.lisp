@@ -131,7 +131,7 @@
         :disturbing "#f00"
         :already-answered "#ffe843"
         :logical-fallacy "#ff8100"
-        :needs-reference "#4f41c8"
+        :needs-evidence "#4f41c8"
         :raise-question "#4f41c8"
         :out-of-bounds "#f00"
         :funny "#1cff00"

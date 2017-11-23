@@ -114,7 +114,7 @@ Some of these factors will obviously affect the respect points more than others.
 ;;   IncorrectFlag?
 
 ;; unverified
-;; Flags: NeedsReference (when negative: RaiseQuestion)
+;; Flags: NeedsEvidence (when negative: RaiseQuestion)
 
 ;; irrelevant
 ;; Flags: Redundant OutOfDate IncorrectFlag? Offtopic Arcane AlreadyAnswered?
@@ -134,20 +134,20 @@ Some of these factors will obviously affect the respect points more than others.
 ;; of statement should be carefully considered, not discarded.
 ;;
 
-;;FIXME: Handling of NeedsReference and RaiseQuestion flags
-;; These flags need some custom handling. Take, for example, a NeedsReference flag
+;;FIXME: Handling of NeedsEvidence and RaiseQuestion flags
+;; These flags need some custom handling. Take, for example, a NeedsEvidence flag
 ;; with a -1 VoteValue. If someone adds a reference, say with the Evidence flag,
-;; to the NeedsReference flag, it should have a VoteValue of -1 indicating a
+;; to the NeedsEvidence flag, it should have a VoteValue of -1 indicating a
 ;; neutralization of the need for a reference. Assuming that the reference is
 ;; good it should be effectively applied to the target as a +1 Evidence flag in
-;; place of the NeedsReference flag.
+;; place of the NeedsEvidence flag.
 
-;; Adding a +1 Evidence flag to the -1 NeedsReference flag will be taken as support
+;; Adding a +1 Evidence flag to the -1 NeedsEvidence flag will be taken as support
 ;; for the latter flag. You're saying that you are presenting additional reasons
 ;; that the grandparent target needs evidence. Thus your +1 Evidence flag
 ;; translates into a -1 Evidence to the toplevel target.
 
-;; This inversion over the NeedsReference and RaiseQuestion flags will probably
+;; This inversion over the NeedsEvidence and RaiseQuestion flags will probably
 ;; cause some confusion to users. There should be a UI cue or two that will
 ;; help with clarity.
 
@@ -216,7 +216,7 @@ Some of these factors will obviously affect the respect points more than others.
   (let ((vv (assoc-cdr :votevalue opinion))
         (flag (third (assoc :flag opinion))))
     (cond
-      ((eq flag :needs-reference) 1)
+      ((eq flag :needs-evidence) 1)
       ((and (eq flag :raise-question)
             (> 0 vv))
        1)

@@ -32,7 +32,7 @@ flag will help prevent redundant discussions all over the place."
      "Use this to point out a logical fallacy. It's good form to explain the
 problem in your comment."
 
-     :needs-reference
+     :needs-evidence
      "Any time that a vague claim has been made, such as \"Studies indicate...\".
 This is your way of saying \"Put up or shut up\" to an opponent. It is a way
 to challenge unquestioned assumptions. Note that the VoteValue field of this
@@ -78,7 +78,7 @@ expect your opinion to be automatically accepted because of this flag. In fact,
 it serves as an invitation for the community to verify your qualifications."
 
      :second-hand
-     "This is meant for situations where you have spoken to a witness of an event. If a NeedsReference or RaiseQuestion flag has been raised on a point and you are able to interview a source first hand knowledge to resolve the question, then you can use this flag to indicate that you have done so."
+     "This is meant for situations where you have spoken to a witness of an event. If a NeedsEvidence or RaiseQuestion flag has been raised on a point and you are able to interview a source first hand knowledge to resolve the question, then you can use this flag to indicate that you have done so."
 
      :anecdotal
      "Indicates that a certain argument or piece of evidence is a one-off experience, and should be taken with a grain of salt. You may use this flag on other peoples' submissions, or to flag your own statements."
@@ -136,7 +136,7 @@ throw the discussion tree out of whack."
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "LanguageWarning" "Disturbing"
      "AlreadyAnswered" "LogicalFallacy"
-     "NeedsReference" "RaiseQuestion" "OutOfBounds")
+     "NeedsEvidence" "RaiseQuestion" "OutOfBounds")
     ("Funny" "Agree" "Like" "Interesting")
     ("EyeWitness" "AmQualified" "SecondHand" "Anecdotal" "Evidence" "Disclosure")
     ("Redundant" "OutOfDate" "Retraction" "Correction" "IncorrectFlag"

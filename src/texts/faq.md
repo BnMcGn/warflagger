@@ -43,7 +43,7 @@ Like target, reference is meant to hold an URL. Unlike target, it is optional. U
 Examples: 
 
 - If you wish to flag an opinion as **Redundant**, it's a good practice to link to the post that the opinion duplicates.
-- When replying to a **NeedsReference** request, you can put an answering URL in the reference field, especially if you are leaving the comment field blank.
+- When replying to a **NeedsEvidence** request, you can put an answering URL in the reference field, especially if you are leaving the comment field blank.
 - The reference field is mandatory when using the **SameThing** flag to merge two discussions.
 
 ## Future
