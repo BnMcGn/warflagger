@@ -91,7 +91,7 @@
          :url url
          :warstats (warstats-for-target url))))
   (lambda (targdata)
-    (truncate-string (getf targdata :title) :length 40))
+    (truncate-string (getf targdata :title) :length 80))
    ; (concatenate 'string
    ;              (truncate-string (getf targdata :title) :length 15)
    ;              " - "
