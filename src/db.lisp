@@ -361,7 +361,7 @@ the page text can be found in the cache."
                         :values (list id comment)))
       (when (and (stringp reference) (not-empty reference))
         (insert-records :into 'reference :attributes
-                        (list (colm :opinion) (colm :comment))
+                        (list (colm :opinion) (colm :reference))
                         :values (list id reference)))
       (dolist (k '(:excerpt :excerpt-offset :time-excerpt :excerpt-length))
         (when-let* ((pair (assoc k opin))
