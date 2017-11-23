@@ -306,6 +306,13 @@
             (psx (:span :class "knobdule"
                         (strcat (chain immed (to-string)) allstr)))))
 
+      ;;FIXME: The reference should include much more information: title, link to target
+      ;; page, warstats...
+      (def-component reference-line
+          (psx
+           (:div
+            (:a :href (prop reference) "Reference"))))
+
       (def-component opinion
           (let* ((op (@ (prop opinions) 0))
                  (tree-ad (chain (prop tree-address)
@@ -346,7 +353,9 @@
                :... (@ this props)
                :text (@ op comment)
                :opinions (prop opinions (slice 1))
-               :tree-address tree-ad))))
+               :tree-address tree-ad)
+              (when (@ op reference)
+                (psx (:reference-line :key "x1" :reference (@ op reference)))))))
         handle-click
         (lambda (e)
           (chain e (stop-propagation)))
