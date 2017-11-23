@@ -29,7 +29,7 @@
 (in-package :wf/text-extract)
 
 ;;;(defparameter *cache-path* "/home/ben/opinml/")
-(defparameter *cache-age* (encode-time-delta 0 0 1 0))
+(defparameter *cache-age* (encode-time-delta 0 10 0 0))
 (defvar *bynum*)
 (defvar *byurl*)
 ;;(defparameter *text-extractor-script*
@@ -66,7 +66,10 @@
   (when update (update-page url))
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
     (read-file-into-string
-     (make-pathname :directory (cache-loc url) :name "text"))))
+     (make-pathname :directory (cache-loc url) :name
+                    (if (probe-file (make-pathname :directory (cache-loc url)
+                                                   :name "text.locked"))
+                        "text.locked" "text")))))
 
 (defun grab-title (url &key (alternate "[No Title]") (update t))
   (when update (update-page url))
