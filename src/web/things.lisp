@@ -82,12 +82,12 @@
 (def-thing
     'target
     (lambda (rootid)
-      ;;FIXME: maybe should check that page is extracted/available
       (let ((url (get-rooturl-by-id rootid)))
         (list
          :id rootid
-         :title (grab-title url)
-         :text (grab-text url)
+         ;;FIXME: tryit isn't the safest thing to use
+         :title (or (tryit (grab-title url)) "PAGE UNAVAILABLE")
+         :text (or (tryit (grab-text url)) "PAGE UNAVAILABLE")
          :url url
          :warstats (warstats-for-target url))))
   (lambda (targdata)
