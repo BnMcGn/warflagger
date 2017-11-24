@@ -29,7 +29,7 @@
     (ok (is-cached testurl))
     (ok (string= (grab-title testurl) "Sample Web Page"))
     (ok (stringp (grab-text testurl)))
-    (ok (sequence-starts-with (read-line (grab-text testurl)) "Sample"))
+    (ok (sequence-starts-with (grab-text testurl) "Sample"))
 
     (let ((test-url2 (strcat testurl "x")))
       (update-page test-url2)
@@ -39,7 +39,6 @@
       (ok (fresh-failure test-url2))
       (ok (null (is-pending test-url2))))
 
-    ;;(cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)
-    ))
+    (cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)))
 
 
