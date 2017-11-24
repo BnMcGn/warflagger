@@ -1,49 +1,45 @@
 
 (in-package #:test-warflagger)
 
-(in-suite test-warflagger)
-
-;set up whatever?
-
 (use-package 'wf/text-extract)
 
+(defparameter *tmp-dir* "/tmp/")
 
-;FIXME: need a wf/local-settings package, with tmp location specced.
-(defparameter *tmp-dir* "/home/ben/tmp/")
-(setf *cache-path* (strcat *tmp-dir* "textract/"))
-(defparameter *test-url* 
-  "file:///home/ben/quicklisp/local-projects/warflagger/t/sample.html")
+(defun test-textract ()
+  (let ((*cache-path* (strcat *tmp-dir* "textract/"))
+        (testurl
+         (strcat
+          "file://"
+          (princ-to-string (asdf:system-relative-pathname 'warflagger "t/sample.html")))))
 
-(test initialize
-  (cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)
-  (ensure-directories-exist (make-pathname :directory *cache-path*))
-  (initialize-indices))
+    (cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)
+    (ensure-directories-exist (make-pathname :directory *cache-path*))
+    (initialize-indices)
 
-(test (textract-initial :depends-on initialize)
-  (is (null (is-cached *test-url*)))
-  (is (null (is-fresh *test-url*)))
-  (is (null (has-failure *test-url*)))
-  (is (null (fresh-failure *test-url*)))
-  (is (null (is-pending *test-url*)))
-  (is (null (old-page-available *test-url*)))
-  (is (= 0 (length (hash-table-keys *byurl*)))))
+    (ok (null (is-cached testurl)))
+    (ok (null (is-fresh testurl)))
+    (ok (null (has-failure testurl)))
+    (ok (null (fresh-failure testurl)))
+    (ok (null (is-pending testurl)))
+    (ok (null (old-page-available testurl)))
+    (ok (= 0 (length (hash-table-keys *byurl*))))
 
-(test (textract :depends-on initialize)
-  (update-page *test-url*)
-  (sleep 0.50)
-  (is (is-cached *test-url*))
-  (is (string= (grab-title *test-url*) "Sample Web Page"))
-  (is (stringp (grab-text *test-url*)))
-  (is (sequence-starts-with (read-line (grab-text *test-url*)) "Sample")))
-
-(test (textract-nonexistent-url :depends-on initialize)
-  (let ((test-url2 (strcat *test-url* "x")))
-    (update-page test-url2)
+    (update-page testurl)
     (sleep 0.50)
-    (is (is-cached test-url2))
-    (is (has-failure test-url2))
-    (is (fresh-failure test-url2))
-    (is (null (is-pending test-url2)))))
-  
+    (ok (is-cached testurl))
+    (ok (string= (grab-title testurl) "Sample Web Page"))
+    (ok (stringp (grab-text testurl)))
+    (ok (sequence-starts-with (read-line (grab-text testurl)) "Sample"))
+
+    (let ((test-url2 (strcat testurl "x")))
+      (update-page test-url2)
+      (sleep 0.50)
+      (ok (is-cached test-url2))
+      (ok (has-failure test-url2))
+      (ok (fresh-failure test-url2))
+      (ok (null (is-pending test-url2))))
+
+    ;;(cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)
+    ))
 
 
