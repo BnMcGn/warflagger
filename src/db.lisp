@@ -239,22 +239,20 @@ the page text can be found in the cache."
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
 
+;;FIXME: Perhaps in the case of WF user, we shouldn't be looking here for the screen
+;; name. That breaks a few assumtions. We don't have userfig here.
 (defun author-representation-from-row (data)
-  (when data
-    (acond
-      ((assoc :screen-name data) (values (cdr it) (car it)))
-      ((assoc :display-name data) (values (cdr it) (car it)))
-      ((assoc :homepage data) (values (cdr it) (car it)))
-      ((assoc :email data) (values (cdr it) (car it))))))
+  (when-let ((res (assoc-or '(:screen-name :display-name :homepage :email) data)))
+    (values (cdr res) (car res))))
 
 (defun get-author-representation (aid)
+  "How the author should look on the website."
   (author-representation-from-row (get-author-data aid)))
 
+;;FIXME: doesn't account for local users. Perhaps this should be done at webhax-user level
 (defun author-identification-from-row (data)
-  (when data
-    (acond
-      ((assoc :homepage data) (values (cdr it) (car it)))
-      ((assoc :email data) (values (cdr it) (car it))))))
+  (when-let ((res (assoc-or '(:homepage :email) data)))
+    (values (cdr res) (car res))))
 
 (defun get-author-identification (aid)
   (author-identification-from-row (get-author-data aid)))
@@ -275,14 +273,15 @@ the page text can be found in the cache."
 
 ;;FIXME: doesn't look like a very reliable way to do things.
 (defun author-type (author)
+  "For parsing incoming RDF"
   (cond
     ((integerp author) :id)
     ((starts-with "http" author) :homepage)
     ((starts-with "mailto" author) :email)
     (t :string)))
 
-(defun get-author-id (author atype)
-  "Get the PKey of the author given any type of author identifier. Mostly for RDF input."
+(defun find-author-id (author atype)
+  "Find the PKey of the author given any type of author identifier. Mostly for RDF input."
   (case atype
     (:id (when (exists (select (colm 'author 'id)
                                :where (sql-= (colm 'author 'id)
@@ -328,9 +327,9 @@ the page text can be found in the cache."
 
 (defun save-opinion-from-user (opinion authorid
                                &key (opinurl #'make-opinion-url))
+  "Opinions need to be set up with some stuff."
   (unless (listp opinion)
     (error "Opinion needs to be an alist"))
-  "Opinions need to be set up with some stuff."
   (let ((id (next-val "opinion_id_seq")))
     (insert-opinion
      (cons (cons :url (funcall opinurl authorid id)) opinion)

@@ -66,7 +66,8 @@
   (when update (update-page url))
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
     (read-file-into-string
-     (make-pathname :directory (cache-loc url) :name
+     (make-pathname :directory (cache-loc url)
+                    :name
                     (if (probe-file (make-pathname :directory (cache-loc url)
                                                    :name "text.locked"))
                         "text.locked" "text")))))

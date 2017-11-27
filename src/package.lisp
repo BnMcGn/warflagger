@@ -21,7 +21,7 @@
    #:opinion-from-db-row
    #:opinion-from-id
    #:get-local-user-id
-   #:get-author-id
+   #:find-author-id
    #:user-lister
    #:get-author-representation
    #:find-excerpt-position
@@ -51,5 +51,6 @@
    #:generate-rooturl-warstats
    #:if-production
    #:when-production
-   #:unless-production))
+   #:unless-production
+   #:delete-opinion))
 
