@@ -12,7 +12,8 @@
   :components ((:module :t
                         :serial t
                         :components ((:file "package")
-                                     (:file "textract-test")))))
+                                     (:file "textract-test")
+                                     (:file "db-test")))))
 
 
 

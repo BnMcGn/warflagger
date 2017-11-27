@@ -1,4 +1,5 @@
 
 (defpackage #:test-warflagger
-    (:use #:cl #:prove #:gadgets #:alexandria #:wf/text-extract))
+  (:use #:cl #:prove #:gadgets #:alexandria
+        #:warflagger #:wf/text-extract))
 

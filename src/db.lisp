@@ -213,7 +213,7 @@ the page text can be found in the cache."
 
 (defun get-target-id-from-url (url)
   (if-let ((id (rooturl-p url)))
-    (values id :rooturl)
+    (values (caar id) :rooturl)
     (if-let ((op (opinion-exists-p url)))
       (values (assoc-cdr :id op) :opinion)
       (error "URL not found as rootURL or as opinion."))))
