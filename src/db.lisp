@@ -54,9 +54,13 @@
              :where (sql-and (sql-= (sql-escape url) (colm 'target))
                              (sql-> 0 (colm 'votevalue)))))))
 
+;;FIXME: This will get too large as site grows. Maybe it should be calc'ed client-side?
+(defparameter *warstat-store* (make-hash-table :test #'equal))
+
 (defun warstats-for-target (target)
-  (declare (ignore target))
-  nil)
+  (unless (gethash target *warstat-store*)
+    (generate-rooturl-warstats target)) ;;Will place the root warstat in the store.
+  (gethash target *warstat-store*))
 
 ;;;
 ;;; Rooturl utilities

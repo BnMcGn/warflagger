@@ -89,9 +89,6 @@
     ))
 
 
-  ;;Add a look
-  ;; - check
-  ;; - delete
 #|
 
 (defun rooturl-real-p (id)

@@ -52,5 +52,6 @@
    #:if-production
    #:when-production
    #:unless-production
-   #:delete-opinion))
+   #:delete-opinion
+   #:get-target-id-from-url))
 

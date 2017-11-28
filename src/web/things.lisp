@@ -45,6 +45,24 @@
         :opinion (lisp-raw (json:encode-json-alist-to-string opinion))
         :trim (lisp thing-lister:*thing-summary-width*)))))
 
+(defun display-target-line (target)
+  (let ((warstats (getf target :warstats)))
+    (html-out-str
+      (:div
+       (str (truncate-string (getf target :title) :length 80))
+       (:span
+        :title
+        (format nil "~a direct responses, ~a in conversation"
+                (getf warstats :replies-immediate) (getf warstats :replies-total))
+        (str (format nil "(~a/~a)"
+                 (getf warstats :replies-immediate) (getf warstats :replies-total))))
+       ))))
+
+'(:X-SUPPORTED (2 0.0) :X-DISSED (0 5.4) :X-WRONG (0 0.0) :X-RIGHT (1 0.0)
+  :X-PROBLEMATIC (6 0.0) :X-UNVERIFIED (0 0.0) :X-IRRELEVANT (0 0.0)
+  :REPLIES-TOTAL 18 :REPLIES-IMMEDIATE 8 :LOOKS NIL :REFERENCED 0)
+
+ 
 ;;; FIXME: If reasonable, this should move to the rest of the URL stuff in
 ;; warflagger.lisp
 (defun author-thing-link (authid)
@@ -90,8 +108,9 @@
          :text (or (tryit (grab-text url)) "PAGE UNAVAILABLE")
          :url url
          :warstats (warstats-for-target url))))
-  (lambda (targdata)
-    (truncate-string (getf targdata :title) :length 80))
+  #'display-target-line
+  ;(lambda (targdata)
+  ;  (truncate-string (getf targdata :title) :length 80))
    ; (concatenate 'string
    ;              (truncate-string (getf targdata :title) :length 15)
    ;              " - "
