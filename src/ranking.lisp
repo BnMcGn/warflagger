@@ -179,7 +179,7 @@ Some of these factors will obviously affect the respect points more than others.
       ((member flag '(:dislike :disagree)) 1)
       ((eq flag :inflammatory) (if (> 0 vv) 0.5 0))
       ((and (member flag '(:interesting :anecdotal))
-            (< 0 vv))
+            (> 0 vv))
        1)
       (t 0))))
 
