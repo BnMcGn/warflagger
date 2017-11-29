@@ -348,3 +348,50 @@
 (defun redraw-all-badges (&optional (storage-dir wf/local-settings:*targinfo-path*))
   (dolist (id (sql-stuff:get-column 'rooturl 'id))
     (create-badges-for-rootid id storage-dir)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Status indicator for targets
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *indicator-names* (list :x-supported "thumbs_up_sign"
+                                      :x-dissed "thumbs_down_sign"
+                                      :x-right "check_mark"
+                                      :x-wrong "ballot_x"
+                                      :x-problematic "heavy_exclamation_mark_symbol"
+                                      :x-unverified "black_question_mark_ornament"))
+
+(defparameter *warstat-text*
+  (list :x-supported "Has approval"
+        :x-dissed "Has disapproval"
+        :x-right "Has supporting evidence"
+        :x-wrong "Has contradicting evidence"
+        :x-problematic "Has conflict"
+        :x-unverified "Has unresolved questions"))
+
+(defun draw-indicator (category direction text)
+  (html-out
+    (:span :style (format nil "background-color: ~a; margin-left: 1px; margin-right: 1px;"
+                          (getf *direction-colors* direction))
+           (:img :src (format nil "/static/img/~a.svg"
+                              (getf *indicator-names* category))
+                 :title text
+                 :style "height: .75em; :background-color: black;"))))
+
+(defun display-warstats (wstats)
+  (when (<= 1 (car (getf wstats :x-supported)))
+    (draw-indicator :x-supported :positive (getf *warstat-text* :x-supported)))
+  (when (<= 1 (car (getf wstats :x-dissed)))
+    (draw-indicator :x-dissed :negative (getf *warstat-text* :x-dissed)))
+  (when (<= 1 (car (getf wstats :x-right)))
+    (draw-indicator :x-right :positive (getf *warstat-text* :x-right)))
+  (when (<= 1 (car (getf wstats :x-wrong)))
+    (draw-indicator :x-wrong :negative (getf *warstat-text* :x-wrong)))
+  (when (or (<= 1 (car (getf wstats :x-problematic)))
+            (<= 1 (second (getf wstats :x-supported)))
+            (<= 1 (second (getf wstats :x-dissed)))
+            (<= 1 (second (getf wstats :x-right)))
+            (<= 1 (second (getf wstats :x-wrong)))
+            (<= 1 (second (getf wstats :x-unverified))))
+    (draw-indicator :x-problematic :contested (getf *warstat-text* :x-problematic)))
+  (when (<= 1 (car (getf wstats :x-unverified)))
+    (draw-indicator :x-unverified :contested (getf *warstat-text* :x-unverified))))
