@@ -57,6 +57,7 @@
 
 ;;;FIXME: Doesn't account for .pdf, etc
 ;;;FIXME: SECURITY: Block file urls, at least when live
+;;;UPD: assumes html
 (defun grab-page (url &key (update t))
   (when update (update-page url))
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
