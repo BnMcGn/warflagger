@@ -3,7 +3,8 @@
 import sys
 import string
 import urllib2
-from BeautifulSoup import BeautifulSoup
+import json
+from BeautifulSoup import BeautifulSoup, SoupStrainer
 import os
 from pattern.web import plaintext
 from readability import Document
@@ -66,8 +67,13 @@ def get_page_type(ufh):
     else:
         raise ValueError, "Unknown document type"
 
+def extract_links(page):
+    links = BeautifulSoup(page, parseOnlyThese=SoupStrainer('a'))
+    links = [l for l in links if l.has_key('href')]
+    return [(l.get('href'), l.getText()) for l in links]
+
 def process_links(linktext):
-    return "" #Implement me
+    return json.dumps(extract_links(linktext))
 
 def page2text(url):
     fh = open(page_loc(url))
