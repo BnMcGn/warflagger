@@ -107,7 +107,7 @@ def process_pdf(url):
     except:
         text = "Could not extract text from PDF file"
         syslog(LOG_DEBUG, "PDF extract failed: {0}".format(cache_loc(url)))
-    gadgets.string_to_file(text, text_loc(url))
+    gadgets.string_to_file(text.encode('utf-8'), text_loc(url))
     gadgets.string_to_file("", links_loc(url))
     try:
         pdread = pp.PdfFileReader(open(page_loc(url)))
@@ -115,7 +115,7 @@ def process_pdf(url):
     except:
         title = "No Title Found"
         syslog(LOG_DEBUG, "PDF title not found: {0}".format(cache_loc(url)))
-    gadgets.string_to_file(title, title_loc(url))
+    gadgets.string_to_file(title.encode('utf-8'), title_loc(url))
 
 def do_page_save(url):
     fname = tname = titlename = None
