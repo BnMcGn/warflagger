@@ -16,6 +16,8 @@
     (ensure-directories-exist (make-pathname :directory *cache-path*))
     (initialize-indices)
 
+    (plan 15)
+
     (ok (null (is-cached testurl)))
     (ok (null (is-fresh testurl)))
     (ok (null (has-failure testurl)))

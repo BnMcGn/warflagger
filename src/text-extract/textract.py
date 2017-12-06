@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import sys
-import string 
+import string
 import urllib2
 from BeautifulSoup import BeautifulSoup
-import os 
+import os
 from pattern.web import plaintext
 from readability import Document
+import pyPdf as pp
 from shutil import move
 from syslog import syslog, openlog, LOG_DEBUG, LOG_INFO
 
@@ -23,7 +24,7 @@ cachepath = ''
 # to it, so not replacing now. Clean up some time....
 def cache_loc(url):
     assert len(cachepath)
-    return cachepath 
+    return cachepath
 
 def page_loc(url, utype=None):
     if utype:
@@ -35,7 +36,7 @@ def page_loc(url, utype=None):
         fname = cache_loc(url) + 'page.pdf' + cache_tmp
         if os.path.exists(fname):
             return fname
-        raise "Can't calculate page location without type"
+        raise ValueError, "Can't calculate page location without type"
 
 def text_loc(url):
     return cache_loc(url) + 'text' + cache_tmp
@@ -63,7 +64,7 @@ def get_page_type(ufh):
     elif "pdf" in t:
         return "pdf"
     else:
-        raise "Unknown document type"
+        raise ValueError, "Unknown document type"
 
 def process_links(linktext):
     return "" #Implement me
@@ -77,7 +78,7 @@ def page2text(url):
     gadgets.string_to_file(text, text_loc(url))
     links = process_links(clean)
     links = links.encode('utf-8')
-    gadgets.string_to_file(links, link_loc(url))
+    gadgets.string_to_file(links, links_loc(url))
     fh.close()
 
 def extract_title(url):
@@ -98,24 +99,24 @@ def pdf2text(fh):
     for i in range(0, pdf.getNumPages()):
         content += pdf.getPage(i).extractText() + "\n"
     content = " ".join(content.replace(u"\xa0", " ").strip().split())
-    return content, pp.
+    return content
 
 def process_pdf(url):
     try:
-        text = pdf2text(open(page_loc(url))
+        text = pdf2text(open(page_loc(url)))
     except:
         text = "Could not extract text from PDF file"
-        syslog(LOG_DEBUG, "PDF extract failed: {0}".format(cache_loc(url))
+        syslog(LOG_DEBUG, "PDF extract failed: {0}".format(cache_loc(url)))
     gadgets.string_to_file(text, text_loc(url))
-    gadgets.string_to_file("", link_loc(url))
-    try: 
+    gadgets.string_to_file("", links_loc(url))
+    try:
         pdread = pp.PdfFileReader(open(page_loc(url)))
         title = pdread.getDocumentInfo().title
     except:
         title = "No Title Found"
-        syslog(LOG_DEBUG, "PDF title not found: {0}".format(cache_loc(url))
+        syslog(LOG_DEBUG, "PDF title not found: {0}".format(cache_loc(url)))
     gadgets.string_to_file(title, title_loc(url))
-    
+
 def do_page_save(url):
     fname = tname = titlename = None
     if os.path.exists(failure_loc(url)):
@@ -127,7 +128,7 @@ def do_page_save(url):
             try:
                 uh = get_url_fh(url)
             except:
-                gadgets.string_to_file(str(sys.exc_info()[1]), 
+                gadgets.string_to_file(str(sys.exc_info()[1]),
                                         failure_loc(url))
                 return False
             utype = get_page_type(uh)
@@ -145,7 +146,7 @@ def do_page_save(url):
             tname = text_loc(url)
             titlename = title_loc(url)
         with FileLock(cache_loc(url)+'main') as lck2:
-            move(fname, page_loc(url), utype)
+            move(fname, page_loc(url, utype))
             move(tname, text_loc(url))
             move(titlename, title_loc(url))
 
