@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.8
--- Dumped by pg_dump version 9.5.8
+-- Dumped from database version 9.5.10
+-- Dumped by pg_dump version 9.5.10
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -170,6 +170,19 @@ CREATE TABLE reference (
 
 
 ALTER TABLE reference OWNER TO ben;
+
+--
+-- Name: reference2; Type: TABLE; Schema: public; Owner: ben
+--
+
+CREATE TABLE reference2 (
+    id integer,
+    urlfrom text,
+    urlto text
+);
+
+
+ALTER TABLE reference2 OWNER TO ben;
 
 --
 -- Name: reference_opinion_seq; Type: SEQUENCE; Schema: public; Owner: ben
