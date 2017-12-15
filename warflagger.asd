@@ -8,6 +8,7 @@
                #:webhax-user
                #:gadgets
                #:sql-stuff
+               #:liql
                #:alexandria
                #:cl-who
                #:anaphora

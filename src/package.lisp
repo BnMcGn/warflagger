@@ -2,7 +2,7 @@
 
 (defpackage #:warflagger
   (:use #:cl #:wf/local-settings #:wf/text-extract #:sql-stuff #:clsql
-	#:gadgets #:alexandria #:anaphora #:kebab #:webhax #:cl-postgres)
+	#:gadgets #:alexandria #:anaphora #:kebab #:webhax #:cl-postgres #:liql)
   (:export
    #:opinion-ids-for-rooturl
    #:opinion-tree-for-rooturl
