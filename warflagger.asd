@@ -27,6 +27,7 @@
                               (:file "constants")
                               (:file "warflagger")
                               (:file "db")
+                              (:file "references")
                               (:file "excerpts")
                               (:file "ranking")))))
 
