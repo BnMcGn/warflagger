@@ -24,7 +24,8 @@
    #:*text-extractor-script*
    #:initialize-indices
    #:update-page
-   #:text-server))
+   #:text-server
+   #:grab-links))
 
 (in-package :wf/text-extract)
 
@@ -50,6 +51,9 @@
 
 (defun failure-loc (url)
   (concatenate 'string (cache-loc url) "failed"))
+
+(defun links-loc (url)
+  (concatenate 'string (cache-loc url) "links"))
 
 (defun update-page (url &key force)
   (unless (and (is-fresh url) (not force))
@@ -81,6 +85,15 @@
           (apply #'concatenate 'string
                  (map-file-by-line #'identity (title-loc url))))
         alternate)))
+
+(defun grab-links (url &key update)
+  (when update (update-page url))
+  "The links file is optional. It is only generated if the source document is html."
+  (let ((lfile (links-loc url)))
+    (when (probe-file lfile)
+      (with-file-lock (lfile)
+        (with-open-file (s lfile)
+          (json:decode-json s))))))
 
 (defun index-file-name ()
   (make-pathname :directory *cache-path* :name "urlindex.inf"))

@@ -11,6 +11,7 @@
                #:liql
                #:alexandria
                #:cl-who
+               #:cl-json
                #:anaphora
                #:cl-fad
                #:external-program
