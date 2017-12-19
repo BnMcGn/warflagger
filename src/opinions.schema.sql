@@ -172,19 +172,6 @@ CREATE TABLE reference (
 ALTER TABLE reference OWNER TO ben;
 
 --
--- Name: reference2; Type: TABLE; Schema: public; Owner: ben
---
-
-CREATE TABLE reference2 (
-    id integer,
-    urlfrom text,
-    urlto text
-);
-
-
-ALTER TABLE reference2 OWNER TO ben;
-
---
 -- Name: reference_opinion_seq; Type: SEQUENCE; Schema: public; Owner: ben
 --
 
