@@ -91,9 +91,11 @@
   "The links file is optional. It is only generated if the source document is html."
   (let ((lfile (links-loc url)))
     (when (probe-file lfile)
-      (with-file-lock (lfile)
-        (with-open-file (s lfile)
-          (json:decode-json s))))))
+      (mapcar (lambda (x)
+                (mapcar (lambda (y) (if (emptyp y) nil y)) x))
+              (with-file-lock (lfile)
+                (with-open-file (s lfile)
+                  (json:decode-json s)))))))
 
 (defun index-file-name ()
   (make-pathname :directory *cache-path* :name "urlindex.inf"))
