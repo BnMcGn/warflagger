@@ -218,9 +218,8 @@ the page text can be found in the cache."
 (defun get-target-id-from-url (url)
   (if-let ((id (rooturl-p url)))
     (values (caar id) :rooturl)
-    (if-let ((op (opinion-exists-p url)))
-      (values (assoc-cdr :id op) :opinion)
-      (error "URL not found as rootURL or as opinion."))))
+    (when-let ((op (opinion-exists-p url)))
+      (values (assoc-cdr :id op) :opinion))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors
@@ -439,5 +438,6 @@ the page text can be found in the cache."
   (multiple-value-bind (id type) (get-target-id-from-url target-url)
     (case type
       (:rooturl (get-rooturl-looks id))
-      (:opinion (get-opinion-looks id)))))
+      (:opinion (get-opinion-looks id))
+      (otherwise (error "Not a RootURL or an opinion")))))
 
