@@ -128,7 +128,9 @@ throw the discussion tree out of whack."
  deteriorating into name calling or getting trapped in details."
 
      :same-thing
-     "This flag ties two URLs with identical content together. Use the SameThing on the mirror URL. Place the URL which you believe to be the authorative source in the Reference field.")))
+     "This flag ties two URLs with identical content together. Use the SameThing on the mirror URL. Place the URL which you believe to be the authorative source in the Reference field."
+     :blank
+     "The most general purpose flag. Can be used to mark an excerpt for later reference. Used by the RefBot for automated references.")))
 
 (defparameter *flag-categories*
  '("Negative" "Positive" "Statements" "Custodial"))
@@ -140,7 +142,7 @@ throw the discussion tree out of whack."
     ("Funny" "Agree" "Like" "Interesting")
     ("EyeWitness" "AmQualified" "SecondHand" "Anecdotal" "Evidence" "Disclosure")
     ("Redundant" "OutOfDate" "Retraction" "Correction" "IncorrectFlag"
-     "FlagAbuse" "Offtopic" "Arcane" "SameThing")))
+     "FlagAbuse" "Offtopic" "Arcane" "SameThing" "Blank")))
 
 ;;; for each type: whether respectively, negative, neutral, positive vote values
 ;;; are allowed for an opinion type. Last field is the default
