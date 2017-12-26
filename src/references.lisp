@@ -62,7 +62,7 @@
 (defun get-generated-references-from (url)
   (let ((rid (get-refbot-id)))
     (grab-column
-      (liql url 'reference.reference 'reference.opinion 'opinion.id rid 'opinion.author))))
+      (liql url 'opinion.target rid 'opinion.author 'opinion 'reference.opinion))))
 
 (defun get-references-from (url)
   "Returns IDs of opinions that are referenced by the URL in one way or another."
@@ -103,11 +103,16 @@
        (or (equal (second ref1) (second ref2))
            (not (second ref2)))))
 
+(defun %format-reference (opinid)
+  (let ((opin (opinion-from-id opinid)))
+    (list (assoc-cdr :reference opin) (assoc-cdr :excerpt opin))))
+
 (defun find-new-references (url)
   (let ((existing
           (collecting-hash-table (:test #'equal)
-            (dolist (ref (get-references-from url))
-              (collect (car ref) ref))))
+            (dolist (opid (get-references-from url))
+              (let ((ref (%format-reference opid)))
+                (collect (car ref) ref)))))
         (stor (make-hash-table :test #'equal)))
     (flatten-1
      (hash-table-values
