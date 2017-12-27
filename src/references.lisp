@@ -85,17 +85,28 @@
      (:flag . (:custodial :blank)))
    *system-author-id*))
 
-(defun extract-links-from-target (url)
+(defun %absolutify (url found-url)
+  "Given a relative link in a document, it should be found on the same server as the document."
+  (let ((parsed (puri:parse-uri found-url)))
+    (if (puri:uri-host parsed)
+        found-url
+        (puri:render-uri (puri:merge-uris parsed url) nil))))
+
+(defun %extract-links-from-target (url)
   (let ((text))
     (cond
       ((is-cached url)
        (if-let ((links (grab-links url)))
-         (return-from extract-links-from-target links)
+         (return-from %extract-links-from-target links)
          (setf text (grab-text url))))
       ((opinion-exists-p url)
        (setf text (assoc-cdr :comment (opinion-exists-p url))))
       (t (error "Target not found as RootURL or as opinion")))
     (mapcar (lambda (x) (list x nil)) (find-urls text))))
+
+(defun extract-links-from-target (url)
+  (mapcar (lambda (x) (cons (%absolutify url (car x)) (cdr x)))
+          (%extract-links-from-target url)))
 
 (defun reference-redundant-p (ref1 ref2)
   "Ref1 is the existing reference. Ref2 is the addition being considered. Will treat as redundant either if the excerpt (second itm) matches or if ref2 doesn't have an excerpt."
