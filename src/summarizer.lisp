@@ -1,5 +1,32 @@
 (in-package :warflagger)
 
+(defun make-id-path (id)
+  "Will put 1000 per dir for now"
+  (if (< id 1000)
+      "/0000/"
+      (strcat "/"
+              (let ((strid (princ-to-string id)))
+                (subseq strid 0 (- (length strid) 3)))
+              "000/")))
+
+(defun make-subpath (id type)
+  (format nil "~a~a/~a"
+          (make-id-path id) id
+          (getf '(:badge "opinion-badge.svg"
+                  :tree "tree.json"
+                  :warstats "warstats.json"
+                  :references "references.json"
+                  :questions "questions.json"
+                  :opinions "opinions.json"
+                  ;;FIXME: may add page text, looks to this list.
+                  )
+                type)))
+
+(defun make-warstats-path (id type)
+  (strcat wf/local-settings:*warstats-path* (make-subpath id type)))
+
+(defun make-warstats-url (id type)
+  (strcat "/static/warstats" (make-subpath id type)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;

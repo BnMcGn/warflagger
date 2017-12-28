@@ -18,7 +18,7 @@
    #:*text-extractor-script*
    #:*db-connect-type*
    #:*db-connect-spec*
-   #:*targinfo-path*
+   #:*warstats-path*
    #:*production*))
 
 (in-package :wf/local-settings)
@@ -28,7 +28,7 @@
 (defparameter *text-extractor-script* "")
 (defparameter *db-connect-type* nil)
 (defparameter *db-connect-spec* nil)
-(defparameter *targinfo-path* "")
+(defparameter *warstats-path* "")
 
 (defparameter *production* nil)
 

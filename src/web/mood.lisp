@@ -118,7 +118,6 @@
 
       )))
 
-
 (defun flag-color-page (&rest params)
   (declare (ignore params))
   (html-out-str
