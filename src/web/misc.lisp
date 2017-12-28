@@ -18,17 +18,6 @@
              (:hour 2) #\: (:min 2) #\: (:sec 2) :gmt-offset-hhmm))
   (write-char #\" stream))
 
-(defun test-js ()
-  (ps
-    (define-react-class thing
-        (cl-react:psx
-         (:a :href "http://www.google.com"
-             (:span :class "text-green" "Click heare!" ))))
-    (chain |ReactDOM|
-           (render (create-element thing)
-                   (chain document (get-element-by-id "things"))))))
-
-
 (defun %opinion-data (opid text)
   (let ((data (opinion-from-id opid)))
     (if (assoc-cdr :excerpt data)
