@@ -219,16 +219,13 @@
                                  (scale-controv (getf warstat :controversy))
                                  (scale-effect (getf warstat :effect))))))))))
 
-;;FIXME: eventually might not want a flat directory space for these
-(defun create-badges-for-rootid (rootid storage-dir)
+(defun create-badges-for-rootid (rootid)
   (let* ((rooturl (get-rooturl-by-id rootid))
          (main-tree (opinion-tree-for-rooturl rooturl))
          (warstats (generate-rooturl-warstats rooturl :tree main-tree)))
     (labels ((proc (tree)
                (dolist (node tree)
-                 (let ((fname (merge-pathnames
-                               storage-dir
-                               (format nil "~a.svg" (car node)))))
+                 (let ((fname (make-warstats-path (car node) :badge)))
                    (when (probe-file fname)
                      (delete-file fname))
                    (write-html-file
@@ -240,7 +237,7 @@
                    (proc (cdr node))))))
       (proc main-tree))))
 
-(defun redraw-all-badges (&optional (storage-dir wf/local-settings:*targinfo-path*))
+(defun redraw-all-badges ()
   (dolist (id (sql-stuff:get-column 'rooturl 'id))
-    (create-badges-for-rootid id storage-dir)))
+    (create-badges-for-rootid id)))
 

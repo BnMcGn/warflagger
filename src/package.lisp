@@ -55,5 +55,8 @@
    #:delete-opinion
    #:get-target-id-from-url
    #:grab-links
-   #:save-new-references))
+   #:save-new-references
+   #:*flag-colors*
+   #:make-warstats-path
+   #:make-warstats-url))
 
