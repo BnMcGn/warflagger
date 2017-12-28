@@ -21,8 +21,7 @@
                #:ps-gadgets
                #:lack-middleware-mount
                #:clath
-               #:userfig
-               #:simple-rgb)
+               #:userfig)
   :serial t
   :components ((:module 
 		 :src

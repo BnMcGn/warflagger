@@ -26,6 +26,4 @@
                           #:collecting-string #:collecting #:do-window
                           #:collect)
   (:shadowing-import-from #:parenscript #:switch #:call)
-  (:shadowing-import-from #:anaphora #:it)
-  (:export
-   #:opinion-tree-for-target))
+  (:shadowing-import-from #:anaphora #:it))

@@ -53,5 +53,7 @@
    #:when-production
    #:unless-production
    #:delete-opinion
-   #:get-target-id-from-url))
+   #:get-target-id-from-url
+   #:grab-links
+   #:save-new-references))
 

@@ -16,7 +16,8 @@
                #:cl-fad
                #:external-program
                #:cl-postgres
-               #:ratify)
+               #:ratify
+               #:simple-rgb)
   :serial t
   :components ((:module 
 		 :src
@@ -30,5 +31,6 @@
                               (:file "db")
                               (:file "references")
                               (:file "excerpts")
-                              (:file "ranking")))))
+                              (:file "ranking")
+                              (:file "summarizer"))))
 
