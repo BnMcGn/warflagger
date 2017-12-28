@@ -91,10 +91,13 @@
           ;;FIXME: db needs a constraint for this
           (setf (gethash :datestamp values)
                 (clsql:get-time))
-          (let ((newid (save-opinion-from-user (hu:hash->alist values) aid)))
+          (let* ((newid (save-opinion-from-user (hu:hash->alist values) aid))
+                 (savedopin (opinion-from-id newid)))
+            ;;FIXME: Should be done in separate thread to reduce delay for user
             ;;Update badges
-            (create-badges-for-rootid
-             (assoc-cdr :rooturl (opinion-from-id newid)) *targinfo-path*))))
+            (create-badges-for-rootid (assoc-cdr :rooturl savedopin) *targinfo-path*)
+            ;;Generate references
+            (save-new-references (assoc-cdr :url savedopin))))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
 
