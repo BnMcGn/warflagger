@@ -29,6 +29,25 @@
   (strcat "/static/warstats" (make-subpath id type)))
 
 
+
+(defmethod json:encode-json ((object clsql-sys:wall-time) &optional stream)
+  (write-char #\" stream)
+  (clsql:format-time stream object :format :iso8601)
+  ;;FIXME: quick hack to make this work on the live server (GMT). Javascript is touchy
+  ;; about parsing dates.
+  (write-string "+0000" stream)
+  (write-char #\" stream))
+
+(defmethod json:encode-json ((object local-time:timestamp) &optional stream)
+  (write-char #\" stream)
+  ;; FIXME: verify correct. Who uses local-time?
+  (local-time:format-timestring
+   stream object
+   :format '((:year 4) #\- (:month 2) #\- (:day 2) #\T
+             (:hour 2) #\: (:min 2) #\: (:sec 2) :gmt-offset-hhmm))
+  (write-char #\" stream))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;
 ; SVG badge generator
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -241,3 +260,42 @@
   (dolist (id (sql-stuff:get-column 'rooturl 'id))
     (create-badges-for-rootid id)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Gather the opinion data
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun %opinion-data (opid text)
+  (let ((data (opinion-from-id opid)))
+    (if (assoc-cdr :excerpt data)
+        (cons
+         (list*
+          :text-position
+          (multiple-value-list
+           (find-excerpt-position text (assoc-cdr :excerpt data)
+                                  (or (assoc-cdr :excerptoffset data) 0))))
+         data)
+        data)))
+
+(defun %fill-out-opinion-tree (tree text)
+  (if (null tree)
+      nil
+      (let ((op (%opinion-data (caar tree) text)))
+        (cons
+         (cons
+          op
+          (%fill-out-opinion-tree (cdar tree)
+                                  (create-textdata
+                                   (aif (assoc :comment op) (cdr it) ""))))
+         (%fill-out-opinion-tree (cdr tree) text)))))
+
+
+(defun write-all-rootid-warstats (rootid)
+  (let* ((url (get-rooturl-by-id rootid))
+         (text (progn
+                 (unless (is-cached url)
+                   (error "Don't have that page!"))
+                 ;;FIXME: Suboptimal place, but somebody has to do it...
+                 (make-rooturl-real id)
+                 (grab-text url))))
+    ;;FIXME: could save text too? Will cut some server load.
+    (json:encode-json )))
