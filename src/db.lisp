@@ -55,6 +55,7 @@
                              (sql-> 0 (colm 'votevalue)))))))
 
 ;;FIXME: This will get too large as site grows. Maybe it should be calc'ed client-side?
+;;FIXME: Obsolete? will be storing as static json.
 (defparameter *warstat-store* (make-hash-table :test #'equal))
 
 (defun warstats-for-target (target)

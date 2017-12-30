@@ -15,9 +15,12 @@
           (getf '(:badge "opinion-badge.svg"
                   :tree "tree.json"
                   :warstats "warstats.json"
+                  :opinion-warstats "opin-warstats.json"
                   :references "references.json"
                   :questions "questions.json"
                   :opinions "opinions.json"
+                  :author "author.json"
+                  :text "page.txt"
                   ;;FIXME: may add page text, looks to this list.
                   )
                 type)))
@@ -288,6 +291,55 @@
                                    (aif (assoc :comment op) (cdr it) ""))))
          (%fill-out-opinion-tree (cdr tree) text)))))
 
+(defun %warstats-pathdata-for-url (url)
+  (multiple-value-bind (rid rtype)
+      (get-target-id-from-url url)
+    (when rid
+      (list rid (case rtype
+                  (:rooturl :warstats)
+                  (:opinion :opinion-warstats)
+                  (otherwise
+                   (error "Unknown type")))))))
+
+(defun request-warstats-for-url (url &optional (cache (make-hash-table)))
+  "First check the in memory cache for warstats, then check the disk storage, then create minimal default stats."
+  (or
+   (cl-hash-util:hget cache (list url :warstats))
+   (when-let* ((spec (%warstats-pathdata-for-url url))
+               (path (apply #'make-warstats-path spec)))
+     (when (probe-file path)
+       (with-open-file (fh path)
+         ;;FIXME: verify me: need hash tables. Warstats are a plist?
+         (json:decode-json fh))))
+   ;;FIXME: The default warstats figures should all be in one place, perhaps?
+   ;;FIXME: Do we need a full warstats dict?
+   (list :x-supported 1)))
+
+(defun reference-list-for-rooturl (rooturl)
+  (collecting-hash-table (:test #'equal :mode :replace)
+    (let ((tree (opinion-tree-for-rooturl rooturl)))
+      (labels ((proc (tree location)
+                 (dolist (node tree)
+                   (when (grab-column (liql (car node) 'reference.opinion))
+                     (let ((refopin (opinion-from-id (car node))))
+                       (hu:collect (assoc-cdr :reference refopin)
+                         (hu:plist->hash
+                          (list
+                           :tree-address (nreverse (cons (car node) location))
+                           :refbot (system-generated-p (car node))
+                           :refopinid (assoc-cdr :id refopin)
+                           :refopinurl (assoc-cdr :url refopin)
+                           :warstats
+                           (request-warstats-for-url (assoc-cdr :reference refopin))
+                           :warstats-src-url
+                           (when-let ((spec
+                                       (%warstats-pathdata-for-url
+                                        (assoc-cdr :reference refopin))))
+                             (strcat wf/local-settings:*base-url*
+                                     (apply #'make-warstats-url spec))))))))
+                   (when (cdr tree)
+                     (proc (cdr tree) (cons (car tree) location))))))
+        (proc tree nil)))))
 
 (defun write-all-rootid-warstats (rootid)
   (let* ((url (get-rooturl-by-id rootid))
@@ -296,6 +348,24 @@
                    (error "Don't have that page!"))
                  ;;FIXME: Suboptimal place, but somebody has to do it...
                  (make-rooturl-real id)
-                 (grab-text url))))
+                 (grab-text url)))
+         (references (reference-list-for-rooturl url)))
     ;;FIXME: could save text too? Will cut some server load.
-    (json:encode-json )))
+    (with-open-file (fh (make-warstats-path rootid :opinions)
+                        :direction :output :if-exists :overwrite)
+      (json:encode-json (%fill-out-opinion-tree
+                         (opinion-tree-for-rooturl url) (create-textdata text))
+                        fh))
+    (with-open-file (fh (make-warstats-path rootid :references)
+                        :direction :output :if-exists :overwrite)
+      (json:encode-json references fh))
+    (with-open-file (fh (make-warstats-path rootid :warstats)
+                        :direction :output :if-exists :overwrite)
+      (json:encode-json (generate-rooturl-warstats url :references-cache references) fh))
+    (with-open-file (fh (make-warstats-path rootid :questions)
+                        :direction :output :if-exists :overwrite)
+      (json:encode-json  fh))
+    (with-open-file (fh (make-warstats-path rootid :text)
+                        :direction :output :if-exists :overwrite)
+      (write-string text fh))))
+

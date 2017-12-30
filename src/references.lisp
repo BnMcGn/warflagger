@@ -55,6 +55,10 @@
              :wf-user *system-author-user*
              :display-name *system-author-display*))))
 
+(defun system-generated-p (opinid)
+  (when-let ((opin (opinion-from-id opinid)))
+    (eq (get-refbot-id) (assoc-cdr :author-id opin))))
+
 (defun get-references-to (url)
   "Returns IDs of opinions that contain a reference to URL."
   (grab-column (liql url 'reference.reference 'reference.opinion 'opinion)))
