@@ -72,7 +72,7 @@
 
     ;;Do opinion tree checks
     (let* ((tree (opinion-tree-for-rooturl *target*))
-           (subtree (first-match (lambda (x) (eq (car x) opin1id)) tree)))
+           (subtree (find-if (lambda (x) (eq (car x) opin1id)) tree)))
       (is (car subtree) opin1id)
       (is (caadr subtree) opin2id))
 

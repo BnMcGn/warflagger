@@ -133,7 +133,7 @@
      (hash-table-values
       (collecting-hash-table (:existing stor)
         (dolist (ref (extract-links-from-target url))
-          (unless (first-match (rcurry #'reference-redundant-p ref)
+          (unless (find-if (rcurry #'reference-redundant-p ref)
                                (cat (gethash (car ref) existing)
                                     (gethash (car ref) stor)))
             (collect (car ref) ref))))))))
