@@ -367,11 +367,12 @@ Some of these factors will obviously affect the respect points more than others.
 
 (defvar *reference-list*)
 
-(defun generate-rooturl-warstats (rooturl &key tree)
+(defun generate-rooturl-warstats (rooturl &key tree reference-cache)
   (let* ((tree (or tree (opinion-tree-for-rooturl rooturl)))
          (*opinion-effect-cache* (make-hash-table))
          (root-ax (opinion-axis-data (list* nil tree)))
-         (*reference-list* (reference-list-for-rooturl rooturl)))
+         (*reference-list* (or reference-cache
+                               (reference-list-for-rooturl rooturl))))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)

@@ -309,13 +309,36 @@
                      (proc (cdr tree) (cons (car tree) location))))))
         (proc tree nil)))))
 
+(defun question-opinion-p (opinid)
+  (member (grab-one (liql opinid 'opinion 'opinion.flag))
+          '("Negative RaiseQuestion" "Negative NeedsReference")))
+
+(defun question-list-for-rooturl (rooturl)
+  (collecting
+    (let ((tree (opinion-tree-for-rooturl rooturl)))
+      (labels ((proc (tree location)
+                 (dolist (node tree)
+                   (when (question-opinion-p (car node))
+                     (let ((opin (opinion-from-id (car node))))
+                       (collect
+                         (hu:plist->hash
+                          (list
+                           :tree-address (nreverse (cons (car node) location))
+                           :questopinid (assoc-cdr :id opin)
+                           :questopinurl (assoc-cdr :url opin)
+                           ;;FIXME: Should have warstats summary? Would be nice.
+                                     ))))))
+                   (when (cdr tree)
+                     (proc (cdr tree) (cons (car tree) location)))))
+        (proc tree nil)))))
+
 (defun write-all-rootid-warstats (rootid)
   (let* ((url (get-rooturl-by-id rootid))
          (text (progn
                  (unless (is-cached url)
                    (error "Don't have that page!"))
                  ;;FIXME: Suboptimal place, but somebody has to do it...
-                 (make-rooturl-real id)
+                 (make-rooturl-real rootid)
                  (grab-text url)))
          (references (reference-list-for-rooturl url)))
     (with-open-file (fh (make-warstats-path rootid :opinions)
@@ -328,10 +351,10 @@
       (json:encode-json references fh))
     (with-open-file (fh (make-warstats-path rootid :warstats)
                         :direction :output :if-exists :overwrite)
-      (json:encode-json (generate-rooturl-warstats url :references-cache references) fh))
+      (json:encode-json (generate-rooturl-warstats url :reference-cache references) fh))
     (with-open-file (fh (make-warstats-path rootid :questions)
                         :direction :output :if-exists :overwrite)
-      (json:encode-json  fh))
+      (json:encode-json (question-list-for-rooturl url) fh))
     (with-open-file (fh (make-warstats-path rootid :text)
                         :direction :output :if-exists :overwrite)
       (write-string text fh))))
