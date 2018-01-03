@@ -94,10 +94,11 @@
           (let* ((newid (save-opinion-from-user (hu:hash->alist values) aid))
                  (savedopin (opinion-from-id newid)))
             ;;FIXME: Should be done in separate thread to reduce delay for user
-            ;;Update badges
+            ;;FIXME: this will shortly be obsolete. Done by write-all-rootid-warstats
             (create-badges-for-rootid (assoc-cdr :rooturl savedopin) *targinfo-path*)
             ;;Generate references
-            (save-new-references (assoc-cdr :url savedopin))))
+            (save-new-references (assoc-cdr :url savedopin))
+            (write-all-rootid-warstats (assoc-cdr :rooturl savedopin)))))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
 
