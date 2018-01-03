@@ -311,7 +311,7 @@
   (member (grab-one (liql opinid 'opinion 'opinion.flag))
           '("Negative RaiseQuestion" "Negative NeedsReference")))
 
-(defun question-list-for-rooturl (rooturl)
+(defun question-list-for-rooturl (rooturl warstats)
   (collecting
     (let ((tree (opinion-tree-for-rooturl rooturl)))
       (labels ((proc (tree location)
@@ -324,8 +324,7 @@
                            :tree-address (nreverse (cons (car node) location))
                            :questopinid (assoc-cdr :id opin)
                            :questopinurl (assoc-cdr :url opin)
-                           ;;FIXME: Should have warstats summary? Would be nice.
-                                     ))))))
+                           :warstats (gethash (car node) warstats)))))))
                    (when (cdr tree)
                      (proc (cdr tree) (cons (car tree) location)))))
         (proc tree nil)))))
@@ -338,7 +337,8 @@
                  ;;FIXME: Suboptimal place, but somebody has to do it...
                  (make-rooturl-real rootid)
                  (grab-text url)))
-         (references (reference-list-for-rooturl url)))
+         (references (reference-list-for-rooturl url))
+         (warstats (generate-rooturl-warstats url :reference-cache references)))
     (uiop/common-lisp:ensure-directories-exist (make-warstat-path rootid :opinions))
     (with-open-file (fh (make-warstats-path rootid :opinions)
                         :direction :output :if-exists :overwrite
@@ -353,11 +353,11 @@
     (with-open-file (fh (make-warstats-path rootid :warstats)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
-      (json:encode-json (generate-rooturl-warstats url :reference-cache references) fh))
+      (json:encode-json warstats fh))
     (with-open-file (fh (make-warstats-path rootid :questions)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
-      (json:encode-json (question-list-for-rooturl url) fh))
+      (json:encode-json (question-list-for-rooturl url warstats) fh))
     (with-open-file (fh (make-warstats-path rootid :text)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
