@@ -20,9 +20,7 @@
                   :questions "questions.json"
                   :opinions "opinions.json"
                   :author "author.json"
-                  :text "page.txt"
-                  ;;FIXME: may add page text, looks to this list.
-                  )
+                  :text "page.txt")
                 type)))
 
 (defun make-warstats-path (id type)
@@ -363,5 +361,6 @@
     (with-open-file (fh (make-warstats-path rootid :text)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
-      (write-string text fh))))
+      (write-string text fh))
+    t))
 

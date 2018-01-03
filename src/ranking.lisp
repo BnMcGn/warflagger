@@ -334,7 +334,7 @@ Some of these factors will obviously affect the respect points more than others.
     (dolist (tree (cdr optree))
       (let ((replyid (car tree)))
         (when (system-generated-p replyid)
-          (let* ((results (values-list (opinion-effect tree)))
+          (let* ((results (multiple-value-list (opinion-effect tree)))
                  (refdat
                   (hu:hget *reference-list*
                            (list (assoc-cdr :reference (opinion-from-id (car tree)))
