@@ -55,39 +55,6 @@
 ; SVG badge generator
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(defparameter *flag-colors*
-  (list :spam "#f00"
-        :inflammatory "#ff8100"
-        :disagree "#ff8100"
-        :dislike "#ff8100"
-        :language-warning "#ffe843"
-        :disturbing "#f00"
-        :already-answered "#ffe843"
-        :logical-fallacy "#ff8100"
-        :needs-evidence "#4f41c8"
-        :raise-question "#4f41c8"
-        :out-of-bounds "#f00"
-        :funny "#1cff00"
-        :agree "#1cff00"
-        :like "#1cff00"
-        :interesting "#00adff"
-        :eye-witness "#00adff"
-        :am-qualified "#00adff"
-        :second-hand "#00adff"
-        :anecdotal "#00adff"
-        :evidence "#00adff"
-        :disclosure "#9a12c6"
-        :redundant "#ffe843"
-        :out-of-date "#ffe843"
-        :retraction "#9a12c6"
-        :correction "#ffe843"
-        :incorrect-flag "#ffe843"
-        :flag-abuse "#f00"
-        :offtopic "#ffe843"
-        :arcane "#ffe843"
-        :same-thing "#ffe843"))
-
-
 (defparameter *ring-cx* "21")
 (defparameter *ring-cy* "21")
 (defparameter *ring-r* "15.91549430918954")
@@ -351,7 +318,6 @@
                  (make-rooturl-real id)
                  (grab-text url)))
          (references (reference-list-for-rooturl url)))
-    ;;FIXME: could save text too? Will cut some server load.
     (with-open-file (fh (make-warstats-path rootid :opinions)
                         :direction :output :if-exists :overwrite)
       (json:encode-json (%fill-out-opinion-tree

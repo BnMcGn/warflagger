@@ -20,7 +20,7 @@ Yes, if you are self-hosting your content, but expect to be called on it by othe
 
 ### Won't WarFlagger turn into an echo chamber or get taken over by correctness nazis or voting blocs or be bought out by Big Money?
 
-All of these are valid concerns. For more things to worry about, plus possible solutions to them, please see tHE [Scenarios](https://github.com/BnMcGn/warflagger/wiki/Scenarios) section of the WarFlagger Wiki.
+All of these are valid concerns. For more things to worry about, plus possible solutions to them, please see the [Scenarios](https://github.com/BnMcGn/warflagger/wiki/Scenarios) section of the WarFlagger Wiki.
 
 WarFlagger is designed to extract useful discussion from knock-down-drag-out internet flame wars. It aims to be resilient to all sorts of partisan savagery and dirty tricks. It has a few layers of defense.
 
