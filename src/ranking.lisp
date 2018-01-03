@@ -36,7 +36,7 @@ that is winding down. Drops hotness if less than 10% of opinions are new."
        (apply #'+ recent))))
 
 (defun number-of-posts-factor (number)
-  (or (cdr (first-match (lambda (x)
+  (or (cdr (find-if (lambda (x)
                           (> (car x) number))
                         '((1 . 0) (2 . 1) (10 . 4) (100 . 6) (200 . 8))))
       10))
@@ -294,7 +294,14 @@ Some of these factors will obviously affect the respect points more than others.
   (let* ((opinion (or opinion (opinion-from-id (car optree))))
          (axdat (opinion-axis-data optree))
          (effect (calculate-opinion-effect axdat opinion))
-         (controv (calculate-opinion-controversy axdat)))
+         (controv (calculate-opinion-controversy axdat))
+         (ref-effects (calculate-reference-effects
+                       effect controv
+                       (getf axdat :reference-effect-main)
+                       (getf axdat :reference-controversy-main))))
+    (setf effect (+ effect (car ref-effects) (getf axdat :reference-effect-extra)))
+    (setf controv
+          (+ controv (second ref-effects) (getf axdat :reference-controversy-extra)))
     (when (hash-table-p *opinion-effect-cache*)
       (setf (gethash (car optree) *opinion-effect-cache*)
             (list* :effect effect :controversy controv axdat)))
@@ -302,13 +309,49 @@ Some of these factors will obviously affect the respect points more than others.
 
 (defparameter *opinion-effect-cache* nil)
 (defun opinion-effect (optree &key opinion)
+  "Opinion keyword is a lookup cache. No special meaning."
+  ;;FIXME: Why if? Some form of typo?
   (if (hash-table-p *opinion-effect-cache*)
       (if-let ((dat (gethash (car optree) *opinion-effect-cache*)))
         (values (getf dat :effect) (getf dat :controversy))
         (%opinion-effect optree :opinion opinion))))
 
+(defun calculate-reference-effects (effect controv ref-effect ref-controv)
+  "References will obviously have their own opinions, ranking, controversy and effect. We can't just take the reputation of the reference and import it into the current conversation. The referrer may be abusing the reference in any number of creative ways. The first two parameters are the values of the reference. The second two are from the discussion that resulted from the reference being posted. We are attempting to come up with a reasonable value that reflects the quality of the original reference with its applicability to the current discussion. Much wildly arbitrary guesswork follows."
+  (list (* effect ref-effect) (* controv ref-controv)))
+
+(defun reference-data (optree)
+  ;;When we are getting reference data for a rooturl, car will be nil
+  (let ((opinion (and (car optree) (opinion-from-id (car optree))))
+        (effect 0)
+        (controv 0)
+        (meffect 0)
+        (mcontrov 0))
+    (when-let* ((link (assoc-cdr :reference opinion))
+                (refdat (hu:hget *reference-list* (list link :warstats))))
+      (setf meffect (getf refdat :effect)
+            mcontrov (getf refdat :controversy)))
+    (dolist (tree (cdr optree))
+      (let ((replyid (car tree)))
+        (when (system-generated-p replyid)
+          (let* ((results (opinion-effect tree))
+                 (refdat
+                  (hu:hget *reference-list*
+                           (list (assoc-cdr :reference (opinion-from-id (car tree)))
+                                 :warstats)))
+                 (reffects (calculate-reference-effects
+                            (getf results :effect) (getf results :controversy)
+                            (getf refdat :effect) (getf refdat :controversy))))
+            (incf effect (car reffects)) (incf controv (second reffects))))))
+    (list
+     :reference-effect-main meffect
+     :reference-controversy-main mcontrov
+     :reference-effect-extra effect
+     :reference-controversy-extra controv
+     :referenced (and opinion (get-references-to (assoc-cdr :url opinion))))))
+
 (defun opinion-axis-data (optree)
-  (list
+  (list*
    :x-supported (collect-axis-sum #'filter-supported (cdr optree))
    :x-dissed (collect-axis-sum #'filter-dissed (cdr optree))
    :x-wrong (collect-axis-sum #'filter-wrong (cdr optree))
@@ -320,13 +363,15 @@ Some of these factors will obviously affect the respect points more than others.
    :replies-immediate (length (cdr optree))
    :looks (when (car optree) ;nil if root isn't an opinion.
             (length (get-opinion-looks (car optree))))
-   ;;FIXME: Implement the factoring-in of references.
-   :referenced 0))
+   (reference-data optree)))
+
+(defvar *reference-list*)
 
 (defun generate-rooturl-warstats (rooturl &key tree)
   (let* ((tree (or tree (opinion-tree-for-rooturl rooturl)))
          (*opinion-effect-cache* (make-hash-table))
-         (root-ax (opinion-axis-data (list* nil tree))))
+         (root-ax (opinion-axis-data (list* nil tree)))
+         (*reference-list* (reference-list-for-rooturl rooturl)))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)

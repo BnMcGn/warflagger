@@ -329,6 +329,7 @@
                            :refbot (system-generated-p (car node))
                            :refopinid (assoc-cdr :id refopin)
                            :refopinurl (assoc-cdr :url refopin)
+                           ;;FIXME: Should just be a summary, not the whole tree.
                            :warstats
                            (request-warstats-for-url (assoc-cdr :reference refopin))
                            :warstats-src-url
