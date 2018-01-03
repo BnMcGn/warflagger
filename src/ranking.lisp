@@ -318,7 +318,7 @@ Some of these factors will obviously affect the respect points more than others.
 
 (defun calculate-reference-effects (effect controv ref-effect ref-controv)
   "References will obviously have their own opinions, ranking, controversy and effect. We can't just take the reputation of the reference and import it into the current conversation. The referrer may be abusing the reference in any number of creative ways. The first two parameters are the values of the reference. The second two are from the discussion that resulted from the reference being posted. We are attempting to come up with a reasonable value that reflects the quality of the original reference with its applicability to the current discussion. Much wildly arbitrary guesswork follows."
-  (list (* effect ref-effect) (* controv ref-controv)))
+  (list (* (or effect 0) (or ref-effect 0)) (* (or controv 0) (or ref-controv 0))))
 
 (defun reference-data (optree)
   ;;When we are getting reference data for a rooturl, car will be nil
@@ -334,13 +334,13 @@ Some of these factors will obviously affect the respect points more than others.
     (dolist (tree (cdr optree))
       (let ((replyid (car tree)))
         (when (system-generated-p replyid)
-          (let* ((results (opinion-effect tree))
+          (let* ((results (values-list (opinion-effect tree)))
                  (refdat
                   (hu:hget *reference-list*
                            (list (assoc-cdr :reference (opinion-from-id (car tree)))
                                  :warstats)))
                  (reffects (calculate-reference-effects
-                            (getf results :effect) (getf results :controversy)
+                            (car results) (second results)
                             (getf refdat :effect) (getf refdat :controversy))))
             (incf effect (car reffects)) (incf controv (second reffects))))))
     (list
@@ -370,9 +370,9 @@ Some of these factors will obviously affect the respect points more than others.
 (defun generate-rooturl-warstats (rooturl &key tree reference-cache)
   (let* ((tree (or tree (opinion-tree-for-rooturl rooturl)))
          (*opinion-effect-cache* (make-hash-table))
-         (root-ax (opinion-axis-data (list* nil tree)))
          (*reference-list* (or reference-cache
-                               (reference-list-for-rooturl rooturl))))
+                               (reference-list-for-rooturl rooturl)))
+         (root-ax (opinion-axis-data (list* nil tree))))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)

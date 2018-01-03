@@ -58,5 +58,6 @@
    #:save-new-references
    #:*flag-colors*
    #:make-warstats-path
-   #:make-warstats-url))
+   #:make-warstats-url
+   #:write-all-rootid-warstats))
 

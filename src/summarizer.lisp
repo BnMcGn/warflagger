@@ -280,7 +280,7 @@
          (json:decode-json fh))))
    ;;FIXME: The default warstats figures should all be in one place, perhaps?
    ;;FIXME: Do we need a full warstats dict?
-   (list :x-supported 1)))
+   (list :effect 1 :controversy 0)))
 
 (defun reference-list-for-rooturl (rooturl)
   (collecting-hash-table (:test #'equal :mode :replace)
@@ -305,8 +305,8 @@
                                         (assoc-cdr :reference refopin))))
                              (strcat wf/local-settings:*base-url*
                                      (apply #'make-warstats-url spec))))))))
-                   (when (cdr tree)
-                     (proc (cdr tree) (cons (car tree) location))))))
+                   (when (cdr node)
+                     (proc (cdr node) (cons (car node) location))))))
         (proc tree nil)))))
 
 (defun question-opinion-p (opinid)
@@ -341,21 +341,27 @@
                  (make-rooturl-real rootid)
                  (grab-text url)))
          (references (reference-list-for-rooturl url)))
+    (uiop/common-lisp:ensure-directories-exist (make-warstat-path rootid :opinions))
     (with-open-file (fh (make-warstats-path rootid :opinions)
-                        :direction :output :if-exists :overwrite)
+                        :direction :output :if-exists :overwrite
+                        :if-does-not-exist :create)
       (json:encode-json (%fill-out-opinion-tree
                          (opinion-tree-for-rooturl url) (create-textdata text))
                         fh))
     (with-open-file (fh (make-warstats-path rootid :references)
-                        :direction :output :if-exists :overwrite)
+                        :direction :output :if-exists :overwrite
+                        :if-does-not-exist :create)
       (json:encode-json references fh))
     (with-open-file (fh (make-warstats-path rootid :warstats)
-                        :direction :output :if-exists :overwrite)
+                        :direction :output :if-exists :overwrite
+                        :if-does-not-exist :create)
       (json:encode-json (generate-rooturl-warstats url :reference-cache references) fh))
     (with-open-file (fh (make-warstats-path rootid :questions)
-                        :direction :output :if-exists :overwrite)
+                        :direction :output :if-exists :overwrite
+                        :if-does-not-exist :create)
       (json:encode-json (question-list-for-rooturl url) fh))
     (with-open-file (fh (make-warstats-path rootid :text)
-                        :direction :output :if-exists :overwrite)
+                        :direction :output :if-exists :overwrite
+                        :if-does-not-exist :create)
       (write-string text fh))))
 
