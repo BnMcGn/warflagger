@@ -73,7 +73,7 @@
   (let ((res (get-generated-references-from url)))
     (multiple-value-bind (id type) (get-target-id-from-url url)
       (if (and (eq :opinion type)
-               (grab-one (liql id 'reference.opinion)))
+               (grab-column (liql id 'reference.opinion)))
           (cons id res) ;; URL is itself a reference opinion.
           res))))
 
