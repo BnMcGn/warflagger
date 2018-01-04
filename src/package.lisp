@@ -59,5 +59,6 @@
    #:*flag-colors*
    #:make-warstats-path
    #:make-warstats-url
-   #:write-all-rootid-warstats))
+   #:write-all-rootid-warstats
+   #:*direction-colors*))
 

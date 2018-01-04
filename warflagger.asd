@@ -32,5 +32,5 @@
                               (:file "references")
                               (:file "excerpts")
                               (:file "ranking")
-                              (:file "summarizer"))))
+                              (:file "summarizer")))))
 
