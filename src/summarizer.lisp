@@ -65,16 +65,16 @@
   (defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
                                          attr-list body body-fn)
     (nconc (cons "<radialGradient"
-                 (let ((*downcase-tokens-p* nil))
-                   (convert-attributes (recasify-attributes attr-list))))
+                 (let ((cl-who:*downcase-tokens-p* nil))
+                   (cl-who:convert-attributes (recasify-attributes attr-list))))
            (list ">")
            (funcall body-fn body)
            (list "</radialGradient>")))
 
   (defmethod convert-tag-to-string-list ((tag (eql :svg)) attr-list body body-fn)
     (nconc (cons "<svg"
-                 (let ((*downcase-tokens-p* nil))
-                   (convert-attributes (recasify-attributes attr-list))))
+                 (let ((cl-who:*downcase-tokens-p* nil))
+                   (cl-who:convert-attributes (recasify-attributes attr-list))))
            (list ">")
            (funcall body-fn body)
            (list "</svg>")))
@@ -213,6 +213,7 @@
     (labels ((proc (tree)
                (dolist (node tree)
                  (let ((fname (make-warstats-path (car node) :badge)))
+                   (uiop/common-lisp:ensure-directories-exist fname)
                    (when (probe-file fname)
                      (delete-file fname))
                    (write-html-file
