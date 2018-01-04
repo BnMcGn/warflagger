@@ -3,12 +3,6 @@
 (defparameter *intensity-thresholds*
   '((0 . 2) (5 . 4) (20 . 6) (50 . 8) (100 . 16)))
 
-(defparameter *direction-colors*
-  (list :negative "rgba(256,0,0,0.75)"
-        :neutral "rgba(171,163,163,0.75)"
-        :positive "rgba(0,256,0,0.75)"
-        :contested "rgba(256,136,0,0.75)"))
-
 (define-parts mood-lib
   :@javascript
   (lambda ()
