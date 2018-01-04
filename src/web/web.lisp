@@ -148,7 +148,9 @@
         (quick-page ()
           :@inner
           (large-logo)
-          (named-text :introduction)))
+          (html-out
+            (:div :class "featurebox"
+                  (named-text :introduction)))))
 
   (setf (ningle:route *app* "/bookmarklet/")
         (quick-page ()
