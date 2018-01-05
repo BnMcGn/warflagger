@@ -340,7 +340,7 @@
                  (grab-text url)))
          (references (reference-list-for-rooturl url))
          (warstats (generate-rooturl-warstats url :reference-cache references)))
-    (uiop/common-lisp:ensure-directories-exist (make-warstat-path rootid :opinions))
+    (uiop/common-lisp:ensure-directories-exist (make-warstats-path rootid :opinions))
     (with-open-file (fh (make-warstats-path rootid :opinions)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
