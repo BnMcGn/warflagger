@@ -267,6 +267,17 @@
                   (otherwise
                    (error "Unknown type")))))))
 
+(defun %tidy-loaded-json (json)
+  (hu:alist->hash
+   (mapcar (lambda (x)
+             (cons
+              (let ((sym (string-unless-number (mkstr (car x)))))
+                (if (numberp sym)
+                    sym
+                    (car x)))
+              (hu:alist->plist (cdr x))))
+           json)))
+
 (defun request-warstats-for-url (url &optional (cache (make-hash-table)))
   "First check the in memory cache for warstats, then check the disk storage, then create minimal default stats."
   (or
@@ -276,7 +287,7 @@
      (when (probe-file path)
        (with-open-file (fh path)
          ;;FIXME: verify me: need hash tables. Warstats are a plist?
-         (json:decode-json fh))))
+         (%tidy-loaded-json (json:decode-json fh)))))
    ;;FIXME: The default warstats figures should all be in one place, perhaps?
    ;;FIXME: Do we need a full warstats dict?
    (list :effect 1 :controversy 0)))
@@ -330,6 +341,11 @@
                      (proc (cdr tree) (cons (car tree) location)))))
         (proc tree nil)))))
 
+(defun %prep-for-json (warstats)
+  (collecting-hash-table (:mode :replace)
+    (gadgets:do-hash-table (k v warstats)
+      (hu:collect k (hu:plist->hash v)))))
+
 (defun write-all-rootid-warstats (rootid)
   (let* ((url (get-rooturl-by-id rootid))
          (text (progn
@@ -354,7 +370,7 @@
     (with-open-file (fh (make-warstats-path rootid :warstats)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
-      (json:encode-json warstats fh))
+      (json:encode-json (%prep-for-json warstats) fh))
     (with-open-file (fh (make-warstats-path rootid :questions)
                         :direction :output :if-exists :overwrite
                         :if-does-not-exist :create)
