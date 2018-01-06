@@ -178,7 +178,10 @@
               (%make-segments (prop text)
                               (remove-if-not
                                (lambda (x)
-                                 (chain (@ x 0) (has-own-property :excerpt)))
+                                 (and (chain (@ x 0) (has-own-property :excerpt))
+                                      ;;FIXME: do what with broken excerpts?
+                                      ;; right now they just disappear?
+                                      (not (equal null (@ x 0 'text-position 0)))))
                                (prop opinions))
                               (@ this props))))))
 
