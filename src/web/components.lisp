@@ -186,7 +186,6 @@
                               (@ this props))))))
 
       (defun %make-opin-popups (opinions props)
-                                        ;(setf opinions (mock-opinions 30))
         (loop for op in opinions
            for (x y) in (opinion-fan (length opinions))
            collect
@@ -459,14 +458,3 @@
 
       )))
 
-
-
-(defpsmacro mock-opinions (quantity)
-  `(list
-    ,@(gadgets:collecting
-        (dotimes (i quantity)
-          (gadgets:collect
-              `(list (create :flag (list "Negative"
-                                         ,(whichever "Spam" "Inflammatory" "Disagree" "Dislike" "Obscene" "Disturbing" "AlreadyAnswered" "LogicalFallacy" "AdHominem" "FromAuthority" "NeedsEvidence" "RaiseQuestion"))
-
-                             :votevalue ,(whichever (- 1) 0 1))))))))

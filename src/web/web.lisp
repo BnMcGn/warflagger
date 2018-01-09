@@ -6,7 +6,7 @@
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
    :@css-link "/static/css/style.css"
-   :@javascript (wfweb-library))
+   :@javascript (wf-web-library))
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"
@@ -109,35 +109,6 @@
                        :opinionid opinion))
            (print (json:encode-json-to-string "OK") *webhax-output*))
          :content-type "application/json"))
-
-  (setf (ningle:route *app* "/target/*")
-        (quick-page
-            (#'webhax:react-parts
-             #'target-components
-             #'mood-lib
-             :@side-content
-             (lambda ()
-               (bind-validated-input
-                   ((id :integer))
-                 (funcall
-                  (html-thing-lister:connector-display-func
-                   'target 'participants)
-                  id))))
-          (bind-validated-input
-              ((id :integer))
-            (let ((url (get-rooturl-by-id id)))
-              (multiple-value-bind (text opinions looks warstats)
-                  (target-data id)
-                (mount-component (target-root)
-                  :text (lisp-raw text)
-                  :opinions (lisp-raw opinions)
-                  :url (lisp url)
-                  :rootid (lisp id)
-                  :title (lisp (grab-title url))
-                  :looks (lisp-raw looks)
-                  :warstats (lisp-raw warstats)
-                  :focus '()
-                  ))))))
 
   (setf (ningle:route *app* "/target/*")
         (quick-page
