@@ -10,7 +10,11 @@
                      (chain label (slice 1)))))))
 
     (def-component vote-value
-        (psx (:img :src (strcat "/static/targinfo/" (prop opinion id) ".svg"))))
+        (psx (:img :src
+                   (strcat "/static/warstats"
+                           (make-id-path (prop opinion id))
+                           (chain (prop opinion id) (to-string))
+                           "/opinion-badge.svg"))))
 
 #|
     (def-component vote-value

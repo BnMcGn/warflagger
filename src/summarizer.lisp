@@ -62,7 +62,7 @@
 
 
 (eval-always
-  (defmethod convert-tag-to-string-list ((tag (eql :radialgradient))
+  (defmethod cl-who:convert-tag-to-string-list ((tag (eql :radialgradient))
                                          attr-list body body-fn)
     (nconc (cons "<radialGradient"
                  (let ((cl-who:*downcase-tokens-p* nil))
@@ -71,7 +71,7 @@
            (funcall body-fn body)
            (list "</radialGradient>")))
 
-  (defmethod convert-tag-to-string-list ((tag (eql :svg)) attr-list body body-fn)
+  (defmethod cl-who:convert-tag-to-string-list ((tag (eql :svg)) attr-list body body-fn)
     (nconc (cons "<svg"
                  (let ((cl-who:*downcase-tokens-p* nil))
                    (cl-who:convert-attributes (recasify-attributes attr-list))))
