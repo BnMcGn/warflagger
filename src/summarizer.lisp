@@ -1,5 +1,6 @@
 (in-package :warflagger)
 
+;;FIXME: duplicated in javascript: components.lisp. Update in both places.
 (defun make-id-path (id)
   "Will put 1000 per dir for now"
   (if (< id 1000)

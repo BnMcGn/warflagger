@@ -52,6 +52,12 @@
               (when (eq (@ op 0 id) (@ foc (@ tad length)))
                 (return-from focus-parent-p op))))))
 
+      ;;FIXME: Duplicate of CL version
+      (defun make-id-path (id)
+        (if (< id 1000)
+            "/0000/"
+            (strcat "/" (chain id (to-string) (slice 0 -3)) "000/")))
+
       ;;Find all the indices where excerpts start or stop.
       (defun excerpt-segment-points (opset end)
         (chain
@@ -426,8 +432,38 @@
         get-initial-state
         (lambda () (create focus (prop focus))))
 
+      (def-component target-loader
+          ;;FIXME: Needs error handling
+          (if (and  (state warstats) (state opinions) (state text))
+              (psx (:target-root :... (@ this props)
+                                 :warstats (state warstats)
+                                 :references (state references)
+                                 :questions (state questions)
+                                 :opinions (state opinions)
+                                 :text (state text)))
+              ;;FIXME: decorate
+              (psx (:h3 "Loading...")))
+        component-did-mount
+        (lambda ()
+          (let ((url-root (strcat "/static/warstats"
+                                   (make-id-path (prop rootid))
+                                   (chain (prop rootid) (to-string)) "/")))
+             (json-bind (res (strcat url-root "warstats.json"))
+                 (set-state warstats res))
+             (json-bind (res (strcat url-root "references.json"))
+                 (set-state references res))
+             (json-bind (res (strcat url-root "questions.json"))
+                 (set-state questions res))
+             (json-bind (res (strcat url-root "opinions.json"))
+                 (set-state opinions res))
+             (text-bind (res (strcat url-root "page.txt"))
+                 (set-state text res))))
+        get-initial-state
+        (lambda () (create warstats nil opinions nil text nil)))
 
       )))
+
+
 
 (defpsmacro mock-opinions (quantity)
   `(list

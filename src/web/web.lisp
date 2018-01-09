@@ -138,6 +138,31 @@
                   :focus '()
                   ))))))
 
+  (setf (ningle:route *app* "/target/*")
+        (quick-page
+            (#'webhax:react-parts
+             #'target-components
+             #'mood-lib
+             :@side-content
+             (lambda ()
+               (bind-validated-input
+                   ((id :integer))
+                 (funcall
+                  (html-thing-lister:connector-display-func
+                   'target 'participants)
+                  id))))
+          (bind-validated-input
+              ((id :integer))
+            (let ((url (get-rooturl-by-id id)))
+              (mount-component (target-loader)
+                :url (lisp url)
+                :rootid (lisp id)
+                :title (lisp (grab-title url))
+                :looks (lisp-raw (json:encode-json-to-string
+                                  (get-looks (get-user-name) id)))
+                :focus '()
+                )))))
+
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
           (html-out
