@@ -161,6 +161,7 @@
                 :looks (lisp-raw (json:encode-json-to-string
                                   (get-looks (get-user-name) id)))
                 :focus '()
+                :username (lisp (webhax-user:get-user-name))
                 )))))
 
   (setf (ningle:route *app* "/faq/")

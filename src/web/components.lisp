@@ -393,11 +393,13 @@
         look-handler
         (lambda (opinid)
           (unless (getprop (state looks) opinid)
-            (json-post-bind (res "/look-post/" (create :opinion opinid)))
+            (when (prop username)
+              (json-post-bind (res "/look-post/" (create :opinion opinid))))
             (set-state looks (set-copy (state looks) opinid t))))
         component-did-mount
         (lambda ()
-          (json-post-bind (res "/look-post/" (create :root (prop rootid))))))
+          (when (prop username)
+            (json-post-bind (res "/look-post/" (create :root (prop rootid)))))))
 
       (def-component target-root-inner
           (psx
