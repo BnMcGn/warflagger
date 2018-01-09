@@ -5,7 +5,8 @@
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
-   :@css-link "/static/css/style.css")
+   :@css-link "/static/css/style.css"
+   :@javascript (wfweb-library))
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"

@@ -60,5 +60,7 @@
    #:make-warstats-path
    #:make-warstats-url
    #:write-all-rootid-warstats
-   #:*direction-colors*))
+   #:*direction-colors*
+   #:create-badges-for-rootid
+   #:redraw-all-badges))
 

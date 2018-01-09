@@ -52,12 +52,6 @@
               (when (eq (@ op 0 id) (@ foc (@ tad length)))
                 (return-from focus-parent-p op))))))
 
-      ;;FIXME: Duplicate of CL version
-      (defun make-id-path (id)
-        (if (< id 1000)
-            "/0000/"
-            (strcat "/" (chain id (to-string) (slice 0 -3)) "000/")))
-
       ;;Find all the indices where excerpts start or stop.
       (defun excerpt-segment-points (opset end)
         (chain

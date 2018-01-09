@@ -99,6 +99,15 @@
      :summary-width 40
      :pagequantity 20)))
 
+(defun wfweb-library ()
+  (ps
+    ;;FIXME: Duplicate of CL version
+    (defun make-id-path (id)
+      (if (< id 1000)
+          "/0000/"
+          (strcat "/" (chain id (to-string) (slice 0 -3)) "000/"))) 
+    ))
+
 (defun tracking-code ()
  "<!-- Start of StatCounter Code for Default Guide -->
 <script type=\"text/javascript\">
