@@ -6,6 +6,7 @@
   :@css-link "/static/css/target.css"
   :@javascript #'distribute-ranks
   :@javascript #'titlebar-components
+  :@javascript #'target-thread
   :@javascript-link "/static/javascript/jsPlumb-2.0.5.js"
   :@javascript
   (lambda ()
@@ -167,6 +168,13 @@
                                    :focus (@ props focus)
                                    :last-char-pos end))))))))))
 
+      (defun has-excerpt-p (opin)
+        (chain opin (has-own-property :excerpt)))
+
+      (defun has-found-excerpt-p (opin)
+        (and (has-excerpt-p opin)
+             (not (equal null (@ opin 'text-position 0)))))
+
       (def-component
           hilited-text
           (psx
@@ -177,11 +185,9 @@
             (when (prop text)
               (%make-segments (prop text)
                               (remove-if-not
-                               (lambda (x)
-                                 (and (chain (@ x 0) (has-own-property :excerpt))
-                                      ;;FIXME: do what with broken excerpts?
-                                      ;; right now they just disappear?
-                                      (not (equal null (@ x 0 'text-position 0)))))
+                               ;;FIXME: do what with broken excerpts?
+                               ;; right now they just disappear?
+                               (lambda (x) (has-found-excerpt-p (@ x 0)))
                                (prop opinions))
                               (@ this props))))))
 
@@ -376,7 +382,8 @@
 
       (def-component target-root
           (psx
-           (:target-root-inner
+           ;;target-root-inner
+           (:target-root-thread
             :... (@ this props)
             :looks (state looks)
             :look-handler (@ this look-handler)))
