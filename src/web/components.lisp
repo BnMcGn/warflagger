@@ -175,8 +175,7 @@
         (and (has-excerpt-p opin)
              (not (equal null (@ opin 'text-position 0)))))
 
-      (def-component
-          hilited-text
+      (def-component hilited-text
           (psx
            (:div
             :class
