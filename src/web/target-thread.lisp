@@ -9,10 +9,10 @@
     (def-component thread-excerpt
         (psx
          (:div
-          (:whatever))))
+          (prop opinion excerpt))))
 
     (def-component thread-opinion
-        (let ((opinion (prop opinions (list-last (prop tree-address))))
+        (let ((opinion (@ (prop opinions) (list-last (prop tree-address))))
               (text (if (< 1 (prop tree-address length))
                         (or (@ opinion comment) "")
                         (prop text))))
@@ -41,7 +41,7 @@
                         (dolist (branch tree)
                           (let ((newadd (chain address (concat (@ branch 0 id)))))
                             (setf (@ opinstore (@ branch 0 id)) (@ branch 0))
-                            (collect (list (@ branch 0) newadd))
+                            (collect newadd)
                             (when (< 1 (@ branch length))
                               (proc (chain branch (slice 1)) newadd))))))
                (proc opins (list))))
