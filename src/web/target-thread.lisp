@@ -31,12 +31,14 @@
             (when (has-excerpt-p opinion)
               (if (has-found-excerpt-p opinion)
                   (psx (:thread-excerpt
+                        :key 7
                         :opinion opinion
                         :text text))
                   (psx (:thread-excerpt
+                        :key 7
                         :opinion opinion))))
             (when (@ opinion comment)
-              (psx (:div (@ opinion comment))))))))
+              (psx (:div :key 8 (@ opinion comment))))))))
 
     (defun %reformat-opinions (opins)
       (let ((opinstore (create)))
@@ -56,12 +58,14 @@
     (def-component target-root-thread
         (psx
          (:div
-          (:div "Title:" (prop title))
+          (:div :key "x"
+                "Title:" (prop title))
           (collecting
               (let ((data (%reformat-opinions (prop opinions))))
                 (dolist (op (@ data 0))
                   (collect
                       (psx (:thread-opinion
+                            :key (unique-id)
                             :opinions (@ data 1)
                             :text (prop text)
                             :tree-address op)))))))))
