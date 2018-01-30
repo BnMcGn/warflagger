@@ -3,13 +3,34 @@
 ;; This a (currently experimental) comment-style layout of the opinion tree of a
 ;; root target
 
+(defparameter *excerpt-margin* 100)
+
 (defun target-thread ()
   (ps
 
     (def-component thread-excerpt
-        (psx
-         (:div
-          (prop opinion excerpt))))
+        (if (prop text)
+            (let*
+                ((tlength (prop text length))
+                 (estart (prop opinion text-position 0))
+                 (eend (+ (prop opinion text-position 1) estart))
+                 (tstart (when (< (lisp *excerpt-margin*) estart)
+                           (- estart (lisp *excerpt-margin*))))
+                 (tend (when (< (+ eend (lisp *excerpt-margin*)) tlength)
+                         (+ eend (lisp *excerpt-margin*))))
+                 (leading-context (prop text (slice (or tstart 0) estart)))
+                 (excerpt (prop text (slice estart eend)))
+                 (trailing-context (prop text (slice eend (or tend tlength)))))
+              (psx
+               (:div
+                (:span leading-context)
+                ;;FIXME: quick hack
+                (:span :class (flavor (list (list (prop opinion)))) excerpt)
+                (:span trailing-context))))
+            (psx
+             (:div
+              "WARNING!"
+              (prop opinion excerpt)))))
 
     (def-component thread-opinion
         (let* ((opinion (@ (prop opinions) (list-last (prop tree-address))))
@@ -23,6 +44,8 @@
                          (prop text))))
           (psx
            (:div
+            :class (chain "opinion-thread-depth-"
+                          (concat (prop tree-address length (to-string))))
             (:vote-value :key 1 :opinion opinion) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "

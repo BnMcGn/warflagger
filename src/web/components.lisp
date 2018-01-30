@@ -55,6 +55,7 @@
 
       ;;Find all the indices where excerpts start or stop.
       (defun excerpt-segment-points (opset end)
+        "End is the length of the text."
         (chain
          (collecting-set
              (dolist (itm opset)
