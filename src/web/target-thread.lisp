@@ -3,7 +3,7 @@
 ;; This a (currently experimental) comment-style layout of the opinion tree of a
 ;; root target
 
-(defparameter *excerpt-margin* 100)
+(defparameter *excerpt-margin* 500)
 
 (defun target-thread ()
   (ps
@@ -20,13 +20,19 @@
                          (+ eend (lisp *excerpt-margin*))))
                  (leading-context (prop text (slice (or tstart 0) estart)))
                  (excerpt (prop text (slice estart eend)))
-                 (trailing-context (prop text (slice eend (or tend tlength)))))
+                 (trailing-context (prop text (slice eend (or tend tlength))))
+                 (classes (collecting
+                              (collect "thread-excerpt")
+                              (when tstart (collect "fade-start"))
+                              (when tend (collect "fade-end")))))
+
               (psx
                (:div
-                (:span leading-context)
+                :class (chain classes (join " "))
+                (:span (rebreak leading-context))
                 ;;FIXME: quick hack
-                (:span :class (flavor (list (list (prop opinion)))) excerpt)
-                (:span trailing-context))))
+                (:span :class (flavor (list (list (prop opinion)))) (rebreak excerpt))
+                (:span (rebreak trailing-context)))))
             (psx
              (:div
               "WARNING!"
