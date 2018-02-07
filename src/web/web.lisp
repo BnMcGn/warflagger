@@ -6,6 +6,7 @@
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
    :@css-link "/static/css/style.css"
+   ;;:@javascript-link "/static/javascript/warflagger-bundle.js"
    :@javascript (wf-web-library))
   (html-out
                                         ;;Header

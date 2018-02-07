@@ -3,7 +3,7 @@
 ;; This a (currently experimental) comment-style layout of the opinion tree of a
 ;; root target
 
-(defparameter *excerpt-margin* 500)
+(defparameter *excerpt-margin* 200)
 
 (defun target-thread ()
   (ps
@@ -28,6 +28,7 @@
 
               (psx
                (:div
+                :!found-excerpt "true"
                 :class (chain classes (join " "))
                 (:span (rebreak leading-context))
                 ;;FIXME: quick hack
@@ -35,7 +36,7 @@
                 (:span (rebreak trailing-context)))))
             (psx
              (:div
-              "WARNING!"
+              :!found-excerpt nil
               (prop opinion excerpt)))))
 
     (def-component thread-opinion
