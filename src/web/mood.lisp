@@ -110,6 +110,67 @@
                                connector "Straight"
                                endpoint "Blank")))))))))
 
+;;; This section is for setting up data attributes in the opinion display, so that moods
+;;; can be rendered by css
+
+
+      (defun magnitude (item &optional (keyfunc (lambda (x) x)))
+        "Because CSS doesn't support greater than/ less than."
+        (let ((val (keyfunc item)))
+          (cond
+            ((< 200 val) 4)
+            ((< 50 val) 3)
+            ((< 10 val) 2)
+            ((< 3 val) 1)
+            (t 0))))
+
+      (defun format-warstats-data (stor stats)
+        (let ((keylist
+               (create controversy :data-controversy effect :data-effect
+                 reference-controversy-extra :data-reference-controversy-extra
+                 reference-controversy-main :data-reference-controversy-main
+                 reference-effect-extra :data-reference-effect-extra
+                 reference-effect-main :data-reference-effect-main  replies-immediate
+                 :data-replies-immediate replies-total :data-replies-total))
+              (xlist
+               (create x-dissed :data-x-dissed  x-irrelevant :data-x-irrelevant
+                 x-problematic :data-x-problematic  x-right :data-x-right
+                 x-supported :data-x-supported  x-unverified :data-x-unverified
+                 x-wrong :data-x-wrong)))
+          (do-keyvalue (k v keylist)
+            (setf (getprop stor v) (getprop stats k))
+            (setf (getprop stor (concat v "-m")) (magnitude (getprop stats k))))
+          (do-keyvalue (k v xlist)
+            (let ((val (getprop stats k)))
+              (setf (getprop stor (concat v "-effect")) (@ val 0))
+              (setf (getprop stor (concat v "-effect-m")) (magnitude (@ val 0)))
+              (setf (getprop stor (concat v "-controversy")) (@ val 1))
+              (setf (getprop stor (concat v "-controversy-m")) (magnitude (@ val 1)))))
+          (let ((referenced (if (@ stats :referenced)
+                                (@ stats :referenced length)
+                                0)))
+            (setf (@ stor :data-referenced) referenced)
+            (setf (@ stor :data-referenced-m) (magnitude referenced)))))
+
+      (defun format-opinion-data (stor opinion)
+        (setf (@ stor :data-flag (@ opinion flag 1)))
+        (setf (@ stor :data-flag-category (@ opinion flag 0)))
+        (setf (@ stor :data-votevalue (@ opinion votevalue))))
+      ;;Add datestamp?
+
+      ;;(defun format-looks-data (stor ))
+
+      (defun format-styling-data (props)
+        (let ((res (create))
+              (opid (when (chain props (has-own-property 'tree-address))
+                      (list-last (@ props tree-address)))))
+          (format-warstats-data
+           res (if opid (getprop (@ props warstats) opid) (@ props warstats root)))
+          (when opid
+            (format-warstats-data res (getprop (@ props opinions) opid)))
+          res))
+
+
       )))
 
 (defun flag-color-page (&rest params)

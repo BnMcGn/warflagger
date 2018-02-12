@@ -343,6 +343,8 @@ Some of these factors will obviously affect the respect points more than others.
                             (car results) (second results)
                             (getf refdat :effect) (getf refdat :controversy))))
             (incf effect (car reffects)) (incf controv (second reffects))))))
+    ;;Main: from the reference slot
+    ;;Extra: from comment body
     (list
      :reference-effect-main meffect
      :reference-controversy-main mcontrov
