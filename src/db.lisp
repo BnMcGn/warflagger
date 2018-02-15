@@ -415,7 +415,7 @@ the page text can be found in the cache."
                           (sql-and (sql-= (colm :wf_user) (sql-escape user))
                                    (sql-= (colm :rootid) rootid)
                                    (sql-equal/null (colm :opinionid) opinionid))))
-      '(insert-records :into 'looks :attributes
+      (insert-records :into 'looks :attributes
         (list (colm :firstlook) (colm :wf_user)
          (colm :rootid) (colm :opinionid))
         :values
