@@ -98,6 +98,12 @@
                             :key (unique-id)
                             :opinions (@ data 1)
                             :text (prop text)
+                            :styling-data
+                            (format-styling-data
+                             (copy-merge-all (@ %thisref props)
+                                            (create
+                                             'opinion-store (@ data 1)
+                                             'tree-address op)))
                             :tree-address op)))))))))
 
     ))
