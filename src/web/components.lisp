@@ -382,8 +382,8 @@
 
       (def-component target-root
           (psx
-           (:target-root-inner
-           ;;(:target-root-thread
+           ;;(:target-root-inner
+           (:target-root-thread
             :... (@ this props)
             :looks (state looks)
             :look-handler (@ this look-handler)))

@@ -103,7 +103,8 @@
                              (copy-merge-all (@ %thisref props)
                                             (create
                                              'opinion-store (@ data 1)
-                                             'tree-address op)))
+                                             'tree-address op
+                                             'opinions (@ data 1))))
                             :tree-address op)))))))))
 
     ))

@@ -139,13 +139,13 @@
                  x-wrong :data-x-wrong)))
           (do-keyvalue (k v keylist)
             (setf (getprop stor v) (getprop stats k))
-            (setf (getprop stor (concat v "-m")) (magnitude (getprop stats k))))
+            (setf (getprop stor (strcat v "-m")) (magnitude (getprop stats k))))
           (do-keyvalue (k v xlist)
             (let ((val (getprop stats k)))
-              (setf (getprop stor (concat v "-effect")) (@ val 0))
-              (setf (getprop stor (concat v "-effect-m")) (magnitude (@ val 0)))
-              (setf (getprop stor (concat v "-controversy")) (@ val 1))
-              (setf (getprop stor (concat v "-controversy-m")) (magnitude (@ val 1)))))
+              (setf (getprop stor (strcat v "-effect")) (@ val 0))
+              (setf (getprop stor (strcat v "-effect-m")) (magnitude (@ val 0)))
+              (setf (getprop stor (strcat v "-controversy")) (@ val 1))
+              (setf (getprop stor (strcat v "-controversy-m")) (magnitude (@ val 1)))))
           (let ((referenced (if (@ stats :referenced)
                                 (@ stats :referenced length)
                                 0)))
@@ -153,12 +153,16 @@
             (setf (@ stor :data-referenced-m) (magnitude referenced)))))
 
       (defun format-opinion-data (stor opinion)
-        (setf (@ stor :data-flag (@ opinion flag 1)))
-        (setf (@ stor :data-flag-category (@ opinion flag 0)))
-        (setf (@ stor :data-votevalue (@ opinion votevalue))))
+        (setf (@ stor :data-flag) (@ opinion flag 1))
+        (setf (@ stor :data-flag-category) (@ opinion flag 0))
+        (setf (@ stor :data-votevalue) (@ opinion votevalue)))
       ;;Add datestamp?
 
-      ;;(defun format-looks-data (stor ))
+      (defun format-looks-data (stor id looks username)
+        (when username
+          (setf (@ stor :data-looks-available) "true")
+          (when (chain looks (has-own-property id))
+            (setf (@ stor :data-looked) "true"))))
 
       (defun format-styling-data (props)
         (let ((res (create))
@@ -166,8 +170,9 @@
                       (list-last (@ props tree-address)))))
           (format-warstats-data
            res (if opid (getprop (@ props warstats) opid) (@ props warstats root)))
+          (format-looks-data res opid (@ props looks) (@ props username) )
           (when opid
-            (format-warstats-data res (getprop (@ props opinions) opid)))
+            (format-opinion-data res (getprop (@ props opinions) opid)))
           res))
 
 
