@@ -35,15 +35,7 @@
                                    :src
                                    (strcat "/static/img/" (getprop names k) ".svg")
                                    :title (getprop descs k)))))))))))
-    
-#|
-    (def-component vote-value
-        (let ((vv (prop opinion votevalue)))
-          (case vv
-            (-1 (psx (:b :style (create background "#ff0000") "-")))
-            (0 (psx (:b :style (create background "#aba3a3") "o")))
-            (1 (psx (:b :style (create background "#00ff00") "+"))))))
-|#
+
     (defun %plurify (value single multiple)
       (if (< 1 value)
           (strcat (chain value (to-string)) multiple)

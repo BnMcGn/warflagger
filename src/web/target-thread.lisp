@@ -58,13 +58,7 @@
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
-            (:span :class "opinion-response"
-                   (loop for name in (lisp (cons 'create *indicator-names*))
-                      for labl in (lisp (cons 'create *warstat-text*))
-                      collect
-                        (psx (:span
-                              (:img :src (strcat "/static/img/" name ".svg")
-                                    :title labl)))))
+            (:display-warstats2)
             (:reply-link :key 6 :url (@ opinion url))
             (when (has-excerpt-p opinion)
               (if (has-found-excerpt-p opinion)
