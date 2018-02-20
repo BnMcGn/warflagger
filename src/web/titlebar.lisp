@@ -16,6 +16,25 @@
                            (make-id-path (prop opinion id))
                            (chain (prop opinion id) (to-string))
                            "/opinion-badge.svg"))))
+
+    ;;FIXME: React/CSS version of display-warstats in mood.lisp. Other should probably
+    ;; go away eventually.
+    (def-component display-warstats2
+        (let ((names (lisp (cons 'create *indicator-names*)))
+              (descs (lisp (cons 'create *warstat-text*))))
+          (psx
+           (:span :class "display-warstats"
+                  (collecting
+                      (dolist (k (lisp (cons 'list
+                                          (map-by-2 (lambda (&rest x) (car x))
+                                                    *warstat-text*))))
+                        (collect
+                            (psx (:span
+                                  :class k
+                                  (:img
+                                   :src
+                                   (strcat "/static/img/" (getprop names k) ".svg")
+                                   :title (getprop descs k)))))))))))
     
 #|
     (def-component vote-value
