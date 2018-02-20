@@ -25,23 +25,27 @@
             (0 (psx (:b :style (create background "#aba3a3") "o")))
             (1 (psx (:b :style (create background "#00ff00") "+"))))))
 |#
+    (defun %plurify (value single multiple)
+      (if (< 1 value)
+          (strcat (chain value (to-string)) multiple)
+          (strcat (chain value (to-string)) single)))
 
     (defun display-date-nicely (dstamp)
       (let ((past (ago dstamp)))
         (cond
           ((< 1 (chain past (get-years)))
-           (strcat (chain past (get-years) (to-string)) " years ago"))
+           (%plurify (chain past (get-years)) " year ago" " years ago"))
           ((< 0 (chain past (get-months)))
-           (strcat (chain past (get-months) (to-string)) " months ago"))
+           (%plurify (chain past (get-months)) " month ago" " months ago"))
           ((< 0 (chain past (get-weeks)))
-           (strcat (chain past (get-weeks) (to-string)) " weeks ago"))
+           (%plurify (chain past (get-weeks)) " week ago" " weeks ago"))
           ((< 0 (chain past (get-days)))
-           (strcat (chain past (get-days) (to-string)) " days ago"))
+           (%plurify (chain past (get-days)) " day ago" " days ago"))
           ((< 0 (chain past (get-hours)))
-           (strcat (chain past (get-hours) (to-string)) " hours ago"))
+           (%plurify (chain past (get-hours)) " hour ago" " hours ago"))
           ((< 0 (chain past (get-minutes)))
-              (strcat (chain past (get-minutes) (to-string)) " minutes ago"))
-          (t (strcat (chain past (get-seconds) (to-string)) " seconds ago")))))
+           (%plurify (chain past (get-minutes)) " minute ago" " minutes ago"))
+          (t (%plurify (chain past (get-seconds)) " second ago" " seconds ago")))))
 
     (def-component date-stamp
         (psx
