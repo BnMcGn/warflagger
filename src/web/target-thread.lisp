@@ -51,12 +51,20 @@
                          (prop text))))
           (psx
            (:div
-            :class (chain "opinion-thread-depth-"
+            :class (chain "opinion-thread depth-"
                           (concat (prop tree-address length (to-string))))
+            :... (prop styling-data)
             (:vote-value :key 1 :opinion opinion) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
+            (:span :class "opinion-response"
+                   (loop for name in (lisp (cons 'create *indicator-names*))
+                      for labl in (lisp (cons 'create *warstat-text*))
+                      collect
+                        (psx (:span
+                              (:img :src (strcat "/static/img/" name ".svg")
+                                    :title labl)))))
             (:reply-link :key 6 :url (@ opinion url))
             (when (has-excerpt-p opinion)
               (if (has-found-excerpt-p opinion)
@@ -68,7 +76,7 @@
                         :key 7
                         :opinion opinion))))
             (when (@ opinion comment)
-              (psx (:div :key 8 (@ opinion comment))))))))
+              (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))))))
 
     (defun %reformat-opinions (opins)
       (let ((opinstore (create)))
