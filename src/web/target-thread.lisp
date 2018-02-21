@@ -3,7 +3,7 @@
 ;; This a (currently experimental) comment-style layout of the opinion tree of a
 ;; root target
 
-(defparameter *excerpt-margin* 200)
+(defparameter *excerpt-margin* 50)
 
 (defun target-thread ()
   (ps
@@ -58,19 +58,20 @@
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
-            (:display-warstats2)
+            (:display-warstats2 :key 5)
             (:reply-link :key 6 :url (@ opinion url))
-            (when (has-excerpt-p opinion)
-              (if (has-found-excerpt-p opinion)
-                  (psx (:thread-excerpt
-                        :key 7
-                        :opinion opinion
-                        :text text))
-                  (psx (:thread-excerpt
-                        :key 7
-                        :opinion opinion))))
-            (when (@ opinion comment)
-              (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))))))
+            (:div :key 9 :class "opinion-comment-wrapper"
+             (when (has-excerpt-p opinion)
+               (if (has-found-excerpt-p opinion)
+                   (psx (:thread-excerpt
+                         :key 7
+                         :opinion opinion
+                         :text text))
+                   (psx (:thread-excerpt
+                         :key 7
+                         :opinion opinion))))
+             (when (@ opinion comment)
+               (psx (:div :key 8 :class "opinion-comment" (@ opinion comment)))))))))
 
     (defun %reformat-opinions (opins)
       (let ((opinstore (create)))

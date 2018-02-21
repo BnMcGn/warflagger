@@ -72,7 +72,7 @@
         (let ((excerpt (prop excerpt))
               (offset (prop offset)))
           (psx
-           (:form :action "/opinion/" :method "GET"
+           (:form :class "opinion-reply" :action "/opinion/" :method "GET"
                   :style (create :display "inline-block")
                   (:input :type "hidden" :name "target" :key 1
                           :value (prop url))
