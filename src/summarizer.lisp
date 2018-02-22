@@ -293,15 +293,16 @@
    (list :effect 1 :controversy 0)))
 
 (defun reference-list-for-rooturl (rooturl)
-  (collecting-hash-table (:test #'equal :mode :replace)
+  (collecting-hash-table (:mode :replace)
     (let ((tree (opinion-tree-for-rooturl rooturl)))
       (labels ((proc (tree location)
                  (dolist (node tree)
                    (when (grab-column (liql (car node) 'reference.opinion))
                      (let ((refopin (opinion-from-id (car node))))
-                       (hu:collect (assoc-cdr :reference refopin)
+                       (hu:collect (assoc-cdr :id refopin)
                          (hu:plist->hash
                           (list
+                           :reference (assoc-cdr :reference refopin)
                            :tree-address (nreverse (cons (car node) location))
                            :refbot (system-generated-p (car node))
                            :refopinid (assoc-cdr :id refopin)
@@ -353,7 +354,10 @@
                  ;;FIXME: Suboptimal place, but somebody has to do it...
                  (make-rooturl-real rootid)
                  (grab-text url)))
-         (references (reference-list-for-rooturl url))
+         (references
+          (collecting-hash-table (:mode :replace :test #'equal)
+            (dolist (hash-table-values (reference-list-for-rooturl url))
+              (hu:collect (gethash :reference ref) ref))))
          (warstats (generate-rooturl-warstats url :reference-cache references)))
     (uiop/common-lisp:ensure-directories-exist (make-warstats-path rootid :opinions))
     (with-open-file (fh (make-warstats-path rootid :opinions)
