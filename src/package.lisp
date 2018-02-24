@@ -62,5 +62,6 @@
    #:write-all-rootid-warstats
    #:*direction-colors*
    #:create-badges-for-rootid
-   #:redraw-all-badges))
+   #:redraw-all-badges
+   #:write-all-warstats))
 

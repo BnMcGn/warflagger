@@ -384,3 +384,7 @@
       (write-string text fh))
     t))
 
+;;FIXME: Needs to deal with failures
+(defun write-all-warstats ()
+  (dolist (rurl (all-rooturls))
+    (write-all-rootid-warstats (get-rooturl-id rurl))))
