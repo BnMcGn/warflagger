@@ -361,25 +361,25 @@
          (warstats (generate-rooturl-warstats url :reference-cache references)))
     (uiop/common-lisp:ensure-directories-exist (make-warstats-path rootid :opinions))
     (with-open-file (fh (make-warstats-path rootid :opinions)
-                        :direction :output :if-exists :overwrite
+                        :direction :output :if-exists :supercede
                         :if-does-not-exist :create)
       (json:encode-json (%fill-out-opinion-tree
                          (opinion-tree-for-rooturl url) (create-textdata text))
                         fh))
     (with-open-file (fh (make-warstats-path rootid :references)
-                        :direction :output :if-exists :overwrite
+                        :direction :output :if-exists :supercede
                         :if-does-not-exist :create)
       (json:encode-json references fh))
     (with-open-file (fh (make-warstats-path rootid :warstats)
-                        :direction :output :if-exists :overwrite
+                        :direction :output :if-exists :supercede
                         :if-does-not-exist :create)
       (json:encode-json (%prep-for-json warstats) fh))
     (with-open-file (fh (make-warstats-path rootid :questions)
-                        :direction :output :if-exists :overwrite
+                        :direction :output :if-exists :supercede
                         :if-does-not-exist :create)
       (json:encode-json (question-list-for-rooturl url warstats) fh))
     (with-open-file (fh (make-warstats-path rootid :text)
-                        :direction :output :if-exists :overwrite
+                        :direction :output :if-exists :supercede
                         :if-does-not-exist :create)
       (write-string text fh))
     t))
