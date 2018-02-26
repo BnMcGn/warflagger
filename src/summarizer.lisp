@@ -289,8 +289,24 @@
            (with-open-file (fh path)
              (gethash (if (eq rtype :rooturl) :root rid)
                       (%tidy-loaded-json (json:decode-json fh))))))))
-   ;;FIXME: Do we need a full warstats dict?
+   ;;Don't need a full warstats dict to seed the tree.
    (list :effect 1 :controversy 0)))
+
+;;FIXME: Don't yet have system in place for discussing headlines.
+(defun get-headline-for-url (url)
+  (multiple-value-bind (id type) (get-target-id-from-url url)
+    (collecting-hash-table (:mode :replace)
+      (cond
+        ((eq type :opinion)
+         ;;FIXME: Could make default title from start of comment
+         nil
+         ((eq type :rooturl)
+          (when-let ((title (and (is-cached url)
+                                 (grab-title url :alternate nil :update nil))))
+            (hu:collect :natural-title title)
+            (hu:collect :title title)))
+         ;;FIXME: Don't yet know what to do if reference isn't a target.
+         (t nil))))))
 
 (defun reference-list-for-rooturl (rooturl)
   (collecting-hash-table (:mode :replace)
@@ -314,7 +330,9 @@
                                        (%warstats-pathdata-for-url
                                         (assoc-cdr :reference refopin))))
                              (strcat wf/local-settings:*base-url*
-                                     (apply #'make-warstats-url spec))))))))
+                                     (apply #'make-warstats-url spec)))
+                           :headline
+                           (get-headline-for-url (assoc-cdr :reference refopin)))))))
                    (when (cdr node)
                      (proc (cdr node) (cons (car node) location))))))
         (proc tree nil)))))
