@@ -84,6 +84,12 @@
                                  :value (encode-u-r-i-component offset))))
                   (:input :type "submit" :value "Reply" :key 2)))))
 
+    ;;FIXME: Headline will get considerably more complex in future. Placeholder.
+    (def-component headline
+        (psx
+         (:span :class "headline"
+                (prop title))))
+
     (def-component comment-summary
         (let* ((opin (prop opinion))
                (comment (if (chain opin (has-own-property 'comment))
