@@ -354,11 +354,13 @@
                  ;;FIXME: Suboptimal place, but somebody has to do it...
                  (make-rooturl-real rootid)
                  (grab-text url)))
-         (references
+         (references (reference-list-for-rooturl url))
+         (url-keyed-references
           (collecting-hash-table (:mode :replace :test #'equal)
-            (dolist (ref (hash-table-values (reference-list-for-rooturl url)))
+            (dolist (ref (hash-table-values references))
               (hu:collect (gethash :reference ref) ref))))
-         (warstats (generate-rooturl-warstats url :reference-cache references)))
+         (warstats
+          (generate-rooturl-warstats url :reference-cache url-keyed-references)))
     (uiop/common-lisp:ensure-directories-exist (make-warstats-path rootid :opinions))
     (with-open-file (fh (make-warstats-path rootid :opinions)
                         :direction :output :if-exists :supersede
