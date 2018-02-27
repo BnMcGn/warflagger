@@ -295,18 +295,19 @@
 ;;FIXME: Don't yet have system in place for discussing headlines.
 (defun get-headline-for-url (url)
   (multiple-value-bind (id type) (get-target-id-from-url url)
+    (declare (ignore id))
     (collecting-hash-table (:mode :replace)
       (cond
         ((eq type :opinion)
          ;;FIXME: Could make default title from start of comment
-         nil
-         ((eq type :rooturl)
-          (when-let ((title (and (is-cached url)
-                                 (grab-title url :alternate nil :update nil))))
-            (hu:collect :natural-title title)
-            (hu:collect :title title)))
+         nil)
+        ((eq type :rooturl)
+         (when-let ((title (and (is-cached url)
+                                (grab-title url :alternate nil :update nil))))
+           (hu:collect :natural-title title)
+           (hu:collect :title title)))
          ;;FIXME: Don't yet know what to do if reference isn't a target.
-         (t nil))))))
+        (t nil)))))
 
 (defun reference-list-for-rooturl (rooturl)
   (collecting-hash-table (:mode :replace)
