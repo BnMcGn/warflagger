@@ -39,6 +39,14 @@
               :!found-excerpt nil
               (prop opinion excerpt)))))
 
+    (def-component reference
+        (psx
+         (:div
+          :class "reference"
+          :... (prop styling-data)
+          (:headline :key 1 :title (prop headline title))
+          (:display-warstats2))))
+
     (def-component thread-opinion
         (let* ((opinion (@ (prop opinions) (list-last (prop tree-address))))
                (parentid (when (< 1 (prop tree-address length))
@@ -71,7 +79,12 @@
                          :key 7
                          :opinion opinion))))
              (when (@ opinion comment)
-               (psx (:div :key 8 :class "opinion-comment" (@ opinion comment)))))))))
+               (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
+             (when (prop reference)
+               (psx (:reference :key 10
+                                :... (prop reference)
+                                :styling-data
+                                (format-reference-styling-data (prop reference))))))))))
 
     (defun %reformat-opinions (opins)
       (let ((opinstore (create)))
@@ -107,7 +120,8 @@
                                             (create
                                              'opinion-store (@ data 1)
                                              'tree-address op
-                                             'opinions (@ data 1))))
-                            :tree-address op)))))))))
+                                             'opinions (@ data 1)))
+                            :tree-address op
+                            :reference (getprop (prop references) (@ op id)))))))))))
 
     ))

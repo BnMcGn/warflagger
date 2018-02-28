@@ -164,6 +164,12 @@
           (when (chain looks (has-own-property id))
             (setf (@ stor :data-looked) "true"))))
 
+      (defun format-reference-data (stor reference)
+        (when reference
+          (setf (@ stor :data-is-reference) t)
+          (when (@ reference :refbot)
+            (setf (@ stor :data-refbot) t))))
+
       (defun format-styling-data (props)
         (let ((res (create))
               (opid (when (chain props (has-own-property 'tree-address))
@@ -173,7 +179,13 @@
           (format-looks-data res opid (@ props looks) (@ props username) )
           (when opid
             (format-opinion-data res (getprop (@ props opinions) opid)))
+          (format-reference-data)
           res))
+
+      (defun format-reference-styling-data (refdata)
+        (let ((stor {}))
+          (when (@ refdata 'warstats-src-url)
+            (format-warstats-data stor (@ refdata :warstats)))))
 
 
       )))
