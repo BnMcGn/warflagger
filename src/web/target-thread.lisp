@@ -43,7 +43,7 @@
         (psx
          (:div
           :class "reference"
-          :... (prop styling-data)
+          :... (or (prop styling-data) (create))
           (:headline :key 1 :title (prop headline title))
           (:display-warstats2))))
 
@@ -120,8 +120,9 @@
                                             (create
                                              'opinion-store (@ data 1)
                                              'tree-address op
-                                             'opinions (@ data 1)))
+                                             'opinions (@ data 1))))
                             :tree-address op
-                            :reference (getprop (prop references) (@ op id)))))))))))
+                            :reference
+                            (getprop (prop references) (list-last op)))))))))))
 
     ))
