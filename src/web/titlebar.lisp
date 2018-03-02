@@ -86,9 +86,14 @@
 
     ;;FIXME: Headline will get considerably more complex in future. Placeholder.
     (def-component headline
-        (psx
-         (:span :class "headline"
-                (prop title))))
+        (let ((title (prop title)))
+          (if title
+              (psx
+               (:span :class "headline"
+                      (prop title)))
+              (psx
+               (:span :class "headline-empty"
+                      "[No Title]")))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))
