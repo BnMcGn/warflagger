@@ -86,14 +86,17 @@
 
     ;;FIXME: Headline will get considerably more complex in future. Placeholder.
     (def-component headline
-        (let ((title (prop title)))
-          (if title
-              (psx
-               (:span :class "headline"
-                      (prop title)))
-              (psx
-               (:span :class "headline-empty"
-                      "[No Title]")))))
+        (let* ((title (prop title))
+               (ext-link (when (prop external-link)
+                           (psx (:a :href (prop external-link) " [X]"
+                                    :title "Original article"))))
+               (class (if title "headline" "headline headline-empty"))
+               (core (if title
+                         (psx (:span title))
+                         (psx (:span "[No Title]")))))
+          (if (prop url)
+              (psx (:span :class class (:a :href (prop url) core) ext-link))
+              (psx (:span :class class core ext-link)))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))
