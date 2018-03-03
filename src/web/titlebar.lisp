@@ -88,8 +88,9 @@
     (def-component headline
         (let* ((title (prop title))
                (ext-link (when (prop external-link)
-                           (psx (:a :href (prop external-link) " [X]"
-                                    :title "Original article"))))
+                           (psx (:a :href (prop external-link)
+                                    :title "Original article"
+                                    " [X]"))))
                (elclass (if title "headline" "headline headline-empty"))
                (domain (if (prop domain)
                            (strcat " (" (prop domain) ")")
