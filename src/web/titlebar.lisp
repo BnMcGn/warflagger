@@ -91,9 +91,12 @@
                            (psx (:a :href (prop external-link) " [X]"
                                     :title "Original article"))))
                (class (if title "headline" "headline headline-empty"))
+               (domain (if (prop domain)
+                           (strcat " (" (prop domain) ")")
+                           ""))
                (core (if title
-                         (psx (:span title))
-                         (psx (:span "[No Title]")))))
+                         (psx (:span title domain))
+                         (psx (:span "[No Title]" domain)))))
           (if (prop url)
               (psx (:span :class class (:a :href (prop url) core) ext-link))
               (psx (:span :class class core ext-link)))))

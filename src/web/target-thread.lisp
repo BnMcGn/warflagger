@@ -44,7 +44,7 @@
          (:div
           :class "reference"
           :... (or (prop styling-data) (create))
-          (:headline :key 1 :title (prop headline title))
+          (:headline :key 1 :title (prop headline title) :domain (prop reference-domain))
           (:display-warstats2))))
 
     (def-component thread-opinion

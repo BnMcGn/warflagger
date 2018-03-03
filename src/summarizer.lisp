@@ -320,6 +320,8 @@
                          (hu:plist->hash
                           (list
                            :reference (assoc-cdr :reference refopin)
+                           :reference-domain
+                           (nth-value 2 (quri:parse-uri (assoc-cdr :reference refopin)))
                            :tree-address (nreverse (cons (car node) location))
                            :refbot (system-generated-p (car node))
                            :refopinid (assoc-cdr :id refopin)
