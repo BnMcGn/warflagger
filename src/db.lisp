@@ -222,6 +222,13 @@ the page text can be found in the cache."
     (when-let ((op (opinion-exists-p url)))
       (values (assoc-cdr :id op) :opinion))))
 
+(defun make-wf-url-for-url (url)
+  (multiple-value-bind (id type) (get-target-id-from-url url)
+    (case type
+      (:rooturl (make-rootid-url id))
+      (:opinion (make-opinion-url nil id))
+      (otherwise (make-missing-rootid-url url)))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;

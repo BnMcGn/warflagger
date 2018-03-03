@@ -22,6 +22,13 @@
   (declare (ignore userid))
   (strcat *base-url* "things/thing/opinion/" (princ-to-string opinid)))
 
+(defun make-rootid-url (rid)
+  (strcat *base-url* "target/" (princ-to-string rid)))
+
+(defun make-missing-rootid-url (url)
+  "Sometimes we want to display a target that is not yet entered into WarFlagger. Make a link that will result in such a display."
+  (strcat *base-url* "target/?newurl=" (quri:url-encode url)))
+
 ;;FIXME: rethink user urls
 (defun warflagger-user-from-url (url)
   (aref (nth-value

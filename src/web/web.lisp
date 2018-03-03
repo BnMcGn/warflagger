@@ -111,6 +111,7 @@
            (print (json:encode-json-to-string "OK") *webhax-output*))
          :content-type "application/json"))
 
+  ;;FIXME: Target page needs to handle URLs that don't have a rootid yet.
   (setf (ningle:route *app* "/target/*")
         (quick-page
             (#'webhax:react-parts

@@ -315,27 +315,24 @@
       (labels ((proc (tree location)
                  (dolist (node tree)
                    (when (grab-column (liql (car node) 'reference.opinion))
-                     (let ((refopin (opinion-from-id (car node))))
+                     (let* ((refopin (opinion-from-id (car node)))
+                            (refurl (assoc-cdr :reference refopin)))
                        (hu:collect (assoc-cdr :id refopin)
                          (hu:plist->hash
                           (list
-                           :reference (assoc-cdr :reference refopin)
-                           :reference-domain
-                           (nth-value 2 (quri:parse-uri (assoc-cdr :reference refopin)))
+                           :reference refurl
+                           :reference-domain (nth-value 2 (quri:parse-uri refurl))
+                           :warflagger-link (make-wf-url-for-url refurl)
                            :tree-address (nreverse (cons (car node) location))
                            :refbot (system-generated-p (car node))
                            :refopinid (assoc-cdr :id refopin)
                            :refopinurl (assoc-cdr :url refopin)
-                           :warstats
-                           (request-warstats-for-url (assoc-cdr :reference refopin))
+                           :warstats (request-warstats-for-url refurl)
                            :warstats-src-url
-                           (when-let ((spec
-                                       (%warstats-pathdata-for-url
-                                        (assoc-cdr :reference refopin))))
+                           (when-let ((spec (%warstats-pathdata-for-url refurl)))
                              (strcat wf/local-settings:*base-url*
                                      (apply #'make-warstats-url spec)))
-                           :headline
-                           (get-headline-for-url (assoc-cdr :reference refopin)))))))
+                           :headline (get-headline-for-url refurl))))))
                    (when (cdr node)
                      (proc (cdr node) (cons (car node) location))))))
         (proc tree nil)))))
