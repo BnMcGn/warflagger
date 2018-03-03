@@ -90,7 +90,7 @@
                (ext-link (when (prop external-link)
                            (psx (:a :href (prop external-link) " [X]"
                                     :title "Original article"))))
-               (class (if title "headline" "headline headline-empty"))
+               (elclass (if title "headline" "headline headline-empty"))
                (domain (if (prop domain)
                            (strcat " (" (prop domain) ")")
                            ""))
@@ -98,8 +98,8 @@
                          (psx (:span title domain))
                          (psx (:span "[No Title]" domain)))))
           (if (prop url)
-              (psx (:span :class class (:a :href (prop url) core) ext-link))
-              (psx (:span :class class core ext-link)))))
+              (psx (:span :class elclass (:a :href (prop url) core) ext-link))
+              (psx (:span :class elclass core ext-link)))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))

@@ -43,7 +43,7 @@
         (psx
          (:div
           :class "reference"
-          :... (or (prop styling-data) (create))
+          :... (or (prop styling-data) (create :data-replies-total 0))
           (:headline :key 1 :title (prop headline title) :domain (prop reference-domain))
           (:display-warstats2))))
 
