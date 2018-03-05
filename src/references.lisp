@@ -37,8 +37,8 @@
 ;; opinion. There are references found in the text of an article or an opinion. The
 ;; current policy is to harvest these and store them as generated opinions attached
 ;; to the article or opinion.
-;; In addition, there are references that users have directly attached to the target,
-;; as well as references attached further down the discussion tree. We could also be
+;; Another distinction: references that users have directly attached to the target,
+;; vs. references attached further down the discussion tree. We could also be
 ;; interested in references to references, perhaps when trying to identify the general
 ;; topic of an article.
 ;;;
@@ -130,13 +130,14 @@
                 (collect (car ref) ref)))))
         (stor (make-hash-table :test #'equal)))
     (flatten-1
-     (hash-table-values
-      (collecting-hash-table (:existing stor)
-        (dolist (ref (extract-links-from-target url))
-          (unless (find-if (rcurry #'reference-redundant-p ref)
-                               (cat (gethash (car ref) existing)
-                                    (gethash (car ref) stor)))
-            (collect (car ref) ref))))))))
+     (nreverse
+      (hash-table-values
+       (collecting-hash-table (:existing stor)
+         (dolist (ref (extract-links-from-target url))
+           (unless (find-if (rcurry #'reference-redundant-p ref)
+                            (cat (gethash (car ref) existing)
+                                 (gethash (car ref) stor)))
+             (collect (car ref) ref)))))))))
 
 (defun save-new-references (url)
   (loop for (link excerpt) in (find-new-references url)
