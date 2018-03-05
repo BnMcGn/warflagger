@@ -92,19 +92,37 @@
                                 :styling-data
                                 (format-reference-styling-data (prop reference))))))))))
 
+    (defun sort-compare-opinions (opa opb)
+      ;;FIXME: Special treatment of missing excerpt opinions?
+      (let ((posa (and (chain opa (has-own-property 'text-position))
+                       (< 0 (@ opa 'text-position length))
+                       (@ opa 'text-position 0)))
+            (posb (and (chain opb (has-own-property 'text-position))
+                       (< 0 (@ opb 'text-position length))
+                       (@ opb 'text-position 0))))
+        (if posa
+            (if posb
+                (- posa posb)
+                1) ;;Excerptless comes first
+            (if posb
+                -1 ;; Ditto
+                (- (@ opa datestamp) (@ opb datestamp))))))
+
     (defun %reformat-opinions (opins)
-      (let ((opinstore (create)))
-        (list
-         (collecting
-             (labels ((proc (tree address)
-                        (dolist (branch tree)
-                          (let ((newadd (chain address (concat (@ branch 0 id)))))
-                            (setf (@ opinstore (@ branch 0 id)) (@ branch 0))
-                            (collect newadd)
-                            (when (< 1 (@ branch length))
-                              (proc (chain branch (slice 1)) newadd))))))
-               (proc opins (list))))
-         opinstore)))
+      (let* ((opinstore (create))
+             (opins
+              (list
+               (collecting
+                   (labels ((proc (tree address)
+                              (dolist (branch tree)
+                                (let ((newadd (chain address (concat (@ branch 0 id)))))
+                                  (setf (@ opinstore (@ branch 0 id)) (@ branch 0))
+                                  (collect newadd)
+                                  (when (< 1 (@ branch length))
+                                    (proc (chain branch (slice 1)) newadd))))))
+                     (proc opins (list)))))))
+        (chain opins (sort sort-compare-opinions))
+        (list opins opinstore)))
 
     ;;For now, drop in place of target-root-inner
     (def-component target-root-thread
