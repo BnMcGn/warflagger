@@ -8,6 +8,16 @@
 (defun target-thread ()
   (ps
 
+    (defun previous-break (text index)
+      (let ((res (chain text (substring 0 index) (last-index-of #\linefeed))))
+        (when (<= 0 res)
+          res)))
+
+    (defun next-break (text index)
+      (let ((res (chain text (substring (1+ index)) (index-of #\linefeed))))
+        (when (<= 0 res)
+          (+ res 1 index))))
+
     (def-component thread-excerpt
         (if (prop text)
             (let*
