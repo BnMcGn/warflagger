@@ -179,7 +179,7 @@
           (format-looks-data res opid (@ props looks) (@ props username) )
           (when opid
             (format-opinion-data res (getprop (@ props opinions) opid)))
-          (format-reference-data)
+          (format-reference-data res (getprop (@ props references) opid))
           res))
 
       (defun format-reference-styling-data (refdata)
