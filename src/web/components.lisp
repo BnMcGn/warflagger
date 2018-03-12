@@ -21,7 +21,7 @@
 
       (defun rebreak (text)
         (chain (collecting
-                   (dolist (string (chain text (split (lisp-raw "\"\\n\""))))
+                   (dolist (string (chain text (split #\linefeed)))
                      (collect string)
                      (collect (psx (:br :key (unique-id))))))
                (slice 0 -1)))
