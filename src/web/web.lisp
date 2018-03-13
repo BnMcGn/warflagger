@@ -17,7 +17,8 @@
     (:div :id "left_side"
           :@site-index :@side-content)
     (:div :id "right_side"
-          :@site-search :@notifications)
+          :@site-search :@notifications
+          (:div :class "featurebox_side" :style "opacity: 0;" "_"))
     (:div :id "content"
           :@messages :@inner :@footnotes)
                                         ;;Footer
