@@ -380,6 +380,23 @@
                       (@ itm 0)))))
           res))
 
+      (setf -react-tabs (require "react-tabs"))
+      (setf tabs (@ -react-tabs -tabs))
+      (setf tab (@ -react-tabs -tab))
+      (setf tab-list (@ -react-tabs -tab-list))
+      (setf tab-panel (@ -react-tabs -tab-panel))
+
+      (def-component target-tabs
+          (psx
+           (:tabs
+            (:tab-list
+             (:tab "Article View")
+             (:tab "Comment View"))
+            (:tab-panel
+             (:target-root-inner :... (@ this props)))
+            (:tab-panel
+             (:target-root-thread :... (@ this props))))))
+
       (def-component target-root
           (psx
            ;;(:target-root-inner
