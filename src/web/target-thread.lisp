@@ -24,9 +24,10 @@
                 ((tlength (prop text length))
                  (estart (prop opinion text-position 0))
                  (eend (+ (prop opinion text-position 1) estart))
-                 (tstart (1+ (previous-break (prop text) estart)))
+                 (tstart (previous-break (prop text) estart))
                  (tend (next-break (prop text) eend))
-                 (leading-context (prop text (slice (or tstart 0) estart)))
+                 (leading-context (prop text (slice (if tstart (1+ tstart) 0)
+                                                    estart)))
                  (excerpt (prop text (slice estart eend)))
                  (trailing-context (prop text (slice eend (or tend tlength))))
                  (classes (collecting
