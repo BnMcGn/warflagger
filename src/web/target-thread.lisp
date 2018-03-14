@@ -107,7 +107,7 @@
                                  :... (prop reference)
                                  :styling-data
                                  (format-reference-styling-data (prop reference)))))
-              (when t ;(prop question)
+              (when (prop question)
                 (psx (:question :key 11
                                         ;:... (prop question)
                                 )))))))))
