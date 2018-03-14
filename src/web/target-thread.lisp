@@ -59,7 +59,12 @@
            :url (prop warflagger-link)
            :external-link (when (not (equal (prop reference) (prop warflagger-link)))
                             (prop reference))
-          (:display-warstats2)))))
+           (:display-warstats2)))))
+
+    (def-component question
+        (psx
+         (:div
+          :class "question")))
 
     (def-component thread-opinion
         (let* ((opinion (@ (prop opinions) (list-last (prop tree-address))))
@@ -94,11 +99,18 @@
                          :opinion opinion))))
              (when (@ opinion comment)
                (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
-             (when (prop reference)
-               (psx (:reference :key 10
-                                :... (prop reference)
-                                :styling-data
-                                (format-reference-styling-data (prop reference))))))))))
+             (:div
+              :key 12
+              :class "opinion-extras"
+              (when (prop reference)
+                (psx (:reference :key 10
+                                 :... (prop reference)
+                                 :styling-data
+                                 (format-reference-styling-data (prop reference)))))
+              (when t ;(prop question)
+                (psx (:question :key 11
+                                        ;:... (prop question)
+                                )))))))))
 
     (defun sort-compare-opinions (opa opb)
       ;;FIXME: Special treatment of missing excerpt opinions?
