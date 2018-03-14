@@ -70,7 +70,7 @@
         (let* ((opinion (@ (prop opinions) (list-last (prop tree-address))))
                (parentid (when (< 1 (prop tree-address length))
                            (@ (prop tree-address) (- (prop tree-address length) 2))))
-               (parent (when parentid (@ (prop opinions) parentid)))
+               (parent (when parentid (getprop (prop opinions) parentid)))
                (text (if parent
                          (if (chain parent (has-own-property 'comment))
                              (@ parent comment)
