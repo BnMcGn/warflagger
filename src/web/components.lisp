@@ -4,6 +4,8 @@
 
 (define-parts target-components
   :@css-link "/static/css/target.css"
+  ;;FIXME: Need better way to include:
+  :@css-link "/static/css/react-tabs.css"
   :@javascript #'distribute-ranks
   :@javascript #'titlebar-components
   :@javascript #'target-thread
@@ -400,7 +402,7 @@
       (def-component target-root
           (psx
            ;;(:target-root-inner
-           (:target-root-thread
+           (:target-tabs
             :... (@ this props)
             :looks (state looks)
             :look-handler (@ this look-handler)))
