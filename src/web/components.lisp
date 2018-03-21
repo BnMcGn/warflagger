@@ -388,6 +388,7 @@
       (setf tab-list (@ -react-tabs -tab-list))
       (setf tab-panel (@ -react-tabs -tab-panel))
 
+      ;;FIXME: Url should remember tab settings. Also remember user's pref in session
       (def-component target-tabs
           (psx
            (:tabs
@@ -401,7 +402,6 @@
 
       (def-component target-root
           (psx
-           ;;(:target-root-inner
            (:target-tabs
             :... (@ this props)
             :looks (state looks)
