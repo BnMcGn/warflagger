@@ -364,6 +364,13 @@
     (gadgets:do-hash-table (k v warstats)
       (hu:collect k (hu:plist->hash v)))))
 
+(defun %prep-references-for-json (references)
+  ;;WARNING: Modifies the references table
+  (do-hash-table (k ref references)
+    (setf (gethash :warstats ref)
+          (hu:plist->hash (gethash :warstats ref))))
+  references)
+
 (defun write-all-rootid-warstats (rootid)
   (let* ((url (get-rooturl-by-id rootid))
          (text (progn
@@ -386,14 +393,14 @@
       (json:encode-json (%fill-out-opinion-tree
                          (opinion-tree-for-rooturl url) (create-textdata text))
                         fh))
-    (with-open-file (fh (make-warstats-path rootid :references)
-                        :direction :output :if-exists :supersede
-                        :if-does-not-exist :create)
-      (json:encode-json references fh))
     (with-open-file (fh (make-warstats-path rootid :warstats)
                         :direction :output :if-exists :supersede
                         :if-does-not-exist :create)
       (json:encode-json (%prep-for-json warstats) fh))
+    (with-open-file (fh (make-warstats-path rootid :references)
+                        :direction :output :if-exists :supersede
+                        :if-does-not-exist :create)
+      (json:encode-json (%prep-references-for-json references) fh))
     (with-open-file (fh (make-warstats-path rootid :questions)
                         :direction :output :if-exists :supersede
                         :if-does-not-exist :create)
