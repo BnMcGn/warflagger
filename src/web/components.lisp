@@ -9,6 +9,7 @@
   :@javascript #'distribute-ranks
   :@javascript #'titlebar-components
   :@javascript #'target-thread
+  :@javascript #'target-summary
   :@javascript-link "/static/javascript/jsPlumb-2.0.5.js"
   :@javascript
   (lambda ()
@@ -393,12 +394,16 @@
           (psx
            (:tabs
             (:tab-list
-             (:tab "Article View")
-             (:tab "Comment View"))
-            (:tab-panel
+             :key 1
+             (:tab :key 2 "Article View")
+             (:tab :key 3 "Comment View")
+             (:tab :key 4 "Summary"))
+            (:tab-panel :key 5
              (:target-root-inner :... (@ this props)))
-            (:tab-panel
-             (:target-root-thread :... (@ this props))))))
+            (:tab-panel :key 6
+             (:target-root-thread :... (@ this props)))
+            (:tab-panel :key 7
+             (:target-root-summary :... (@ this props))))))
 
       (def-component target-root
           (psx

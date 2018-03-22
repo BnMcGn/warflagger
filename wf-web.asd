@@ -33,6 +33,7 @@
                               (:file "web/titlebar")
                               (:file "web/components")
                               (:file "web/target-thread")
+                              (:file "web/target-summary")
                               (:file "web/misc")
                               (:file "web/opinion-form")
                               (:file "web/account")
