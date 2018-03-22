@@ -37,7 +37,7 @@
 
               (psx
                (:div
-                :... (create 'found-excerpt "true")
+                :... (create :found-excerpt "true")
                 :class (chain classes (join " "))
                 (:span (rebreak leading-context))
                 ;;FIXME: quick hack
@@ -45,7 +45,7 @@
                 (:span (rebreak trailing-context)))))
             (psx
              (:div
-              :... (create 'found-excerpt nil)
+              :... (create :found-excerpt nil)
               (prop opinion excerpt)))))
 
     (def-component reference
