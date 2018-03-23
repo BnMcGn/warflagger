@@ -8,8 +8,18 @@
     (def-component target-root-summary
         (psx
          (:div
-          (:div :key 1
-                "Title:" (prop title)))))
+          :... (format-styling-data (@ this props))
+          (:headline :key 1
+                     :title (prop title)
+                     :external-link (prop url))
+          (:display-warstats2 :key 2)
+          (:div
+           :key 3
+           (:h2 "Discussion Statistics")
+           (:h3 "Immediate responses:" (prop warstats root replies-immediate))
+           (:h3 "Total responses:" (prop warstats root replies-total))
+           (:h3 "Incoming references:"))
+          )))
 
 
     ))
