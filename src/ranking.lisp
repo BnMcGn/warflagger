@@ -375,6 +375,7 @@ Some of these factors will obviously affect the respect points more than others.
          (*reference-list* (or reference-cache
                                (reference-list-for-rooturl rooturl)))
          (root-ax (opinion-axis-data (list* nil tree))))
+    (setf (getf root-ax :referenced) (get-references-to rooturl))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)
