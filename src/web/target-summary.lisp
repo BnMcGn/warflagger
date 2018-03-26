@@ -23,7 +23,7 @@
                 (strcat "/static/warstats"
                         (make-id-path r)
                         (chain r (to-string))
-                        "/opinion-stats.json")))))
+                        "/opinion-data.json")))))
 
     (def-component referenced
         (:div

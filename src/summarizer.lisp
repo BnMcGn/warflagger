@@ -14,6 +14,7 @@
   (format nil "~a~a/~a"
           (make-id-path id) id
           (getf '(:badge "opinion-badge.svg"
+                  :opinion "opinion-data.json"
                   :tree "tree.json"
                   :warstats "warstats.json"
                   :references "references.json"
@@ -371,6 +372,16 @@
           (hu:plist->hash (gethash :warstats ref))))
   references)
 
+(defun write-individual-references (references)
+  (do-hash-table (id ref references)
+    (let ((opinion (opinion-from-id (gethash :refopinid ref))))
+      (setf (gethash :opinion ref)
+            (hu:plist->hash opinion))
+      (with-open-file (fh (make-warstats-path (gethash :refopinid ref) :opinion)
+                         :direction :output :if-exists :supersede
+                         :if-does-not-exist :create)
+       (json:encode-json ref)))))
+
 (defun write-all-rootid-warstats (rootid)
   (let* ((url (get-rooturl-by-id rootid))
          (text (progn
@@ -400,7 +411,9 @@
     (with-open-file (fh (make-warstats-path rootid :references)
                         :direction :output :if-exists :supersede
                         :if-does-not-exist :create)
-      (json:encode-json (%prep-references-for-json references) fh))
+      (%prep-references-for-json references) ;;WARNING: modifies!
+      (json:encode-json references fh))
+    (write-individual-references references) ;;WARNING: also modifies!
     (with-open-file (fh (make-warstats-path rootid :questions)
                         :direction :output :if-exists :supersede
                         :if-does-not-exist :create)
