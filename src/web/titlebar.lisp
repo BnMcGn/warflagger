@@ -17,6 +17,17 @@
                            (chain (prop opinion id) (to-string))
                            "/opinion-badge.svg"))))
 
+    (def-component display-tree-address
+        (psx
+         (:span
+          (dolist (id (prop tree-address))
+            ;;FIXME: Should also indicate score of each parent, plus link to them.
+            (psx
+             (:img
+              :class "opinion-badge"
+              :src (strcat "/static/warstats" (make-id-path id)
+                           (chain id (to-string)) "/opinion-badge.svg")))))))
+
     ;;FIXME: React/CSS version of display-warstats in mood.lisp. Other should probably
     ;; go away eventually.
     (def-component display-warstats2
