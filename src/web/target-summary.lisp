@@ -55,8 +55,10 @@
             (:div
              :key 3
              (:h2 "Discussion Statistics")
-             (:h3 "Immediate responses:" (@ rwstats replies-immediate))
-             (:h3 "Total responses:" (@ rwstats replies-total))
+             (:h3 "Score: " (@ rwstats effect))
+             (:h3 "Controversy: " (@ rwstats controversy))
+             (:h3 "Immediate responses: " (@ rwstats replies-immediate))
+             (:h3 "Total responses: " (@ rwstats replies-total))
              (:h3 "Incoming references:")
              (when (@ rwstats referenced)
                (psx (:referenced-loader :key 4 :referenced (@ rwstats referenced))))
