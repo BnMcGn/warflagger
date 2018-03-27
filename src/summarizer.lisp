@@ -376,7 +376,7 @@
   (do-hash-table (id ref references)
     (let ((opinion (opinion-from-id (gethash :refopinid ref))))
       (setf (gethash :opinion ref)
-            (hu:plist->hash opinion))
+            (hu:alist->hash opinion))
       (with-open-file (fh (make-warstats-path (gethash :refopinid ref) :opinion)
                          :direction :output :if-exists :supersede
                          :if-does-not-exist :create)

@@ -246,14 +246,14 @@ Some of these factors will obviously affect the respect points more than others.
             (incf controversy (* factor c))))))
     (list effect controversy)))
 
-(defun calculate-opinion-interest (axis-data)
+(defun calculate-axdat-interest (axis-data)
   "Tries to determine how much interest is being shown in a target based on how many people have replied to it vs. how many have looked at it. An opinion with few replies may be of low interest in a well-trodden area or it may be significant in a niche field. We would like to detect the difference. This is harder than it looks. Should we count the immediate replies to the target, or the whole tree of replies below it? Should we count the number of opinions or the number of participants?"
   (declare (ignore axis-data))
   ;;FIXME: Not implemented
   ;;(/ (getf axis-data :looks) (getf axis-data :replies-total))
   1)
 
-(defun calculate-opinion-effect (axis-data opinion)
+(defun calculate-axdat-effect (axis-data opinion)
   (labels ((getx (key)
              (car (getf axis-data key))))
     (let* ((likedness (- (getx :x-supported) (getx :x-dissed)))
@@ -261,13 +261,17 @@ Some of these factors will obviously affect the respect points more than others.
            (worries (- 0 (getx :x-problematic)
                        (getx :x-unverified)
                        (getx :x-irrelevant)))
-           (initial (opinion-initial-effect :opinion opinion))
+           (initial (if opinion
+                        (opinion-initial-effect :opinion opinion)
+                        ;;FIXME: This constant should be 1. documented 2. elsewhere
+                        ;;represents rooturl initial effect
+                        1))
            (raw-score (+ initial likedness (* 2 rightness) worries)))
       (if (< 0 raw-score)
-          (* raw-score (calculate-opinion-interest axis-data))
+          (* raw-score (calculate-axdat-interest axis-data))
           0))))
 
-(defun calculate-opinion-controversy (axis-data)
+(defun calculate-axdat-controversy (axis-data)
   (labels ((getx (key)
              (car (getf axis-data key))))
     (let ((positive (+ (getx :x-supported) (getx :x-right)))
@@ -293,8 +297,8 @@ Some of these factors will obviously affect the respect points more than others.
 (defun %opinion-effect (optree &key opinion)
   (let* ((opinion (or opinion (opinion-from-id (car optree))))
          (axdat (opinion-axis-data optree))
-         (effect (calculate-opinion-effect axdat opinion))
-         (controv (calculate-opinion-controversy axdat))
+         (effect (calculate-axdat-effect axdat opinion))
+         (controv (calculate-axdat-controversy axdat))
          (ref-effects (calculate-reference-effects
                        effect controv
                        (getf axdat :reference-effect-main)
@@ -375,6 +379,8 @@ Some of these factors will obviously affect the respect points more than others.
          (*reference-list* (or reference-cache
                                (reference-list-for-rooturl rooturl)))
          (root-ax (opinion-axis-data (list* nil tree))))
+    (setf (getf root-ax :effect) (calculate-axdat-effect root-ax nil))
+    (setf (getf root-ax :controversy) (calculate-axdat-controversy root-ax))
     (setf (getf root-ax :referenced) (get-references-to rooturl))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
