@@ -9,7 +9,9 @@
         (let ((opinion (@ (prop opinions) (list-last (prop tree-address)))))
           (psx
            (:div
-            (:vote-value :opinion opinion)
+            (if (prop tree-address)
+                (:display-tree-address :tree-address (prop tree-address))
+                (:vote-value :opinion opinion))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
