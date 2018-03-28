@@ -458,15 +458,35 @@
         get-initial-state
         (lambda () (create focus (prop focus))))
 
+      (defun %reformat-opinions (opins)
+        (let* ((opinstore (create))
+               (opins
+                (collecting
+                    (labels ((proc (tree address)
+                               (dolist (branch tree)
+                                 (let ((newadd (chain address (concat (@ branch 0 id)))))
+                                   (setf (@ opinstore (@ branch 0 id)) (@ branch 0))
+                                   (collect newadd)
+                                   (when (< 1 (@ branch length))
+                                     (proc (chain branch (slice 1)) newadd))))))
+                      (proc opins (list))))))
+          ;;FIXME: can't sort here. They're trees!
+          ;; will need to think out sorting.
+          ;;(chain opins (sort sort-compare-opinions))
+          (list opins opinstore)))
+
       (def-component target-loader
           ;;FIXME: Needs error handling
           (if (and  (state warstats) (state opinions) (state text))
-              (psx (:target-root :... (@ this props)
-                                 :warstats (state warstats)
-                                 :references (state references)
-                                 :questions (state questions)
-                                 :opinions (state opinions)
-                                 :text (state text)))
+              (let ((opdat (%reformat-opinions (prop opinions))))
+                (psx (:target-root :... (@ this props)
+                                   :warstats (state warstats)
+                                   :references (state references)
+                                   :questions (state questions)
+                                   :opinions (state opinions)
+                                   :tree-addresses (@ opdat 0)
+                                   :opinion-store (@ opdat 1)
+                                   :text (state text))))
               ;;FIXME: decorate
               (psx (:h3 "Loading...")))
         component-did-mount

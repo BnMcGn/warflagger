@@ -68,10 +68,10 @@
           :class "question")))
 
     (def-component thread-opinion
-        (let* ((opinion (@ (prop opinions) (list-last (prop tree-address))))
+        (let* ((opinion (@ (prop opinion-store) (list-last (prop tree-address))))
                (parentid (when (< 1 (prop tree-address length))
                            (@ (prop tree-address) (- (prop tree-address length) 2))))
-               (parent (when parentid (getprop (prop opinions) parentid)))
+               (parent (when parentid (getprop (prop opinion-store) parentid)))
                (text (if parent
                          (if (chain parent (has-own-property 'comment))
                              (@ parent comment)
@@ -129,24 +129,6 @@
                 -1 ;; Ditto
                 (- (@ opa datestamp) (@ opb datestamp))))))
 
-    (defun %reformat-opinions (opins)
-      (let* ((opinstore (create))
-             (opins
-              (collecting
-                  (labels ((proc (tree address)
-                             (dolist (branch tree)
-                               (let ((newadd (chain address (concat (@ branch 0 id)))))
-                                 (setf (@ opinstore (@ branch 0 id)) (@ branch 0))
-                                 (collect newadd)
-                                 (when (< 1 (@ branch length))
-                                   (proc (chain branch (slice 1)) newadd))))))
-                    (proc opins (list))))))
-        ;;FIXME: can't sort here. They're trees!
-        ;; will need to think out sorting.
-        ;;(chain opins (sort sort-compare-opinions))
-        (list opins opinstore)))
-
-    ;;For now, drop in place of target-root-inner
     (def-component target-root-thread
         (psx
          (:div
@@ -154,11 +136,12 @@
                 "Title:" (prop title))
           (collecting
               (let ((data (%reformat-opinions (prop opinions))))
-                (dolist (op (@ data 0))
+                (dolist (op (prop tree-addresses))
                   (collect
                       (psx (:thread-opinion
                             :key (unique-id)
-                            :opinions (@ data 1)
+                            :opinions (prop opinions)
+                            :opinion-store (prop opinion-store)
                             :text (prop text)
                             :styling-data
                             (format-styling-data
