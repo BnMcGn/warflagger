@@ -478,7 +478,7 @@
       (def-component target-loader
           ;;FIXME: Needs error handling
           (if (and  (state warstats) (state opinions) (state text))
-              (let ((opdat (%reformat-opinions (prop opinions))))
+              (let ((opdat (%reformat-opinions (state opinions))))
                 (psx (:target-root :... (@ this props)
                                    :warstats (state warstats)
                                    :references (state references)
