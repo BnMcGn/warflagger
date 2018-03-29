@@ -6,7 +6,7 @@
   (ps
 
     (def-component opinion-summary
-        (let ((opinion (@ (prop opinions) (list-last (prop tree-address)))))
+        (let ((opinion (@ (prop opinion-store) (list-last (prop tree-address)))))
           (psx
            (:div
             (if (prop tree-address)
@@ -49,7 +49,15 @@
         (psx (:div)))
 
     (def-component high-scores
-        (psx (:div)))
+        (psx
+         (:div
+          (:h3 "High scoring replies:")
+          (dolist (id (filter-opins-score
+                       (prop tree-addresses) (prop opinion-store) (prop warstats)))
+            (psx
+             (:opinion-summary
+              :tree-address (getprop (prop opinion-store) id 'tree-address)
+              :opinion-store (prop opinion-store)))))))
 
     (def-component controversial
         (psx (:div)))
