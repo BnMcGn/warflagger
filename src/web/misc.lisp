@@ -67,11 +67,12 @@
              (collecting
                  (dolist (ta tree-addresses)
                    (let ((id (list-last ta)))
-                     (when (< 3 (getprop warstats id 'effect))
+                     (when (< 2 (getprop warstats id 'effect))
                        (collect id)))))))
         (chain res
                (sort (lambda (a b) (- (getprop warstats a 'effect)
-                                      (getprop warstats b 'effect)))))))
+                                      (getprop warstats b 'effect)))))
+        res))
     ))
 
 (defun tracking-code ()

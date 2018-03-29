@@ -10,8 +10,8 @@
           (psx
            (:div
             (if (prop tree-address)
-                (:display-tree-address :tree-address (prop tree-address))
-                (:vote-value :opinion opinion))
+                (psx (:display-tree-address :tree-address (prop tree-address)))
+                (psx (:vote-value :opinion opinion)))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
@@ -52,12 +52,14 @@
         (psx
          (:div
           (:h3 "High scoring replies:")
-          (dolist (id (filter-opins-score
-                       (prop tree-addresses) (prop opinion-store) (prop warstats)))
-            (psx
-             (:opinion-summary
-              :tree-address (getprop (prop opinion-store) id 'tree-address)
-              :opinion-store (prop opinion-store)))))))
+          (collecting
+              (dolist (id (filter-opins-score
+                           (prop tree-addresses) (prop opinion-store) (prop warstats)))
+                (collect
+                    (psx
+                     (:opinion-summary
+                      :tree-address (getprop (prop opinion-store) id 'tree-address)
+                      :opinion-store (prop opinion-store)))))))))
 
     (def-component controversial
         (psx (:div)))
