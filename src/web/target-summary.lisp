@@ -45,6 +45,15 @@
           :store-name "inrefs"
           (:referenced :... (@ this props)))))
 
+    (def-component questions
+        (psx (:div)))
+
+    (def-component high-scores
+        (psx (:div)))
+
+    (def-component controversial
+        (psx (:div)))
+
     (def-component target-root-summary
         (let ((rwstats (prop warstats root)))
           (psx
@@ -61,11 +70,14 @@
              (:h3 "Controversy: " (@ rwstats controversy))
              (:h3 "Immediate responses: " (@ rwstats replies-immediate))
              (:h3 "Total responses: " (@ rwstats replies-total))
-             (:h3 "Incoming references:")
+             (when (@ rwstats referenced)
+               (:h3 "Incoming references:"))
              (when (@ rwstats referenced)
                (psx (:referenced-loader :key 4 :referenced (@ rwstats referenced))))
-             )
-            ))))
+             (:questions :... (@ this props))
+             (:high-scores :... (@ this props))
+             (:controversial :... (@ this props))
+            )))))
 
 
     ))
