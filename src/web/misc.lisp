@@ -73,6 +73,19 @@
                (sort (lambda (a b) (- (getprop warstats a 'effect)
                                       (getprop warstats b 'effect)))))
         res))
+
+    (defun filter-opins-controversial (tree-addresses opinions warstats)
+      (let ((res
+             (collecting
+                 (dolist (ta tree-addresses)
+                   (let ((id (list-last ta)))
+                     (when (< 2 (getprop warstats id 'controversy))
+                       (collect id)))))))
+        (chain res
+               (sort (lambda (a b) (- (getprop warstats a 'controversy)
+                                      (getprop warstats b 'controversy)))))
+        res))
+
     ))
 
 (defun tracking-code ()

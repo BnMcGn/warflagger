@@ -62,7 +62,16 @@
                       :opinion-store (prop opinion-store)))))))))
 
     (def-component controversial
-        (psx (:div)))
+        (psx (:div
+              (:h3 "Controversial replies:")
+              (collecting
+                  (dolist (id (filter-opins-controversial
+                               (prop tree-addresses) (prop opinion-store) (prop warstats)))
+                    (collect
+                        (psx
+                         (:opinion-summary
+                          :tree-address (getprop (prop opinion-store) id 'tree-address)
+                          :opinion-store (prop opinion-store)))))))))
 
     (def-component target-root-summary
         (let ((rwstats (prop warstats root)))
