@@ -466,6 +466,7 @@
                                (dolist (branch tree)
                                  (let ((newadd (chain address (concat (@ branch 0 id)))))
                                    (setf (@ opinstore (@ branch 0 id)) (@ branch 0))
+                                   (setf (@ branch 0 tree-address) newadd)
                                    (collect newadd)
                                    (when (< 1 (@ branch length))
                                      (proc (chain branch (slice 1)) newadd))))))
