@@ -66,7 +66,7 @@
       (let ((curr opinions))
         (dolist (id tree-address)
           (dotimes (i (@ curr length))
-            (when (= id (@ curr i 0 id))
+            (when (= id (getprop curr i 0 id))
               (setf curr (chain (@ curr i) (slice 1)))
               (break))))
         curr))
@@ -100,8 +100,8 @@
              (collecting
                  (dolist (ta tree-addresses)
                    (let* ((id (list-last ta))
-                          (opin (@ opinions id))
-                          (stats (@ warstats id)))
+                          (opin (getprop opinions id))
+                          (stats (getprop warstats id)))
                      (when
                          ;;FIXME: This is a crude definition of a question. Reconsider
                          ;; if/when we implement "Accepted" flag. Also if directives

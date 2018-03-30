@@ -51,14 +51,14 @@
 
     (defun %question-answers (treead opinions opstore)
       (collecting
-          (dolist (opin (opinion-chilren treead opinions))
+          (dolist (opin (opinion-children treead opinions))
             (when (and (chain (list "evidence" "secondHand" "eyeWitness" "anecdotal")
                               (includes (@ opin 0 flag 1)))
                        (> 1 (@ opin 0 votevalue)))
               (collect (@ opin 0 id))))))
 
     (def-component question-summary
-        (let ((opin (prop opinion-store (prop opinion-id))))
+        (let ((opin (getprop (prop opinion-store) (prop opinion-id))))
           (psx
            (:div
             (:opinion-summary
@@ -76,7 +76,6 @@
                         :opinion-store (prop opinion-store)
                         :warstats (prop warstats)
                         :opid ansid)))))))))
-
 
     (def-component questions
         (psx
