@@ -6,9 +6,13 @@
   (ps
 
     (def-component opinion-summary
-        (let ((opinion (@ (prop opinion-store) (list-last (prop tree-address)))))
+        (let ((opinion (@ (prop opinion-store)
+                          (if (prop tree-address)
+                              (list-last (prop tree-address))
+                              (prop opid)))))
           (psx
            (:div
+            ;;FIXME: do we need to insert styling-data from warstats?
             (if (prop tree-address)
                 (psx (:display-tree-address :tree-address (prop tree-address)))
                 (psx (:vote-value :opinion opinion)))
@@ -34,7 +38,7 @@
              (when data
                (:opinion-summary
                 :key (unique-id)
-                :opinions (create-from-list (list r data))
+                :opinion-store (create-from-list (list r data))
                 :tree-address (@ data tree-address)
                 :warstats (@ data warstats)))))))
 
@@ -45,8 +49,50 @@
           :store-name "inrefs"
           (:referenced :... (@ this props)))))
 
+    (defun %question-answers (treead opinions opstore)
+      (collecting
+          (dolist (opin (opinion-chilren treead opinions))
+            (when (and (chain (list "evidence" "secondHand" "eyeWitness" "anecdotal")
+                              (includes (@ opin 0 flag 1)))
+                       (> 1 (@ opin 0 votevalue)))
+              (collect (@ opin 0 id))))))
+
+    (def-component question-summary
+        (let ((opin (prop opinion-store (prop opinion-id))))
+          (psx
+           (:div
+            (:opinion-summary
+             :key 1
+             :opinion-store (prop opinion-store)
+             :tree-address (@ opin tree-address)
+             :warstats (prop warstats))
+            (collecting
+                (dolist (ansid (%question-answers (@ opin tree-address) (prop opinions)
+                                                  (prop opinion-store)))
+                  (collect
+                      (psx
+                       (:opinion-summary
+                        :key (unique-id)
+                        :opinion-store (prop opinion-store)
+                        :warstats (prop warstats)
+                        :opid ansid)))))))))
+
+
     (def-component questions
-        (psx (:div)))
+        (psx
+         (:div
+          (:h3 "Questions and answers:")
+          (collecting
+              (dolist (id (filter-opins-question
+                           (prop tree-addresses) (prop opinion-store) (prop warstats)))
+                (collect
+                    (psx
+                     (:question-summary
+                      :key (unique-id)
+                      :opinion-id id
+                      :opinions (prop opinions)
+                      :opinion-store (prop opinion-store)
+                      :warstats (prop warstats)))))))))
 
     (def-component high-scores
         (psx
@@ -95,8 +141,7 @@
                (psx (:referenced-loader :key 4 :referenced (@ rwstats referenced))))
              (:questions :... (@ this props))
              (:high-scores :... (@ this props))
-             (:controversial :... (@ this props))
-            )))))
+             (:controversial :... (@ this props)))))))
 
 
     ))

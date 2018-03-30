@@ -66,7 +66,7 @@
       (let ((curr opinions))
         (dolist (id tree-address)
           (dotimes (i (@ curr length))
-            (when (= id (@ curr i 0))
+            (when (= id (@ curr i 0 id))
               (setf curr (chain (@ curr i) (slice 1)))
               (break))))
         curr))
