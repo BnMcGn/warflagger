@@ -62,6 +62,15 @@
           "/0000/"
           (strcat "/" (chain id (to-string) (slice 0 -3)) "000/")))
 
+    (defun opinion-children (tree-address opinions)
+      (let ((curr opinions))
+        (dolist (id tree-address)
+          (dotimes (i (@ curr length))
+            (when (= id (@ curr i 0))
+              (setf curr (chain (@ curr i) (slice 1)))
+              (break))))
+        curr))
+
     (defun filter-opins-score (tree-addresses opinions warstats)
       (let ((res
              (collecting
