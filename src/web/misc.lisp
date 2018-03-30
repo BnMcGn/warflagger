@@ -86,6 +86,30 @@
                                       (getprop warstats b 'controversy)))))
         res))
 
+    (defun filter-opins-question (tree-addresses opinions warstats)
+      (let ((res
+             (collecting
+                 (dolist (ta tree-addresses)
+                   (let* ((id (list-last ta))
+                          (opin (@ opinions id))
+                          (stats (@ warstats id)))
+                     (when
+                         ;;FIXME: This is a crude definition of a question. Reconsider
+                         ;; if/when we implement "Accepted" flag. Also if directives
+                         ;; are added.
+                         (or (chain (list "needsEvidence" "raiseQuestion")
+                                    (includes (@ opin flag 1)))
+                             ;; Wrong axis is a stand in for being answered. For now.
+                             (< 1 (@ stats x-wrong 0)))
+                       (collect id)))))))
+        (chain res
+               (sort
+                ;; Have arbitrarily decided to sort by combined controversy and effect
+                (lambda (a b) (- (+ (getprop warstats a 'controversy)
+                                    (getprop warstats a 'effect))
+                                 (+ (getprop warstats b 'controversy)
+                                    (getprop warstats b 'effect))))))))
+
     ))
 
 (defun tracking-code ()
