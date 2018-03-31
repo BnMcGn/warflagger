@@ -33,6 +33,7 @@
 
     (def-component referenced
         (:div
+         (:h3 "Incoming references:")
          (dolist (r (prop referenced))
            (let ((data (getprop (prop inrefs) r)))
              (when data
@@ -79,46 +80,57 @@
                         :opid ansid)))))))))
 
     (def-component questions
-        (psx
-         (:div
-          (:h3 "Questions and answers:")
-          (collecting
-              (dolist (id (filter-opins-question
-                           (prop tree-addresses) (prop opinion-store) (prop warstats)))
-                (collect
-                    (psx
-                     (:question-summary
-                      :key (unique-id)
-                      :opinion-id id
-                      :opinions (prop opinions)
-                      :opinion-store (prop opinion-store)
-                      :warstats (prop warstats)))))))))
+        (let ((data (filter-opins-question
+                     (prop tree-addresses) (prop opinion-store) (prop warstats))))
+          (psx
+           (:display-if
+            :test (not-empty data)
+            (:div
+             (:h3 "Questions and answers:")
+             (collecting
+                 (dolist (id (filter-opins-question
+                              (prop tree-addresses) (prop opinion-store) (prop warstats)))
+                   (collect
+                       (psx
+                        (:question-summary
+                         :key (unique-id)
+                         :opinion-id id
+                         :opinions (prop opinions)
+                         :opinion-store (prop opinion-store)
+                         :warstats (prop warstats)))))))))))
 
     (def-component high-scores
-        (psx
-         (:div
-          (:h3 "High scoring replies:")
-          (collecting
-              (dolist (id (filter-opins-score
-                           (prop tree-addresses) (prop opinion-store) (prop warstats)))
-                (collect
-                    (psx
-                     (:opinion-summary
-                      :tree-address (getprop (prop opinion-store) id 'tree-address)
-                      :opinion-store (prop opinion-store)))))))))
+        (let ((data (filter-opins-score
+                     (prop tree-addresses) (prop opinion-store) (prop warstats))))
+          (psx
+           (:display-if
+            :test (not-empty data)
+            (:div
+             (:h3 "High scoring replies:")
+             (collecting
+                 (dolist (id data)
+                   (collect
+                       (psx
+                        (:opinion-summary
+                         :tree-address (getprop (prop opinion-store) id 'tree-address)
+                         :opinion-store (prop opinion-store)))))))))))
 
     (def-component controversial
-        (psx (:div
-              (:h3 "Controversial replies:")
-              (collecting
-                  (dolist (id (filter-opins-controversial
-                               (prop tree-addresses) (prop opinion-store) (prop warstats)))
-                    (collect
-                        (psx
-                         (:opinion-summary
-                          :key (unique-id)
-                          :tree-address (getprop (prop opinion-store) id 'tree-address)
-                          :opinion-store (prop opinion-store)))))))))
+        (let ((data (filter-opins-controversial
+                     (prop tree-addresses) (prop opinion-store) (prop warstats))))
+          (psx
+           (:display-if
+            :test (not-empty data)
+            (:div
+             (:h3 "Controversial replies:")
+             (collecting
+                 (dolist (id data)
+                   (collect
+                       (psx
+                        (:opinion-summary
+                         :key (unique-id)
+                         :tree-address (getprop (prop opinion-store) id 'tree-address)
+                         :opinion-store (prop opinion-store)))))))))))
 
     (def-component references-summary
         (psx (:div
@@ -149,11 +161,10 @@
              (:h3 "Controversy: " (@ rwstats controversy))
              (:h3 "Immediate responses: " (@ rwstats replies-immediate))
              (:h3 "Total responses: " (@ rwstats replies-total))
-             (when (@ rwstats referenced)
-               (:h3 "Incoming references:"))
-             (when (@ rwstats referenced)
-               (psx (:referenced-loader :key 4 :referenced (@ rwstats referenced))))
-             (:references-summary :... (@ this props))
+             (:display-if :test (@ rwstats referenced)
+                          (:referenced-loader :key 4 :referenced (@ rwstats referenced)))
+             (:display-if :test (not-empty (prop references))
+                          (:references-summary :... (@ this props)))
              (:questions :... (@ this props))
              (:high-scores :... (@ this props))
              (:controversial :... (@ this props)))))))
