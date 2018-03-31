@@ -36,11 +36,12 @@
          (dolist (r (prop referenced))
            (let ((data (getprop (prop inrefs) r)))
              (when data
-               (:opinion-summary
-                :key (unique-id)
-                :opinion-store (create-from-list (list r data))
-                :tree-address (@ data tree-address)
-                :warstats (@ data warstats)))))))
+               (psx
+                (:opinion-summary
+                 :key (unique-id)
+                 :opinion-store (create-from-list (list r data))
+                 :tree-address (@ data tree-address)
+                 :warstats (@ data warstats))))))))
 
     (def-component referenced-loader
         (psx
@@ -115,6 +116,20 @@
                     (collect
                         (psx
                          (:opinion-summary
+                          :key (unique-id)
+                          :tree-address (getprop (prop opinion-store) id 'tree-address)
+                          :opinion-store (prop opinion-store)))))))))
+
+    (def-component references-summary
+        (psx (:div
+              ;;FIXME: Should the references list be ordered?
+              (:h3 "References made:")
+              (collecting
+                  (do-keyvalue (id ref (prop references))
+                    (collect
+                        (psx
+                         (:opinion-summary
+                          :key (unique-id)
                           :tree-address (getprop (prop opinion-store) id 'tree-address)
                           :opinion-store (prop opinion-store)))))))))
 
@@ -138,6 +153,7 @@
                (:h3 "Incoming references:"))
              (when (@ rwstats referenced)
                (psx (:referenced-loader :key 4 :referenced (@ rwstats referenced))))
+             (:references-summary :... (@ this props))
              (:questions :... (@ this props))
              (:high-scores :... (@ this props))
              (:controversial :... (@ this props)))))))
