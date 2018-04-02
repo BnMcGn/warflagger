@@ -39,10 +39,11 @@
                (:div
                 :... (create :found-excerpt "true")
                 :class (chain classes (join " "))
-                (:span (rebreak leading-context))
+                (:span :key 1 (rebreak leading-context))
                 ;;FIXME: quick hack
-                (:span :class (flavor (list (list (prop opinion)))) (rebreak excerpt))
-                (:span (rebreak trailing-context)))))
+                (:span :key 2 :class (flavor (list (list (prop opinion))))
+                       (rebreak excerpt))
+                (:span :key 3 (rebreak trailing-context)))))
             (psx
              (:div
               :... (create :found-excerpt nil)
