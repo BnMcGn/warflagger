@@ -14,8 +14,8 @@
            (:div
             ;;FIXME: do we need to insert styling-data from warstats?
             (if (prop tree-address)
-                (psx (:display-tree-address :tree-address (prop tree-address)))
-                (psx (:vote-value :opinion opinion)))
+                (psx (:display-tree-address :key 1 :tree-address (prop tree-address)))
+                (psx (:vote-value :key 1 :opinion opinion)))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
@@ -33,7 +33,7 @@
 
     (def-component referenced
         (:div
-         (:h3 "Incoming references:")
+         (:h3 :key 1 "Incoming references:")
          (dolist (r (prop referenced))
            (let ((data (getprop (prop inrefs) r)))
              (when data
@@ -86,7 +86,7 @@
            (:display-if
             :test (not-empty data)
             (:div
-             (:h3 "Questions and answers:")
+             (:h3 :key 2 "Questions and answers:")
              (collecting
                  (dolist (id (filter-opins-question
                               (prop tree-addresses) (prop opinion-store) (prop warstats)))
@@ -106,7 +106,7 @@
            (:display-if
             :test (not-empty data)
             (:div
-             (:h3 "High scoring replies:")
+             (:h3 :key 2 "High scoring replies:")
              (collecting
                  (dolist (id data)
                    (collect
@@ -122,7 +122,7 @@
            (:display-if
             :test (not-empty data)
             (:div
-             (:h3 "Controversial replies:")
+             (:h3 :key 2 "Controversial replies:")
              (collecting
                  (dolist (id data)
                    (collect
@@ -135,7 +135,7 @@
     (def-component references-summary
         (psx (:div
               ;;FIXME: Should the references list be ordered?
-              (:h3 "References made:")
+              (:h3 :key 1 "References made:")
               (collecting
                   (do-keyvalue (id ref (prop references))
                     (collect
@@ -156,18 +156,17 @@
             (:display-warstats2 :key 2)
             (:div
              :key 3
-             (:h2 "Discussion Statistics")
-             (:h3 "Score: " (@ rwstats effect))
-             (:h3 "Controversy: " (@ rwstats controversy))
-             (:h3 "Immediate responses: " (@ rwstats replies-immediate))
-             (:h3 "Total responses: " (@ rwstats replies-total))
-             (:display-if :test (@ rwstats referenced)
-                          (:referenced-loader :key 4 :referenced (@ rwstats referenced)))
-             (:display-if :test (not-empty (prop references))
+             (:h2 :key 4 "Discussion Statistics")
+             (:h3 :key 5 "Score: " (@ rwstats effect))
+             (:h3 :key 6 "Controversy: " (@ rwstats controversy))
+             (:h3 :key 7 "Immediate responses: " (@ rwstats replies-immediate))
+             (:h3 :key 8 "Total responses: " (@ rwstats replies-total))
+             (:display-if :key 9 :test (@ rwstats referenced)
+                          (:referenced-loader :referenced (@ rwstats referenced)))
+             (:display-if :key 10 :test (not-empty (prop references))
                           (:references-summary :... (@ this props)))
-             (:questions :... (@ this props))
-             (:high-scores :... (@ this props))
-             (:controversial :... (@ this props)))))))
-
+             (:questions :key 11 :... (@ this props))
+             (:high-scores :key 12 :... (@ this props))
+             (:controversial :key 13 :... (@ this props)))))))
 
     ))

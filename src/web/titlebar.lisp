@@ -26,6 +26,7 @@
                 (collect
                     (psx
                      (:img
+                      :key (unique-id)
                       :class "opinion-badge"
                       :src (strcat "/static/warstats" (make-id-path id)
                                    (chain id (to-string)) "/opinion-badge.svg")))))))))
@@ -43,6 +44,7 @@
                                                     *warstat-text*))))
                         (collect
                             (psx (:span
+                                  :key (unique-id)
                                   :class k
                                   (:img
                                    :src
@@ -101,7 +103,7 @@
     (def-component headline
         (let* ((title (prop title))
                (ext-link (when (prop external-link)
-                           (psx (:a :href (prop external-link)
+                           (psx (:a :key 1 :href (prop external-link)
                                     :title "Original article"
                                     (:span :class "headline-external")))))
                (elclass (if title "headline" "headline headline-empty"))
@@ -109,11 +111,12 @@
                            (strcat " (" (prop domain) ")")
                            ""))
                (core (if title
-                         (psx (:span title domain))
-                         (psx (:span "[Title Not Available]" domain)))))
+                         (psx (:span :key 2 title domain))
+                         (psx (:span :key 2 "[Title Not Available]" domain)))))
           (if (prop url)
-              (psx (:span :class elclass (:a :href (prop url) core) ext-link))
-              (psx (:span :class elclass core ext-link)))))
+              (psx (:span :key 3 :class elclass
+                          (:a :key 4 :href (prop url) core) ext-link))
+              (psx (:span :key 3 :class elclass core ext-link)))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))
