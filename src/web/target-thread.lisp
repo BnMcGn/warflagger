@@ -133,8 +133,15 @@
     (def-component target-root-thread
         (psx
          (:div
-          (:div :key "x"
-                "Title:" (prop title))
+          :... (format-styling-data (@ this props))
+          (:div
+           :key "x"
+           :class (strcat (flavor-from-warstats (prop warstats root)) "-new")
+           "Target Page: "
+           (:headline :key 1
+                      :title (prop title)
+                      :external-link  (prop url))
+           (:display-warstats2 :key 2))
           (collecting
               (let ((data (%reformat-opinions (prop opinions))))
                 (dolist (op (prop tree-addresses))

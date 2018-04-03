@@ -55,7 +55,7 @@
                (irrel (@ warstats x-irrelevant 0))
                (unver (@ warstats x-unverified 0))
                (probl (@ warstats x-problematic))
-               (diff (relative-to-range 0 effect controversy)))
+               (diff (relative-to-range 0 effect controv)))
           (if (< 0 effect)
               (if (> diff 0.7)
                   "contested"
