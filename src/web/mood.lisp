@@ -46,6 +46,26 @@
         (chain (calculate-flavor opins)
                (concat "-" (calculate-freshness opins))))
 
+      ;;FIXME: Crude, doesn't account for target type, doesn't represent problematic
+      (defun flavor-from-warstats (warstats)
+        (let* ((effect (@ warstats effect))
+               (controv (@ warstats controversy))
+               (pos (+ (@ warstats x-right 0) (@ warstats x-supported 0)))
+               (neg (+ (@ warstats x-wrong 0) (@ warstats x-dissed 0)))
+               (irrel (@ warstats x-irrelevant 0))
+               (unver (@ warstats x-unverified 0))
+               (probl (@ warstats x-problematic))
+               (diff (relative-to-range 0 effect controversy)))
+          (if (< 0 effect)
+              (if (> diff 0.7)
+                  "contested"
+                  "positive")
+              (if (< 0 neg)
+                  "negative"
+                  (if (< 0 probl)
+                      "contested"
+                      "neutral")))))
+
       (defun calculate-intensity (opins)
         ;;For now, just count
         (let ((counter 0))
