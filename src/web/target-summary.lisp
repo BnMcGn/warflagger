@@ -149,15 +149,7 @@
         (let ((rwstats (prop warstats root)))
           (psx
            (:div
-            :... (format-styling-data (@ this props))
-            (:div
-             :key 1
-             :class (strcat (flavor-from-warstats (prop warstats root)) "-new")
-             "Target Page: "
-             (:headline :key 1
-                        :title (prop title)
-                        :external-link  (prop url))
-             (:display-warstats2 :key 2))
+            (:target-title :key 1 :... (@ this props))
             (:div
              :key 3
              (:h2 :key 4 "Discussion Statistics")

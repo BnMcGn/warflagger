@@ -162,8 +162,6 @@
             (setf (getprop stor (strcat v "-m")) (magnitude (getprop stats k))))
           (do-keyvalue (k v xlist)
             (let ((val (getprop stats k)))
-              (say k)
-              (say val)
               (setf (getprop stor (strcat v "-effect")) (@ val 0))
               (setf (getprop stor (strcat v "-effect-m")) (magnitude (@ val 0)))
               (setf (getprop stor (strcat v "-controversy")) (@ val 1))

@@ -374,6 +374,23 @@
         (lambda ()
           (funcall (prop look-handler) (@ (prop opinions) 0 id))))
 
+      (def-component target-title
+          (psx
+           (:div
+            :... (format-styling-data (@ this props))
+            (:h3
+             :class (strcat (flavor-from-warstats (prop warstats root))
+                            "-old target-title")
+             "Target Page: "
+             (:headline :key 1
+                        :title (prop title)
+                        :external-link  (prop url))
+             (:display-warstats2 :key 2)
+             (prop children)
+             (:reply-link :key 3 :url (prop url))
+             ))
+           ))
+
       (defun %format-looks (looks)
         (let ((res (create)))
           (when looks
@@ -427,21 +444,20 @@
 
       (def-component target-root-inner
           (psx
-           (:div :style (create position :absolute width "80%")
-                 :on-click (@ this handle-click)
-            (:div :key 1
-                  :class (flavor (prop opinions))
-                  (:h3
-                   "Target Page:"
-                   (:a :href (prop url) :key 1 (prop title))
-                   (:general-opinion-knobdule
-                    :key 2
-                    :... (@ this props)
-                    :focus (state focus)
-                    :opinions (prop opinions)
-                    :tree-address (list)
-                    :focusfunc (@ this focus-func))
-                   (:reply-link :url (prop url) :key 3)))
+           (:div
+            :style (create position :absolute width "80%")
+            :on-click (@ this handle-click)
+            (:target-title
+             :key 0
+             :... (@ this props)
+             " "
+             (:general-opinion-knobdule
+              :key 1
+              :... (@ this props)
+              :focus (state focus)
+              :opinions (prop opinions)
+              :tree-address (list)
+              :focusfunc (@ this focus-func)))
             (:hilited-text
              :key 2
              :text (prop text)
