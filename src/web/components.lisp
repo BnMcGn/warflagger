@@ -416,7 +416,7 @@
              (:tab :key 3 "Comment View")
              (:tab :key 4 "Summary"))
             (:tab-panel :key 5
-             (:target-root-inner :... (@ this props)))
+             (:target-root-article :... (@ this props)))
             (:tab-panel :key 6
              (:target-root-thread :... (@ this props)))
             (:tab-panel :key 7
@@ -442,7 +442,7 @@
           (when (prop username)
             (json-post-bind (res "/look-post/" (create :root (prop rootid)))))))
 
-      (def-component target-root-inner
+      (def-component target-root-article
           (psx
            (:div
             :style (create position :absolute width "80%")
