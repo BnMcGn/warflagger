@@ -191,6 +191,8 @@
             (setf (@ stor :data-refbot) t))))
 
       (defun format-styling-data (props)
+        ;;Wants: opinion-store, warstats
+        ;;Optional: tree-address (if opinion), references (if reference)
         (let ((res (create))
               (opid (when (chain props (has-own-property 'tree-address))
                       (list-last (@ props tree-address)))))
@@ -198,7 +200,7 @@
            res (if opid (getprop (@ props warstats) opid) (@ props warstats root)))
           (format-looks-data res opid (@ props looks) (@ props username) )
           (when opid
-            (format-opinion-data res (getprop (@ props opinions) opid))
+            (format-opinion-data res (getprop (@ props opinion-store) opid))
             (when (@ props references)
               (format-reference-data res (getprop (@ props references) opid))))
           res))

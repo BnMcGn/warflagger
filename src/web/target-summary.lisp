@@ -12,7 +12,8 @@
                               (prop opid)))))
           (psx
            (:div
-            ;;FIXME: do we need to insert styling-data from warstats?
+            :... (or (prop styling-data)
+                     (format-styling-data (@ this props)))
             (if (prop tree-address)
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)))
                 (psx (:vote-value :key 1 :opinion opinion)))
@@ -113,7 +114,8 @@
                        (psx
                         (:opinion-summary
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
-                         :opinion-store (prop opinion-store)))))))))))
+                         :opinion-store (prop opinion-store)
+                         :warstats (prop warstats)))))))))))
 
     (def-component controversial
         (let ((data (filter-opins-controversial
@@ -130,7 +132,8 @@
                         (:opinion-summary
                          :key (unique-id)
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
-                         :opinion-store (prop opinion-store)))))))))))
+                         :opinion-store (prop opinion-store)
+                         :warstats (prop warstats)))))))))))
 
     (def-component references-summary
         (psx (:div
@@ -143,7 +146,8 @@
                          (:opinion-summary
                           :key (unique-id)
                           :tree-address (getprop (prop opinion-store) id 'tree-address)
-                          :opinion-store (prop opinion-store)))))))))
+                          :opinion-store (prop opinion-store)
+                          :warstats (prop warstats)))))))))
 
     (def-component target-root-summary
         (let ((rwstats (prop warstats root)))
