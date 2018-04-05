@@ -14,6 +14,7 @@
            (:div
             :... (or (prop styling-data)
                      (format-styling-data (@ this props)))
+            :class "opinion-summary"
             (if (prop tree-address)
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)))
                 (psx (:vote-value :key 1 :opinion opinion)))
@@ -153,6 +154,7 @@
         (let ((rwstats (prop warstats root)))
           (psx
            (:div
+            :class "target-summary"
             (:target-title :key 1 :... (@ this props))
             (:div
              :key 3
