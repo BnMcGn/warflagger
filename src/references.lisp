@@ -164,11 +164,13 @@
       (let ((first-ref
              (take-one
               (select (colm 'opinion 'datestamp)
-                      :from (tabl 'opinion)
+                      :from (list (tabl 'opinion) (tabl 'reference))
                       :where (sql-and
                               (sql-= (colm 'reference 'reference) rooturl)
                               (sql-= (colm 'reference 'opinion) (colm 'opinion 'id)))
                       :order-by (colm 'datestamp)
                       :ascending t))))
-        (when (< first-opin first-ref)
-          t)))))
+        (if first-ref
+            (when (time< first-opin first-ref)
+              t)
+            t)))))
