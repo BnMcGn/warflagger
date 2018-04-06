@@ -142,3 +142,33 @@
 (defun save-new-references (url)
   (loop for (link excerpt) in (find-new-references url)
      do (insert-generated-reference-opinion url link excerpt)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Cluster detection tools
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun discussion-root-p (rootid)
+  "For now, we consider a RootURL to be a discussion root if it has opinions on it and if one of those opinions predate any references to it."
+  (let* ((rooturl (get-rooturl-by-id rootid))
+         (first-opin
+          (take-one
+           (select (colm 'opinion 'datestamp)
+                   :from (tabl 'opinion)
+                   :where (sql-= (colm 'target) rooturl)
+                   :order-by (colm 'datestamp)
+                   :ascending t))))
+    (when first-opin
+      (let ((first-ref
+             (take-one
+              (select (colm 'opinion 'datestamp)
+                      :from (tabl 'opinion)
+                      :where (sql-and
+                              (sql-= (colm 'reference 'reference) rooturl)
+                              (sql-= (colm 'reference 'opinion) (colm 'opinion 'id)))
+                      :order-by (colm 'datestamp)
+                      :ascending t))))
+        (when (< first-opin first-ref)
+          t)))))

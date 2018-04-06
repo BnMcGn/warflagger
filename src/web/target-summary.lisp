@@ -161,6 +161,7 @@
              (:h2 :key 4 "Discussion Statistics")
              (:h3 :key 5 "Score: " (@ rwstats effect))
              (:h3 :key 6 "Controversy: " (@ rwstats controversy))
+             ;;FIXME: Shouldn't count refbot/system opinions?
              (:h3 :key 7 "Immediate responses: " (@ rwstats replies-immediate))
              (:h3 :key 8 "Total responses: " (@ rwstats replies-total))
              (:display-if :key 9 :test (@ rwstats referenced)
