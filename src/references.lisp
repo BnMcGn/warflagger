@@ -69,7 +69,7 @@
       (liql url 'opinion.target rid 'opinion.author 'opinion 'reference.opinion))))
 
 (defun get-references-from (url)
-  "Returns IDs of opinions that are referenced by the URL in one way or another."
+  "Returns IDs of opinions that are references made by the URL in one way or another."
   (let ((res (get-generated-references-from url)))
     (multiple-value-bind (id type) (get-target-id-from-url url)
       (if (and (eq :opinion type)
@@ -174,3 +174,26 @@
             (when (time< first-opin first-ref)
               t)
             t)))))
+
+(defun get-rootids-of-references-to (url)
+  (collecting-set ()
+    (dolist (refid (get-references-to url))
+      (when-let*
+          ((opin (opinion-from-id refid))
+           (rootid (assoc-cdr :rooturl opin)))
+        (collect rootid)))))
+
+(defun get-rootids-referred-to-in-tree (url)
+  (let ((ids
+         (collecting-set ()
+           (dolist (id (flatten (opinion-tree-for-target url)))
+             (collect id))
+           (dolist (id (get-references-from url))
+             (collect id)))))
+    (collecting
+        (dolist (id ids)
+          (let ((opin (opinion-from-id id)))
+            (when-let*
+                ((refurl (assoc-cdr :reference opin))
+                 (rootp (rooturl-p refurl)))
+              (collect id)))))))
