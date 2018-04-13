@@ -150,6 +150,10 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;FIXME: Discussion clustering is very basic for now, simply considering outgoing
+;; references as the source of info. We can also use: word clustering, participants,
+;; hashtags. 
+
 (defun discussion-root-p (rootid)
   "For now, we consider a RootURL to be a discussion root if it has opinions on it and if one of those opinions predate any references to it."
   (let* ((rooturl (get-rooturl-by-id rootid))
@@ -175,6 +179,7 @@
               t)
             t)))))
 
+;;FIXME: Should also return references to any child of URL?
 (defun get-rootids-of-references-to (url)
   (collecting-set ()
     (dolist (refid (get-references-to url))
@@ -197,3 +202,32 @@
                 ((refurl (assoc-cdr :reference opin))
                  (rootp (rooturl-p refurl)))
               (collect id)))))))
+
+;;FIXME: For now, we are not attaching incoming refs to the discussion.
+;;FIXME: This is not tail recursive. Could hit some limits.
+(defun discussion-tree-for-root (discroot discroots)
+  "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the rootURLs in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
+  (let ((found (make-hash-table))
+        (otherdisc nil))
+    (labels ((proc (curr)
+               (collecting
+                   (dolist (id (get-rootids-referred-to-in-tree
+                                (get-rooturl-by-id curr)))
+                     (unless (gethash id found)
+                       (setf (gethash id found) t)
+                       (collect
+                           (if (member id discroots)
+                               (progn (push id otherdisc)
+                                      (list id))
+                               (list* id (proc id)))))))))
+      (values (proc discroot) otherdisc))))
+
+(defun cluster-discussions ()
+  (let* ((rooturls (all-rooturls))
+         (rootids (mapcar #'get-rooturl-id rooturls))
+         (discroots (remove-if-not #'discussion-root-p rootids)))
+    (collecting
+        (dolist (dr discroots)
+          (collect dr)
+          (collect (values-list (discussion-tree-for-root dr discroots)))))))
+
