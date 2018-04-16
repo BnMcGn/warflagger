@@ -201,7 +201,7 @@
             (when-let*
                 ((refurl (assoc-cdr :reference opin))
                  (rootp (rooturl-p refurl)))
-              (collect id)))))))
+              (collect (get-rooturl-id refurl))))))))
 
 ;;FIXME: For now, we are not attaching incoming refs to the discussion.
 ;;FIXME: This is not tail recursive. Could hit some limits.
