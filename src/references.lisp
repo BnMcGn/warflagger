@@ -229,5 +229,5 @@
     (collecting
         (dolist (dr discroots)
           (collect dr)
-          (collect (values-list (discussion-tree-for-root dr discroots)))))))
+          (collect (multiple-value-list (discussion-tree-for-root dr discroots)))))))
 
