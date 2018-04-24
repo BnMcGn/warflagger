@@ -67,5 +67,7 @@
    #:make-opinion-url
    #:make-rootid-url
    #:make-missing-rootid-url
-   #:make-wf-url-for-url))
+   #:make-wf-url-for-url
+   #:*warstats-path-types*
+   #:cluster-discussions))
 

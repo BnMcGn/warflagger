@@ -28,10 +28,7 @@
       (let ((res (create)))
         (dolist (r refs)
           (setf (getprop res r)
-                (strcat "/static/warstats"
-                        (make-id-path r)
-                        (chain r (to-string))
-                        "/opinion-data.json")))))
+                (make-warstats-url r 'opinion)))))
 
     (def-component referenced
         (:div

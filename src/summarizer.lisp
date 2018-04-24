@@ -10,19 +10,20 @@
                 (subseq strid 0 (- (length strid) 3)))
               "000/")))
 
+(defparameter *warstats-path-types*
+  '(:badge "opinion-badge.svg"
+    :opinion "opinion-data.json"
+    :tree "tree.json"
+    :warstats "warstats.json"
+    :references "references.json"
+    :questions "questions.json"
+    :opinions "opinions.json"
+    :author "author.json"
+    :text "page.txt"))
+
 (defun make-subpath (id type)
   (format nil "~a~a/~a"
-          (make-id-path id) id
-          (getf '(:badge "opinion-badge.svg"
-                  :opinion "opinion-data.json"
-                  :tree "tree.json"
-                  :warstats "warstats.json"
-                  :references "references.json"
-                  :questions "questions.json"
-                  :opinions "opinions.json"
-                  :author "author.json"
-                  :text "page.txt")
-                type)))
+          (make-id-path id) id (getf *warstats-path-types* type)))
 
 (defun make-warstats-path (id type)
   (strcat wf/local-settings:*warstats-path* (make-subpath id type)))

@@ -62,6 +62,14 @@
           "/0000/"
           (strcat "/" (chain id (to-string) (slice 0 -3)) "000/")))
 
+    (defun make-warstats-url (id type)
+      (strcat "/static/warstats"
+              (make-id-path id)
+              (chain id (to-string))
+              (getprop (lisp (ps-gadgets:alist->ps-object-code
+                              (hu:plist->alist warflagger:*warstats-path-types*)))
+               type)))
+
     (defun opinion-children (tree-address opinions)
       (let ((curr opinions))
         (dolist (id tree-address)
