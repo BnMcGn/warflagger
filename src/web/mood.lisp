@@ -190,6 +190,13 @@
           (when (@ reference :refbot)
             (setf (@ stor :data-refbot) t))))
 
+      (defun format-depth-data (stor tree-address display-depth)
+        (when (or tree-address display-depth)
+          (setf (@ stor :data-display-depth)
+                (if tree-address
+                    (@ tree-address length)
+                    display-depth))))
+
       (defun format-styling-data (props)
         ;;Wants: opinion-store, warstats
         ;;Optional: tree-address (if opinion), references (if reference)
@@ -203,6 +210,7 @@
             (format-opinion-data res (getprop (@ props opinion-store) opid))
             (when (@ props references)
               (format-reference-data res (getprop (@ props references) opid))))
+          (format-depth-data res (@ props tree-address) (@ props display-depth))
           res))
 
       (defun format-reference-styling-data (refdata)
