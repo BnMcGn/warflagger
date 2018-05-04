@@ -139,6 +139,27 @@
                 :username (lisp (webhax-user:get-user-name))
                 )))))
 
+  (setf (ningle:route *app* "/grouped/*")
+        (quick-page
+            (#'webhax:react-parts
+             #'target-components
+             #'mood-lib)
+          (let* ((tree (cluster-discussions))
+                 (ids (remove-if-not #'integerp (flatten tree)))
+                 (roots
+                  (collecting-hash-table ()
+                    (dolist (id ids)
+                      (hu:collect
+                          id
+                        (hu:plist->hash
+                         (list
+                          :url (get-rooturl-by-id id)
+                          :title (grab-title (get-rooturl-by-id id))
+                          :looks (get-looks (get-user-name) id))))))))
+            (mount-component (grouped-page)
+              :roots (lisp-raw (json:encode-json-to-string roots))
+              :tree (lisp-raw (json:encode-json-to-string tree))))))
+
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
           (html-out

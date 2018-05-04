@@ -65,7 +65,7 @@
             (:h3
              :class (strcat (flavor-from-warstats (prop warstats root))
                             "-old target-title")
-             "Target Page: "
+             (or (prop intro-text) "Target Page: ")
              (:headline :key 1
                         :title (prop title)
                         :external-link  (prop url))
