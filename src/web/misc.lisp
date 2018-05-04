@@ -66,6 +66,7 @@
       (strcat "/static/warstats"
               (make-id-path id)
               (chain id (to-string))
+              "/"
               (getprop (lisp (ps-gadgets:alist->ps-object-code
                               (hu:plist->alist warflagger:*warstats-path-types*)))
                type)))

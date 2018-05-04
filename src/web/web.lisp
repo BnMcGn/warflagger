@@ -143,7 +143,8 @@
         (quick-page
             (#'webhax:react-parts
              #'target-components
-             #'mood-lib)
+             #'mood-lib
+             :@javascript #'grouped-page)
           (let* ((tree (cluster-discussions))
                  (ids (remove-if-not #'integerp (flatten tree)))
                  (roots
@@ -158,7 +159,7 @@
                           :looks (get-looks (get-user-name) id))))))))
             (mount-component (grouped-page)
               :roots (lisp-raw (json:encode-json-to-string roots))
-              :tree (lisp-raw (json:encode-json-to-string tree))))))
+              :tree (lisp-raw (json:encode-json-to-string (hu:plist->hash tree)))))))
 
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
