@@ -36,6 +36,7 @@
                               (:file "web/target-summary")
                               (:file "web/target")
                               (:file "web/misc")
+                              (:file "web/grouped")
                               (:file "web/opinion-form")
                               (:file "web/account")
                               (:file "web/web")))))

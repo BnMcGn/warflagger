@@ -148,7 +148,7 @@
           (let* ((tree (cluster-discussions))
                  (ids (remove-if-not #'integerp (flatten tree)))
                  (roots
-                  (collecting-hash-table ()
+                  (collecting-hash-table (:mode :replace)
                     (dolist (id ids)
                       (hu:collect
                           id

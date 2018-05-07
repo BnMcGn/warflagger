@@ -34,7 +34,9 @@
                                   (:target-title
                                    :key (unique-id)
                                    :display-depth depth
-                                   :warstats (getprop (prop warstats) itm)))
+                                   :intro-text "Article: "
+                                   :warstats (getprop (prop warstats) itm)
+                                   :... (getprop (prop roots) itm)))
                                  (psx (:div "Loading...")))))))))))
 
     (defun %grouped-warstats-urls (tree)
