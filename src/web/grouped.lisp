@@ -20,17 +20,27 @@
                      (dotree (itm (ensure-array (prop group))
                                   :proc-branch nil :proc-leaf t)
                        (let ((depth (@ *tree-stack* length)))
-                         (collect
-                             ;;FIXME: support non-integer itm
-                             (if (getprop (prop warstats) itm)
-                                 (psx
-                                  (:target-title
-                                   :key (unique-id)
-                                   :display-depth depth
-                                   :intro-text "Article: "
-                                   :warstats (getprop (prop warstats) itm)
-                                   :... (getprop (prop roots) itm)))
-                                 (psx (:div "Loading...")))))))))))
+                         (cond ((numberp itm)
+                                (collect
+                                    (if (getprop (prop warstats) itm)
+                                        (psx
+                                         (:target-title
+                                          :key (unique-id)
+                                          :display-depth depth
+                                          :intro-text "Article: "
+                                          :warstats (getprop (prop warstats) itm)
+                                          :... (getprop (prop roots) itm)))
+                                        (psx (:div "Loading...")))))
+                               ((stringp itm)
+                                (collect
+                                    (psx
+                                     (:reference
+                                      :key (unique-id)
+;;;FIXME: URL generation should only be in one place!
+                                      :url (strcat "/target/?newurl="
+                                                   (encode-u-r-i-component itm))
+                                      :domain (url-domain itm)
+                                      :external-link itm))))))))))))
 
     (defun %grouped-warstats-urls (tree)
       (let ((res (create)))
