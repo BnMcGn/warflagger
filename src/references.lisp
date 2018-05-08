@@ -152,7 +152,7 @@
 
 ;;FIXME: Discussion clustering is very basic for now, simply considering outgoing
 ;; references as the source of info. We can also use: word clustering, participants,
-;; hashtags. 
+;; hashtags.
 
 (defun discussion-root-p (rootid)
   "For now, we consider a RootURL to be a discussion root if it has opinions on it and if one of those opinions predate any references to it."
@@ -188,7 +188,8 @@
            (rootid (assoc-cdr :rooturl opin)))
         (collect rootid)))))
 
-(defun get-rootids-referred-to-in-tree (url)
+(defun get-reference-opinions-under-rooturl (url)
+  "Returns all of the reference opinions in the discussion tree under url, including references made in the root article itself."
   (let ((ids
          (collecting-set ()
            (dolist (id (flatten (opinion-tree-for-target url)))
@@ -198,29 +199,38 @@
     (collecting
         (dolist (id ids)
           (let ((opin (opinion-from-id id)))
-            (when-let*
-                ((refurl (assoc-cdr :reference opin))
-                 (rootp (rooturl-p refurl)))
-              (collect (get-rooturl-id refurl))))))))
+            (when (assoc-cdr :reference opin)
+              (collect opin)))))))
+
+(defun get-referred-to-in-tree (url)
+  "Returns an integer ID for refs to known rooturls. Returns a string URL for refs to unextracted texts."
+  (collecting
+      (dolist (opin (get-reference-opinions-under-rooturl url))
+        (let ((refurl (assoc-cdr :reference opin)))
+          (if (rooturl-p refurl)
+              (collect (get-rooturl-id refurl))
+              ;;FIXME: We don't handle references to outside opinions ATM. Consider.
+              (unless (opinion-exists-p refurl)
+                (collect refurl)))))))
 
 ;;FIXME: For now, we are not attaching incoming refs to the discussion.
 ;;FIXME: This is not tail recursive. Could hit some limits.
 (defun discussion-tree-for-root (discroot discroots)
   "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the rootURLs in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
-  (let ((found (make-hash-table))
+  (let ((found (make-hash-table :test #'equal))
         (otherdisc nil))
     (setf (gethash discroot found) t)
     (labels ((proc (curr)
-               (collecting
-                   (dolist (id (get-rootids-referred-to-in-tree
-                                (get-rooturl-by-id curr)))
-                     (unless (gethash id found)
-                       (setf (gethash id found) t)
-                       (collect
-                           (if (member id discroots)
-                               (progn (push id otherdisc)
-                                      (list id))
-                               (list* id (proc id)))))))))
+               (when (integerp curr)
+                 (collecting
+                     (dolist (id (get-referred-to-in-tree (get-rooturl-by-id curr)))
+                       (unless (gethash id found)
+                         (setf (gethash id found) t)
+                         (collect
+                             (if (member id discroots)
+                                 (progn (push id otherdisc)
+                                        (list id))
+                                 (list* id (proc id))))))))))
       (values (list* discroot (proc discroot)) otherdisc))))
 
 (defun cluster-discussions ()
