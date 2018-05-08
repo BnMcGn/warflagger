@@ -3,22 +3,6 @@
 (defun grouped-page ()
   (ps
 
-    (def-component rooturl-summary
-        (psx
-         (:div
-          :... (format-styling-data (@ this props))
-          (:h3
-           :class (strcat (flavor-from-warstats (prop warstats root))
-                          "-old target-title")
-           "Article: "
-           (:headline :key 1
-                      :title (prop title)
-                      :external-link (prop url)
-                      :url (strcat "/target/"
-                                   ;;FIXME: id?
-                                   (prop id (to-string))))
-           (:display-warstats2 :key 2)))))
-
     (def-component grouped
         (psx
          (:div :style (create "margin-bottom" "1em")
