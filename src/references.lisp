@@ -209,6 +209,7 @@
   "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the rootURLs in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
   (let ((found (make-hash-table))
         (otherdisc nil))
+    (setf (gethash discroot found) t)
     (labels ((proc (curr)
                (collecting
                    (dolist (id (get-rootids-referred-to-in-tree
@@ -220,7 +221,7 @@
                                (progn (push id otherdisc)
                                       (list id))
                                (list* id (proc id)))))))))
-      (values (proc discroot) otherdisc))))
+      (values (list* discroot (proc discroot)) otherdisc))))
 
 (defun cluster-discussions ()
   (let* ((rooturls (all-rooturls))
