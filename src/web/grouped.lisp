@@ -6,16 +6,8 @@
     (def-component grouped
         (psx
          (:div :style (create "margin-bottom" "1em")
+               :class "grouped"
                (when (prop warstats)
-                 (if (getprop (prop warstats) (prop root-article-id))
-                     (psx
-                      (:target-title
-                       :key (unique-id)
-                       :display-depth 0
-                       :intro-text "Article: "
-                       :warstats (getprop (prop warstats) (prop root-article-id))
-                       :... (getprop (prop roots) (prop root-article-id))))
-                     (psx (:div "Loading...")))
                  (collecting
                      (dotree (itm (ensure-array (prop group))
                                   :proc-branch nil :proc-leaf t)
@@ -37,9 +29,13 @@
                                      (:reference
                                       :key (unique-id)
 ;;;FIXME: URL generation should only be in one place!
+                                      :headline {}
+                                      :styling-data
+                                      (create :data-display-depth depth
+                                              :data-replies-total 0)
                                       :url (strcat "/target/?newurl="
                                                    (encode-u-r-i-component itm))
-                                      :domain (url-domain itm)
+                                      :reference-domain (url-domain itm)
                                       :external-link itm))))))))))))
 
     (defun %grouped-warstats-urls (tree)
