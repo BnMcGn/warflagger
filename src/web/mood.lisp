@@ -193,9 +193,9 @@
       (defun format-depth-data (stor tree-address display-depth)
         (when (or tree-address display-depth)
           (setf (@ stor :data-display-depth)
-                (if tree-address
-                    (@ tree-address length)
-                    display-depth))))
+                (if display-depth
+                    display-depth
+                    (@ tree-address length)))))
 
       (defun format-styling-data (props)
         ;;Wants: opinion-store, warstats
