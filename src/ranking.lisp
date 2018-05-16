@@ -255,7 +255,6 @@ Some of these factors will obviously affect the respect points more than others.
   ;;(/ (getf axis-data :looks) (getf axis-data :replies-total))
   1)
 
-;;FIXME: Should integrate reference effects?
 (defun calculate-axdat-effect (axis-data opinion)
   (labels ((getx (key)
              (car (getf axis-data key))))
@@ -269,12 +268,12 @@ Some of these factors will obviously affect the respect points more than others.
                         ;;FIXME: This constant should be 1. documented 2. elsewhere
                         ;;represents rooturl initial effect
                         1))
-           (raw-score (+ initial likedness (* 2 rightness) worries)))
+           (raw-score (+ initial likedness (* 2 rightness) worries
+                         (getx :referenced-effect))))
       (if (< 0 raw-score)
           (* raw-score (calculate-axdat-interest axis-data))
           0))))
 
-;;FIXME: Should integrate reference effects?
 (defun calculate-axdat-controversy (axis-data)
   (labels ((getx (key)
              (car (getf axis-data key))))
@@ -328,6 +327,15 @@ Some of these factors will obviously affect the respect points more than others.
   "References will obviously have their own opinions, ranking, controversy and effect. We can't just take the reputation of the reference and import it into the current conversation. The referrer may be abusing the reference in any number of creative ways. The first two parameters are the values of the reference. The second two are from the discussion that resulted from the reference being posted. We are attempting to come up with a reasonable value that reflects the quality of the original reference with its applicability to the current discussion. Much wildly arbitrary guesswork follows."
   (list (* (or effect 0) (or ref-effect 0)) (* (or controv 0) (or ref-controv 0))))
 
+(defun referenced-effect (refopinids)
+  "The total approval effect of incoming reference opinions. All effects are assumed to be positive because the opins are using the reference as a resource."
+  (reduce #'+
+          (mapcar (lambda (id)
+                    (getf (request-warstats-for-url
+                           (assoc-cdr :url (opinion-from-id id)))
+                          :effect))
+                  refopinids)))
+
 (defun reference-data (optree)
   ;;When we are getting reference data for a rooturl, car will be nil
   (let ((opinion (and (car optree) (opinion-from-id (car optree))))
@@ -353,13 +361,15 @@ Some of these factors will obviously affect the respect points more than others.
             (incf effect (car reffects)) (incf controv (second reffects))))))
     ;;Main: from the reference slot
     ;;Extra: from comment body
-    (list
-     :reference-effect-main meffect
-     :reference-controversy-main mcontrov
-     :reference-effect-extra effect
-     :reference-controversy-extra controv
-     ;; referenced for rootURL is filled in elsewhere
-     :referenced (and opinion (get-references-to (assoc-cdr :url opinion))))))
+    (let ((referenced (and opinion (get-references-to (assoc-cdr :url opinion)))))
+      (list
+       :reference-effect-main meffect
+       :reference-controversy-main mcontrov
+       :reference-effect-extra effect
+       :reference-controversy-extra controv
+       ;; referenced for rootURL is filled in elsewhere
+       :referenced referenced
+       :referenced-effect (referenced-effect referenced)))))
 
 (defun opinion-axis-data (optree)
   (list*
@@ -384,9 +394,11 @@ Some of these factors will obviously affect the respect points more than others.
          (*reference-list* (or reference-cache
                                (reference-list-for-rooturl rooturl)))
          (root-ax (opinion-axis-data (list* nil tree))))
+    (setf (getf root-ax :referenced) (get-references-to rooturl))
+    (setf (getf root-ax :referenced-effect)
+          (referenced-effect (getf root-ax :referenced)))
     (setf (getf root-ax :effect) (calculate-axdat-effect root-ax nil))
     (setf (getf root-ax :controversy) (calculate-axdat-controversy root-ax))
-    (setf (getf root-ax :referenced) (get-references-to rooturl))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)
