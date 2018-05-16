@@ -232,6 +232,8 @@ Some of these factors will obviously affect the respect points more than others.
 
 ;;FIXME: No check for multiple flags from one author
 ;;FIXME: Need faction detection.
+;;FIXME: Want responsibility tracing. Each opinion is reponsible for what percent
+;; of the outcome. Need a rework to support this.
 (defun collect-axis-sum (filter optree)
   (let ((effect 0)
         (controversy 0))
@@ -253,6 +255,7 @@ Some of these factors will obviously affect the respect points more than others.
   ;;(/ (getf axis-data :looks) (getf axis-data :replies-total))
   1)
 
+;;FIXME: Should integrate reference effects?
 (defun calculate-axdat-effect (axis-data opinion)
   (labels ((getx (key)
              (car (getf axis-data key))))
@@ -271,6 +274,7 @@ Some of these factors will obviously affect the respect points more than others.
           (* raw-score (calculate-axdat-interest axis-data))
           0))))
 
+;;FIXME: Should integrate reference effects?
 (defun calculate-axdat-controversy (axis-data)
   (labels ((getx (key)
              (car (getf axis-data key))))
@@ -354,6 +358,7 @@ Some of these factors will obviously affect the respect points more than others.
      :reference-controversy-main mcontrov
      :reference-effect-extra effect
      :reference-controversy-extra controv
+     ;; referenced for rootURL is filled in elsewhere
      :referenced (and opinion (get-references-to (assoc-cdr :url opinion))))))
 
 (defun opinion-axis-data (optree)
