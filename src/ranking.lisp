@@ -277,7 +277,8 @@ Some of these factors will obviously affect the respect points more than others.
 (defun calculate-axdat-controversy (axis-data)
   (labels ((getx (key)
              (car (getf axis-data key))))
-    (let ((positive (+ (getx :x-supported) (getx :x-right)))
+    (let ((positive (+ (getx :x-supported) (getx :x-right)
+                       (getf axis-data :referenced-effect)))
           (negative (+ (getx :x-wrong) (getx :x-dissed) (getx :x-problematic)
                        (getx :x-irrelevant))))
       ;; Pick a number, any number... see how it works.
