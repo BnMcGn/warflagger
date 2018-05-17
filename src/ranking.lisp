@@ -269,7 +269,7 @@ Some of these factors will obviously affect the respect points more than others.
                         ;;represents rooturl initial effect
                         1))
            (raw-score (+ initial likedness (* 2 rightness) worries
-                         (getx :referenced-effect))))
+                         (getf axis-data :referenced-effect))))
       (if (< 0 raw-score)
           (* raw-score (calculate-axdat-interest axis-data))
           0))))
