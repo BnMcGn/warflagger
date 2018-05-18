@@ -202,35 +202,37 @@
             (when (assoc-cdr :reference opin)
               (collect opin)))))))
 
-(defun get-referred-to-in-tree (url)
-  "Returns an integer ID for refs to known rooturls. Returns a string URL for refs to unextracted texts."
-  (collecting
-      (dolist (opin (get-reference-opinions-under-rooturl url))
-        (let ((refurl (assoc-cdr :reference opin)))
-          (if (rooturl-p refurl)
-              (collect (get-rooturl-id refurl))
-              ;;FIXME: We don't handle references to outside opinions ATM. Consider.
-              (unless (opinion-exists-p refurl)
-                (collect refurl)))))))
+(defun %reference-end-result (refurl)
+  (if (rooturl-p refurl)
+      (get-rooturl-id refurl)
+      ;;FIXME: We don't handle references to outside opinions ATM. Consider.
+      (unless (opinion-exists-p refurl)
+        refurl)))
 
 ;;FIXME: For now, we are not attaching incoming refs to the discussion.
 ;;FIXME: This is not tail recursive. Could hit some limits.
+;;FIXME: Possibly we want to include every reference to a rootURL in the discussion,
+;; but for simplicity we are just taking the first occurence.
 (defun discussion-tree-for-root (discroot discroots)
-  "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the rootURLs in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
+  "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the reference opinion ids in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
   (let ((found (make-hash-table :test #'equal))
         (otherdisc nil))
     (setf (gethash discroot found) t)
     (labels ((proc (curr)
                (when (integerp curr)
                  (collecting
-                     (dolist (id (get-referred-to-in-tree (get-rooturl-by-id curr)))
-                       (unless (gethash id found)
-                         (setf (gethash id found) t)
-                         (collect
-                             (if (member id discroots)
-                                 (progn (push id otherdisc)
-                                        (list id))
-                                 (list* id (proc id))))))))))
+                     (loop for opin in (get-reference-opinions-under-rooturl
+                                        (get-rooturl-by-id curr))
+                        for id = (%reference-end-result (assoc-cdr :reference opin))
+                        for rid = (assoc-cdr :id opin)
+                        do (when id
+                             (unless (gethash id found)
+                               (setf (gethash id found) t)
+                               (collect
+                                   (if (member id discroots)
+                                       (progn (push id otherdisc)
+                                              (list rid))
+                                       (list* rid (proc id)))))))))))
       (values (list* discroot (proc discroot)) otherdisc))))
 
 (defun cluster-discussions ()
