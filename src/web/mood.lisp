@@ -54,7 +54,7 @@
                (neg (+ (@ warstats x-wrong 0) (@ warstats x-dissed 0)))
                (irrel (@ warstats x-irrelevant 0))
                (unver (@ warstats x-unverified 0))
-               (probl (@ warstats x-problematic))
+               (probl (@ warstats x-problematic 0))
                (diff (relative-to-range 0 effect controv)))
           (if (< 0 effect)
               (if (> diff 0.7)
