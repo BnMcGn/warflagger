@@ -188,12 +188,14 @@
                    (map-by-2
                     (lambda (k v)
                       (list
-                       k (list*
-                          k (and (car v)
-                                 (mapleaves
-                                  (lambda (x)
-                                    (assoc-cdr :rooturl (opinion-from-id x)))
-                                  (car v))))))
+                       k (list
+                          (list*
+                           k (and (car v)
+                                  (mapleaves
+                                   (lambda (x)
+                                     (warflagger::reference-end-result
+                                      (assoc-cdr :reference (opinion-from-id x))))
+                                   (car v)))))))
                     tree))))
             (mount-component (grouped-page)
               :roots (lisp-raw (json:encode-json-to-string roots))
