@@ -150,7 +150,8 @@ the page text can be found in the cache."
 ;;;
 
 (defun opinion-exists-p (url)
-  (get-assoc-by-col (colm 'opinion 'url) url))
+  (when url
+    (get-assoc-by-col (colm 'opinion 'url) url)))
 
 (defun get-excerpt-data (eid)
   (map-tuples

@@ -146,17 +146,55 @@
              #'mood-lib
              :@javascript #'grouped-page)
           (let* ((tree (cluster-discussions))
-                 (ids (remove-if-not #'integerp (flatten tree)))
+                 (discroots (map-by-2 (lambda (&rest params) (car params)) tree))
+                 (refids (flatten
+                          (map-by-2 (lambda (&rest params) (cdr params)) tree)))
                  (roots
                   (collecting-hash-table (:mode :replace)
-                    (dolist (id ids)
-                      (hu:collect
-                          id
-                        (hu:plist->hash
-                         (list
-                          :url (get-rooturl-by-id id)
-                          :title (grab-title (get-rooturl-by-id id))
-                          :looks (get-looks (get-user-name) id))))))))
+                    (dolist (id refids)
+                      (let* ((refopin (opinion-from-id id))
+                             (refurl (assoc-cdr :reference refopin))
+                             (rootid (when (rooturl-p refurl)
+                                       (get-rooturl-id refurl)))
+                             (parent-rootid (assoc-cdr :rooturl refopin)))
+                        (unless (opinion-exists-p refurl)
+                          (hu:collect
+                              (or rootid refurl)
+                            (hu:plist->hash
+                             (if rootid
+                                 (list
+                                  :url refurl
+                                  :refparent parent-rootid
+                                  :refid id
+                                  :title (grab-title refurl)
+                                  :looks (get-looks (get-user-name) rootid)
+                                  :rootid rootid)
+                                 (list
+                                  :url refurl
+                                  :refparent parent-rootid
+                                  :refid id)))))))
+
+                    (dolist (id discroots)
+                      (let ((url (get-rooturl-by-id id)))
+                        (hu:collect
+                            id
+                          (hu:plist->hash
+                           (list
+                            :url url
+                            :title (grab-title url)
+                            :looks (get-looks (get-user-name) id))))))))
+                 (tree
+                  (flatten-1
+                   (map-by-2
+                    (lambda (k v)
+                      (list
+                       k (list*
+                          k (and (car v)
+                                 (mapleaves
+                                  (lambda (x)
+                                    (assoc-cdr :rooturl (opinion-from-id x)))
+                                  (car v))))))
+                    tree))))
             (mount-component (grouped-page)
               :roots (lisp-raw (json:encode-json-to-string roots))
               :tree (lisp-raw (json:encode-json-to-string (hu:plist->hash tree)))))))

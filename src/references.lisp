@@ -202,7 +202,7 @@
             (when (assoc-cdr :reference opin)
               (collect opin)))))))
 
-(defun %reference-end-result (refurl)
+(defun reference-end-result (refurl)
   (if (rooturl-p refurl)
       (get-rooturl-id refurl)
       ;;FIXME: We don't handle references to outside opinions ATM. Consider.
@@ -223,7 +223,7 @@
                  (collecting
                      (loop for opin in (get-reference-opinions-under-rooturl
                                         (get-rooturl-by-id curr))
-                        for id = (%reference-end-result (assoc-cdr :reference opin))
+                        for id = (reference-end-result (assoc-cdr :reference opin))
                         for rid = (assoc-cdr :id opin)
                         do (when id
                              (unless (gethash id found)
@@ -233,7 +233,7 @@
                                        (progn (push id otherdisc)
                                               (list rid))
                                        (list* rid (proc id)))))))))))
-      (values (list* discroot (proc discroot)) otherdisc))))
+      (values (proc discroot) otherdisc))))
 
 (defun cluster-discussions ()
   (let* ((rooturls (all-rooturls))
