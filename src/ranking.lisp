@@ -65,6 +65,61 @@ that is winding down. Drops hotness if less than 10% of opinions are new."
                   #'> :key #'cdr))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Opinion direction
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Opinion direction is a simple indication of whether an opinion is "for" or
+;; "against" its target. It is an approximation, mostly for display purposes.
+;; It is a binary indicator, avoiding the subtlety of numeric measures like effect
+;; and controversy.
+;;
+;; - This version of direction is entirely calculated from the opinion itself,
+;; we aren't counting in response to the opinion or questions of faction.
+;; - There is an earlier measure called direction that factored in response. It will
+;; hopefully disappear some day.
+
+(defun opinion-direction (opin)
+  (let ((vv (assoc-cdr :votevalue opin))
+        (flag (second (assoc-cdr :flag opin))))
+    (cond
+      ((eq 0 vv)
+       :neutral)
+      ((member flag '(:incorrect-flag :language-warning :redundant :out-of-date
+                      :offtopic :arcane :same-thing))
+       :neutral)
+      ((< 0 vv)
+       :pro)
+      (t :con))))
+
+(defun opinion-chain-direction (parent-dir child-dir)
+  "Attempt to discern whether an item is pro or con something farther up the tree based on relationship to parent opinion. Revert to neutral if either item is ambiguous."
+  (cond
+    ((eq parent-dir :neutral) :neutral)
+    ((eq child-dir :neutral) :neutral)
+    ((eq child-dir :con)
+     (if (eq parent-dir :con) :pro :con))
+    ((eq child-dir :pro)
+     (if (eq parent-dir :con) :con :pro))
+    (t (error "Shouldn't have reached this"))))
+
+(defun generate-direction-data (tree)
+  (labels ((proc (tree pardir)
+             (dolist (branch tree)
+               (let* ((opin (opinion-from-id (car branch)))
+                      (opdir (opinion-direction opin))
+                      (oprootdir (if pardir
+                                     (opinion-chain-direction pardir opdir)
+                                     opdir)))
+                 (setf (getf (gethash (car branch) *opinion-effect-cache*)
+                             :direction)
+                       opdir)
+                 (setf (getf (gethash (car branch) *opinion-effect-cache*)
+                             :direction-on-root)
+                       oprootdir)
+                 (proc (cdr tree) oprootdir)))))
+    (proc tree nil)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; First attempt at opinion evaluation code
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -401,6 +456,7 @@ Some of these factors will obviously affect the respect points more than others.
     (setf (getf root-ax :effect) (calculate-axdat-effect root-ax nil))
     (setf (getf root-ax :controversy) (calculate-axdat-controversy root-ax))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
+    (generate-direction-data tree) ;; Output auto-stored in *opinion-effect-cache*
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)
     *opinion-effect-cache*))
