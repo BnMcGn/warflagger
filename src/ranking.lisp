@@ -116,7 +116,7 @@ that is winding down. Drops hotness if less than 10% of opinions are new."
                  (setf (getf (gethash (car branch) *opinion-effect-cache*)
                              :direction-on-root)
                        oprootdir)
-                 (proc (cdr tree) oprootdir)))))
+                 (proc (cdr branch) oprootdir)))))
     (proc tree nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
