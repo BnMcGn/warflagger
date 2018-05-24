@@ -211,7 +211,9 @@
             (when (@ props references)
               (format-reference-data res (getprop (@ props references) opid))))
           (format-depth-data res (@ props tree-address) (@ props display-depth))
-          res))
+          (if (@ props extra-styling)
+              (copy-merge-all res (@ props extra-styling))
+              res)))
 
       (defun format-reference-styling-data (refdata)
         (let ((stor {}))

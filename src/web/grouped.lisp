@@ -19,7 +19,10 @@
                                          (:target-title
                                           :key (unique-id)
                                           :display-depth depth
-                                          :intro-text "Article: "
+                                          :intro-text " "
+                                          :extra-styling
+                                          (grouped-styling-data itm
+                                                                (@ %thisref props))
                                           :warstats (getprop (prop warstats) itm)
                                           :... (getprop (prop roots) itm)))
                                         (psx (:div "Loading...")))))
@@ -44,6 +47,15 @@
             (when (equal (typeof id) "number")
               (setf (getprop res id)
                     (make-warstats-url id 'warstats))))))
+
+    (defun grouped-styling-data (id props)
+      (let* ((data (getprop (@ props roots) id))
+             (warstats
+              (when (@ data refid)
+                (getprop (@ props warstats) (@ data refparent) (@ data refid)))))
+        (if warstats
+            (create :data-direction (@ warstats 'direction-on-root))
+            (create))))
 
     (def-component grouped-loader
         (psx
