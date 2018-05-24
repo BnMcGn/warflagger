@@ -69,7 +69,13 @@
               "/"
               (getprop (lisp (ps-gadgets:alist->ps-object-code
                               (hu:plist->alist warflagger:*warstats-path-types*)))
-               type)))
+                       type)))
+
+    (defun make-rootid-url (rid)
+      (strcat "/target/" (chain rid (to-string))))
+
+    (defun make-missing-rootid-url (url)
+      (strcat "/target/?newurl=" (encode-u-r-i-component url)))
 
     (defun opinion-children (tree-address opinions)
       (let ((curr opinions))

@@ -19,7 +19,9 @@
                                          (:target-title
                                           :key (unique-id)
                                           :display-depth depth
+                                          :hide-reply t
                                           :intro-text " "
+                                          :warflagger-link (make-rootid-url itm)
                                           :extra-styling
                                           (grouped-styling-data itm
                                                                 (@ %thisref props))
@@ -36,10 +38,9 @@
                                       :styling-data
                                       (create :data-display-depth depth
                                               :data-replies-total 0)
-                                      :url (strcat "/target/?newurl="
-                                                   (encode-u-r-i-component itm))
+                                      :warflagger-link (make-missing-rootid-url itm)
                                       :reference-domain (url-domain itm)
-                                      :external-link itm))))))))))))
+                                      :reference itm))))))))))))
 
     (defun %grouped-warstats-urls (tree)
       (let ((res (create)))

@@ -58,6 +58,7 @@
                            (< 0 (@ o 0 excerpt length)))
                 (collect o)))))
 
+      ;;FIXME: Overall use of url, external-link, warflagger-link is inconsistent.
       (def-component target-title
           (psx
            (:div
@@ -68,10 +69,12 @@
              (or (prop intro-text) "Target Page: ")
              (:headline :key 1
                         :title (prop title)
+                        :url (prop warflagger-link)
                         :external-link  (prop url))
              (:display-warstats2 :key 2)
              (prop children)
-             (:reply-link :key 3 :url (prop url))
+             (unless (prop hide-reply)
+               (psx (:reply-link :key 3 :url (prop url))))
              ))
            ))
 
