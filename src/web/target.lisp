@@ -75,8 +75,8 @@
              (prop children)
              (unless (prop hide-reply)
                (psx (:reply-link :key 3 :url (prop url))))
-             ))
-           ))
+             (when (prop show-count)
+               (psx (:reply-count :key 4 :warstats (prop warstats root))))))))
 
       (defun %format-looks (looks)
         (let ((res (create)))

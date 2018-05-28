@@ -20,6 +20,7 @@
                                           :key (unique-id)
                                           :display-depth depth
                                           :hide-reply t
+                                          :show-count t
                                           :intro-text " "
                                           :warflagger-link (make-rootid-url itm)
                                           :extra-styling
@@ -73,6 +74,7 @@
     (def-component grouped-page
         (psx
          (:div
+          (:h2 :key "a1" "Discussions:")
           (collecting
               (dolist (rootid (prop order))
                 (collect

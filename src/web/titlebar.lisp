@@ -99,6 +99,16 @@
                                  :value (encode-u-r-i-component offset))))
                   (:input :type "submit" :value "Reply" :key 2)))))
 
+    (def-component reply-count
+        (let* ((immediate (prop warstats replies-immediate))
+               (total (prop warstats replies-total))
+               (immed (and immediate (chain immediate (to-string))))
+               (tot (and total (chain total (to-string)))))
+          (psx
+           (:span :title
+                  (strcat immed " direct responses, " tot " in conversation")
+                  (strcat "(" immed "/" tot ")")))))
+
     ;;FIXME: Headline will get considerably more complex in future. Placeholder.
     (def-component headline
         (let* ((title (prop title))
