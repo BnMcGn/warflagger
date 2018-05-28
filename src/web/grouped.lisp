@@ -74,12 +74,12 @@
         (psx
          (:div
           (collecting
-              (do-keyvalue (rootid grp (prop tree))
+              (dolist (rootid (prop order))
                 (collect
                     (psx (:grouped-loader
                           :key (unique-id)
                           :... (@ %thisref props)
                           :root-article-id (parse-int rootid)
-                          :group (@ grp 0)))))))))
+                          :group (getprop (prop tree) rootid 0)))))))))
 
     ))

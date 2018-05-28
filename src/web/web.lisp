@@ -199,7 +199,8 @@
                     tree))))
             (mount-component (grouped-page)
               :roots (lisp-raw (json:encode-json-to-string roots))
-              :tree (lisp-raw (json:encode-json-to-string (hu:plist->hash tree)))))))
+              :tree (lisp-raw (json:encode-json-to-string (hu:plist->hash tree)))
+              :order (lisp-raw (json:encode-json-to-string discroots))))))
 
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
