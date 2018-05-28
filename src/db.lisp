@@ -54,6 +54,13 @@
              :where (sql-and (sql-= (sql-escape url) (colm 'target))
                              (sql-> 0 (colm 'votevalue)))))))
 
+(def-query replies-by-date (&rest rootid/s)
+  (query-marker
+   (select 'id 'datestamp
+           :from (tabl 'opinion)
+           :where (in-or-equal (colm 'opinion 'rooturl) rootid/s)
+           :order-by (list (list (colm 'opinion 'datestamp) :desc)))))
+
 ;;FIXME: This will get too large as site grows. Maybe it should be calc'ed client-side?
 ;;FIXME: Obsolete? will be storing as static json.
 (defparameter *warstat-store* (make-hash-table :test #'equal))

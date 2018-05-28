@@ -216,7 +216,8 @@
 (defun discussion-tree-for-root (discroot discroots)
   "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the reference opinion ids in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
   (let ((found (make-hash-table :test #'equal))
-        (otherdisc nil))
+        (otherdisc nil)
+        (rootids (list discroot)))
     (setf (gethash discroot found) t)
     (labels ((proc (curr)
                (when (integerp curr)
@@ -228,19 +229,33 @@
                         do (when id
                              (unless (gethash id found)
                                (setf (gethash id found) t)
+                               (when (integerp id)
+                                 (push id rootids))
                                (collect
                                    (if (member id discroots)
                                        (progn (push id otherdisc)
                                               (list rid))
                                        (list* rid (proc id)))))))))))
-      (values (proc discroot) otherdisc))))
+      (values (proc discroot) rootids otherdisc))))
+
+(defun %discussion-sort-key (idlist)
+  (clsql-helper:print-timestamp (second (car (replies-by-date idlist)))))
+
+(defun sort-discussions (dlist)
+  (hu:alist->plist
+   (sort dlist
+         #'string>
+         :key (lambda (itm) (%discussion-sort-key (third itm))))))
 
 (defun cluster-discussions ()
   (let* ((rooturls (all-rooturls))
          (rootids (mapcar #'get-rooturl-id rooturls))
          (discroots (remove-if-not #'discussion-root-p rootids)))
-    (collecting
-        (dolist (dr discroots)
-          (collect dr)
-          (collect (multiple-value-list (discussion-tree-for-root dr discroots)))))))
+    (sort-discussions
+     (collecting
+         (dolist (dr discroots)
+           (collect
+               (cons dr
+                     (multiple-value-list
+                      (discussion-tree-for-root dr discroots)))))))))
 

@@ -148,7 +148,7 @@
           (let* ((tree (cluster-discussions))
                  (discroots (map-by-2 (lambda (&rest params) (car params)) tree))
                  (refids (flatten
-                          (map-by-2 (lambda (&rest params) (cdr params)) tree)))
+                          (map-by-2 (lambda (&rest params) (car (second params))) tree)))
                  (roots
                   (collecting-hash-table (:mode :replace)
                     (dolist (id refids)
