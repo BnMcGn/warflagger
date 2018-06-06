@@ -52,9 +52,12 @@
 
     (defun grouped-styling-data (id props)
       (let* ((data (getprop (@ props roots) id))
+             (pardata
+              (when (@ data refparent)
+                (getprop (@ props warstats) (@ data refparent))))
              (warstats
-              (when (@ data refid)
-                (getprop (@ props warstats) (@ data refparent) (@ data refid)))))
+              (when pardata
+                (getprop pardata (@ data refid)))))
         (if warstats
             (create :data-direction (@ warstats 'direction-on-root))
             (create))))
