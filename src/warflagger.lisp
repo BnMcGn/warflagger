@@ -43,3 +43,6 @@
 
 (defmacro unless-production (clause)
   (unless wf/local-settings:*production* clause))
+
+(defun url-p (thing)
+  (quri:uri-host (quri:uri thing)))

@@ -133,7 +133,10 @@ throw the discussion tree out of whack."
      "The most general purpose flag. Can be used to mark an excerpt for later reference. Used by the RefBot for automated references.")))
 
 (defparameter *flag-categories*
- '("Negative" "Positive" "Statements" "Custodial"))
+  '("Negative" "Positive" "Statements" "Custodial"))
+
+(defparameter *flag-category-keys*
+  '(:negative :positive :statements :custodial))
 
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "LanguageWarning" "Disturbing"
@@ -160,6 +163,14 @@ throw the discussion tree out of whack."
     (nil t nil 1) (nil t nil 1) (nil t nil 1) (nil t nil 1)
     (t t nil 0) (t t nil 0) (t t nil 1) (t t nil 1)
     (nil t nil 1)))
+
+(defparameter *default-vote*
+  (list :spam -1 :inflammatory -1 :disagree -1 :dislike -1 :language-warning -1 :disturbing -1
+        :already-answered -1 :logical-fallacy -1 :needs-evidence -1 :raise-question 0
+        :out-of-bounds -1 :funny 1 :agree 1 :like 1 :interesting 1 :eye-witness 0
+        :am-qualified 0 :second-hand 0 :anecdotal 0 :evidence 0 :disclosure -1 :redundant -1
+        :out-of-date -1 :retraction -1 :correction -1 :incorrect-flag -1 :flag-abuse -1
+           :offtopic -1 :arcane 0 :same-thing 0 :blank 0))
 
 (defparameter *flag-colors*
   (list :spam "#f00"
