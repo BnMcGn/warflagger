@@ -403,6 +403,16 @@ the page text can be found in the cache."
     (unless (get-assoc-by-col (colm 'opinion 'rooturl) rooturl)
       (delete-records :from 'rooturl :where (sql-= (colm 'id) rooturl)))))
 
+(defun opinion-may-exist (opin authorid)
+  "For auto-entered opinions, try to give some warning that a double entry is about to happen."
+  (let ((target (assoc-cdr :target opin))
+        (flag (flag-to-db (assoc-cdr :flag opin))))
+    (select 'id
+            :from 'opinion
+            :where (sql-and
+                    (sql-= target (colm 'target))
+                    (sql-= flag (colm 'flag))
+                    (sql-= authorid (colm 'author))))))
 
 ;;;;;;;;;;;;;;
 ;; Looks stuff
