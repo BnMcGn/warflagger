@@ -29,6 +29,7 @@
                               (:file "constants")
                               (:file "warflagger")
                               (:file "db")
+                              (:file "bulk-enter")
                               (:file "references")
                               (:file "excerpts")
                               (:file "ranking")
