@@ -49,8 +49,8 @@
        (:@title title)
      (princ (funcall body-func) *webhax-output*))))
 
-(clsql:connect wf/text-extract::*db-connect-spec*
-               :database-type :postgresql-socket3)
+(clsql:connect wf/local-settings:*db-connect-spec*
+               :database-type wf/local-settings:*db-connect-type*)
 
 (defun favicon-links ()
   (html-out
