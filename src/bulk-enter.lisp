@@ -41,7 +41,7 @@
                   :reference reference))))
       (when (opinion-may-exist data authid)
         (error "Opinion may already exist in database"))
-      (insert-opinion data authid))))
+      (save-opinion-from-user data authid))))
 
 (defun divide-on-end-of-keywords (items)
   (if-let ((divindex
