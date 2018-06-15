@@ -18,6 +18,7 @@
    #:*text-extractor-script*
    #:*db-connect-type*
    #:*db-connect-spec*
+   #:*test-db-connect-spec*
    #:*warstats-path*
    #:*production*))
 
@@ -28,6 +29,7 @@
 (defparameter *text-extractor-script* "")
 (defparameter *db-connect-type* nil)
 (defparameter *db-connect-spec* nil)
+(defparameter *test-db-connect-spec* nil)
 (defparameter *warstats-path* "")
 
 (defparameter *production* nil)
