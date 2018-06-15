@@ -9,13 +9,14 @@
 
 
 (defun expand-flag (flagspec)
-  (loop
-     for cat in *flag-category-keys*
-     for flags in *flag-types-source*
-     when
-       (member flagspec flags)
-     return (list cat flagspec)
-     finally (error "Flag not found")))
+  (let ((flagspec (or flagspec :blank)))
+    (loop
+      for cat in *flag-category-keys*
+      for flags in *flag-types-source*
+      when
+        (member flagspec flags)
+      return (list cat flagspec)
+      finally (error "Flag not found"))))
 
 (defun enter-bulk-opinion (target &key comment author flag votevalue excerpt reference)
   (let* ((authid (or (find-author-id author :display-name)
@@ -73,7 +74,11 @@
   (let ((target (fetch-keyword :url forms)))
     (%proc-forms (remove-if-not #'listp forms) target)))
 
-
+(defun bulk-enter-file (path)
+  (with-open-file (s path)
+    (loop for data = (read s nil nil)
+       while data
+         do (bulk-enter data))))
 
 
 
