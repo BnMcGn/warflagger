@@ -314,7 +314,7 @@
    (:insert 3) ;clack.builder:builder
    (clack.middleware.clsql:<clack-middleware-clsql>
     :database-type :postgresql-socket3
-    :connection-spec *db-connect-spec*)
+    :connection-spec *test-db-connect-spec*)
    (clack.middleware.static:<clack-middleware-static>
     :path "/static/"
     :root #p"~/quicklisp/local-projects/wf-static/")
