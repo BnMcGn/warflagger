@@ -25,7 +25,8 @@
    #:initialize-indices
    #:update-page
    #:text-server
-   #:grab-links))
+   #:grab-links
+   #:grab-failed-message))
 
 (in-package :wf/text-extract)
 
@@ -67,6 +68,7 @@
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
     (open (make-pathname :directory (cache-loc url) :name "page.html"))))
 
+;;;FIXME: Need to clean up after crash that leaves main.lock in place. 
 (defun grab-text (url &key (update t))
   (when update (update-page url))
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
@@ -96,6 +98,11 @@
               (with-file-lock (lfile)
                 (with-open-file (s lfile)
                   (json:decode-json s)))))))
+
+(defun grab-failed-message (url)
+  (unless (probe-file (failure-loc url))
+    (error "No failure message found"))
+  (read-file-into-string (failure-loc url)))
 
 (defun index-file-name ()
   (make-pathname :directory *cache-path* :name "urlindex.inf"))
