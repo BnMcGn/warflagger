@@ -58,6 +58,8 @@
     (cond
       ((string-equal (car form) 'opinion)
        (%proc-opinion form target))
+      ((string-equal (car form) 'vote)
+       (%proc-vote form target))
       (t (error "Not supported")))))
 
 (defun %proc-opinion (form target)
@@ -67,6 +69,12 @@
     (let ((opid (apply #'enter-bulk-opinion target :comment (car other) keys)))
       (%proc-forms (cdr other) (make-opinion-url nil opid)))))
 
+(defun %proc-vote (form target)
+  (multiple-value-bind (keys other)
+      (divide-on-end-of-keywords (cdr form))
+    ;;No comment. Any non-keyword items are replies
+    (let ((opid (apply #'enter-bulk-opinion target keys)))
+      (%proc-forms other (make-opinion-url nil opid)))))
 
 (defun bulk-enter (forms)
   (unless (string-equal (car forms) 'target)
