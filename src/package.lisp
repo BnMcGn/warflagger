@@ -69,5 +69,9 @@
    #:make-missing-rootid-url
    #:make-wf-url-for-url
    #:*warstats-path-types*
-   #:cluster-discussions))
+   #:cluster-discussions
+   #:*flag-category-keys*
+   #:*default-vote*
+   #:url-p
+   #:bulk-enter-file))
 

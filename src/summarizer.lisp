@@ -375,10 +375,12 @@
 
 (defun write-individual-references (references)
   (do-hash-table (id ref references)
-    (let ((opinion (opinion-from-id (gethash :refopinid ref))))
+    (let ((opinion (opinion-from-id (gethash :refopinid ref)))
+          (statpath (make-warstats-path (gethash :refopinid ref) :opinion)))
       (setf (gethash :opinion ref)
             (hu:alist->hash opinion))
-      (with-open-file (fh (make-warstats-path (gethash :refopinid ref) :opinion)
+      (uiop/common-lisp:ensure-directories-exist statpath)
+      (with-open-file (fh statpath
                          :direction :output :if-exists :supersede
                          :if-does-not-exist :create)
        (json:encode-json ref)))))
@@ -425,7 +427,17 @@
       (write-string text fh))
     t))
 
-;;FIXME: Needs to deal with failures
 (defun write-all-warstats ()
-  (dolist (rurl (all-rooturls))
-    (write-all-rootid-warstats (get-rooturl-id rurl))))
+  (let ((rurls (all-rooturls))
+        (updating nil))
+    (dolist (rurl rurls)
+      (unless (is-cached rurl)
+        (update-page rurl)
+        (setf updating t)))
+    (when updating
+      (sleep 2))
+    (dolist (rurl rurls)
+      (if (is-cached rurl)
+          (write-all-rootid-warstats (get-rooturl-id rurl))
+          (format
+           t "Didn't process url: ~a~%Reason: ~a" rurl (grab-failed-message rurl))))))
