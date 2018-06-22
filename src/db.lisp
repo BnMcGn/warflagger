@@ -47,6 +47,10 @@
        :format #'car
        :identity-func #'third)))
 
+(defun target-replies (turl)
+  "Return a list of immediate replies to a target. Replies are opinids."
+  (mapcar #'car (opinion-tree-for-target turl)))
+
 (defun controversial-p (url)
   (exists
    (unexecuted

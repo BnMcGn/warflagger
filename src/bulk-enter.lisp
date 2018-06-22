@@ -11,14 +11,32 @@
 (defun expand-flag (flagspec)
   (let ((flagspec (or flagspec :blank)))
     (loop
-      for cat in *flag-category-keys*
-      for flags in *flag-types-source*
-      when
-        (member flagspec flags)
-      return (list cat flagspec)
-      finally (error "Flag not found"))))
+       for cat in *flag-category-keys*
+       for flags in *flag-types-source*
+       when
+         (member flagspec flags)
+       return (list cat flagspec)
+       finally (error "Flag not found"))))
 
-(defun enter-bulk-opinion (target &key comment author flag votevalue excerpt reference)
+(defun handle-reference (author reference excerpt)
+  (when reference
+    (unless (url-p reference)
+      (error "Reference needs to be an URL"))
+    (if excerpt
+        (or (find-usable-excerpt-opinion reference excerpt nil)
+            (let ((data (plist->alist
+                         (list
+                          :target reference
+                          :flag (expand-flag :blank)
+                          :votevalue 0
+                          :excerpt excerpt
+                          :datestamp (clsql:get-time)))))
+              (save-opinion-from-user data author)))
+        reference)))
+
+;;FIXME: we are ignoring excerpt offsets
+(defun enter-bulk-opinion (target &key comment author flag votevalue excerpt reference
+                                    reference-excerpt)
   (let* ((authid (or (find-author-id author :display-name)
                     ;;FIXME: Should add some URL to indicate fake author?
                     (insert-new-author :display-name author)))
@@ -28,8 +46,6 @@
                             (error "Invalid votevalue"))
                         (getf *default-vote* (second flag))))
          (datestamp (clsql:get-time))) ;;FIXME: Want more sophisticated?
-    (when (and reference (not (url-p reference)))
-      (error "Reference needs to be an URL"))
     (let ((data (plist->alist
                  (list
                   :target target
@@ -38,7 +54,7 @@
                   :datestamp datestamp
                   :excerpt excerpt
                   :comment comment
-                  :reference reference))))
+                  :reference (handle-reference authid reference reference-excerpt)))))
       (when (opinion-may-exist data authid)
         (error "Opinion may already exist in database"))
       (save-opinion-from-user data authid))))
@@ -86,7 +102,17 @@
   (with-open-file (s path)
     (loop for data = (read s nil nil)
        while data
-         do (bulk-enter data))))
+       do (bulk-enter data))))
+
+(defun find-usable-excerpt-opinion (target excerpt offset)
+  "Usable: same excerpt and a reasonable flag. Probably just Blank for now. No comment?"
+  (dolist (replyid (target-replies target))
+    (let ((reply (opinion-from-id replyid)))
+      (when (and (equal excerpt (assoc-cdr :excerpt reply))
+                 (if (assoc :excerpt-offset reply)
+                     (eql (assoc-cdr :excerpt-offset reply) offset)
+                     t))
+        (return (values (assoc-cdr :url reply) replyid))))))
 
 
 

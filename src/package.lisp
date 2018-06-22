@@ -73,5 +73,6 @@
    #:*flag-category-keys*
    #:*default-vote*
    #:url-p
-   #:bulk-enter-file))
+   #:bulk-enter-file
+   #:target-replies))
 
