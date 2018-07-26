@@ -183,12 +183,12 @@
     ;; mechanism may need some rethinking.
     (labels ((scale-effect (num)
                (if (< min-effect max-effect)
-                   (as-in-range 3 15
+                   (as-in-range 3 10
                                 (relative-to-range min-effect max-effect num))
                    4))
              (scale-controv (num)
                (if (< min-controv max-controv)
-                   (as-in-range 3 15
+                   (as-in-range 3 10
                                 (relative-to-range min-controv max-controv num))
                    4)))
       (draw-ring
