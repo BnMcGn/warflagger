@@ -31,7 +31,7 @@
                           :votevalue 0
                           :excerpt excerpt
                           :datestamp (clsql:get-time)))))
-              (save-opinion-from-user data author)))
+              (nth-value 1 (save-opinion-from-user data author))))
         reference)))
 
 ;;FIXME: we are ignoring excerpt offsets

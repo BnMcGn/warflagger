@@ -353,12 +353,13 @@ the page text can be found in the cache."
   "Opinions need to be set up with some stuff."
   (unless (listp opinion)
     (error "Opinion needs to be an alist"))
-  (let ((id (next-val "opinion_id_seq")))
+  (let* ((id (next-val "opinion_id_seq"))
+         (url (funcall opinurl authorid id)))
     (insert-opinion
-     (cons (cons :url (funcall opinurl authorid id)) opinion)
+     (cons (cons :url url) opinion)
      authorid
      id)
-    id))
+    (values id url)))
 
 (defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
