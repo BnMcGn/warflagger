@@ -49,8 +49,11 @@
        (:@title title)
      (princ (funcall body-func) *webhax-output*))))
 
-(clsql:connect wf/local-settings:*test-db-connect-spec*
-               :database-type wf/local-settings:*db-connect-type*)
+(if-production
+ (clsql:connect wf/local-settings:*db-connect-spec*
+                :database-type wf/local-settings:*db-connect-type*)
+ (clsql:connect wf/local-settings:*test-db-connect-spec*
+                :database-type wf/local-settings:*db-connect-type*))
 
 (defun favicon-links ()
   (html-out
