@@ -220,7 +220,11 @@
          :content-type "application/json"))
 
   (setf (ningle:route *app* "/")
-        (quick-page (#'main-page-parts))))
+        (quick-page (#'webhax:react-parts
+                     #'target-components
+                     #'mood-lib
+                     :@javascript #'grouped-components
+                     #'main-page-parts))))
 
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)
