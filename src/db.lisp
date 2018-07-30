@@ -312,14 +312,15 @@ the page text can be found in the cache."
            (parse-integer author)))
     (:string
      (get-local-user-id author))
-    ((or :homepage :email)
+    ((or :homepage :email :display-name)
      (awhen (select (colm 'id) :from 'author
                     :where (sql-and (sql-= (colm 'type)
-                                           (sql-escape atype))
+                                           (sql-escape (to-snake-case atype)))
                                     (sql-= (colm 'value)
                                            (sql-escape author)))
                     :flatp t)
-       (car it)))))
+       (car it)))
+    (otherwise (error "AType not found"))))
 
 (defun insert-new-author (&rest atypes-and-values)
   (let ((aid (next-val "author_id_seq")))
