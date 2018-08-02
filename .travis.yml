@@ -1,0 +1,26 @@
+language: common-lisp
+sudo: required
+
+env:
+ matrix:   
+    - LISP=sbcl
+    - LISP=ccl
+
+services:
+    - postgresql
+
+install:
+  # Install cl-travis
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  - git clone https://github.com/fukamachi/sxql.git quicklisp/local-projects/sxql
+  - git clone https://github.com/fukamachi/cl-dbi.git quicklisp/local-projects/cl-dbi
+
+before_script:
+         - psql -c 'create database test_opinions;' -U postgres 
+
+script:
+  - cl -l prove -e '(or (prove:run :test-gadgets) (uiop:quit -1))' 
+
+notifications:
+  email:
+    - bnmcgn@gmail.com
