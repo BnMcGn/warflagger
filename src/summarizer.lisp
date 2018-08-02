@@ -199,7 +199,7 @@
          (loop
             for (offset . length) in intervals
             for id in reply-ids
-            for opinion = (opinion-from-id id)
+            for opinion = (opinion-by-id id)
             for warstat = (gethash id warstats)
             for direction = (calculate-direction-from-axis opinion warstat)
             do (draw-segment (getf *direction-colors* direction)
@@ -220,7 +220,7 @@
                      (delete-file fname))
                    (write-html-file
                        fname
-                     (draw-opinion-badge (opinion-from-id (car node))
+                     (draw-opinion-badge (opinion-by-id (car node))
                                          (cdr node)
                                          warstats)))
                  (when (cdr node)
@@ -236,7 +236,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun %opinion-data (opid text)
-  (let ((data (opinion-from-id opid)))
+  (let ((data (opinion-by-id opid)))
     (if (assoc-cdr :excerpt data)
         (cons
          (list*
@@ -317,7 +317,7 @@
       (labels ((proc (tree location)
                  (dolist (node tree)
                    (when (grab-column (liql (car node) 'reference.opinion))
-                     (let* ((refopin (opinion-from-id (car node)))
+                     (let* ((refopin (opinion-by-id (car node)))
                             (refurl (assoc-cdr :reference refopin)))
                        (hu:collect (assoc-cdr :id refopin)
                          (hu:plist->hash
@@ -349,7 +349,7 @@
       (labels ((proc (tree location)
                  (dolist (node tree)
                    (when (question-opinion-p (car node))
-                     (let ((opin (opinion-from-id (car node))))
+                     (let ((opin (opinion-by-id (car node))))
                        (collect
                          (hu:plist->hash
                           (list
@@ -375,7 +375,7 @@
 
 (defun write-individual-references (references)
   (do-hash-table (id ref references)
-    (let ((opinion (opinion-from-id (gethash :refopinid ref)))
+    (let ((opinion (opinion-by-id (gethash :refopinid ref)))
           (statpath (make-warstats-path (gethash :refopinid ref) :opinion)))
       (setf (gethash :opinion ref)
             (hu:alist->hash opinion))

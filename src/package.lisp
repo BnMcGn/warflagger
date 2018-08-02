@@ -19,7 +19,7 @@
    #:rooturl-p
    #:get-author-data
    #:opinion-from-db-row
-   #:opinion-from-id
+   #:opinion-by-id
    #:get-local-user-id
    #:find-author-id
    #:user-lister

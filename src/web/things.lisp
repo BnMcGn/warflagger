@@ -129,7 +129,7 @@
     'replies
   (lambda (&rest x)
     (mapcar #'car (opinion-tree-for-target
-                   (assoc-cdr :url (opinion-from-id (car x))))))
+                   (assoc-cdr :url (opinion-by-id (car x))))))
   :other-thing 'opinion)
 
 ;;FIXME: Should all be done in query or else with something like an ordered

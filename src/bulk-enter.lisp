@@ -107,7 +107,7 @@
 (defun find-usable-excerpt-opinion (target excerpt offset)
   "Usable: same excerpt and a reasonable flag. Probably just Blank for now. No comment?"
   (dolist (replyid (target-replies target))
-    (let ((reply (opinion-from-id replyid)))
+    (let ((reply (opinion-by-id replyid)))
       (when (and (equal excerpt (assoc-cdr :excerpt reply))
                  (if (assoc :excerpt-offset reply)
                      (eql (assoc-cdr :excerpt-offset reply) offset)

@@ -194,7 +194,7 @@ the page text can be found in the cache."
                  (get-excerpt-data (gethash :id res))
                  (hash->alist res))))
 
-(defun opinion-from-id (oid)
+(defun opinion-by-id (oid)
   (opinion-from-db-row (get-assoc-by-pkey 'opinion oid)))
 
 (def-query get-opinion-peers (o-url)
@@ -438,7 +438,7 @@ the page text can be found in the cache."
 (defun set-look (user &key rootid opinionid)
   (let ((rootid (or rootid
                     (assoc-cdr :rooturl
-                               (opinion-from-id opinionid)))))
+                               (opinion-by-id opinionid)))))
     (unless (integerp rootid)
       (error "Unable to find rootid"))
     (when (emptyp (select (colm :wf_user) :from (tabl :looks)

@@ -105,7 +105,7 @@ that is winding down. Drops hotness if less than 10% of opinions are new."
 (defun generate-direction-data (tree)
   (labels ((proc (tree pardir)
              (dolist (branch tree)
-               (let* ((opin (opinion-from-id (car branch)))
+               (let* ((opin (opinion-by-id (car branch)))
                       (opdir (opinion-direction opin))
                       (oprootdir (if pardir
                                      (opinion-chain-direction pardir opdir)
@@ -293,7 +293,7 @@ Some of these factors will obviously affect the respect points more than others.
   (let ((effect 0)
         (controversy 0))
     (dolist (op optree)
-      (let* ((opinion (opinion-from-id (car op)))
+      (let* ((opinion (opinion-by-id (car op)))
              (factor (funcall filter opinion)))
         ;;FIXME: This is inefficient, but makes sure all opinions in tree get
         ;; processed. Find better way.
@@ -347,14 +347,14 @@ Some of these factors will obviously affect the respect points more than others.
 
 (defun opinion-initial-effect (&key id opinion)
   "Set up the initial effect, or score, that an opinion will have before replies have been factored in."
-  (let ((opinion (or opinion (opinion-from-id id))))
+  (let ((opinion (or opinion (opinion-by-id id))))
     ;;FIXME: author-respect maybe should vary for different flags?
     (author-respect (assoc-cdr :author-id opinion))))
 
 ;;FIXME: Opinion-effect is recurrent. Eventually a discussion will be larger than
 ;; the stack limit.
 (defun %opinion-effect (optree &key opinion)
-  (let* ((opinion (or opinion (opinion-from-id (car optree))))
+  (let* ((opinion (or opinion (opinion-by-id (car optree))))
          (axdat (opinion-axis-data optree))
          (effect (calculate-axdat-effect axdat opinion))
          (controv (calculate-axdat-controversy axdat))
@@ -388,13 +388,13 @@ Some of these factors will obviously affect the respect points more than others.
   (reduce #'+
           (mapcar (lambda (id)
                     (getf (request-warstats-for-url
-                           (assoc-cdr :url (opinion-from-id id)))
+                           (assoc-cdr :url (opinion-by-id id)))
                           :effect))
                   refopinids)))
 
 (defun reference-data (optree)
   ;;When we are getting reference data for a rooturl, car will be nil
-  (let ((opinion (and (car optree) (opinion-from-id (car optree))))
+  (let ((opinion (and (car optree) (opinion-by-id (car optree))))
         (effect 0)
         (controv 0)
         (meffect 0)
@@ -409,7 +409,7 @@ Some of these factors will obviously affect the respect points more than others.
           (let* ((results (multiple-value-list (opinion-effect tree)))
                  (refdat
                   (hu:hget *reference-list*
-                           (list (assoc-cdr :reference (opinion-from-id (car tree)))
+                           (list (assoc-cdr :reference (opinion-by-id (car tree)))
                                  :warstats)))
                  (reffects (calculate-reference-effects
                             (car results) (second results)

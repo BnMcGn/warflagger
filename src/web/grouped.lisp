@@ -97,7 +97,7 @@
                  (roots
                   (collecting-hash-table (:mode :replace)
                     (dolist (id refids)
-                      (let* ((refopin (opinion-from-id id))
+                      (let* ((refopin (opinion-by-id id))
                              (refurl (assoc-cdr :reference refopin))
                              (rootid (when (rooturl-p refurl)
                                        (get-rooturl-id refurl)))
@@ -139,7 +139,7 @@
                                   (mapleaves
                                    (lambda (x)
                                      (warflagger::reference-end-result
-                                      (assoc-cdr :reference (opinion-from-id x))))
+                                      (assoc-cdr :reference (opinion-by-id x))))
                                    (car v)))))))
                     tree))))
             (mount-component (grouped-main)

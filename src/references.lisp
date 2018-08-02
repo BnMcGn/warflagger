@@ -56,7 +56,7 @@
              :display-name *system-author-display*))))
 
 (defun system-generated-p (opinid)
-  (when-let ((opin (opinion-from-id opinid)))
+  (when-let ((opin (opinion-by-id opinid)))
     (eq (get-refbot-id) (assoc-cdr :author-id opin))))
 
 (defun get-references-to (url)
@@ -119,7 +119,7 @@
            (not (second ref2)))))
 
 (defun %format-reference (opinid)
-  (let ((opin (opinion-from-id opinid)))
+  (let ((opin (opinion-by-id opinid)))
     (list (assoc-cdr :reference opin) (assoc-cdr :excerpt opin))))
 
 (defun find-new-references (url)
@@ -184,7 +184,7 @@
   (collecting-set ()
     (dolist (refid (get-references-to url))
       (when-let*
-          ((opin (opinion-from-id refid))
+          ((opin (opinion-by-id refid))
            (rootid (assoc-cdr :rooturl opin)))
         (collect rootid)))))
 
@@ -198,7 +198,7 @@
              (collect id)))))
     (collecting
         (dolist (id ids)
-          (let ((opin (opinion-from-id id)))
+          (let ((opin (opinion-by-id id)))
             (when (assoc-cdr :reference opin)
               (collect opin)))))))
 

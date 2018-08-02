@@ -50,7 +50,7 @@
       (let ((target (cond
                       (target target)
                       (target-id (get-rooturl-by-id target-id))
-                      (opinion-id (assoc-cdr :url (opinion-from-id opinion-id))))))
+                      (opinion-id (assoc-cdr :url (opinion-by-id opinion-id))))))
         (html-out
          (:h2 "Enter an opinion")
          (mount-component (webhax-form)
@@ -92,7 +92,7 @@
           (setf (gethash :datestamp values)
                 (clsql:get-time))
           (let* ((newid (save-opinion-from-user (hu:hash->alist values) aid))
-                 (savedopin (opinion-from-id newid)))
+                 (savedopin (opinion-by-id newid)))
             ;;FIXME: Should be done in separate thread to reduce delay for user
             ;;FIXME: this will shortly be obsolete. Done by write-all-rootid-warstats
             (create-badges-for-rootid (assoc-cdr :rooturl savedopin))
