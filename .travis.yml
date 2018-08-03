@@ -12,14 +12,26 @@ services:
 install:
   # Install cl-travis
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
-  - git clone https://github.com/fukamachi/sxql.git quicklisp/local-projects/sxql
-  - git clone https://github.com/fukamachi/cl-dbi.git quicklisp/local-projects/cl-dbi
+
+  - git clone https://github.com/bnmcgn/Parenscript quicklisp/local-projects/Parenscript
+    repo=cl-react
+  - git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
+  - git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
+  - git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
+  - git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
+  - git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
+  - git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
+  - git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
+  - git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
+  - git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
+  - git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
+
 
 before_script:
          - psql -c 'create database test_opinions;' -U postgres 
 
 script:
-  - cl -l prove -e '(or (prove:run :test-gadgets) (uiop:quit -1))' 
+  - cl -l prove -e '(or (prove:run :test-warflagger) (uiop:quit -1))' 
 
 notifications:
   email:

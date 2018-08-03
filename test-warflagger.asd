@@ -13,7 +13,8 @@
                         :serial t
                         :components ((:file "package")
                                      (:file "textract-test")
-                                     (:file "db-test")))))
+                                     (:file "db-test")
+                                     (:file "tests")))))
 
 
 
