@@ -26,7 +26,7 @@ install:
   - git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
   - git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
 
-  - cp quicklisp/local-projects/src/local-settings-template.lisp quicklisp/local-projects/src/local-settings.lisp
+  - cp quicklisp/local-projects/warflagger/src/local-settings-template.lisp quicklisp/local-projects/warflagger/src/local-settings.lisp
 
 before_script:
          - psql -c "create user ben with password 'test_password';"
