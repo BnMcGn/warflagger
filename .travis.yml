@@ -26,9 +26,13 @@ install:
   - git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
   - git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
 
+  - cp quicklisp/local-projects/src/local-settings-template.lisp quicklisp/local-projects/src/local-settings.lisp
 
 before_script:
+         - psql -c "create user ben with password 'test_password';"
          - psql -c 'create database test_opinions;' -U postgres 
+         - psql -c 'grant all privileges on database test_opinions to ben;'
+         - psql -U ben -d 'test_opinions' -1 -f quicklisp/local-projects/warflagger/src/opinions.schema.sql
 
 script:
   - cl -l prove -e '(or (prove:run :test-warflagger) (uiop:quit -1))' 
