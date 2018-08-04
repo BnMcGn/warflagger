@@ -34,7 +34,7 @@ before_script:
          - psql -c "create user ben with password 'test_password';"
          - psql -c 'create database test_opinions;' -U postgres 
          - psql -c 'grant all privileges on database test_opinions to ben;'
-         - psql -U ben -d 'test_opinions' -1 -f quicklisp/local-projects/warflagger/src/opinions.schema.sql
+         - psql -U ben -d 'test_opinions' -1 -f src/opinions.schema.sql
 
 script:
   - cl -l prove -e '(or (prove:run :test-warflagger) (uiop:quit -1))' 
