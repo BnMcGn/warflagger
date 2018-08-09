@@ -28,7 +28,7 @@ install:
 
   - cp src/local-settings-template.lisp src/local-settings.lisp
 
-  - pip install -r requirements
+  - pip install -r requirements.txt
 
 before_script:
 
