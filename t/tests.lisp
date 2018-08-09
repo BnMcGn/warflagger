@@ -10,7 +10,7 @@
        (*db-connect-type* :postgresql-socket3))
   (ensure-directories-exist *cache-path*)
   (ensure-directories-exist *warstats-path*)
-  (clsql:connect *test-db-connect-spec* *db-connect-type*)
+  (clsql:connect *test-db-connect-spec* :database-type *db-connect-type*)
 
   (test-textract)
   (test-db)
