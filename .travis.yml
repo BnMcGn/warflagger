@@ -28,8 +28,7 @@ install:
 
   - cp src/local-settings-template.lisp src/local-settings.lisp
 
-  - pip install BeautifulSoup
-  - pip install pattern
+  - pip install -r requirements
 
 before_script:
 
