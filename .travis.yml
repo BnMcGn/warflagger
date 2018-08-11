@@ -30,6 +30,8 @@ install:
 
   - pip install --user pattern
   - pip install --user BeautifulSoup
+  - pip install --user pyPdf
+  - pip install --user readability
 
 before_script:
 
