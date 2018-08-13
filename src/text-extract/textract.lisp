@@ -26,7 +26,8 @@
    #:update-page
    #:text-server
    #:grab-links
-   #:grab-failed-message))
+   #:grab-failed-message
+   #:grab-messages))
 
 (in-package :wf/text-extract)
 
@@ -55,6 +56,9 @@
 
 (defun links-loc (url)
   (concatenate 'string (cache-loc url) "links"))
+
+(defun messages-loc (url)
+  (concatenate 'string (cache-loc url) "messages"))
 
 (defun update-page (url &key force)
   (unless (and (is-fresh url) (not force))
@@ -103,6 +107,11 @@
   (unless (probe-file (failure-loc url))
     (error "No failure message found"))
   (read-file-into-string (failure-loc url)))
+
+(defun grab-messages (url)
+  (if (probe-file (messages-loc url))
+      (read-file-into-string (messages-loc url))
+      ""))
 
 (defun index-file-name ()
   (make-pathname :directory *cache-path* :name "urlindex.inf"))
@@ -161,7 +170,8 @@
       (error "Couldn't find text extractor script."))
     (let ((process (external-program:start *text-extractor-script*
                                            (list (cache-loc url))
-                                           :input :stream)))
+                                           :input :stream
+                                           :error (messages-loc url))))
       (write-line url (external-program:process-input-stream process))
       (close (external-program:process-input-stream process))
       index)))
