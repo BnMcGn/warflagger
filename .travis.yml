@@ -1,8 +1,6 @@
 language: common-lisp
 sudo: required
 
-python:
-    - "2.7"
 env:
  matrix:   
     - LISP=sbcl

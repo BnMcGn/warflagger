@@ -168,6 +168,8 @@
     ;; from half-typed urls and malicious users.
     (unless (probe-file *text-extractor-script*)
       (error "Couldn't find text extractor script."))
+    (when (probe-file (messages-loc url))
+      (delete-file (messages-loc url)))
     (let ((process (external-program:start *text-extractor-script*
                                            (list (cache-loc url))
                                            :input :stream
