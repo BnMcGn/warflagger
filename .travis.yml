@@ -33,6 +33,8 @@ install:
   - pip install --user pyPdf
   - pip install --user readability
 
+  - sudo apt-get install python
+
 before_script:
 
 
