@@ -1,4 +1,4 @@
-#!/usr/bin/env pythun
+#!/usr/bin/python
 
 import sys
 import string
