@@ -28,7 +28,7 @@
 
     ;;(update-page testurl)
     (external-program:start "/bin/ls" "/"
-                            :output (messages-loc testurl))
+                            :output (wf/text-extract::messages-loc testurl))
     (sleep 0.50)
     (print (grab-messages testurl))
     (ok (is-cached testurl))
