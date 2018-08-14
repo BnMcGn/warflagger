@@ -26,7 +26,9 @@
     (ok (null (old-page-available testurl)))
     (ok (= 0 (length (hash-table-keys *byurl*))))
 
-    (update-page testurl)
+    ;;(update-page testurl)
+    (external-program:start "/bin/ls" "/"
+                            :output (messages-loc url))
     (sleep 0.50)
     (print (grab-messages testurl))
     (ok (is-cached testurl))
