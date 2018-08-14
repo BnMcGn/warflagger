@@ -27,6 +27,7 @@
     (ok (= 0 (length (hash-table-keys *byurl*))))
 
     (update-page testurl)
+    (delete-file (wf/text-extract::messages-loc testurl))
     (external-program:start "/bin/ls" (list "/")
                             :output (wf/text-extract::messages-loc testurl))
     (sleep 0.50)
