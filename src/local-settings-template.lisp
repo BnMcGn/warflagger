@@ -26,7 +26,8 @@
 
 (defparameter *base-url* "")
 (defparameter *cache-path* "")
-(defparameter *text-extractor-script* "")
+(defparameter *text-extractor-script*
+  (asdf:system-relative-pathname 'warflagger "src/text-extract/textract.py"))
 (defparameter *db-connect-type* nil)
 (defparameter *db-connect-spec* nil)
 (defparameter *test-db-connect-spec* nil)
