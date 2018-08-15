@@ -27,12 +27,7 @@
     (ok (= 0 (length (hash-table-keys *byurl*))))
 
     (update-page testurl)
-    (delete-file (wf/text-extract::messages-loc testurl))
-    (external-program:start "/bin/ls" (list "/")
-                            :output (wf/text-extract::messages-loc testurl))
     (sleep 0.50)
-    (print "Found script?")
-    (print (probe-file wf/local-settings::*text-extractor-script*))
     (print (grab-messages testurl))
     (ok (is-cached testurl))
     (ok (string= (grab-title testurl) "Sample Web Page"))
