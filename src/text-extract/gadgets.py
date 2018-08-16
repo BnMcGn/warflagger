@@ -13,7 +13,7 @@ import collections
 import math
 from contextlib import contextmanager
 
-from gizmo import * #text UI thingys
+#from gizmo import * #text UI thingys
 
 def diff_list(l1, l2):
     """Returns side by side equality test"""

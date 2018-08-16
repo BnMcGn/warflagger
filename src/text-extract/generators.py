@@ -33,12 +33,6 @@ def window(an_iter, length):
             stor = stor[1:] + (thing,)
             yield stor
 
-def ring_window(an_iter, length):
-    """Like window, but the window overlaps onto the beginning of the source iter."""
-    #FIXME: not very efficient. Window already makes a list out of it.
-    an_iter = list(an_iter)
-    return window(itertools.chain(an_iter, an_iter[:length]))
-
 def group(an_iter, length=2):
     """Like window but with no overlap. Last set is yielded even if not full."""
     stor = []
