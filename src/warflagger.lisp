@@ -44,5 +44,13 @@
 (defmacro unless-production (clause)
   (unless wf/local-settings:*production* clause))
 
+(eval-always
+  (defmacro if-travis (true-clause false-clause)
+   (if (uiop:getenv "TRAVIS") true-claue false-clause)))
+
+(defmacro when-travis (clause) (if-travis clause nil))
+
+(defmacro unless-travis (clause) (if-travis nil clause))
+
 (defun url-p (thing)
   (quri:uri-host (quri:uri thing)))

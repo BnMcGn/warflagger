@@ -74,5 +74,8 @@
    #:*default-vote*
    #:url-p
    #:bulk-enter-file
-   #:target-replies))
+   #:target-replies
+   #:if-travis
+   #:when-travis
+   #:unless-travis))
 
