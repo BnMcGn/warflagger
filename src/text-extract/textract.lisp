@@ -40,7 +40,7 @@
 
 (defun cache-loc (url)
   (concatenate
-   'string *cache-path* (princ-to-string (gethash url *byurl*)) "/"))
+   'string (princ-to-string *cache-path*) (princ-to-string (gethash url *byurl*)) "/"))
 
 (defun page-loc (url)
   (concatenate 'string (cache-loc url) "page.html"))
@@ -114,7 +114,7 @@
       ""))
 
 (defun index-file-name ()
-  (make-pathname :directory *cache-path* :name "urlindex.inf"))
+  (merge-pathnames "urlindex.inf" *cache-path*))
 
 (defun read-index-file (fname)
   (let ((data
