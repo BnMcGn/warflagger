@@ -292,6 +292,7 @@ the page text can be found in the cache."
     (car res)))
 
 (defun get-local-user-from-id (aid)
+  (declare (type integer aid))
   (assoc-cdr :wf-user (get-author-data aid)))
 
 ;;FIXME: doesn't look like a very reliable way to do things.
