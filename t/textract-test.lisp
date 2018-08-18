@@ -6,14 +6,13 @@
 (defparameter *tmp-dir* "/tmp/")
 
 (defun test-textract ()
-  (let ((*cache-path* (strcat *tmp-dir* "textract/"))
-        (testurl
+  (let ((testurl
          (strcat
           "file://"
           (princ-to-string (asdf:system-relative-pathname 'warflagger "t/sample.html")))))
 
-    (cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)
-    (ensure-directories-exist (make-pathname :directory *cache-path*))
+    ;(cl-fad:delete-directory-and-files *cache-path* :if-does-not-exist :ignore)
+    ;(ensure-directories-exist (make-pathname :directory *cache-path*))
     (initialize-indices)
 
     (plan 15)
@@ -25,6 +24,7 @@
     (ok (null (is-pending testurl)))
     (ok (null (old-page-available testurl)))
     (ok (= 0 (length (hash-table-keys *byurl*))))
+
 
     (update-page testurl)
     (sleep 0.50)
