@@ -23,6 +23,9 @@
               (invoke-restart restart))))))
     (clsql:connect *test-db-connect-spec* :database-type *db-connect-type*))
 
+  (print "")
+  (when-travis (print "IN TRAVIS"))
+  (print *cache-path*)
   (liql:liql)
   (test-textract)
   (test-db)
