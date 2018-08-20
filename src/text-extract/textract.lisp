@@ -165,7 +165,9 @@
   (let ((index (get-url-index url)))
     (print "in save-page-to-cache")
     (print (cache-loc url))
-    (ensure-directories-exist (make-pathname :directory (cache-loc url)))
+    ;;(ensure-directories-exist (make-pathname :directory (cache-loc url)))
+    (ensure-directories-exist (cache-loc url))
+    (print "here")
     ;;FIXME: Need a way to not cache non-existent urls. Otherwise will get major clutter
     ;; from half-typed urls and malicious users.
     (unless (probe-file *text-extractor-script*)
