@@ -2,9 +2,7 @@
 (in-package #:test-warflagger)
 
 ;;FIXME: tmpdir should be handled differently on non-travis test runs
-(let* ((tmpdir (if-travis
-                (homedir-relative-pathname "tmp/")
-                (homedir-relative-pathname "tmp/")))
+(let* ((tmpdir (homedir-relative-pathname "tmp/"))
        (*cache-path* (merge-pathnames "cache/" tmpdir))
        (*warstats-path* (merge-pathnames "warstats/" tmpdir))
        ;;FIXME: Need better general way to handle db credentials.
@@ -23,9 +21,6 @@
               (invoke-restart restart))))))
     (clsql:connect *test-db-connect-spec* :database-type *db-connect-type*))
 
-  (print "")
-  (when-travis (print "IN TRAVIS"))
-  (print *cache-path*)
   (liql:liql)
   (test-textract)
   (test-db)
