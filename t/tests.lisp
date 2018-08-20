@@ -3,7 +3,7 @@
 
 ;;FIXME: tmpdir should be handled differently on non-travis test runs
 (let* ((tmpdir (if-travis
-                ""
+                (homedir-relative-pathname "tmp/")
                 (homedir-relative-pathname "tmp/")))
        (*cache-path* (merge-pathnames "cache/" tmpdir))
        (*warstats-path* (merge-pathnames "warstats/" tmpdir))
