@@ -23,6 +23,7 @@
               (invoke-restart restart))))))
     (clsql:connect *test-db-connect-spec* :database-type *db-connect-type*))
 
+  (liql:liql)
   (test-textract)
   (test-db)
   ;;FIXME: think this through

@@ -7,7 +7,8 @@
   :depends-on (#:warflagger
                #:alexandria
                #:gadgets
-               #:prove) 
+               #:prove
+               #:liql) 
   :serial t
   :components ((:module :t
                         :serial t
