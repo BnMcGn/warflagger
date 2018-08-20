@@ -28,6 +28,7 @@
 
     (update-page testurl)
     (sleep 0.50)
+    (print "Printing script errors")
     (print (grab-messages testurl))
     (ok (is-cached testurl))
     (ok (string= (grab-title testurl) "Sample Web Page"))
