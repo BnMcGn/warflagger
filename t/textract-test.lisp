@@ -24,7 +24,7 @@
     (ok (null (is-pending testurl)))
     (ok (null (old-page-available testurl)))
     (ok (= 0 (length (hash-table-keys *byurl*))))
-
+(print "here")
 
     (update-page testurl)
     (sleep 0.50)
