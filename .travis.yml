@@ -9,6 +9,9 @@ env:
 services:
     - postgresql
 
+addons:
+    postgresql: 9.5
+
 install:
   # Install cl-travis
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
