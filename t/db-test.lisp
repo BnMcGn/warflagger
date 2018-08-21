@@ -3,14 +3,14 @@
 
 
 (defparameter *target* "http://warflagger.net/static/html/sample.html")
-(defparameter *user* "BnMcGn")
+(defparameter *user* "WFTestUser")
 (defparameter *refurl* "http://warflagger.net/faq/")
 (defparameter *testcomment* "Test")
 
 (defun test-db ()
   (let ((userid (gadgets:assoc-cdr
                  :id
-                 (sql-stuff:get-assoc-by-col (sql-stuff:colm 'author 'value) "BnMcGn")))
+                 (sql-stuff:get-assoc-by-col (sql-stuff:colm 'author 'value) *user*)))
         (rootid (find/store-root-url *target*))
         (opin1
          (list (cons :target *target*)
@@ -28,6 +28,10 @@
         (opin1id nil)
         (opin2id nil)
         (ourl nil))
+
+    ;;May need to set up author
+    (unless (integerp userid)
+      (setf userid (insert-new-author :display-name *user*)))
 
     ;;Some basic sanity checks
     (ok (integerp userid))

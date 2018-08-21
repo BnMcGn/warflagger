@@ -257,6 +257,7 @@ the page text can be found in the cache."
 ;; user attributes.
 
 (defun get-author-data (aid)
+  (declare (type integer aid))
   (map-tuples
    (compose #'keywordize-foreign (curry #'assoc-cdr :type))
    (curry #'assoc-cdr :value)
