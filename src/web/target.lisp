@@ -97,11 +97,11 @@
       (def-component target-tabs
           (psx
            (:tabs
-            :default-index (prop target-mode)
+            :default-index (prop tmode)
             :on-select (lambda (index)
-                         (setf (@ window location)
-                               (update-url-parameter (@ window location)
-                                                     "targetmode"
+                         (setf (@ window location href)
+                               (update-url-parameter (@ window location href)
+                                                     "tmode"
                                                      index)))
             (:tab-list
              :key 1
