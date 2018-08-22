@@ -130,7 +130,9 @@
                    'target 'participants)
                   id))))
           (bind-validated-input
-              ((id :integer))
+              ((id :integer)
+               &key
+               (targetmode :integer))
             (let ((url (get-rooturl-by-id id)))
               (mount-component (target-loader)
                 :url (lisp url)
@@ -139,6 +141,7 @@
                 :looks (lisp-raw (json:encode-json-to-string
                                   (get-looks (get-user-name) id)))
                 :focus '()
+                :target-mode (lisp targetmode)
                 :username (lisp (webhax-user:get-user-name))
                 )))))
 
