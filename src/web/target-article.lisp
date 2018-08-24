@@ -5,8 +5,6 @@
 (defun target-article ()
   (ps
 
-    (chain js-plumb (ready (lambda ())))
-
     (defun focus-p (props?)
       (let ((tad (@ props? tree-address))
             (foc (@ props? focus)))
@@ -34,35 +32,17 @@
           :class (flavor (prop opinions))
           :on-click (@ this handle-click)
           (rebreak (prop text))
+          (:span :style (create position :absolute)
+                 (%get-replies-count (prop opinions) (@ this props)))
           (:span :style (create position :relative) :key (unique-id)
-                 :id (prop id)
-                 (%make-opin-popups (if (and (not (prop not-viewable))
-                                             (state viewable))
-                                        (prop opinions)
-                                        (list))
-                                    (@ this props)))))
+                 :id (prop id))))
       get-initial-state
       (lambda () (create viewable false))
       handle-click
       (lambda (e)
         (unless (prop not-viewable)
           (set-state viewable (not (state viewable)))
-          (chain e (stop-propagation))))
-      display-plumbs
-      (lambda ()
-        (when (state viewable)
-          (display-popup-plumbs
-           this
-           (prop id)
-           (chain document (get-element-by-id (prop id))
-                  parent-element parent-element parent-element)
-           (prop opinions))))
-      component-did-mount
-      (lambda () (chain this (display-plumbs)))
-      component-did-update
-      (lambda () (chain this (display-plumbs)))
-      component-will-unmount
-      (lambda () (delete-plumbs this)))
+          (chain e (stop-propagation)))))
 
     (def-component plain-segment
         (psx
@@ -156,6 +136,13 @@
                                :top (+ y (lisp *unit-string*))
                                :left (+ x (lisp *unit-string*))
                                :key (unique-id)))))
+
+    (defun %get-replies-count (opinions props)
+      (let ((total 0))
+        (dolist (op opinions)
+          (incf total))
+          ;(incf total (@ props warstats (@ op 0 id) replies-total)))
+        total))
 
     (def-component mini-opinion
         (psx
@@ -349,6 +336,7 @@
            :focus (state focus)
            :focusfunc (@ this focus-func)
            :tree-address (list)
+           :warstats (prop warstats)
            :looks (prop looks)
            :look-handler (prop look-handler))))
       handle-click
