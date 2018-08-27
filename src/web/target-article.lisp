@@ -28,12 +28,13 @@
     (def-component hilited-segment
         (psx
          (:span
-          :style (create font-weight :bold)
+          :style (create font-weight :bold position :relative)
           :class (flavor (prop opinions))
           :on-click (@ this handle-click)
           (rebreak (prop text))
-          (:span :style (create position :absolute)
-                 (%get-replies-count (prop opinions) (@ this props)))
+          (:span :class "segment-count"
+                 (let ((count (%get-replies-count (prop opinions) (@ this props))))
+                   (if (< 1 count) count "")))
           (:span :style (create position :relative) :key (unique-id)
                  :id (prop id))))
       get-initial-state
