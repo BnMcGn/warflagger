@@ -20,9 +20,6 @@
       (setf tab-list (@ -react-tabs -tab-list))
       (setf tab-panel (@ -react-tabs -tab-panel))
 
-      (setf -tool-tip (require "react-portal-tooltip"))
-      (setf tool-tip (@ -tool-tip -tool-tip))
-
       (let ((counter 0))
         (defun unique-id ()
           (incf counter)))

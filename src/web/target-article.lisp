@@ -36,17 +36,13 @@
           :class (flavor (prop opinions))
           :on-mouse-enter (@ this handle-mouse-enter)
           :on-mouse-leave (@ this handle-mouse-leave)
-          ;;:on-click (@ this handle-click)
           (rebreak (prop text))
           (:span :class "segment-count" :key (unique-id)
                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
                    (if (< 1 count) count "")))
           (:tool-tip :active (state viewable) :position "top" :arrow "center"
                      :parent (strcat "#" (prop id))
-                     (:div "HeLLO"))
-          ;;(:span :style (create position :relative) :key (unique-id)
-          ;;       :id (prop id))
-          ))
+                     (:sub-opinion-list :... (@ this props)))))
       get-initial-state
       (lambda () (create viewable false))
       handle-mouse-enter
@@ -54,12 +50,7 @@
         (set-state viewable true))
       handle-mouse-leave
       (lambda (e)
-        (set-state viewable false))
-      handle-click
-      (lambda (e)
-        (unless (prop not-viewable)
-          (set-state viewable (not (state viewable)))
-          (chain e (stop-propagation)))))
+        (set-state viewable false)))
 
     (def-component plain-segment
         (psx
@@ -111,6 +102,8 @@
                              :text (chain text (slice start end))
                              :focusfunc (@ props focusfunc)
                              :looks (@ props looks)
+                             :warstats (@ props warstats)
+                             'opinion-store (@ props opinion-store)
                              'look-handler (@ props look-handler)
                              tree-address (@ props tree-address))))
                 (cond ((< (@ common-data :opinions length) 1)
@@ -160,6 +153,19 @@
           (incf total))
           ;(incf total (@ props warstats (@ op 0 id) replies-total)))
         total))
+
+    (def-component sub-opinion-list
+        (psx
+         (:div
+          (collecting
+              (dolist (itm (prop opinions))
+                (collect
+                    (psx
+                     (:opinion-summary
+                      :key (unique-id)
+                      :... (@ this props)
+                      :tree-address (@ (getprop itm 0) tree-address)
+                      :opid (@ (getprop itm 0) id)))))))))
 
     (def-component mini-opinion
         (psx
@@ -354,6 +360,7 @@
            :focusfunc (@ this focus-func)
            :tree-address (list)
            :warstats (prop warstats)
+           :opinion-store (prop opinion-store)
            :looks (prop looks)
            :look-handler (prop look-handler))))
       handle-click
