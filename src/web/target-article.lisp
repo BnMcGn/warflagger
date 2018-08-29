@@ -5,6 +5,9 @@
 (defun target-article ()
   (ps
 
+    (setf tool-tip (@ (require "react-portal-tooltip") default))
+    ;;(setf tool-tip (@ -tool-tip-module -tool-tip))
+
     (defun focus-p (props?)
       (let ((tad (@ props? tree-address))
             (foc (@ props? focus)))
@@ -28,17 +31,30 @@
     (def-component hilited-segment
         (psx
          (:span
+          :id (prop id)
           :style (create font-weight :bold position :relative)
           :class (flavor (prop opinions))
-          :on-click (@ this handle-click)
+          :on-mouse-enter (@ this handle-mouse-enter)
+          :on-mouse-leave (@ this handle-mouse-leave)
+          ;;:on-click (@ this handle-click)
           (rebreak (prop text))
-          (:span :class "segment-count"
+          (:span :class "segment-count" :key (unique-id)
                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
                    (if (< 1 count) count "")))
-          (:span :style (create position :relative) :key (unique-id)
-                 :id (prop id))))
+          (:tool-tip :active (state viewable) :position "top" :arrow "center"
+                     :parent (strcat "#" (prop id))
+                     (:div "HeLLO"))
+          ;;(:span :style (create position :relative) :key (unique-id)
+          ;;       :id (prop id))
+          ))
       get-initial-state
       (lambda () (create viewable false))
+      handle-mouse-enter
+      (lambda (e)
+        (set-state viewable true))
+      handle-mouse-leave
+      (lambda (e)
+        (set-state viewable false))
       handle-click
       (lambda (e)
         (unless (prop not-viewable)

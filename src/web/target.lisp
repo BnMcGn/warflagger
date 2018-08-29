@@ -14,6 +14,15 @@
   (lambda ()
     (ps
 
+      (setf -react-tabs (require "react-tabs"))
+      (setf tabs (@ -react-tabs -tabs))
+      (setf tab (@ -react-tabs -tab))
+      (setf tab-list (@ -react-tabs -tab-list))
+      (setf tab-panel (@ -react-tabs -tab-panel))
+
+      (setf -tool-tip (require "react-portal-tooltip"))
+      (setf tool-tip (@ -tool-tip -tool-tip))
+
       (let ((counter 0))
         (defun unique-id ()
           (incf counter)))
@@ -86,12 +95,6 @@
                 (setf (getprop res (@ itm 1))
                       (@ itm 0)))))
           res))
-
-      (setf -react-tabs (require "react-tabs"))
-      (setf tabs (@ -react-tabs -tabs))
-      (setf tab (@ -react-tabs -tab))
-      (setf tab-list (@ -react-tabs -tab-list))
-      (setf tab-panel (@ -react-tabs -tab-panel))
 
       ;;FIXME: Url should remember tab settings. Also remember user's pref in session
       (def-component target-tabs
