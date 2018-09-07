@@ -36,13 +36,18 @@
           :class (flavor (prop opinions))
           :on-mouse-enter (@ this handle-mouse-enter)
           :on-mouse-leave (@ this handle-mouse-leave)
-          (rebreak (prop text))
-          (:span :class "segment-count" :key (unique-id)
-                 (let ((count (%get-replies-count (prop opinions) (@ this props))))
-                   (if (< 1 count) count "")))
-          (:tool-tip :active (state viewable) :position "top" :arrow "center"
-                     :parent (strcat "#" (prop id))
-                     (:sub-opinion-list :... (@ this props)))))
+          (:where-in-parent
+           :parent (prop hilite-text-id)
+           :child (prop id)
+           (rebreak (prop text))
+           (:span :class "segment-count" :key (unique-id)
+                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
+                    (if (< 1 count) count "")))
+           (:tool-tip :key "a1"
+                      :active (state viewable) :position "top" :arrow "center"
+                      :parent (strcat "#" (prop id))
+                      "x"
+                      (:sub-opinion-list :... (@ this props))))))
       get-initial-state
       (lambda () (create viewable false))
       handle-mouse-enter
@@ -104,6 +109,7 @@
                              :looks (@ props looks)
                              :warstats (@ props warstats)
                              'opinion-store (@ props opinion-store)
+                             'hilited-text-id (@ props hilited-text-id)
                              'look-handler (@ props look-handler)
                              tree-address (@ props tree-address))))
                 (cond ((< (@ common-data :opinions length) 1)
@@ -122,19 +128,23 @@
                                  :last-char-pos end))))))))))
 
     (def-component hilited-text
-        (psx
-         (:div
-          :class
-          (if (focus-p (@ this props)) "hilited" "hilited-parent")
-          :key (unique-id)
-          (when (prop text)
-            (%make-segments (prop text)
-                            (remove-if-not
-                             ;;FIXME: do what with broken excerpts?
-                             ;; right now they just disappear?
-                             (lambda (x) (has-found-excerpt-p (@ x 0)))
-                             (prop opinions))
-                            (@ this props))))))
+        (let ((id (unique-id)))
+          (psx
+           (:div
+            :class
+            (if (focus-p (@ this props)) "hilited" "hilited-parent")
+            :key id
+            :id (strcat "hilited-text-" id)
+            (when (prop text)
+              (%make-segments (prop text)
+                              (remove-if-not
+                               ;;FIXME: do what with broken excerpts?
+                               ;; right now they just disappear?
+                               (lambda (x) (has-found-excerpt-p (@ x 0)))
+                               (prop opinions))
+                              (set-copy (@ this props)
+                                        'hilited-text-id
+                                        (strcat "hilited-text-" id))))))))
 
     (defun %make-opin-popups (opinions props)
       (loop for op in opinions
