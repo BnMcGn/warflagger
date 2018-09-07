@@ -29,6 +29,7 @@
   :@account-info #'account-bar
   :@javascript #'ps-gadgets
   :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
+  :@javascript-link  "https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js"
   :@head #'favicon-links
   :@site-index
   (lambda ()

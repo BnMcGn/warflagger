@@ -36,6 +36,14 @@
           :class (flavor (prop opinions))
           :on-mouse-enter (@ this handle-mouse-enter)
           :on-mouse-leave (@ this handle-mouse-leave)
+          :ref
+          (lambda (el)
+            (when el
+              (let ((res (position-difference
+                          (chain document (get-element-by-id (prop hilited-text-id)))
+                          el)))
+                (unless (chain _ (is-equal (state position) res))
+                  (set-state position res)))))
           (rebreak (prop text))
           (:span :class "segment-count" :key (unique-id)
                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
@@ -45,7 +53,7 @@
                      :parent (strcat "#" (prop id))
                      (:sub-opinion-list :... (@ this props)))))
       get-initial-state
-      (lambda () (create viewable false))
+      (lambda () (create viewable false position nil))
       handle-mouse-enter
       (lambda (e)
         (set-state viewable true))
