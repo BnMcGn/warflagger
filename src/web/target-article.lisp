@@ -36,18 +36,14 @@
           :class (flavor (prop opinions))
           :on-mouse-enter (@ this handle-mouse-enter)
           :on-mouse-leave (@ this handle-mouse-leave)
-          (:where-in-parent
-           :parent (prop hilite-text-id)
-           :child (prop id)
-           (rebreak (prop text))
-           (:span :class "segment-count" :key (unique-id)
-                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
-                    (if (< 1 count) count "")))
-           (:tool-tip :key "a1"
-                      :active (state viewable) :position "top" :arrow "center"
-                      :parent (strcat "#" (prop id))
-                      "x"
-                      (:sub-opinion-list :... (@ this props))))))
+          (rebreak (prop text))
+          (:span :class "segment-count" :key (unique-id)
+                 (let ((count (%get-replies-count (prop opinions) (@ this props))))
+                   (if (< 1 count) count "")))
+          (:tool-tip :key "a1"
+                     :active (state viewable) :position "top" :arrow "center"
+                     :parent (strcat "#" (prop id))
+                     (:sub-opinion-list :... (@ this props)))))
       get-initial-state
       (lambda () (create viewable false))
       handle-mouse-enter
