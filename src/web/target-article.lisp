@@ -28,6 +28,14 @@
             (when (eq (@ op 0 id) (@ foc (@ tad length)))
               (return-from focus-parent-p op))))))
 
+    (defun popup-side (position)
+      (if position
+          (if (< (* (chain -math (abs (@ position right))) 2)
+                 (chain -math (abs (@ position left))))
+              "right"
+              "left")
+          "left"))
+
     (def-component hilited-segment
         (psx
          (:span
@@ -49,7 +57,8 @@
                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
                    (if (< 1 count) count "")))
           (:tool-tip :key "a1"
-                     :active (state viewable) :position "top" :arrow "center"
+                     :active (state viewable) :position "bottom"
+                     :arrow (popup-side (state position))
                      :parent (strcat "#" (prop id))
                      (:sub-opinion-list :... (@ this props)))))
       get-initial-state
@@ -168,18 +177,55 @@
           ;(incf total (@ props warstats (@ op 0 id) replies-total)))
         total))
 
+    (defun reply-link (url excerpt))
+
     (def-component sub-opinion-list
         (psx
          (:div
-          (collecting
-              (dolist (itm (prop opinions))
-                (collect
-                    (psx
-                     (:opinion-summary
-                      :key (unique-id)
-                      :... (@ this props)
-                      :tree-address (@ (getprop itm 0) tree-address)
-                      :opid (@ (getprop itm 0) id)))))))))
+          :key 1 :class "sub-opinion-list"
+          (:a :href (reply-link ) "Reply to the excerpt")
+          (if (< 1 (@ (prop opinions) length))
+              (collecting
+                  (dolist (itm (prop opinions))
+                    (collect
+                        (psx
+                         (:opinion-summary
+                          :key (unique-id)
+                          :... (@ this props)
+                          :tree-address (@ (getprop itm 0) tree-address)
+                          :opid (@ (getprop itm 0) id))))))
+              (psx
+               (:opinion-info
+                :key 2
+                :... (@ this props)
+                :opinion (getprop (prop opinions) 0 0)))))))
+
+    (def-component opinion-info
+        (let* ((opinion (prop opinion))
+               (reference (when (and (prop references)
+                                     (chain (prop references)
+                                            (has-own-property (prop opinion id))))
+                            (getprop (prop references) (prop opinion id)))))
+          (psx
+           (:div
+            :... (format-styling-data (@ this props))
+            (:vote-value :key 1 :opinion opinion) " "
+            (:flag-name :key 2 :opinion opinion) " "
+            (:date-stamp :key 3 :opinion opinion) " "
+            (:author-long :key 4 :opinion opinion) " "
+            (:display-warstats2 :key 5)
+            (:div :key 9 :class "opinion-comment-wrapper"
+                  (when (@ opinion comment)
+                    (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
+                  (:div
+                   :key 12
+                   :class "opinion-extras"
+                   (when reference
+                     (psx (:reference
+                           :key 10
+                           :... (prop reference)
+                          :styling-data
+                          (format-reference-styling-data reference))))))))))
 
     (def-component mini-opinion
         (psx
