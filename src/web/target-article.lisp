@@ -123,6 +123,7 @@
                              :warstats (@ props warstats)
                              'opinion-store (@ props opinion-store)
                              'hilited-text-id (@ props hilited-text-id)
+                             'root-target-url (@ props root-target-url)
                              'look-handler (@ props look-handler)
                              tree-address (@ props tree-address))))
                 (cond ((< (@ common-data :opinions length) 1)
@@ -177,13 +178,25 @@
           ;(incf total (@ props warstats (@ op 0 id) replies-total)))
         total))
 
-    (defun reply-link (url excerpt))
+    (defun reply-link (url excerpt)
+      (let ((exstr (when excerpt (strcat "&excerpt=" (encode-u-r-i-component excerpt)))))
+        (strcat
+         "/opinion/?target="
+         (encode-u-r-i-component url)
+         exstr)))
 
     (def-component sub-opinion-list
         (psx
          (:div
           :key 1 :class "sub-opinion-list"
-          (:a :href (reply-link ) "Reply to the excerpt")
+          (:a :key 2 :class "action"
+              :href (reply-link (if (not-empty (prop tree-address))
+                                    (@ (getprop (prop opinion-store)
+                                                (last-list (prop tree-address)))
+                                       url)
+                                    (prop root-target-url))
+                                (prop text))
+              "Reply to the excerpt")
           (if (< 1 (@ (prop opinions) length))
               (collecting
                   (dolist (itm (prop opinions))
@@ -418,6 +431,7 @@
            :opinions (prop opinions)
            :focus (state focus)
            :focusfunc (@ this focus-func)
+           :root-target-url (prop url)
            :tree-address (list)
            :warstats (prop warstats)
            :opinion-store (prop opinion-store)

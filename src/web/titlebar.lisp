@@ -95,7 +95,7 @@
                     (psx (:input :type "hidden" :name "excerpt" :key 3
                                  :value (encode-u-r-i-component excerpt))))
                   (when offset
-                    (psx (:input :type "hidden" :name "offset" :key 3
+                    (psx (:input :type "hidden" :name "offset" :key 4
                                  :value (encode-u-r-i-component offset))))
                   (:input :type "submit" :value "Reply" :key 2)))))
 

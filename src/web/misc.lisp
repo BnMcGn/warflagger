@@ -79,7 +79,7 @@
     (defun make-missing-rootid-url (url)
       (strcat "/target/?newurl=" (encode-u-r-i-component url)))
 
-    (defun opinion-children (tree-address opinions)
+     (defun opinion-children (tree-address opinions)
       (let ((curr opinions))
         (dolist (id tree-address)
           (dotimes (i (@ curr length))
