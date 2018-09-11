@@ -178,7 +178,7 @@
           ;(incf total (@ props warstats (@ op 0 id) replies-total)))
         total))
 
-    (defun reply-link (url excerpt)
+    (defun excerpt-reply-link (url excerpt)
       (let ((exstr (when excerpt (strcat "&excerpt=" (encode-u-r-i-component excerpt)))))
         (strcat
          "/opinion/?target="
@@ -190,7 +190,7 @@
          (:div
           :key 1 :class "sub-opinion-list"
           (:a :key 2 :class "action"
-              :href (reply-link (if (not-empty (prop tree-address))
+              :href (excerpt-reply-link (if (not-empty (prop tree-address))
                                     (@ (getprop (prop opinion-store)
                                                 (last-list (prop tree-address)))
                                        url)
@@ -209,7 +209,7 @@
                           :opid (@ (getprop itm 0) id))))))
               (psx
                (:opinion-info
-                :key 2
+                :key 3
                 :... (@ this props)
                 :opinion (getprop (prop opinions) 0 0)))))))
 
