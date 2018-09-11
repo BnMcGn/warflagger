@@ -58,6 +58,7 @@
                    (if (< 1 count) count "")))
           (:tool-tip :key "a1"
                      :active (state viewable) :position "bottom"
+                     :group "one"
                      :arrow (popup-side (state position))
                      :parent (strcat "#" (prop id))
                      (:sub-opinion-list :... (@ this props)))))

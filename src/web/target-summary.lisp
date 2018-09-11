@@ -6,15 +6,19 @@
   (ps
 
     (def-component opinion-summary
-        (let ((opinion (@ (prop opinion-store)
+        (let* ((opinion (@ (prop opinion-store)
                           (if (prop tree-address)
                               (list-last (prop tree-address))
-                              (prop opid)))))
+                              (prop opid))))
+               (id (strcat "opinion-summary-" (@ opinion id))))
           (psx
            (:div
+            :id id
             :... (or (prop styling-data)
                      (format-styling-data (@ this props)))
             :class "opinion-summary"
+            :on-mouse-enter (@ this handle-mouse-enter)
+            :on-mouse-leave (@ this handle-mouse-leave)
             (if (prop tree-address)
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)))
                 (psx (:vote-value :key 1 :opinion opinion)))
@@ -22,7 +26,23 @@
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
-            (:reply-link :key 6 :url (@ opinion url))))))
+            (:reply-link :key 6 :url (@ opinion url))
+            (:tool-tip :key 7
+                       :active (state viewable) :position "bottom"
+                       :arrow "right"
+                       :group "two"
+                       :parent (strcat "#" id)
+                       (:opinion-info
+                        :... (@ this props)
+                        :opinion opinion)))))
+      get-initial-state
+      (lambda () (create viewable false))
+      handle-mouse-enter
+      (lambda (e)
+        (set-state viewable true))
+      handle-mouse-leave
+      (lambda (e)
+        (set-state viewable false)))
 
     (defun %format-referenced (refs)
       (let ((res (create)))
