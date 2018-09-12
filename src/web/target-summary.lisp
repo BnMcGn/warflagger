@@ -5,6 +5,7 @@
 (defun target-summary ()
   (ps
 
+    ;;FIXME: relocate
     (def-component opinion-summary
         (let* ((opinion (@ (prop opinion-store)
                           (if (prop tree-address)

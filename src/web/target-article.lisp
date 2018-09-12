@@ -214,6 +214,7 @@
                 :... (@ this props)
                 :opinion (getprop (prop opinions) 0 0)))))))
 
+    ;;FIXME: Needs different look, more long form.
     (def-component opinion-info
         (let* ((opinion (prop opinion))
                (reference (when (and (prop references)
@@ -415,7 +416,7 @@
     (def-component target-root-article
         (psx
          (:div
-          :style (create position :absolute width "80%")
+          :style (create position :absolute width "80%" :margin-bottom "20em")
           :on-click (@ this handle-click)
           (:target-title
            :key 0
@@ -428,6 +429,10 @@
             :opinions (prop opinions)
             :tree-address (list)
             :focusfunc (@ this focus-func)))
+          (:h3
+           :style (create :font-style "italic" :background "lightgrey")
+           :key 3
+           "Text from article at " (url-domain (prop url)))
           (:hilited-text
            :key 2
            :text (prop text)
