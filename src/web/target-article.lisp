@@ -256,7 +256,10 @@
                             :key (unique-id)
                             :... (@ this props)
                             :tree-address op
-                            :styling-data (format-styling-data (@ %thisref props))
+                            :styling-data (format-styling-data
+                                           (copy-merge-all (@ %thisref props)
+                                                           (create
+                                                            'tree-address op)))
                             :reference (getprop (prop references) opid))))))))))))
 
     (def-component target-root-article
