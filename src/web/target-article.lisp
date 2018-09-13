@@ -6,7 +6,6 @@
   (ps
 
     (setf tool-tip (@ (require "react-portal-tooltip") default))
-    ;;(setf tool-tip (@ -tool-tip-module -tool-tip))
 
     (defun focus-p (props?)
       (let ((tad (@ props? tree-address))
@@ -161,17 +160,6 @@
                                         'hilited-text-id
                                         (strcat "hilited-text-" id))))))))
 
-    (defun %make-opin-popups (opinions props)
-      (loop for op in opinions
-         for (x y) in (opinion-fan (length opinions))
-         collect
-           (psx (:mini-opinion :... props
-                               :opinion (@ op 0)
-                               :opinions (chain op (slice 1))
-                               :top (+ y (lisp *unit-string*))
-                               :left (+ x (lisp *unit-string*))
-                               :key (unique-id)))))
-
     (defun %get-replies-count (opinions props)
       (let ((total 0))
         (dolist (op opinions)
@@ -244,39 +232,6 @@
                           :styling-data
                           (format-reference-styling-data reference))))))))))
 
-    (def-component mini-opinion
-        (psx
-         (:div
-          :id (strcat "opinid-" (prop opinion id (to-string)))
-          :class (strcat "opinion " (flavor (prop opinions)))
-          :on-click (@ this handle-click)
-          :style (create position :absolute
-                         top (prop top) left (prop left)
-                         box-shadow "4px 4px 20px -2px #000"
-                         ;;FIXME: Inline-table works for now. What does it mean?
-                         display "inline-table")
-          (:vote-value :opinion (prop opinion) :key (unique-id))
-          (:flag-name :key (unique-id) :opinion (prop opinion))))
-      handle-click
-      (lambda (e)
-        (funcall (prop focusfunc)
-                 (chain (prop tree-address)
-                        (concat (list (prop opinion id)))))
-        (chain e (stop-propagation)))
-      component-did-mount
-      (lambda ()
-        (unless ;;Leave unread if has comment text or replies
-            (or (prop opinion comment)
-                (< 0 (prop opinions length)))
-          (funcall (prop look-handler) (prop opinion id)))))
-
-    (defun %make-knob-id (treeaddress)
-      (collecting-string
-        (collect "knob")
-        (dolist (ta treeaddress)
-          (collect "-")
-          (collect (chain ta (to-string))))))
-
     (defun %get-excerptless-opinions (opins)
       (collecting
           (dolist (o opins)
@@ -284,147 +239,16 @@
                          (< 0 (@ o 0 excerpt length)))
               (collect o)))))
 
-    ;;FIXME: this is getting too large & complicated
-    (def-component general-opinion-knobdule
-        (let ((opins (%get-excerptless-opinions (prop opinions))))
-          (delete-plumbs this)
-          (psx (:span :on-click (@ this handle-click)
-                      :style (create position :relative)
-                      :id (%make-knob-id (prop tree-address))
-                      (:knobdule-display :opinions opins :key "x")
-                      (let ((focussed (focus-parent-p (@ this props))))
-                        (if (and focussed
-                                 (not (and (@ focussed 0 excerpt)
-                                           (< 0 (@ focussed 0 excerpt length)))))
-                            (psx (:opinion :opinions focussed
-                                           :key (unique-id)
-                                           :focus (prop focus)
-                                           :focusfunc (prop focusfunc)
-                                           :tree-address (prop tree-address)
-                                           :looks (prop looks)
-                                           :look-handler
-                                           (prop look-handler)))
-                            (when (focus-p (@ this props))
-                              (psx (:span :style (create position :absolute)
-                                          :key 1
-                                          (%make-opin-popups
-                                           (if (and (not (prop not-viewable))
-                                                    (state viewable))
-                                               opins
-                                               (list))
-                                           (@ this props))))))))))
-      get-initial-state
-      (lambda () (create viewable false))
-      handle-click
-      (lambda (e)
-        (unless (prop not-viewable)
-          (set-state viewable (not (state viewable)))
-          (chain e (stop-propagation))))
-      display-plumbs
-      (lambda ()
-        (let ((id (%make-knob-id (prop tree-address))))
-          (when (state viewable)
-            (display-popup-plumbs
-             this
-             id
-             ;;FIXME: Looks a little shaky
-             (chain document (get-element-by-id id)
-                    parent-element parent-element parent-element)
-             (%get-excerptless-opinions (prop opinions))))))
-      component-will-receive-props
-      (lambda (_)
-        (set-state viewable nil))
-      component-did-mount
-      (lambda () (chain this (display-plumbs)))
-      component-did-update
-      (lambda () (chain this (display-plumbs))))
-
-    (def-component knobdule-display
-        (let* ((immed (chain (prop opinions) length))
-               (all
-                (labels ((counter (things)
-                           (let ((ln (chain things length)))
-                             (if (= 1 ln)
-                                 1
-                                 (chain (mapcar #'counter things)
-                                        (reduce (lambda (a b) (+ a b))
-                                                0))))))
-                  (counter (prop opinions))))
-               (allstr (if (< immed all)
-                           (strcat "/" (chain all (to-string)))
-                           "")))
-          (psx (:span :class "knobdule"
-                      (strcat (chain immed (to-string)) allstr)))))
-
-    ;;FIXME: The reference should include much more information: title, link to target
-    ;; page, warstats...
-    (def-component reference-line
-        (psx
-         (:div
-          (:a :href (prop reference) "Reference"))))
-
-    (def-component opinion
-        (let* ((op (@ (prop opinions) 0))
-               (tree-ad (chain (prop tree-address)
-                               (concat (list (@ op id))))))
-          (psx
-           (:div
-            :ref
-            (lambda (el)
-              (when el
-                (let ((offset
-                       (+ (lisp *grandchild-shift*)
-                          (chain (position-difference
-                                  (chain el parent-element parent-element)
-                                  (chain el parent-element)) left))))
-                  (setf (chain el style left)
-                        (chain offset (to-string) (concat "px"))))))
-            :on-click (@ this handle-click)
-            :class "opinion"
-            :key (unique-id)
-            :style (create position :absolute
-                           top "1em"
-                           left (prop horizontal-position))
-            (:div :key (unique-id)
-                  :class (flavor (prop opinions (slice 1)))
-                  :style (create padding "1em")
-                  (:vote-value :key 1 :opinion op) " "
-                  (:flag-name :key 2 :opinion op) " "
-                  (:date-stamp :key 3 :opinion op) " "
-                  (:author-long :key 4 :opinion op) " "
-                  (:reply-link :key 6 :url (@ op url))
-                  (:general-opinion-knobdule
-                   :key 5
-                   :... (@ this props)
-                   :opinions (prop opinions (slice 1))
-                   :tree-address tree-ad))
-            (:hilited-text
-             :key (unique-id)
-             :... (@ this props)
-             :text (@ op comment)
-             :opinions (prop opinions (slice 1))
-             :tree-address tree-ad)
-            (when (@ op reference)
-              (psx (:reference-line :key "x1" :reference (@ op reference)))))))
-      handle-click
-      (lambda (e)
-        (chain e (stop-propagation)))
-      component-did-mount
-      (lambda ()
-        (funcall (prop look-handler) (@ (prop opinions) 0 id))))
-
     (def-component excerptless-opinions
         (psx
          (:div
           :style (create 'margin-top "2em")
-          (:h3 "General Opinions:")
+          (:h3 :key 1 "General Opinions:")
           (collecting
               (dolist (op (prop tree-addresses))
-                (say op)
                 (when (> 2 (@ op length)) ;opinion is on root article
                   (let* ((opid (elt op 0))
                          (opin (getprop (prop opinion-store) opid)))
-                    (say opin)
                     (unless (has-excerpt-p opin)
                       (collect
                           (psx
@@ -443,14 +267,7 @@
           (:target-title
            :key 0
            :... (@ this props)
-           " "
-           (:general-opinion-knobdule
-            :key 1
-            :... (@ this props)
-            :focus (state focus)
-            :opinions (prop opinions)
-            :tree-address (list)
-            :focusfunc (@ this focus-func)))
+           " ")
           (:h3
            :style (create 'font-style "italic" :background "lightgrey")
            :key 2
