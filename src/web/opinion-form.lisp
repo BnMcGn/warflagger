@@ -193,6 +193,10 @@
          (chain text (slice 0 start))
          (psx (:span :class "hilited" :key 1
                      :style (create 'background-color "orange")
+                     :ref
+                     (lambda (el)
+                       (when el
+                         (chain el (scroll-into-view))))
                      (chain text (slice start end))))
          (chain text (slice end))))
 
