@@ -413,10 +413,32 @@
       (lambda ()
         (funcall (prop look-handler) (@ (prop opinions) 0 id))))
 
+    (def-component excerptless-opinions
+        (psx
+         (:div
+          :style (create 'margin-top "2em")
+          (:h3 "General Opinions:")
+          (collecting
+              (dolist (op (prop tree-addresses))
+                (say op)
+                (when (> 2 (@ op length)) ;opinion is on root article
+                  (let* ((opid (elt op 0))
+                         (opin (getprop (prop opinion-store) opid)))
+                    (say opin)
+                    (unless (has-excerpt-p opin)
+                      (collect
+                          (psx
+                           (:thread-opinion
+                            :key (unique-id)
+                            :... (@ this props)
+                            :tree-address op
+                            :styling-data (format-styling-data (@ %thisref props))
+                            :reference (getprop (prop references) opid))))))))))))
+
     (def-component target-root-article
         (psx
          (:div
-          :style (create position :absolute width "80%" :margin-bottom "20em")
+          :style (create position :absolute width "80%" 'margin-bottom "20em")
           :on-click (@ this handle-click)
           (:target-title
            :key 0
@@ -430,11 +452,11 @@
             :tree-address (list)
             :focusfunc (@ this focus-func)))
           (:h3
-           :style (create :font-style "italic" :background "lightgrey")
-           :key 3
+           :style (create 'font-style "italic" :background "lightgrey")
+           :key 2
            "Text from article at " (url-domain (prop url)))
           (:hilited-text
-           :key 2
+           :key 3
            :text (prop text)
            :opinions (prop opinions)
            :focus (state focus)
@@ -444,7 +466,10 @@
            :warstats (prop warstats)
            :opinion-store (prop opinion-store)
            :looks (prop looks)
-           :look-handler (prop look-handler))))
+           :look-handler (prop look-handler))
+          (:excerptless-opinions
+           :key 4
+           :... (@ this props))))
       handle-click
       (lambda () (set-state focus (list)))
       focus-func
