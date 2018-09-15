@@ -23,6 +23,7 @@
               (cons :excerpt-offset "1.5") *test-input*)
        wf/web::*opinion-form-specs*)
     (ok (null sig))
+    (is 3 (length (hash-table-keys vals)))
     (ok (key-in-hash? :votevalue vals))
     (ok (key-in-hash? :excerpt-offset vals))
     (ok (key-in-hash? :target vals))

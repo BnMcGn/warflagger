@@ -222,6 +222,7 @@
                   (:h5 :key 1 "Flag Info:")
                   (getprop descs (prop formdata flag))))))
 
+
       (def-component text-sample-core
           (psx
            (:pre :id "textsample"
@@ -311,6 +312,10 @@
             (psx
              (:tr :key (prop keydata)
                   (:td :key "m1"
+                       :title (prop error)
+                       :... (if (prop error)
+                                (create :data-has-error "true")
+                                (create))
                        (or (prop description)
                            (capitalize-first (ensure-string (prop name)))))
                   (children-map (prop children)
@@ -318,6 +323,10 @@
                                   (psx (:td :key (incf count)
                                             :style (create padding-left "1em")
                                             child))))))))
+
+      (defun %has-errors (errors)
+        (do-keyvalue (k v errors)
+          (when v (return-from %has-errors t))))
 
       (def-component custom-opform-layout
           (let ((state (@ this :state))
@@ -331,27 +340,29 @@
                 (children-map
                  (prop children)
                  (lambda (child)
-                   (psx
-                    (:opform-item
-                     :keydata (incf count)
-                     :description (@ child props fieldspec description)
-                     :name (@ child props name)
-                     child
-                     (case (@ child props name)
-                       ("target"
-                        (psx (:message :message (@ state message) :key 1)))
-                       ("excerpt"
-                        (psx (:text-sample
-                              :key 1
-                              :url (@ props formdata target)
-                              :excerpt (@ props formdata excerpt)
-                              :excerpt-offset
-                              (@ props formdata excerpt-offset)
-                              :dispatch cdispatch)))
-                       ("flag"
-                        (psx
-                         (:flag-description :formdata (@ props formdata)
-                                            :key 1))))))))
+                   (let ((name (@ child props name)))
+                     (psx
+                      (:opform-item
+                       :keydata (incf count)
+                       :description (@ child props fieldspec description)
+                       :name name
+                       :error (getprop (prop errors) name)
+                      child
+                      (case name
+                        ("target"
+                         (psx (:message :message (@ state message) :key 1)))
+                        ("excerpt"
+                         (psx (:text-sample
+                               :key 1
+                               :url (@ props formdata target)
+                               :excerpt (@ props formdata excerpt)
+                               :excerpt-offset
+                               (@ props formdata excerpt-offset)
+                               :dispatch cdispatch)))
+                        ("flag"
+                         (psx
+                          (:flag-description :formdata (@ props formdata)
+                                             :key 1)))))))))
                 (:tr
                  :key "user1"
                  (:td
@@ -359,7 +370,9 @@
                           :on-click (@ this post-form))))
                 (:tr
                  :key "user0"
-                 (:td (if (@ props success) "Opinion Posted" ""))))))))
+                 (:td (if (%has-errors (prop errors))
+                          "Opinion not posted: Some fields have errors"
+                          (if (@ props success) "Opinion Posted" "")))))))))
         get-initial-state
         (lambda ()
           (create :message ""))
