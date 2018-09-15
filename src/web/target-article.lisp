@@ -35,6 +35,11 @@
               "left")
           "left"))
 
+    (defun immediate-children-ids (opinions)
+      (mapcar (lambda (opin)
+                (@ (getprop opin 0) id))
+              opinions))
+
     (def-component hilited-segment
         (psx
          (:span
@@ -56,7 +61,8 @@
                  (let ((count (%get-replies-count (prop opinions) (@ this props))))
                    (if (< 1 count) count "")))
           (:tool-tip :key "a1"
-                     :active (state viewable) :position "bottom"
+                     :active (and (state viewable) (not (prop hide-popup)))
+                     :position "bottom"
                      :group "one"
                      :arrow (popup-side (state position))
                      :parent (strcat "#" (prop id))
@@ -65,9 +71,17 @@
       (lambda () (create viewable false position nil))
       handle-mouse-enter
       (lambda (e)
+        (when (prop dispatch)
+          (funcall (prop dispatch)
+                   (create :type 'set-indicated
+                           :data (immediate-children-ids (prop opinions)))))
         (set-state viewable true))
       handle-mouse-leave
       (lambda (e)
+        (when (prop dispatch)
+          (funcall (prop dispatch)
+                   (create :type 'clear-indicated
+                           :data (immediate-children-ids (prop opinions)))))
         (set-state viewable false)))
 
     (def-component plain-segment
@@ -125,6 +139,8 @@
                              'hilited-text-id (@ props hilited-text-id)
                              'root-target-url (@ props root-target-url)
                              'look-handler (@ props look-handler)
+                             'hide-popup (@ props hide-popup)
+                             :dispatch (@ props dispatch)
                              tree-address (@ props tree-address))))
                 (cond ((< (@ common-data :opinions length) 1)
                        (collect
