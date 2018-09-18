@@ -6,6 +6,7 @@
   (ps
 
     (setf tool-tip (@ (require "react-portal-tooltip") default))
+    (setf rangy (require "rangy"))
 
     (defun focus-p (props?)
       (let ((tad (@ props? tree-address))
@@ -39,6 +40,18 @@
       (mapcar (lambda (opin)
                 (@ (getprop opin 0) id))
               opinions))
+
+    (defun %find-parent-hilited (element)
+      (if element
+          (if (equal "hilited" (@ element class-name))
+              element
+              (%find-parent-hilited (@ element parent-element)))))
+
+    (defun is-selection-in-single-hilited-text? (selection)
+      (let ((parent1 (%find-parent-hilited (@ selection anchor-node))))
+        (and (not (@ selection is-collapsed))
+             parent1
+             (eq parent1 (%find-parent-hilited (@ selection focus-node))))))
 
     (def-component hilited-segment
         (psx
@@ -165,6 +178,8 @@
             (if (focus-p (@ this props)) "hilited" "hilited-parent")
             :key id
             :id (strcat "hilited-text-" id)
+            :on-mouse-up (@ this selection-change)
+            :on-key-press (@ this selection-change)
             (when (prop text)
               (%make-segments (prop text)
                               (remove-if-not
@@ -174,7 +189,10 @@
                                (prop opinions))
                               (set-copy (@ this props)
                                         'hilited-text-id
-                                        (strcat "hilited-text-" id))))))))
+                                        (strcat "hilited-text-" id)))))))
+      selection-change
+      (lambda (ev)
+        (say (is-selection-in-single-hilited-text? (chain rangy (get-selection))))))
 
     (defun %get-replies-count (opinions props)
       (let ((total 0))
