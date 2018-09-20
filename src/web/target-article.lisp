@@ -6,7 +6,6 @@
   (ps
 
     (setf tool-tip (@ (require "react-portal-tooltip") default))
-    (setf rangy (require "rangy"))
 
     (defun focus-p (props?)
       (let ((tad (@ props? tree-address))

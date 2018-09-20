@@ -29,6 +29,7 @@
                                                                 (@ %thisref props))
                                           :warstats (getprop (prop warstats) itm)
                                           :... (getprop (prop roots) itm)))
+                                        ;;FIXME: creates error or ugly
                                         (psx (:div "Loading...")))))
                                ((stringp itm)
                                 (collect

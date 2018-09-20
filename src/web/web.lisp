@@ -30,6 +30,9 @@
   :@javascript #'ps-gadgets
   :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
   :@javascript-link  "https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js"
+  ;;FIXME: Should be able to bundle these with browserify. Can't.
+  :@javascript-link "/static/node_modules/rangy/lib/rangy-core.js"
+  :@javascript-link "/static/node_modules/rangy/lib/rangy-textrange.js"
   :@head #'favicon-links
   :@site-index
   (lambda ()

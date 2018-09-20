@@ -104,12 +104,9 @@
 
 (define-parts opinion-components
   :@javascript #'webhax-widgets:ps-widgets
-  :@javascript-link "/static/node_modules/rangy/lib/rangy-core.js"
-  :@javascript-link "/static/node_modules/rangy/lib/rangy-textrange.js"
   :@javascript
   (lambda ()
     (ps
-
       ;;FIXME: Duplicate of lisp functions in excerpt.lisp
       ;;Would be nice to only implement once.
       (defun create-textdata (text)
