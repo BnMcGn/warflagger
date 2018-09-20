@@ -170,28 +170,40 @@
                                  :last-char-pos end))))))))))
 
     (def-component hilited-text
-        (let ((id (unique-id)))
-          (psx
-           (:div
-            :class
-            (if (focus-p (@ this props)) "hilited" "hilited-parent")
-            :key id
-            :id (strcat "hilited-text-" id)
-            :on-mouse-up (@ this selection-change)
-            :on-key-press (@ this selection-change)
-            (when (prop text)
-              (%make-segments (prop text)
-                              (remove-if-not
-                               ;;FIXME: do what with broken excerpts?
-                               ;; right now they just disappear?
-                               (lambda (x) (has-found-excerpt-p (@ x 0)))
-                               (prop opinions))
-                              (set-copy (@ this props)
-                                        'hilited-text-id
-                                        (strcat "hilited-text-" id)))))))
+        (psx
+         (:div
+          :class
+          (if (focus-p (@ this props)) "hilited" "hilited-parent")
+          :key (state id)
+          :id (state id)
+          :on-mouse-up (@ this selection-change)
+          :on-key-press (@ this selection-change)
+          (when (prop text)
+            (%make-segments (prop text)
+                            (remove-if-not
+                             ;;FIXME: do what with broken excerpts?
+                             ;; right now they just disappear?
+                             (lambda (x) (has-found-excerpt-p (@ x 0)))
+                             (prop opinions))
+                            (set-copy (@ this props)
+                                      'hilited-text-id
+                                      (state id))))))
+      get-initial-state
+      (lambda ()
+        (create :id (strcat "hilited-text-" (unique-id))))
       selection-change
       (lambda (ev)
-        (say (is-selection-in-single-hilited-text? (chain rangy (get-selection))))))
+        (when (is-selection-in-single-hilited-text? (chain rangy (get-selection)))
+          (when (prop dispatch)
+            (let* ((textel (chain document (get-element-by-id (state id))))
+                   (range (chain rangy (get-selection) (get-range-at 0)
+                                 (to-character-range textel)))
+                   (excerpt (get-location-excerpt (prop text) (@ range start) (@ range end))))
+              (funcall
+               (prop dispatch)
+               (create :range range
+                       :excerpt (getprop excerpt 0)
+                       :offset (getprop excerpt 1))))))))
 
     (defun %get-replies-count (opinions props)
       (let ((total 0))
