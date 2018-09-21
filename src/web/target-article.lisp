@@ -201,7 +201,8 @@
                    (excerpt (get-location-excerpt (prop text) (@ range start) (@ range end))))
               (funcall
                (prop dispatch)
-               (create :range range
+               (create :type :selection
+                       :range range
                        :excerpt (getprop excerpt 0)
                        :offset (getprop excerpt 1))))))))
 
@@ -315,6 +316,8 @@
           (:target-title
            :key 0
            :... (@ this props)
+           :reply-excerpt (state :reply-excerpt)
+           :reply-offset (state :reply-offset)
            " ")
           (:h3
            :style (create 'font-style "italic" :background "lightgrey")
@@ -330,17 +333,26 @@
            :tree-address (list)
            :warstats (prop warstats)
            :opinion-store (prop opinion-store)
+           :dispatch (@ this dispatch)
            :looks (prop looks)
            :look-handler (prop look-handler))
           (:excerptless-opinions
            :key 4
            :... (@ this props))))
+      get-default-state
+      (lambda ()
+        (create 'reply-excerpt "" 'reply-offset nil))
       handle-click
       (lambda () (set-state focus (list)))
       focus-func
       (lambda (new-focus) (set-state focus new-focus))
       get-initial-state
-      (lambda () (create focus (prop focus))))
+      (lambda () (create focus (prop focus)))
+      dispatch
+      (lambda (action)
+        (when (eq (@ action type) :selection)
+          (set-state :reply-excerpt (@ action excerpt)
+                     :reply-offset (@ action offset)))))
 
     ))
 

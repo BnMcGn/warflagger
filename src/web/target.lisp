@@ -80,7 +80,11 @@
              (:display-warstats2 :key 2)
              (prop children)
              (unless (prop hide-reply)
-               (psx (:reply-link :key 3 :url (prop url))))
+               (psx (:reply-link
+                     :key 3
+                     :url (prop url)
+                     :excerpt (prop reply-excerpt)
+                     :offset (prop reply-offset))))
              (when (prop show-count)
                (psx (:reply-count :key 4 :warstats (prop warstats root))))))))
 
