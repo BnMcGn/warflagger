@@ -97,7 +97,12 @@
                   (when offset
                     (psx (:input :type "hidden" :name "offset" :key 4
                                  :value (encode-u-r-i-component offset))))
-                  (:input :type "submit" :value "Reply" :key 2)))))
+                  (if excerpt
+                      (psx (:input :type "submit"
+                                   :key 2
+                                   :title (strcat "Reply to the excerpt: \"" excerpt "\"")
+                                   :value "Reply to Excerpt"))
+                      (psx (:input :type "submit" :value "Reply" :key 2)))))))
 
     (def-component reply-count
         (let* ((immediate (prop warstats replies-immediate))
