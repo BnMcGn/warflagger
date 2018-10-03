@@ -127,34 +127,35 @@
                                           (collect (@ op 0))))
                             (length text))))
             (do-window ((start end) segpoints)
-              (let ((common-data
-                     (create :opinions
-                             (remove-if-not
-                              (lambda (itm)
-                                (%overlap-p
-                                 start (1- end)
-                                 (@ itm 0 'text-position 0)
-                                 (+ (@ itm 0 'text-position 0)
-                                    (@ itm 0 'text-position 1) (- 1))))
-                              opins)
-                             :key (unique-id)
-                             :id (strcat "lvl-"
-                                         (chain props
-                                                tree-address length (to-string))
-                                         "-pos-"
-                                         (chain end (to-string)))
-                             :text (chain text (slice start end))
-                             :focusfunc (@ props focusfunc)
-                             :looks (@ props looks)
-                             :warstats (@ props warstats)
-                             'opinion-store (@ props opinion-store)
-                             'hilited-text-id (@ props hilited-text-id)
-                             'root-target-url (@ props root-target-url)
-                             'look-handler (@ props look-handler)
-                             'hide-popup (@ props hide-popup)
-                             :dispatch (@ props dispatch)
-                             tree-address (@ props tree-address))))
-                (cond ((< (@ common-data :opinions length) 1)
+              (let* ((id (strcat "lvl-"
+                          (chain props
+                                 tree-address length (to-string))
+                          "-pos-"
+                          (chain end (to-string))))
+                     (common-data
+                      (create :opinions
+                              (remove-if-not
+                               (lambda (itm)
+                                 (%overlap-p
+                                  start (1- end)
+                                  (@ itm 0 'text-position 0)
+                                  (+ (@ itm 0 'text-position 0)
+                                     (@ itm 0 'text-position 1) (- 1))))
+                               opins)
+                              :key id
+                              :id id
+                              :text (chain text (slice start end))
+                              :focusfunc (@ props focusfunc)
+                              :looks (@ props looks)
+                              :warstats (@ props warstats)
+                              'opinion-store (@ props opinion-store)
+                              'hilited-text-id (@ props hilited-text-id)
+                              'root-target-url (@ props root-target-url)
+                              'look-handler (@ props look-handler)
+                              'hide-popup (@ props hide-popup)
+                              :dispatch (@ props dispatch)
+                              tree-address (@ props tree-address))))
+              (cond ((< (@ common-data :opinions length) 1)
                        (collect
                            (psx (:plain-segment
                                  :... common-data))))
