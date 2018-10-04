@@ -35,10 +35,28 @@
               "left")
           "left"))
 
-    (defun immediate-children-ids (opinions)
-      (mapcar (lambda (opin)
-                (@ (getprop opin 0) id))
-              opinions))
+    (defun immediate-children-ids (id opinstore)
+      (if id
+          (let ((len (@ (getprop opinstore id) 'tree-address length)))
+            (collecting
+                (dolist (itm (all-descendant-ids id opinstore))
+                  (when (eq (1+ len) (@ (getprop opinstore itm) 'tree-address length))
+                    (collect itm)))))
+          (collecting
+              (do-keyvalue (k opin opinstore)
+                (when (eq 1 (@ opin 'tree-address length))
+                  (collect k))))))
+
+    (defun all-descendant-ids (id opinstore)
+      (if id
+          (let* ((trad (@ (getprop opinstore id) 'tree-address))
+                 (len (@ trad length)))
+            (collecting
+                (do-keyvalue (k opin opinstore)
+                  (when (< len (@ opin 'tree-address length))
+                    (when (array-equal trad (chain (@ opin 'tree-address) (slice 0 len)))
+                      (collect k))))))
+          (chain -object (keys opinstore))))
 
     (defun %find-parent-hilited (element)
       (if element
@@ -86,14 +104,16 @@
         (when (prop dispatch)
           (funcall (prop dispatch)
                    (create :type 'set-indicated
-                           :data (immediate-children-ids (prop opinions)))))
+                           :data
+                           (immediate-children-ids (prop id-of-text) (prop opinion-store)))))
         (set-state viewable true))
       handle-mouse-leave
       (lambda (e)
         (when (prop dispatch)
           (funcall (prop dispatch)
                    (create :type 'clear-indicated
-                           :data (immediate-children-ids (prop opinions)))))
+                           :data
+                           (immediate-children-ids (prop id-of-text) (prop opinion-store)))))
         (set-state viewable false)))
 
     (def-component plain-segment
@@ -125,7 +145,9 @@
           (let ((segpoints (excerpt-segment-points
                             (collecting (dolist (op opins)
                                           (collect (@ op 0))))
-                            (length text))))
+                            (length text)))
+                (current-id (when (@ props tree-address)
+                              (list-last (@ props tree-address)))))
             (do-window ((start end) segpoints)
               (let* ((id (strcat "lvl-"
                           (chain props
@@ -145,6 +167,7 @@
                               :key id
                               :id id
                               :text (chain text (slice start end))
+                              :id-of-text current-id
                               :focusfunc (@ props focusfunc)
                               :looks (@ props looks)
                               :warstats (@ props warstats)
@@ -194,8 +217,8 @@
         (create :id (strcat "hilited-text-" (unique-id))))
       selection-change
       (lambda (ev)
-        (when (is-selection-in-single-hilited-text? (chain rangy (get-selection)))
-          (when (prop dispatch)
+        (when (prop dispatch)
+          (if (is-selection-in-single-hilited-text? (chain rangy (get-selection)))
             (let* ((textel (chain document (get-element-by-id (state id))))
                    (range (chain rangy (get-selection) (get-range-at 0)
                                  (to-character-range textel)))
@@ -206,7 +229,11 @@
                (create :type :selection
                        :range range
                        :excerpt (getprop excerpt 0)
-                       :offset (getprop excerpt 1))))))))
+                       :offset (getprop excerpt 1))))
+            (funcall
+             (prop dispatch)
+             (create :type :selection
+                     :range false :excerpt "" :offset 0))))))
 
     (defun %get-replies-count (opinions props)
       (let ((total 0))
