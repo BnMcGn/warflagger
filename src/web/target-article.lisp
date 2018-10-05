@@ -88,7 +88,7 @@
                   (set-state position res)))))
           (rebreak (prop text))
           (:span :class "segment-count" :key (unique-id)
-                 (let ((count (%get-replies-count (prop opinions) (@ this props))))
+                 (let ((count (%get-replies-count (prop excerpt-opinions) (@ this props))))
                    (if (< 1 count) count "")))
           (:tool-tip :key "a1"
                      :active (and (state viewable) (not (prop hide-popup)))
@@ -132,6 +132,7 @@
                              (eql (prop last-char-pos)
                                   (+ (@ focussed 0 text-position 0)
                                      (@ focussed 0 text-position 1))))
+                    ;;FIXME: obsolete
                     (psx (:opinion :opinions focussed
                                    :key (unique-id)
                                    :focus (prop focus)
@@ -140,14 +141,15 @@
                                    :look-handler (prop look-handler)
                                    :tree-address (prop tree-address))))))))
 
-    (defun %make-segments (text opins props)
+    (defun %make-segments (text props)
       (collecting
-          (let ((segpoints (excerpt-segment-points
-                            (collecting (dolist (op opins)
-                                          (collect (@ op 0))))
-                            (length text)))
-                (current-id (when (@ props tree-address)
-                              (list-last (@ props tree-address)))))
+          (let* ((current-id (when (@ props tree-address)
+                               (list-last (@ props tree-address))))
+                 (opstore (@ props opinion-store))
+                 (opins (immediate-children-ids current-id opstore))
+                 (segpoints (excerpt-segment-points
+                             (mapcar (lambda (id) (getprop opstore id)) opins)
+                             (length text))))
             (do-window ((start end) segpoints)
               (let* ((id (strcat "lvl-"
                           (chain props
@@ -155,14 +157,16 @@
                           "-pos-"
                           (chain end (to-string))))
                      (common-data
-                      (create :opinions
+                      (create 'excerpt-opinions
                               (remove-if-not
-                               (lambda (itm)
-                                 (%overlap-p
-                                  start (1- end)
-                                  (@ itm 0 'text-position 0)
-                                  (+ (@ itm 0 'text-position 0)
-                                     (@ itm 0 'text-position 1) (- 1))))
+                               (lambda (id)
+                                 (let ((opin (getprop opstore id)))
+                                   (and (has-found-excerpt-p opin)
+                                        (%overlap-p
+                                         start (1- end)
+                                         (@ opin 'text-position 0)
+                                         (+ (@ opin 'text-position 0)
+                                            (@ opin 'text-position 1) (- 1))))))
                                opins)
                               :key id
                               :id id
@@ -178,7 +182,7 @@
                               'hide-popup (@ props hide-popup)
                               :dispatch (@ props dispatch)
                               tree-address (@ props tree-address))))
-              (cond ((< (@ common-data :opinions length) 1)
+              (cond ((< (@ common-data 'excerpt-opinions length) 1)
                        (collect
                            (psx (:plain-segment
                                  :... common-data))))
@@ -204,11 +208,6 @@
           :on-key-press (@ this selection-change)
           (when (prop text)
             (%make-segments (prop text)
-                            (remove-if-not
-                             ;;FIXME: do what with broken excerpts?
-                             ;; right now they just disappear?
-                             (lambda (x) (has-found-excerpt-p (@ x 0)))
-                             (prop opinions))
                             (set-copy (@ this props)
                                       'hilited-text-id
                                       (state id))))))
@@ -235,11 +234,11 @@
              (create :type :selection
                      :range false :excerpt "" :offset 0))))))
 
-    (defun %get-replies-count (opinions props)
+    (defun %get-replies-count (opinion-ids props)
       (let ((total 0))
-        (dolist (op opinions)
+        (dolist (op opinion-ids)
           (incf total))
-          ;(incf total (@ props warstats (@ op 0 id) replies-total)))
+          ;(incf total (@ props warstats op replies-total)))
         total))
 
     (defun excerpt-reply-link (url excerpt)
