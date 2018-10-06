@@ -42,20 +42,38 @@
                 ((< newest (- now hours)) "recent")
                 (t "new"))))
 
-      (defun flavor (opins)
-        (chain (calculate-flavor opins)
-               (concat "-" (calculate-freshness opins))))
+      (defun freshness-from-warstats (&rest warstats-coll)
+        (let* ((hours (lisp *js-hour*))
+               (days (* 2 (lisp *js-day*)))
+               (now (chain -date (now)))
+               (newest (max
+                        (mapcar (lambda (warstats) (@ warstats tree-freshness))
+                                warstats-coll))))
+          (cond ((< newest (- now days)) "old")
+                ((< newest (- now hours)) "recent")
+                (t "new"))))
 
       ;;FIXME: Crude, doesn't account for target type, doesn't represent problematic
-      (defun flavor-from-warstats (warstats)
-        (let* ((effect (@ warstats effect))
-               (controv (@ warstats controversy))
-               (pos (+ (@ warstats x-right 0) (@ warstats x-supported 0)))
-               (neg (+ (@ warstats x-wrong 0) (@ warstats x-dissed 0)))
-               (irrel (@ warstats x-irrelevant 0))
-               (unver (@ warstats x-unverified 0))
-               (probl (@ warstats x-problematic 0))
-               (diff (relative-to-range 0 effect controv)))
+      (defun flavor-from-warstats (&rest warstats-coll)
+        "Creates a flavor descriptor from a collation of all the warstats passed in. Needs to handle multiple warstats collections because it is used for excerpts which may represent multiple opinions."
+        (let* ((effect 0)
+               (controv 0)
+               (pos 0)
+               (neg 0)
+               (irrel 0)
+               (unver 0)
+               (probl 0)
+               (diff 0))
+          (dolist (warstats warstats-coll)
+            (incf effect (@ warstats effect))
+            (incf controv (@ warstats controversy))
+            (incf pos (+ (@ warstats x-right 0) (@ warstats x-supported 0)))
+            (incf neg (+ (@ warstats x-wrong 0) (@ warstats x-dissed 0)))
+            (incf irrel (@ warstats x-irrelevant 0))
+            (incf unver (@ warstats x-unverified 0))
+            (incf probl (@ warstats x-problematic 0))
+            (incf diff (relative-to-range 0 effect controv)))
+          ;;FIXME: This could be more subtle, especially for larger numbers of warstats
           (if (< 0 effect)
               (if (> diff 0.7)
                   "contested"
@@ -65,6 +83,11 @@
                   (if (< 0 probl)
                       "contested"
                       "neutral")))))
+
+      (defun flavor (warstats &rest ids)
+        (let ((wcoll (mapcar (lambda (id) (getprop warstats id)) ids)))
+          (chain (flavor-from-warstats wcoll)
+                (concat "-" (freshness-from-warstats wcoll)))))
 
       (defun calculate-intensity (opins)
         ;;For now, just count
