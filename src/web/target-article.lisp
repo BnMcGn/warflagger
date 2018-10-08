@@ -260,21 +260,22 @@
                                     (prop root-target-url))
                                 (prop text))
               "Reply to the excerpt")
-          (if (< 1 (@ (prop opinions) length))
+          (if (< 1 (@ (prop excerpt-opinions) length))
               (collecting
-                  (dolist (itm (prop opinions))
+                  (dolist (itm (prop excerpt-opinions))
                     (collect
-                        (psx
-                         (:opinion-summary
-                          :key (unique-id)
-                          :... (@ this props)
-                          :tree-address (@ (getprop itm 0) tree-address)
-                          :opid (@ (getprop itm 0) id))))))
+                        (let ((opin (getprop (prop opinion-store) itm)))
+                          (psx
+                           (:opinion-summary
+                            :key (unique-id)
+                            :... (@ this props)
+                            :tree-address (@ opin tree-address)
+                            :opid itm))))))
               (psx
                (:opinion-info
                 :key 3
                 :... (@ this props)
-                :opinion (getprop (prop opinions) 0 0)))))))
+                :opinion (getprop (prop opinion-store) (prop excerpt-opinions 0))))))))
 
     ;;FIXME: Needs different look, more long form.
     (def-component opinion-info
