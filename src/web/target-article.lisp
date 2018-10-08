@@ -75,7 +75,7 @@
          (:span
           :id (prop id)
           :style (create font-weight :bold position :relative)
-          :class (flavor (prop opinions))
+          :class (apply #'flavor (prop warstats) (prop excerpt-opinions))
           :on-mouse-enter (@ this handle-mouse-enter)
           :on-mouse-leave (@ this handle-mouse-leave)
           :ref
