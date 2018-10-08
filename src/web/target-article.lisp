@@ -45,7 +45,7 @@
           (collecting
               (do-keyvalue (k opin opinstore)
                 (when (eq 1 (@ opin 'tree-address length))
-                  (collect k))))))
+                  (collect (@ opin id)))))))
 
     (defun all-descendant-ids (id opinstore)
       (if id
@@ -55,7 +55,7 @@
                 (do-keyvalue (k opin opinstore)
                   (when (< len (@ opin 'tree-address length))
                     (when (array-equal trad (chain (@ opin 'tree-address) (slice 0 len)))
-                      (collect k))))))
+                      (collect (@ opin id)))))))
           (chain -object (keys opinstore))))
 
     (defun %find-parent-hilited (element)

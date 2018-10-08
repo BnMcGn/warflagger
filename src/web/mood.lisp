@@ -86,7 +86,7 @@
 
       (defun flavor (warstats &rest ids)
         (let ((wcoll (mapcar (lambda (id) (getprop warstats id)) ids)))
-          (chain (flavor-from-warstats wcoll)
+          (chain (apply #'flavor-from-warstats wcoll)
                 (concat "-" (freshness-from-warstats wcoll)))))
 
       (defun calculate-intensity (opins)
