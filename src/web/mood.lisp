@@ -53,27 +53,57 @@
                 ((< newest (- now hours)) "recent")
                 (t "new"))))
 
-      ;;FIXME: Crude, doesn't account for target type, doesn't represent problematic
       (defun flavor-from-warstats (&rest warstats-coll)
         "Creates a flavor descriptor from a collation of all the warstats passed in. Needs to handle multiple warstats collections because it is used for excerpts which may represent multiple opinions."
-        (let* ((effect 0)
-               (controv 0)
-               (pos 0)
-               (neg 0)
-               (irrel 0)
-               (unver 0)
-               (probl 0)
-               (diff 0))
-          (dolist (warstats warstats-coll)
-            (incf effect (@ warstats effect))
-            (incf controv (@ warstats controversy))
-            (incf pos (+ (@ warstats x-right 0) (@ warstats x-supported 0)))
-            (incf neg (+ (@ warstats x-wrong 0) (@ warstats x-dissed 0)))
-            (incf irrel (@ warstats x-irrelevant 0))
-            (incf unver (@ warstats x-unverified 0))
-            (incf probl (@ warstats x-problematic 0))
-            (incf diff (relative-to-range 0 effect controv)))
-          ;;FIXME: This could be more subtle, especially for larger numbers of warstats
+        ;;; controv: The opinions are themselves contested
+        ;;; positive: Relatively uncontested postive opinions
+        ;;; negative: Relatively uncontested negative opinions
+        ;;; We return contested if there are significant values in both positive and negative
+        ;;; We return contested if controv is significant
+        ;;; Neutral if none of the three are significant.
+        (labels ((significant (n1 n2)
+                   "is n1 significant related to n2?"
+                   (when (< 0 n1)
+                     (if (>= n1 n2)
+                         t
+                         (if (< 0.7 (relative-to-range 0 n2 n1))
+                             t
+                             nil)))))
+          (let ((controv 0)
+                (positive 0)
+                (negative 0))
+            (dolist (warstats warstats-coll)
+              (cond
+                ((significant (@ warstats controversy) (@ warstats effect))
+                 (incf controv (@ warstats controversy)))
+                ((eql "pro" (@ warstats direction))
+                 (incf positive (@ warstats effect)))
+                ((eql "con" (@ warstats direction))
+                 (incf negative (@ warstats effect)))))
+            (let ((top (max controv positive negative)))
+              (cond
+                ((< 0.5 top) "neutral")
+                ((significant controv top) "contested")
+                ((eql top positive)
+                 (if (significant negative positive)
+                     "contested"
+                     "positive"))
+                ((eql top negative)
+                 (if (significant positive negative)
+                     "contested"
+                     "negative")))))))
+
+      ;;FIXME: Crude, doesn't account for target type, doesn't represent problematic
+      (defun flavor-from-own-warstats (warstats)
+        "Used to give a basic display of the status of a target. Uses own warstats. "
+        (let* ((effect (@ warstats effect))
+               (controv (@ warstats controversy))
+               (pos (+ (@ warstats x-right 0) (@ warstats x-supported 0)))
+               (neg (+ (@ warstats x-wrong 0) (@ warstats x-dissed 0)))
+               (irrel (@ warstats x-irrelevant 0))
+               (unver (@ warstats x-unverified 0))
+               (probl (@ warstats x-problematic 0))
+               (diff (relative-to-range 0 effect controv)))
           (if (< 0 effect)
               (if (> diff 0.7)
                   "contested"
