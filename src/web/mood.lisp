@@ -8,40 +8,6 @@
   (lambda ()
     (ps
 
-;;;FIXME: Implementation of flavor is naive and slow.
-;;; Should account for different values placed on opinions.
-;;; Should use cached results from database
-
-      (defun calculate-flavor (opins)
-        (let ((pos nil)
-              (neg nil)
-              (neut nil))
-          (dolist (o opins)
-            (threeway (@ o 0 votevalue)
-                      (setf neg t) (setf neut t) (setf pos t)))
-          (if pos
-              (if neg "contested" "positive")
-              (if neg "negative" "neutral"))))
-
-      (defun calculate-freshness (opins)
-        (let* ((hours (lisp *js-hour*))
-               (days (* 2 (lisp *js-day*)))
-               (now (chain -date (now)))
-               (newest))
-          (mapleaves
-           (lambda (op)
-             (let* ((dt (@ op datestamp))
-                    (dt (if (eq (typeof dt) "string") (new (-date dt)) dt)))
-               (if newest
-                   (when (< newest dt)
-                     (setf newest dt))
-                   (setf newest dt))))
-           opins
-           :test #'opinion-p)
-          (cond ((< newest (- now days)) "old")
-                ((< newest (- now hours)) "recent")
-                (t "new"))))
-
       (defun freshness-from-warstats (&rest warstats-coll)
         (let* ((hours (lisp *js-hour*))
                (days (* 2 (lisp *js-day*)))
@@ -82,7 +48,7 @@
                  (incf negative (@ warstats effect)))))
             (let ((top (max controv positive negative)))
               (cond
-                ((< 0.5 top) "neutral")
+                ((> 0.5 top) "neutral")
                 ((significant controv top) "contested")
                 ((eql top positive)
                  (if (significant negative positive)

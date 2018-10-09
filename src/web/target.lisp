@@ -70,7 +70,7 @@
            (:div
             :... (format-styling-data (@ this props))
             (:h3
-             :class (strcat (flavor-from-warstats (prop warstats root))
+             :class (strcat (flavor-from-own-warstats (prop warstats root))
                             "-old target-title")
              (or (prop intro-text) "Target Page: ")
              (:headline :key 1
