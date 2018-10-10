@@ -40,8 +40,7 @@
                 :... (create :found-excerpt "true")
                 :class (chain classes (join " "))
                 (:span :key 1 (rebreak leading-context))
-                ;;FIXME: quick hack
-                (:span :key 2 :class (flavor (list (list (prop opinion))))
+                (:span :key 2 :class (flavor (prop warstats) (prop opinion id))
                        (rebreak excerpt))
                 (:span :key 3 (rebreak trailing-context)))))
             (psx
@@ -91,18 +90,31 @@
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
             (:reply-link :key 6 :url (@ opinion url))
-            (:div :key 9 :class "opinion-comment-wrapper"
+            (:div
+             :key 9 :class "opinion-comment-wrapper"
              (when (has-excerpt-p opinion)
                (if (has-found-excerpt-p opinion)
                    (psx (:thread-excerpt
                          :key 7
                          :opinion opinion
+                         :warstats (prop warstats)
                          :text text))
                    (psx (:thread-excerpt
                          :key 7
-                         :opinion opinion))))
+                         :opinion opinion
+                         :warstats (prop warstats)))))
              (when (@ opinion comment)
-               (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
+               (psx
+                (:hilited-text
+                 :key 8
+                 :text (@ opinion comment)
+                 :tree-address (prop tree-address)
+                 :focus (prop tree-address)
+                 :warstats (prop warstats)
+                 :opinion-store (prop opinion-store)
+                 :dispatch nil
+                 :looks (prop looks)
+                 :look-handler (prop look-handler))))
              (:div
               :key 12
               :class "opinion-extras"
@@ -153,6 +165,7 @@
                                              'tree-address op
                                              'opinions (@ data 1))))
                             :tree-address op
+                            :warstats (prop warstats)
                             :reference
                             (getprop (prop references) (list-last op)))))))))))
 

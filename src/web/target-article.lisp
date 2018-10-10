@@ -148,7 +148,11 @@
                  (opstore (@ props opinion-store))
                  (opins (immediate-children-ids current-id opstore))
                  (segpoints (excerpt-segment-points
-                             (mapcar (lambda (id) (getprop opstore id)) opins)
+                             (collecting
+                                 (dolist (id opins)
+                                   (let ((opin (getprop opstore id)))
+                                     (when (has-found-excerpt-p opin)
+                                       (collect opin)))))
                              (length text))))
             (do-window ((start end) segpoints)
               (let* ((id (strcat "lvl-"
@@ -204,6 +208,7 @@
           (if (focus-p (@ this props)) "hilited" "hilited-parent")
           :key (state id)
           :id (state id)
+          :on-click (lambda (e) (chain e (stop-propagation)))
           :on-mouse-up (@ this selection-change)
           :on-key-press (@ this selection-change)
           (when (prop text)
@@ -223,6 +228,8 @@
                                  (to-character-range textel)))
                    (excerpt (get-location-excerpt (create-textdata (prop text))
                                                   (@ range start) (@ range end))))
+              ;(chain ev (stop-propagation))
+              ;(chain ev (prevent-default))
               (funcall
                (prop dispatch)
                (create :type :selection
@@ -255,7 +262,7 @@
           (:a :key 2 :class "action"
               :href (excerpt-reply-link (if (not-empty (prop tree-address))
                                     (@ (getprop (prop opinion-store)
-                                                (last-list (prop tree-address)))
+                                                (list-last (prop tree-address)))
                                        url)
                                     (prop root-target-url))
                                 (prop text))
