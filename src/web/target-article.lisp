@@ -228,8 +228,6 @@
                                  (to-character-range textel)))
                    (excerpt (get-location-excerpt (create-textdata (prop text))
                                                   (@ range start) (@ range end))))
-              ;(chain ev (stop-propagation))
-              ;(chain ev (prevent-default))
               (funcall
                (prop dispatch)
                (create :type :selection

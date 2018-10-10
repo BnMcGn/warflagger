@@ -89,7 +89,8 @@
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
-            (:reply-link :key 6 :url (@ opinion url))
+            (:reply-link :key 6 :url (@ opinion url)
+                         :excerpt (state :reply-excerpt) :offset (state :reply-offset))
             (:div
              :key 9 :class "opinion-comment-wrapper"
              (when (has-excerpt-p opinion)
@@ -112,7 +113,8 @@
                  :focus (prop tree-address)
                  :warstats (prop warstats)
                  :opinion-store (prop opinion-store)
-                 :dispatch nil
+                 :dispatch (@ this dispatch)
+                 :hide-popup t
                  :looks (prop looks)
                  :look-handler (prop look-handler))))
              (:div
@@ -126,7 +128,15 @@
               (when (prop question)
                 (psx (:question :key 11
                                         ;:... (prop question)
-                                )))))))))
+                                ))))))))
+      get-initial-state
+      (lambda ()
+        (create))
+      dispatch
+      (lambda (action)
+        (when (eq (@ action type) :selection)
+          (set-state :reply-excerpt (@ action excerpt)
+                     :reply-offset (@ action offset)))))
 
     (defun sort-compare-opinions (opa opb)
       ;;FIXME: Special treatment of missing excerpt opinions?
