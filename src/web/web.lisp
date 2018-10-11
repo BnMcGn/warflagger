@@ -149,6 +149,27 @@
                 :username (lisp (webhax-user:get-user-name))
                 )))))
 
+  ;;FIXME: Think about taking over the /opinion/ URL for this
+  (setf (ningle:route *app* "/opinion-page/*")
+        (quick-page
+            (#'webhax:react-parts
+             #'target-components
+             #'mood-lib
+             :@javascript #'opinion-page)
+          (bind-validated-input
+              ((id :integer))
+            (let* ((opin (opinion-by-id id))
+                   (rooturl (get-rooturl-by-id (assoc-cdr :rooturl opin))))
+              (mount-component (target-loader)
+                :url (lisp rooturl)
+                :rootid (lisp (assoc-cdr :rooturl opin))
+                :title (lisp (grab-title rooturl))
+                :looks (lisp-raw (json:encode-json-to-string
+                                  (get-looks (get-user-name) id)))
+                :focus (lisp (list* 'list (tree-address id)))
+                :username (lisp (webhax-user:get-user-name))
+                :child 'opinion-page)))))
+
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
             (#'webhax:react-parts

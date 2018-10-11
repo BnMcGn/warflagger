@@ -35,6 +35,7 @@
                               (:file "web/target-thread")
                               (:file "web/target-summary")
                               (:file "web/target")
+                              (:file "web/opinion-page")
                               (:file "web/grouped")
                               (:file "web/misc")
                               (:file "web/opinion-form")

@@ -160,15 +160,17 @@
       (def-component target-loader
           ;;FIXME: Needs error handling
           (if (and  (state warstats) (state opinions) (state text))
-              (let ((opdat (%reformat-opinions (state opinions))))
-                (psx (:target-root :... (@ this props)
-                                   :warstats (state warstats)
-                                   :references (state references)
-                                   :questions (state questions)
-                                   :opinions (state opinions)
-                                   :tree-addresses (@ opdat 0)
-                                   :opinion-store (@ opdat 1)
-                                   :text (state text))))
+              (let ((opdat (%reformat-opinions (state opinions)))
+                    (child-element (or (prop child 'target-root))))
+                (psx (:child-element
+                      :... (@ this props)
+                      :warstats (state warstats)
+                      :references (state references)
+                      :questions (state questions)
+                      :opinions (state opinions)
+                      :tree-addresses (@ opdat 0)
+                      :opinion-store (@ opdat 1)
+                      :text (state text))))
               ;;FIXME: decorate
               (psx (:h3 "Loading...")))
         component-did-mount
