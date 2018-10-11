@@ -77,5 +77,6 @@
    #:target-replies
    #:if-travis
    #:when-travis
-   #:unless-travis))
+   #:unless-travis
+   #:tree-address))
 

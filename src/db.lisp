@@ -47,6 +47,21 @@
        :format #'car
        :identity-func #'third)))
 
+(defun tree-address (opinid)
+  (let* ((opin (opinion-by-id opinid))
+         (tree (opinion-tree-for-rooturl (get-rooturl-by-id (assoc-cdr :rooturl opin)))))
+    (labels ((proc (tree address)
+               (let ((branches nil))
+                 (dolist (node tree)
+                   (when (eq (car node) opinid)
+                     (return-from proc (cons opinid address)))
+                   (when (< 1 (length node))
+                     (push node branches)))
+                 (dolist (branch branches)
+                   (when-let ((res (proc (cdr branch) (cons (car branch) address))))
+                     (return-from proc res))))))
+      (nreverse (proc tree nil)))))
+
 (defun target-replies (turl)
   "Return a list of immediate replies to a target. Replies are opinids."
   (mapcar #'car (opinion-tree-for-target turl)))
