@@ -165,10 +165,10 @@
                 :rootid (lisp (assoc-cdr :rooturl opin))
                 :title (lisp (grab-title rooturl))
                 :looks (lisp-raw (json:encode-json-to-string
-                                  (get-looks (get-user-name) id)))
+                                  (get-looks (get-user-name) (assoc-cdr :rooturl opin))))
                 :focus (lisp (list* 'list (tree-address id)))
                 :username (lisp (webhax-user:get-user-name))
-                :child 'opinion-page)))))
+                :child opinion-page)))))
 
   (setf (ningle:route *app* "/grouped/*")
         (quick-page

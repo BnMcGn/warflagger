@@ -161,7 +161,7 @@
           ;;FIXME: Needs error handling
           (if (and  (state warstats) (state opinions) (state text))
               (let ((opdat (%reformat-opinions (state opinions)))
-                    (child-element (or (prop child 'target-root))))
+                    (child-element (or (prop child) target-root)))
                 (psx (:child-element
                       :... (@ this props)
                       :warstats (state warstats)

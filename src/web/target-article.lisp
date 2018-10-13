@@ -7,25 +7,37 @@
 
     (setf tool-tip (@ (require "react-portal-tooltip") default))
 
+;;    (defun focus-p (props?)
+;;      (let ((tad (@ props? tree-address))
+;;            (foc (@ props? focus)))
+;;        (when (and tad foc (eq (@ tad length) (@ foc length)))
+;;          (loop for x in tad
+;;             for y in foc
+;;             unless (equal x y) do (return-from focus-p nil)
+;;             finally (return-from focus-p t)))))
+
     (defun focus-p (props?)
-      (let ((tad (@ props? tree-address))
-            (foc (@ props? focus)))
-        (when (and tad foc (eq (@ tad length) (@ foc length)))
-          (loop for x in tad
-             for y in foc
-             unless (equal x y) do (return-from focus-p nil)
-             finally (return-from focus-p t)))))
+      (eql (list-last (@ props? tree-address) (list-last (@ props? focus)))))
 
     (defun focus-parent-p (props?)
-      (let ((tad (@ props? tree-address))
-            (foc (@ props? focus)))
-        (when (and tad foc (< (@ tad length) (@ foc length)))
-          (loop for x in tad
-             for y in foc
-             unless (equal x y) do (return-from focus-parent-p nil))
-          (dolist (op (@ props? opinions))
-            (when (eq (@ op 0 id) (@ foc (@ tad length)))
-              (return-from focus-parent-p op))))))
+      (let ((fparent (getprop (chain (@ props? focus) (slice -2)) 0)))
+        (when (eql (list-last (@ props? tree-address) fparent))
+          (getprop (@ props? opinion-store) fparent)))
+      (when
+          (eql (list-last (@ props? tree-address)) fparent)))
+
+;;    (defun focus-parent-p (props?)
+;;      (say "in focus-parent-p")
+;;      (say props?)
+;;      (let ((tad (@ props? tree-address))
+;;            (foc (@ props? focus)))
+;;        (when (and tad foc (< (@ tad length) (@ foc length)))
+;;          (loop for x in tad
+;;             for y in foc
+;;             unless (equal x y) do (return-from focus-parent-p nil))
+;;          (dolist (op (@ props? opinions))
+;;            (when (eq (@ op 0 id) (@ foc (@ tad length)))
+;;              (return-from focus-parent-p op))))))
 
     (defun popup-side (position)
       (if position
@@ -128,7 +140,8 @@
                   :class (if focussed "parent-active" "parent-inactive")
                   :key (unique-id)
                   (rebreak (prop text))
-                  (when (and focussed
+                  (when (and nil ;;Disable for  now
+                             focussed
                              (eql (prop last-char-pos)
                                   (+ (@ focussed 0 text-position 0)
                                      (@ focussed 0 text-position 1))))

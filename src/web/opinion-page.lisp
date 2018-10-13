@@ -5,5 +5,8 @@
 (defun opinion-page ()
   (ps
 
-    ))
+    (def-component opinion-page
+        (psx
+         (:target-root-article
+          :... (@ this props))))))
 
