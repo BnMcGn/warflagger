@@ -76,6 +76,9 @@
     (defun make-rootid-url (rid)
       (strcat "/target/" (chain rid (to-string))))
 
+    (defun make-opinionid-url (opid)
+      (strcat "/opinion-page/" (chain opid (to-string))))
+
     (defun make-missing-rootid-url (url)
       (strcat "/target/?newurl=" (encode-u-r-i-component url)))
 

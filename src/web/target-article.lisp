@@ -17,7 +17,9 @@
 ;;             finally (return-from focus-p t)))))
 
     (defun focus-p (props?)
-      (eql (list-last (@ props? tree-address) (list-last (@ props? focus)))))
+      (if (and (@ props? focus) (not-empty (@ props? focus)))
+          (eql (list-last (@ props? tree-address) (list-last (@ props? focus))))
+          t))
 
     (defun focus-parent-p (props?)
       (let ((fparent (getprop (chain (@ props? focus) (slice -2)) 0)))

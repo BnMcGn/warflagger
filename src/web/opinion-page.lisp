@@ -8,6 +8,7 @@
     (def-component opinion-root
         (psx
          (:div
+          :class "opinion-root"
           :style (create position :absolute width "80%" 'margin-bottom "20em")
           :on-click (@ this handle-click)
           (:target-title
@@ -25,19 +26,19 @@
            :looks (prop looks)
            :look-handler (prop look-handler))))
       handle-click
-      (lambda (ev) ));;FIXME: link to
+      (lambda (ev) (setf (@ window location) (make-rootid-url (prop rootid)))))
 
     (def-component opinion-layer
         (let* ((opinion (getprop (prop opinion-store) (prop opinion-id)))
                (treead (@ opinion tree-address)))
           (psx
            (:div
-            :class (chain "opinion-thread depth-"
+            :class (chain "opinion-layer opinion-thread depth-"
                           (concat (chain treead length (to-string))))
             :... (format-styling-data
                   (copy-merge-all (@ this props) (create 'tree-address treead)))
             :on-click (lambda (e)
-                        (setf (@ window location) (@ opinion url)))
+                        (setf (@ window location) (make-opinionid-url (@ opinion id))))
             (:vote-value :key 1 :opinion opinion) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
@@ -76,6 +77,7 @@
     (def-component opinion-page
         (psx
          (:div
+          :class "opinion-page"
           (:opinion-root
            :... (@ this props))
           (collecting
