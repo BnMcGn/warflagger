@@ -335,26 +335,35 @@
               (collect o)))))
 
     (def-component excerptless-opinions
-        (psx
-         (:div
-          :style (create 'margin-top "2em")
-          (:h3 :key 1 "General Opinions:")
-          (collecting
-              (dolist (op (prop tree-addresses))
-                (when (> 2 (@ op length)) ;opinion is on root article
-                  (let* ((opid (elt op 0))
-                         (opin (getprop (prop opinion-store) opid)))
+        (let* ((ta-len (when (prop tree-address) (@ (prop tree-address) length)))
+               (idlist
+                (if (not-empty (prop tree-address))
+                    (remove-if-not
+                     (lambda (x)
+                       (and (< ta-len (@ x length))
+                            (eql (getprop (prop tree-address) (1- ta-len))
+                                 (getprop x (1- ta-len)))))
+                     (prop tree-addresses))
+                    (remove-if (lambda (x) (< 1 (@ x length))) (prop tree-addresses))))
+               (idlist (mapcar #'list-last idlist)))
+          (psx
+           (:div
+            :style (create 'margin-top "2em")
+            (when (< 0 (@ idlist length))
+              (psx (:h3 :key 1 "Replies:")))
+            (collecting
+                (dolist (opid idlist)
+                  (let ((opin (getprop (prop opinion-store) opid)))
                     (unless (has-excerpt-p opin)
                       (collect
                           (psx
                            (:thread-opinion
                             :key (unique-id)
                             :... (@ this props)
-                            :tree-address op
+                            :tree-address (@ opin tree-address)
                             :styling-data (format-styling-data
-                                           (copy-merge-all (@ %thisref props)
-                                                           (create
-                                                            'tree-address op)))
+                                           (set-copy (@ this props)
+                                                     'tree-address (@ opin tree-address)))
                             :reference (getprop (prop references) opid))))))))))))
 
     (def-component target-root-article

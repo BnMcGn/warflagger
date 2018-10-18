@@ -76,7 +76,7 @@
              (:headline :key 1
                         :title (prop title)
                         :url (prop warflagger-link)
-                        :external-link  (prop url))
+                        :external-link (prop url))
              (:display-warstats2 :key 2)
              (prop children)
              (unless (prop hide-reply)

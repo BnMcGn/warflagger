@@ -83,7 +83,9 @@
                           (concat (prop tree-address length (to-string))))
             :... (prop styling-data)
             :on-click (lambda (e)
-                        (setf (@ window location) (@ opinion url)))
+                        (setf (@ window location)
+                              (make-opinionid-url (@ opinion id)))
+                        (chain e (stop-propagation)))
             (:vote-value :key 1 :opinion opinion) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "

@@ -13,6 +13,7 @@
           :on-click (@ this handle-click)
           (:target-title
            :key 0
+           :hide-reply t
            :... (@ this props)
            " ")
           (:hilited-text
@@ -30,7 +31,8 @@
 
     (def-component opinion-layer
         (let* ((opinion (getprop (prop opinion-store) (prop opinion-id)))
-               (treead (@ opinion tree-address)))
+               (treead (@ opinion tree-address))
+               (topmost (eql (@ treead length) (prop focus length))))
           (psx
            (:div
             :class (chain "opinion-layer opinion-thread depth-"
@@ -44,7 +46,8 @@
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
-            (:reply-link :key 6 :url (@ opinion url))
+            (when topmost
+              (psx (:reply-link :key 6 :url (@ opinion url))))
                          ;;:excerpt (state :reply-excerpt) :offset (state :reply-offset))
             (:div
              :key 9 :class "opinion-comment-wrapper"
@@ -72,7 +75,12 @@
               (when (prop question)
                 (psx (:question :key 11
                                         ;:... (prop question)
-                                )))))))))
+                                ))))
+             (when topmost
+               (psx (:excerptless-opinions
+                     :key 13
+                     :... (@ this props)
+                     :tree-address treead))))))))
 
     (def-component opinion-page
         (psx
