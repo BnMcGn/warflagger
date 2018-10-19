@@ -47,8 +47,9 @@
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
             (when topmost
-              (psx (:reply-link :key 6 :url (@ opinion url))))
-                         ;;:excerpt (state :reply-excerpt) :offset (state :reply-offset))
+              (psx (:reply-link
+                    :key 6 :url (@ opinion url)
+                    :excerpt (state :reply-excerpt) :offset (state :reply-offset))))
             (:div
              :key 9 :class "opinion-comment-wrapper"
              (when (@ opinion comment)
@@ -80,7 +81,14 @@
                (psx (:excerptless-opinions
                      :key 13
                      :... (@ this props)
-                     :tree-address treead))))))))
+                     :tree-address treead)))))))
+      get-initial-state
+      (lambda () (create))
+      dispatch
+      (lambda (action)
+        (when (eq (@ action type) :selection)
+          (set-state :reply-excerpt (@ action excerpt)
+                     :reply-offset (@ action offset)))))
 
     (def-component opinion-page
         (psx

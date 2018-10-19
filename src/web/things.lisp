@@ -71,6 +71,9 @@
   |#
   (format nil "/author/~a" authid))
 
+(defun opinion-thing-link (opid)
+  (format nil "/opinion-page/~a" opid))
+
 (def-thing
     'author
     #'get-author-data
@@ -91,7 +94,8 @@
   #'display-opinion-line
   :keyfunc (lambda (id)
              (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
-  :sortkeys '(target author datestamp excerpt rooturl))
+  :sortkeys '(target author datestamp excerpt rooturl)
+  :html-thing-link #'opinion-thing-link)
 
 (def-thing
     'target
