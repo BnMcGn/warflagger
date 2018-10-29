@@ -4,9 +4,7 @@
   :@css-link "/static/css/target.css"
   ;;FIXME: Need better way to include:
   :@css-link "/static/css/react-tabs.css"
-  :@javascript #'distribute-ranks
   :@javascript #'titlebar-components
-  ;;:@javascript-link "/static/javascript/jsPlumb-2.0.5.js"
   :@javascript #'target-article
   :@javascript #'target-thread
   :@javascript #'target-summary
