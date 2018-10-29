@@ -254,14 +254,14 @@
                      :@javascript #'grouped-components
                      #'main-page-parts))))
 
-;;;Code below starts server. To restart, first stop server thusly:
-;;;(clack:stop wf/web::*handler*)
-;;;Then evaluate code below.
-
 ;;FIXME: Need to handle the user information that will be passed out in OpinML
 ;; exports. User needs to be able to specify a homepage, whether email address
 ;; should go out in the data.
 (defparameter *userfig-fieldspecs* nil)
+
+;;;Code below starts server. To restart, first stop server thusly:
+;;;(clack:stop wf/web::*handler*)
+;;;Then evaluate code below.
 
 (if-production
  (defun run-server ()
