@@ -3,11 +3,32 @@
 (defvar *handler*)
 (defvar *session-store*)
 
+(defparameter *warflagger-js-resources* "/static/javascript/warflagger-resources.js")
+
+;;Compile resources
+
+(write-js-resources
+ (concatenate 'string wf/local-settings:*static-path* "javascript/warflagger-resources.js")
+ 'react:build
+ 'ps-gadgets
+ 'webhax-widgets:ps-widgets
+ 'ps-react-gadgets:ps-react-gadgets
+ 'webhax-ask
+ 'wf-web-library
+ 'opinion-components
+ 'mood-lib
+ 'grouped-components
+ 'titlebar-components
+ 'target-article
+ 'target-thread
+ 'target-summary
+ 'target-components
+ 'warflagger-things)
+
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
    :@css-link "/static/css/style.css"
-   ;;:@javascript-link "/static/javascript/warflagger-bundle.js"
-   :@javascript (wf-web-library))
+   ;;:@javascript-link "/static/javascript/warflagger-bundle.js")
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"
@@ -23,16 +44,27 @@
           :@messages :@inner :@footnotes)
                                         ;;Footer
     (:div :id "footer" :@copyright)
-    (str (tracking-code))))
+    (str (tracking-code)))))
 
 (define-default-parts warflagger-base
+  :@javascript-link "/static/javascript/warflagger-bundle.js"
+  :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"
+  :@javascript-link "https://unpkg.com/react@16.4.2/umd/react.development.js"
+  :@javascript-link "https://unpkg.com/react-dom@16.4.2/umd/react-dom.development.js"
+  :@javascript (ps:ps (setf (ps:@ -react create-class) (require "create-react-class"))
+                      (setf (ps:@ -react -d-o-m) (require "react-dom-factories")))
+  :@javascript-link
+  "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.js"
+  :@javascript-link
+  "https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.js"
+
   :@account-info #'account-bar
-  :@javascript #'ps-gadgets
   :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
   :@javascript-link  "https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js"
   ;;FIXME: Should be able to bundle these with browserify. Can't.
   :@javascript-link "/static/node_modules/rangy/lib/rangy-core.js"
   :@javascript-link "/static/node_modules/rangy/lib/rangy-textrange.js"
+  :@javascript-link *warflagger-js-resources*
   :@head #'favicon-links
   :@site-index
   (lambda ()
@@ -122,9 +154,7 @@
   ;;FIXME: Target page needs to handle URLs that don't have a rootid yet.
   (setf (ningle:route *app* "/target/*")
         (quick-page
-            (#'webhax:react-parts
-             #'target-components
-             #'mood-lib
+            (#'target-parts
              :@side-content
              (lambda ()
                (bind-validated-input
@@ -152,10 +182,7 @@
   ;;FIXME: Think about taking over the /opinion/ URL for this
   (setf (ningle:route *app* "/opinion-page/*")
         (quick-page
-            (#'webhax:react-parts
-             #'target-components
-             #'mood-lib
-             :@javascript #'opinion-page)
+            (#'target-parts)
           (bind-validated-input
               ((id :integer))
             (let* ((opin (opinion-by-id id))
@@ -172,10 +199,7 @@
 
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
-            (#'webhax:react-parts
-             #'target-components
-             #'mood-lib
-             :@javascript #'grouped-components)
+            (#'target-parts)
           (grouped-page)))
 
   (setf (ningle:route *app* "/faq/")
@@ -220,19 +244,15 @@
          #'flag-color-page))
 
   (setf (ningle:route *app* "/home/")
-        (quick-page (#'webhax:react-parts #'warflagger-things)
+        (quick-page ()
           (user-home-page)))
 
   (setf (ningle:route *app* "/author/*")
-        (quick-page (#'webhax:react-parts
-                     #'warflagger-things
-                     #'author-page-parts)))
+        (quick-page ()))
 
   (unless-production
    (setf (ningle:route *app* "/demo/")
-         (quick-page (#'webhax:react-parts
-                      #'webhax::webhax-ask
-                      :@javascript #'webhax-widgets:ps-widgets)
+         (quick-page ()
            (demo-pages))))
 
   ;;FIXME: Should be handled internally by webhax service middleware
@@ -248,10 +268,7 @@
          :content-type "application/json"))
 
   (setf (ningle:route *app* "/")
-        (quick-page (#'webhax:react-parts
-                     #'target-components
-                     #'mood-lib
-                     :@javascript #'grouped-components
+        (quick-page (#'target-parts
                      #'main-page-parts))))
 
 ;;FIXME: Need to handle the user information that will be passed out in OpinML

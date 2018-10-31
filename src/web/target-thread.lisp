@@ -5,7 +5,7 @@
 
 (defparameter *excerpt-margin* 50)
 
-(defun target-thread ()
+(define-ps-lib target-thread ()
   (ps
 
     (defun previous-break (text index)

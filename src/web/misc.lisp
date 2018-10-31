@@ -56,7 +56,7 @@
     (grouped-page)
     ))
 
-(defun wf-web-library ()
+(define-ps-lib wf-web-library ()
   (ps
     ;;FIXME: Duplicate of CL version
     (defun make-id-path (id)

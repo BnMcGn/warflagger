@@ -2,7 +2,7 @@
 
 ;; Summary tab for root target page
 
-(defun target-summary ()
+(define-ps-lib target-summary ()
   (ps
 
     ;;FIXME: relocate

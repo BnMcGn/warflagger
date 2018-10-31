@@ -15,6 +15,7 @@
   (:export
    #:*base-url*
    #:*cache-path*
+   #:*static-path*
    #:*text-extractor-script*
    #:*db-connect-type*
    #:*db-connect-spec*

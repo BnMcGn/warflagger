@@ -2,10 +2,12 @@
 
 ;;; Definitions for the thing-lister
 
-(define-parts warflagger-things
-  :@javascript
-  (titlebar-components)
-  :@javascript
+(define-parts things-parts
+  :@javascript-link "/static/javascript/warflagger-bundle.js"
+  :@javascript-link *warflagger-js-resources*)
+
+;; Depends on: titlebar-components
+(define-ps-lib warflagger-things ()
   (ps
     (def-component opinion-line
         (if (< (prop trim) 20)
@@ -32,8 +34,7 @@
               (:comment-summary :key 5 :opinion (prop opinion) :trimto 40))))))
 
 (setf html-thing-lister:*html-thing-user-parts* nil)
-(push #'warflagger-things html-thing-lister:*html-thing-user-parts*)
-(push #'webhax:react-parts html-thing-lister:*html-thing-user-parts*)
+(push #'things-parts html-thing-lister:*html-thing-user-parts*)
 
 (setf html-thing-lister:*thing-summary-sidebar-width* 18)
 

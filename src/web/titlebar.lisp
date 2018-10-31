@@ -1,6 +1,6 @@
 (in-package :wf/web)
 
-(def-ps-lib titlebar-components ()
+(define-ps-lib titlebar-components ()
   (ps
 
     (def-component flag-name

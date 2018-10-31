@@ -102,209 +102,207 @@
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
 
-(define-parts opinion-components
-  :@javascript #'webhax-widgets:ps-widgets
-  :@javascript
-  (lambda ()
-    (ps
+;; Depends on: webhax-widgets:ps-widgets
+(define-ps-lib opinion-components ()
+  (ps
 
-      (defun hilite-a-slice (text start end)
-        (list
-         (chain text (slice 0 start))
-         (psx (:span :class "hilited" :key 1
-                     :style (create 'background-color "orange")
-                     :ref
-                     (lambda (el)
-                       (when el
-                         (chain el (scroll-into-view))))
-                     (chain text (slice start end))))
-         (chain text (slice end))))
+    (defun hilite-a-slice (text start end)
+      (list
+       (chain text (slice 0 start))
+       (psx (:span :class "hilited" :key 1
+                   :style (create 'background-color "orange")
+                   :ref
+                   (lambda (el)
+                     (when el
+                       (chain el (scroll-into-view))))
+                   (chain text (slice start end))))
+       (chain text (slice end))))
 
-      (defun hilite-excerpt (textdata excerpt offset)
-        (if (and (not-empty excerpt) (not-empty (@ textdata text)))
-            (let ((bounds
-                   (find-excerpt-start/end textdata excerpt (or offset 0))))
-              (if bounds
-                  (hilite-a-slice (@ textdata text)
-                                  (elt bounds 0) (elt bounds 1))
-                  (progn
-                    (say "Excerpt not found")
-                    (@ textdata text))))
-            (@ textdata text)))
+    (defun hilite-excerpt (textdata excerpt offset)
+      (if (and (not-empty excerpt) (not-empty (@ textdata text)))
+          (let ((bounds
+                 (find-excerpt-start/end textdata excerpt (or offset 0))))
+            (if bounds
+                (hilite-a-slice (@ textdata text)
+                                (elt bounds 0) (elt bounds 1))
+                (progn
+                  (say "Excerpt not found")
+                  (@ textdata text))))
+          (@ textdata text)))
 
-      (def-component message
-          (psx (:span (prop message))))
+    (def-component message
+        (psx (:span (prop message))))
 
-      (def-component flag-description
-          (let ((descs (lisp-raw (json:encode-json-to-string
-                                  (format-flag-descriptions)))))
-            (psx (:div
-                  (:h5 :key 1 "Flag Info:")
-                  (getprop descs (prop formdata flag))))))
+    (def-component flag-description
+        (let ((descs (lisp-raw (json:encode-json-to-string
+                                (format-flag-descriptions)))))
+          (psx (:div
+                (:h5 :key 1 "Flag Info:")
+                (getprop descs (prop formdata flag))))))
 
 
-      (def-component text-sample-core
+    (def-component text-sample-core
+        (psx
+         (:pre :id "textsample"
+               :style (create :overflow "auto" :background "lightgrey"
+                              'white-space "pre-wrap":border "1px"
+                              :height "15em" :width "40em" :cursor "text")
+               :on-mouse-up (@ this selection-change)
+               :on-key-press (@ this selection-change)
+               (hilite-excerpt (prop textdata) (prop excerpt)
+                               (prop excerpt-offset))))
+      selection-change
+      (lambda (ev)
+        (let* ((tsample (chain document (get-element-by-id "textsample")))
+               (range (when (< 0 (chain rangy (get-selection) range-count))
+                        (chain rangy (get-selection) (get-range-at 0)
+                               (to-character-range tsample)))))
+          (when range
+            (destructuring-bind (excerpt offset)
+                (get-location-excerpt (prop textdata)
+                                      (@ range start)
+                                      (@ range end))
+              (funcall (prop dispatch)
+                       (create :type :edit
+                               :data (create :excerpt excerpt
+                                             'excerpt-offset offset))))))))
+
+    ;;FIXME: Find a way to make this not pound the server per keystroke.
+    (def-component text-sample
+        (psx
+         (:text-sample-core
+          :dispatch (prop dispatch)
+          :text (state text)
+          :textdata (state textdata)
+          :excerpt (prop excerpt)
+          :excerpt-offset (prop excerpt-offset)))
+      get-initial-state
+      (lambda ()
+        (create :text "" :url "" :timeout nil :textdata []))
+      get-default-props
+      (lambda ()
+        (create :url ""))
+      component-will-mount
+      (lambda ()
+        (chain this (start-load-from-server (prop url))))
+      component-will-receive-props
+      (lambda (new-props)
+        (chain this (start-load-from-server (@ new-props url))))
+      reset-timeout
+      (lambda ()
+        (when (state timeout)
+          (clear-timeout (state timeout))
+          (set-state timeout nil)))
+      set-message
+      (lambda (mess)
+        (funcall (prop dispatch) (create :type "message" :message mess)))
+      start-load-from-server
+      (lambda (url)
+        (when (not (equal url (state url)))
+          (set-state url url)
+          (set-state text "")
+          (chain this (reset-timeout))
+          (set-state timeout
+                     (set-timeout
+                      (@ this load-from-server)
+                      1000 url))))
+      load-from-server
+      (lambda (url)
+        (let ((msgfunc (@ this set-message)))
+          (json-bind (results "/text-server/" :url url)
+              (case (@ results status)
+                ("success"
+                 (set-state text (@ results text))
+                 (set-state textdata (create-textdata (@ results text)))
+                 (msgfunc (@ results message)))
+                ("failure"
+                 (msgfunc (@ results message)))
+                ("wait"
+                 (msgfunc (@ results message))
+                 (when (equal url (state url))
+                   (set-state timeout
+                              (set-timeout
+                               (@ %thisref load-from-server)
+                               2000 url)))))))))
+
+    (def-component opform-item
+        (let ((count 0))
           (psx
-           (:pre :id "textsample"
-                 :style (create :overflow "auto" :background "lightgrey"
-                                'white-space "pre-wrap":border "1px"
-                                :height "15em" :width "40em" :cursor "text")
-                 :on-mouse-up (@ this selection-change)
-                 :on-key-press (@ this selection-change)
-                 (hilite-excerpt (prop textdata) (prop excerpt)
-                                 (prop excerpt-offset))))
-        selection-change
-        (lambda (ev)
-          (let* ((tsample (chain document (get-element-by-id "textsample")))
-                 (range (when (< 0 (chain rangy (get-selection) range-count))
-                          (chain rangy (get-selection) (get-range-at 0)
-                                 (to-character-range tsample)))))
-            (when range
-              (destructuring-bind (excerpt offset)
-                  (get-location-excerpt (prop textdata)
-                                        (@ range start)
-                                        (@ range end))
-                (funcall (prop dispatch)
-                         (create :type :edit
-                                 :data (create :excerpt excerpt
-                                               'excerpt-offset offset))))))))
+           (:tr :key (prop keydata)
+                (:td :key "m1"
+                     :title (prop error)
+                     :... (if (prop error)
+                              (create :data-has-error "true")
+                              (create))
+                     (or (prop description)
+                         (capitalize-first (ensure-string (prop name)))))
+                (children-map (prop children)
+                              (lambda (child)
+                                (psx (:td :key (incf count)
+                                          :style (create padding-left "1em")
+                                          child))))))))
 
-      ;;FIXME: Find a way to make this not pound the server per keystroke.
-      (def-component text-sample
+    (defun %has-errors (errors)
+      (do-keyvalue (k v errors)
+        (when v (return-from %has-errors t))))
+
+    (def-component custom-opform-layout
+        (let ((state (@ this :state))
+              (props (@ this props))
+              (count 0)
+              (cdispatch (@ this custom-dispatch)))
           (psx
-           (:text-sample-core
-            :dispatch (prop dispatch)
-            :text (state text)
-            :textdata (state textdata)
-            :excerpt (prop excerpt)
-            :excerpt-offset (prop excerpt-offset)))
-        get-initial-state
-        (lambda ()
-          (create :text "" :url "" :timeout nil :textdata []))
-        get-default-props
-        (lambda ()
-          (create :url ""))
-        component-will-mount
-        (lambda ()
-          (chain this (start-load-from-server (prop url))))
-        component-will-receive-props
-        (lambda (new-props)
-          (chain this (start-load-from-server (@ new-props url))))
-        reset-timeout
-        (lambda ()
-          (when (state timeout)
-            (clear-timeout (state timeout))
-            (set-state timeout nil)))
-        set-message
-        (lambda (mess)
-          (funcall (prop dispatch) (create :type "message" :message mess)))
-        start-load-from-server
-        (lambda (url)
-          (when (not (equal url (state url)))
-            (set-state url url)
-            (set-state text "")
-            (chain this (reset-timeout))
-            (set-state timeout
-                       (set-timeout
-                        (@ this load-from-server)
-                        1000 url))))
-        load-from-server
-        (lambda (url)
-          (let ((msgfunc (@ this set-message)))
-            (json-bind (results "/text-server/" :url url)
-                (case (@ results status)
-                  ("success"
-                   (set-state text (@ results text))
-                   (set-state textdata (create-textdata (@ results text)))
-                   (msgfunc (@ results message)))
-                  ("failure"
-                   (msgfunc (@ results message)))
-                  ("wait"
-                   (msgfunc (@ results message))
-                   (when (equal url (state url))
-                     (set-state timeout
-                                (set-timeout
-                                 (@ %thisref load-from-server)
-                                 2000 url)))))))))
+           (:form
+            (:table
+             (:tbody
+              (children-map
+               (prop children)
+               (lambda (child)
+                 (let ((name (@ child props name)))
+                   (psx
+                    (:opform-item
+                     :keydata (incf count)
+                     :description (@ child props fieldspec description)
+                     :name name
+                     :error (getprop (prop errors) name)
+                     child
+                     (case name
+                       ("target"
+                        (psx (:message :message (@ state message) :key 1)))
+                       ("excerpt"
+                        (psx (:text-sample
+                              :key 1
+                              :url (@ props formdata target)
+                              :excerpt (@ props formdata excerpt)
+                              :excerpt-offset
+                              (@ props formdata excerpt-offset)
+                              :dispatch cdispatch)))
+                       ("flag"
+                        (psx
+                         (:flag-description :formdata (@ props formdata)
+                                            :key 1)))))))))
+              (:tr
+               :key "user1"
+               (:td
+                (:input :type "button" :value "Post"
+                        :on-click (@ this post-form))))
+              (:tr
+               :key "user0"
+               (:td (if (%has-errors (prop errors))
+                        "Opinion not posted: Some fields have errors"
+                        (if (@ props success) "Opinion Posted" "")))))))))
+      get-initial-state
+      (lambda ()
+        (create :message ""))
+      custom-dispatch
+      (lambda (data)
+        (if (eql :message (@ data :type))
+            (set-state :message (@ data :message))
+            (funcall (prop dispatch) data)))
+      post-form
+      (lambda (data)
+        (funcall (prop dispatch)
+                 (create :type :submit))))
 
-      (def-component opform-item
-          (let ((count 0))
-            (psx
-             (:tr :key (prop keydata)
-                  (:td :key "m1"
-                       :title (prop error)
-                       :... (if (prop error)
-                                (create :data-has-error "true")
-                                (create))
-                       (or (prop description)
-                           (capitalize-first (ensure-string (prop name)))))
-                  (children-map (prop children)
-                                (lambda (child)
-                                  (psx (:td :key (incf count)
-                                            :style (create padding-left "1em")
-                                            child))))))))
-
-      (defun %has-errors (errors)
-        (do-keyvalue (k v errors)
-          (when v (return-from %has-errors t))))
-
-      (def-component custom-opform-layout
-          (let ((state (@ this :state))
-                (props (@ this props))
-                (count 0)
-                (cdispatch (@ this custom-dispatch)))
-            (psx
-             (:form
-              (:table
-               (:tbody
-                (children-map
-                 (prop children)
-                 (lambda (child)
-                   (let ((name (@ child props name)))
-                     (psx
-                      (:opform-item
-                       :keydata (incf count)
-                       :description (@ child props fieldspec description)
-                       :name name
-                       :error (getprop (prop errors) name)
-                      child
-                      (case name
-                        ("target"
-                         (psx (:message :message (@ state message) :key 1)))
-                        ("excerpt"
-                         (psx (:text-sample
-                               :key 1
-                               :url (@ props formdata target)
-                               :excerpt (@ props formdata excerpt)
-                               :excerpt-offset
-                               (@ props formdata excerpt-offset)
-                               :dispatch cdispatch)))
-                        ("flag"
-                         (psx
-                          (:flag-description :formdata (@ props formdata)
-                                             :key 1)))))))))
-                (:tr
-                 :key "user1"
-                 (:td
-                  (:input :type "button" :value "Post"
-                          :on-click (@ this post-form))))
-                (:tr
-                 :key "user0"
-                 (:td (if (%has-errors (prop errors))
-                          "Opinion not posted: Some fields have errors"
-                          (if (@ props success) "Opinion Posted" "")))))))))
-        get-initial-state
-        (lambda ()
-          (create :message ""))
-        custom-dispatch
-        (lambda (data)
-          (if (eql :message (@ data :type))
-              (set-state :message (@ data :message))
-              (funcall (prop dispatch) data)))
-        post-form
-        (lambda (data)
-          (funcall (prop dispatch)
-                   (create :type :submit))))
-
-      )))
+    ))
 

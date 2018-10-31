@@ -2,19 +2,10 @@
 
 (defparameter *grandchild-shift* 15)
 
-(defun target-article ()
+(define-ps-lib target-article ()
   (ps
 
     (setf tool-tip (@ (require "react-portal-tooltip") default))
-
-;;    (defun focus-p (props?)
-;;      (let ((tad (@ props? tree-address))
-;;            (foc (@ props? focus)))
-;;        (when (and tad foc (eq (@ tad length) (@ foc length)))
-;;          (loop for x in tad
-;;             for y in foc
-;;             unless (equal x y) do (return-from focus-p nil)
-;;             finally (return-from focus-p t)))))
 
     (defun focus-p (props?)
       (if (and (@ props? focus) (not-empty (@ props? focus)))
@@ -27,19 +18,6 @@
           (getprop (@ props? opinion-store) fparent)))
       (when
           (eql (list-last (@ props? tree-address)) fparent)))
-
-;;    (defun focus-parent-p (props?)
-;;      (say "in focus-parent-p")
-;;      (say props?)
-;;      (let ((tad (@ props? tree-address))
-;;            (foc (@ props? focus)))
-;;        (when (and tad foc (< (@ tad length) (@ foc length)))
-;;          (loop for x in tad
-;;             for y in foc
-;;             unless (equal x y) do (return-from focus-parent-p nil))
-;;          (dolist (op (@ props? opinions))
-;;            (when (eq (@ op 0 id) (@ foc (@ tad length)))
-;;              (return-from focus-parent-p op))))))
 
     (defun popup-side (position)
       (if position
