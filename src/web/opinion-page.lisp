@@ -2,7 +2,7 @@
 
 (defparameter *grandchild-shift* 15)
 
-(defun opinion-page ()
+(define-ps-lib opinion-page ()
   (ps
 
     (def-component opinion-root

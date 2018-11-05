@@ -23,6 +23,7 @@
  'target-thread
  'target-summary
  'target-components
+ 'opinion-page
  'warflagger-things)
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
