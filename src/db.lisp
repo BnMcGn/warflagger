@@ -415,7 +415,7 @@ the page text can be found in the cache."
                                         val))))
       id)))
 
-(defun delete-opinion (oid)
+(defun delete-opinion (oid &key (remove-rooturl t))
   (let* ((oid (if (numberp oid) oid (parse-integer oid)))
          (rooturl (car (col-from-pkey (colm 'opinion 'rooturl) oid))))
     (with-transaction nil
@@ -423,8 +423,9 @@ the page text can be found in the cache."
       (delete-records :from 'excerpt :where (sql-= (colm 'opinion) oid))
       (delete-records :from 'reference :where (sql-= (colm 'opinion) oid))
       (delete-records :from 'opinion :where (sql-= (colm 'id) oid)))
-    (unless (get-assoc-by-col (colm 'opinion 'rooturl) rooturl)
-      (delete-records :from 'rooturl :where (sql-= (colm 'id) rooturl)))))
+    (when remove-rooturl
+      (unless (get-assoc-by-col (colm 'opinion 'rooturl) rooturl)
+       (delete-records :from 'rooturl :where (sql-= (colm 'id) rooturl))))))
 
 (defun opinion-may-exist (opin authorid)
   "For auto-entered opinions, try to give some warning that a double entry is about to happen."
