@@ -28,8 +28,7 @@
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
-   :@css-link "/static/css/style.css"
-   ;;:@javascript-link "/static/javascript/warflagger-bundle.js")
+   :@css-link "/static/css/style.css")
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"
@@ -45,7 +44,7 @@
           :@messages :@inner :@footnotes)
                                         ;;Footer
     (:div :id "footer" :@copyright)
-    (str (tracking-code)))))
+    (str (tracking-code))))
 
 (define-default-parts warflagger-base
   :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"

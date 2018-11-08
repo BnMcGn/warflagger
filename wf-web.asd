@@ -28,7 +28,6 @@
 		 :serial t
 		 :components ((:file "web/package")
                               (:file "web/things")
-                              (:file "web/ranks")
                               (:file "web/mood")
                               (:file "web/titlebar")
                               (:file "web/target-article")
