@@ -383,11 +383,12 @@ Some of these factors will obviously affect the respect points more than others.
   "References will obviously have their own opinions, ranking, controversy and effect. We can't just take the reputation of the reference and import it into the current conversation. The referrer may be abusing the reference in any number of creative ways. The first two parameters are the values of the reference. The second two are from the discussion that resulted from the reference being posted. We are attempting to come up with a reasonable value that reflects the quality of the original reference with its applicability to the current discussion. Much wildly arbitrary guesswork follows."
   (list (* (or effect 0) (or ref-effect 0)) (* (or controv 0) (or ref-controv 0))))
 
+;;FIXME: Should return nil on no opinions?
 (defun tree-freshness (optree)
   "Find the most recent date in the replies."
-  (apply #'clsql:time-max
-         (mapcar (lambda (id) (assoc-cdr :datestamp (opinion-by-id id)))
-                 (remove-if-not #'integerp (flatten optree)))))
+  (when-let ((dates (mapcar (lambda (id) (assoc-cdr :datestamp (opinion-by-id id)))
+                            (remove-if-not #'integerp (flatten optree)))))
+    (apply #'clsql:time-max dates)))
 
 (defun referenced-effect (refopinids)
   "The total approval effect of incoming reference opinions. All effects are assumed to be positive because the opins are using the reference as a resource."
