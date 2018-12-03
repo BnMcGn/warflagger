@@ -141,31 +141,32 @@
                 (getprop descs (prop formdata flag))))))
 
 
-    (def-component text-sample-core
+    (def-pure-component text-sample-core
         (psx
          (:pre :id "textsample"
                :style (create :overflow "auto" :background "lightgrey"
                               'white-space "pre-wrap":border "1px"
                               :height "15em" :width "40em" :cursor "text")
-               :on-mouse-up (@ this selection-change)
-               :on-key-press (@ this selection-change)
+               :on-mouse-up (lambda (ev)
+                              (chain %thisref (selection-change ev)))
+               :on-key-press (lambda (ev)
+                               (chain %thisref (selection-change ev)))
                (hilite-excerpt (prop textdata) (prop excerpt)
                                (prop excerpt-offset))))
-      selection-change
-      (lambda (ev)
-        (let* ((tsample (chain document (get-element-by-id "textsample")))
-               (range (when (< 0 (chain rangy (get-selection) range-count))
-                        (chain rangy (get-selection) (get-range-at 0)
-                               (to-character-range tsample)))))
-          (when range
-            (destructuring-bind (excerpt offset)
-                (get-location-excerpt (prop textdata)
-                                      (@ range start)
-                                      (@ range end))
-              (funcall (prop dispatch)
-                       (create :type :edit
-                               :data (create :excerpt excerpt
-                                             'excerpt-offset offset))))))))
+      (selection-change (ev)
+       (let* ((tsample (chain document (get-element-by-id "textsample")))
+              (range (when (< 0 (chain rangy (get-selection) range-count))
+                       (chain rangy (get-selection) (get-range-at 0)
+                              (to-character-range tsample)))))
+         (when range
+           (destructuring-bind (excerpt offset)
+               (get-location-excerpt (prop textdata)
+                                     (@ range start)
+                                     (@ range end))
+             (funcall (prop dispatch)
+                      (create :type :edit
+                              :data (create :excerpt excerpt
+                                            'excerpt-offset offset))))))))
 
     ;;FIXME: Find a way to make this not pound the server per keystroke.
     (def-component text-sample
