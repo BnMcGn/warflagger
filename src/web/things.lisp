@@ -38,6 +38,7 @@
 
 (setf html-thing-lister:*thing-summary-sidebar-width* 18)
 
+
 (defun display-opinion-line (opinion)
   (let ((line-id (gadgets:mkstr (gensym "mount-opinion-"))))
     (webhax-core:html-out-str
