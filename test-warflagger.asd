@@ -8,7 +8,8 @@
                #:alexandria
                #:gadgets
                #:prove
-               #:liql) 
+               #:liql
+               #:wf-web) 
   :serial t
   :components ((:module :t
                         :serial t
