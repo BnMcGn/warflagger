@@ -5,6 +5,7 @@
 (let* ((tmpdir (homedir-relative-pathname "tmp/"))
        (*cache-path* (merge-pathnames "cache/" tmpdir))
        (*warstats-path* (merge-pathnames "warstats/" tmpdir))
+       (*static-path* "quicklisp/local-projects/wf-static/")
        ;;FIXME: Need better general way to handle db credentials.
        (*test-db-connect-spec*
         (if-travis '( :unix "test_opinions" "ben" "test_password")
