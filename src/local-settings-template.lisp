@@ -27,6 +27,7 @@
 
 (defparameter *base-url* "")
 (defparameter *cache-path* "")
+(defparameter *static-path* "quicklisp/local-projects/wf-static/")
 (defparameter *text-extractor-script*
   (asdf:system-relative-pathname 'warflagger "src/text-extract/textract.py"))
 (defparameter *db-connect-type* nil)
