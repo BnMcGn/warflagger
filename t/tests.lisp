@@ -13,6 +13,7 @@
        (*db-connect-type* :postgresql-socket3))
   (ensure-directories-exist *cache-path*)
   (ensure-directories-exist *warstats-path*)
+  (ensure-directories-exist *static-path*)
   (handler-bind
       ((clsql:sql-connection-error
         (lambda (c)
