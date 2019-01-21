@@ -7,24 +7,28 @@
 
 ;;Compile resources
 
-(write-js-resources
- (concatenate 'string wf/local-settings:*static-path* "javascript/warflagger-resources.js")
- 'react:build
- 'ps-gadgets
- 'webhax-widgets:ps-widgets
- 'ps-react-gadgets:ps-react-gadgets
- 'webhax-ask
- 'wf-web-library
- 'opinion-components
- 'mood-lib
- 'grouped-components
- 'titlebar-components
- 'target-article
- 'target-thread
- 'target-summary
- 'target-components
- 'opinion-page
- 'warflagger-things)
+(defun write-warflagger-js-resources ()
+  (write-js-resources
+   (concatenate 'string wf/local-settings:*static-path* "javascript/warflagger-resources.js")
+   'react:build
+   'ps-gadgets
+   'webhax-widgets:ps-widgets
+   'ps-react-gadgets:ps-react-gadgets
+   'webhax-ask
+   'wf-web-library
+   'opinion-components
+   'mood-lib
+   'grouped-components
+   'titlebar-components
+   'target-article
+   'target-thread
+   'target-summary
+   'target-components
+   'opinion-page
+   'warflagger-things))
+
+(when (boundp 'wf/local-settings:*static-path*)
+  (write-warflagger-js-resources))
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
