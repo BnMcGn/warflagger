@@ -27,9 +27,6 @@
    'opinion-page
    'warflagger-things))
 
-(when (boundp 'wf/local-settings:*static-path*)
-  (write-warflagger-js-resources))
-
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
    :@css-link "/static/css/style.css")
@@ -88,12 +85,6 @@
    (webhax-route:quick-page
        (:@title title)
      (princ (funcall body-func) *webhax-output*))))
-
-(if-production
- (clsql:connect wf/local-settings:*db-connect-spec*
-                :database-type wf/local-settings:*db-connect-type*)
- (clsql:connect wf/local-settings:*test-db-connect-spec*
-                :database-type wf/local-settings:*db-connect-type*))
 
 (defun favicon-links ()
   (html-out
@@ -283,10 +274,10 @@
 ;;;(clack:stop wf/web::*handler*)
 ;;;Then evaluate code below.
 
-(if-production
- (defun run-server ()
-   (clack-server-manager
-    *handler*
+(defun run-server ()
+  (clack-server-manager
+   *handler*
+   (if-production
     (lack:builder
      (:backtrace
       :output #p"/var/log/warflagger.err"
@@ -300,31 +291,30 @@
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
      (html-thing-lister:thing-component)
      *app*)
-    ;:server :fcgi
-    ;:use-thread nil
-    :port 5005)
-   (sb-thread:join-thread
-    (find-if
-     (lambda (th)
-       (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
-     (sb-thread:list-all-threads))))
- (clack-server-manager
-  *handler*
-  (clack-pretend:pretend-builder
-   (:insert 3) ;clack.builder:builder
-   (clack.middleware.clsql:<clack-middleware-clsql>
-    :database-type :postgresql-socket3
-    :connection-spec *test-db-connect-spec*)
-   (clack.middleware.static:<clack-middleware-static>
-    :path "/static/"
-    :root #p"~/quicklisp/local-projects/wf-static/")
-   :session
-   (clath:component
-    "http://logintest.warflagger.com:5000/")
-   (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-   (html-thing-lister:thing-component)
-   *app*)
-  :port 5000))
+    (clack-pretend:pretend-builder
+     (:insert 3) ;clack.builder:builder
+     (clack.middleware.clsql:<clack-middleware-clsql>
+      :database-type :postgresql-socket3
+      :connection-spec *test-db-connect-spec*)
+     (clack.middleware.static:<clack-middleware-static>
+      :path "/static/"
+      :root #p"~/quicklisp/local-projects/wf-static/")
+     :session
+     (clath:component
+      "http://logintest.warflagger.com:5000/")
+     (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+     (html-thing-lister:thing-component)
+     *app*))
+   :port (if-production 5005 5000)))
 
 
 
+(when wf/local-settings:*auto-run*
+  (write-warflagger-js-resources)
+  ;;FIXME: isn't working for production.
+  (if-production
+   (clsql:connect wf/local-settings:*db-connect-spec*
+                  :database-type wf/local-settings:*db-connect-type*)
+   (clsql:connect wf/local-settings:*test-db-connect-spec*
+                  :database-type wf/local-settings:*db-connect-type*))
+  (run-server))
