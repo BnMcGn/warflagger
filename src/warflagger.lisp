@@ -54,3 +54,11 @@
 
 (defun url-p (thing)
   (quri:uri-host (quri:uri thing)))
+
+(defun warstats-url-server (url)
+  "Return, if it exists, the warstats URL for a rooturl. For lookups from the browser extension"
+  (if (rooturl-p url)
+      (list
+       :warstats (make-warstats-url (get-rooturl-id url) :warstats)
+       :status :success)
+      (list :status :failure)))
