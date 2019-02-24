@@ -75,13 +75,17 @@
 ;;;FIXME: Need to clean up after crash that leaves main.lock in place. 
 (defun grab-text (url &key (update t))
   (when update (update-page url))
-  (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
-    (read-file-into-string
-     (make-pathname :directory (cache-loc url)
-                    :name
-                    (if (probe-file (make-pathname :directory (cache-loc url)
-                                                   :name "text.locked"))
-                        "text.locked" "text")))))
+  (let ((tname
+          (make-pathname
+           :directory (cache-loc url)
+           :name
+           (if (probe-file
+                (make-pathname :directory (cache-loc url) :name "text.locked"))
+               "text.locked" "text"))))
+    (if (probe-file tname)
+        (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
+          (read-file-into-string tname))
+        (error (grab-messages url)))))
 
 (defun grab-title (url &key (alternate "[No Title]") (update t))
   (when update (update-page url))
@@ -163,7 +167,6 @@
 
 (defun save-page-to-cache (url)
   (let ((index (get-url-index url)))
-    ;;(ensure-directories-exist (make-pathname :directory (cache-loc url)))
     (ensure-directories-exist (make-pathname :directory (cache-loc url)))
     ;;FIXME: Need a way to not cache non-existent urls. Otherwise will get major clutter
     ;; from half-typed urls and malicious users.
