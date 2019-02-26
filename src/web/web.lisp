@@ -310,7 +310,10 @@
 
 
 (when wf/local-settings:*auto-run*
-  (write-warflagger-js-resources)
+  (unless-production
+   ;;FIXME: we don't have write permission on production, so update through git instead.
+   ;; This isn't quite the best way to do things.
+   (write-warflagger-js-resources))
   ;;FIXME: isn't working for production.
   (if-production
    (clsql:connect wf/local-settings:*db-connect-spec*
