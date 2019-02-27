@@ -305,7 +305,13 @@
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
      (html-thing-lister:thing-component)
      *app*))
-   :port (if-production 5005 5000)))
+   :port (if-production 5005 5000))
+  (when-production
+   (sb-thread:join-thread
+    (find-if
+     (lambda (th)
+       (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
+     (sb-thread:list-all-threads)))))
 
 
 
