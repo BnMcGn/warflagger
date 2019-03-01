@@ -27,6 +27,7 @@
   (test-textract)
   (test-db)
   (test-form-validator)
+  (test-services)
   ;;FIXME: think this through
   ;;(delete-dir *cache-path* :recursive t)
   ;;(delete-dir *warstats-path* :recursive t)

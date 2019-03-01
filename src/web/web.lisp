@@ -266,7 +266,7 @@
          (lambda ()
            (bind-validated-input
                ((url :url))
-             (json:encode-json-to-string (target-seek-server url))))))
+             (json:encode-json-plist-to-string (target-seek-server url))))))
 
   (setf (ningle:route *app* "/")
         (quick-page (#'target-parts
