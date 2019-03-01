@@ -78,5 +78,6 @@
    #:if-travis
    #:when-travis
    #:unless-travis
-   #:tree-address))
+   #:tree-address
+   #:target-seek-server))
 
