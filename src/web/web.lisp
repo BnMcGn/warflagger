@@ -261,12 +261,15 @@
                     *webhax-output*)))
          :content-type "application/json"))
 
-  (setf (ningle:route *app* "/target-seek/*")
+  (setf (ningle:route *app* "/target-seek/")
         (input-function-wrapper
          (lambda ()
            (bind-validated-input
-               ((url :url))
-             (json:encode-json-plist-to-string (target-seek-server url))))))
+               (&key
+                (url :url))
+             (print (json:encode-json-to-string (target-seek-server url))
+                    *webhax-output*)))
+         :content-type "application/json"))
 
   (setf (ningle:route *app* "/")
         (quick-page (#'target-parts
