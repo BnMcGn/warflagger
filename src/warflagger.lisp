@@ -60,7 +60,7 @@
 ;; non-applicable, maybe some non-web. Need a separate function to handle this.
 (defun target-seek-server (url)
   "This service is designed for searches from the browser extension. It lets the browser know if WarFlagger has anything to say about an URL, presumably the one that the user is visiting. It does not return the data, instead it returns the URL for the appropriate warstats."
-  (let ((id (rooturl-p url)))
+  (let ((id (caar (rooturl-p url))))
     (hu:plist->hash
      (if id
          (list :status "success"

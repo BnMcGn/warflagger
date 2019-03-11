@@ -261,15 +261,18 @@
                     *webhax-output*)))
          :content-type "application/json"))
 
+  ;;FIXME: bad URL should not cause this code to get stuck in the debugger. Should return error.
   (setf (ningle:route *app* "/target-seek/")
         (input-function-wrapper
          (lambda ()
            (bind-validated-input
                (&key
-                (url :url))
-             (print (json:encode-json-to-string (target-seek-server url))
+                ;;FIXME: :url not used to keep things from jamming.
+                (url :string))
+             (princ (json:encode-json-to-string (target-seek-server url))
                     *webhax-output*)))
-         :content-type "application/json"))
+         :content-type "application/json"
+         :headers '("Access-Control-Allow-Origin" "*")))
 
   (setf (ningle:route *app* "/")
         (quick-page (#'target-parts
