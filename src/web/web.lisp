@@ -123,14 +123,6 @@
                         (warflagger:opinion-text-server url)
                         (wf/text-extract:text-server url))))))))
 
-  (setf (ningle:route *app* "/warstats-url-server/")
-        (input-function-wrapper
-         (lambda ()
-           (bind-validated-input
-               ((url :string))
-             (json:encode-json-to-string (warstats-url-server url))))
-         :content-type "application/json"))
-
   (setf (ningle:route *app* "/opinion/")
         (quick-page ()
           (opinion-form-page)))
@@ -329,11 +321,11 @@
      *app*))
    :port (if-production 5005 5000))
   (when-production
-   (sb-thread:join-thread
-    (find-if
-     (lambda (th)
-       (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
-     (sb-thread:list-all-threads)))))
+   #+sbcl (sb-thread:join-thread
+           (find-if
+            (lambda (th)
+              (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
+            (sb-thread:list-all-threads)))))
 
 (when wf/local-settings:*auto-run*
   (unless-production
