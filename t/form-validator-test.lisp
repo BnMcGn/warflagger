@@ -12,6 +12,7 @@
          :excerpt "and"
          :excerpt-offset "3")))
 
+;;FIXME: Need some negative tests
 (defun test-form-validator ()
   (multiple-value-bind (vals sig)
       (webhax-validate:validate-batch *test-input* wf/web::*opinion-form-specs*)

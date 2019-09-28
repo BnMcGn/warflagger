@@ -79,5 +79,6 @@
    #:when-travis
    #:unless-travis
    #:tree-address
-   #:warstats-url-server))
+   #:warstats-url-server
+   #:target-seek-server))
 

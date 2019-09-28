@@ -55,10 +55,17 @@
 (defun url-p (thing)
   (quri:uri-host (quri:uri thing)))
 
-(defun warstats-url-server (url)
-  "Return, if it exists, the warstats URL for a rooturl. For lookups from the browser extension"
-  (if (rooturl-p url)
-      (list
-       :warstats (make-warstats-url (get-rooturl-id url) :warstats)
-       :status :success)
-      (list :status :failure)))
+;;FIXME: This should handle SameThing mirroring and url variants.
+;;FIXME: Need to handle other bad URL types than 'unlisted'. Some URLs should be left alone. Non-permalinks
+;; non-applicable, maybe some non-web. Need a separate function to handle this.
+(defun target-seek-server (url)
+  "This service is designed for searches from the browser extension. It lets the browser know if WarFlagger has anything to say about an URL, presumably the one that the user is visiting. It does not return the data, instead it returns the URL for the appropriate warstats."
+  (let ((id (caar (rooturl-p url))))
+    (hu:plist->hash
+     (if id
+         (list :status "success"
+               :message ""
+               :warstats (make-warstats-url id :warstats))
+         (list :status "missing"
+               :message "URL not listed on server")))))
+

@@ -269,6 +269,19 @@
                     *webhax-output*)))
          :content-type "application/json"))
 
+  ;;FIXME: bad URL should not cause this code to get stuck in the debugger. Should return error.
+  (setf (ningle:route *app* "/target-seek/")
+        (input-function-wrapper
+         (lambda ()
+           (bind-validated-input
+               (&key
+                ;;FIXME: :url not used to keep things from jamming.
+                (url :string))
+             (princ (json:encode-json-to-string (target-seek-server url))
+                    *webhax-output*)))
+         :content-type "application/json"
+         :headers '("Access-Control-Allow-Origin" "*")))
+
   (setf (ningle:route *app* "/")
         (quick-page (#'target-parts
                      #'main-page-parts))))
@@ -304,6 +317,7 @@
      (clack.middleware.clsql:<clack-middleware-clsql>
       :database-type :postgresql-socket3
       :connection-spec *test-db-connect-spec*)
+     (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
      (clack.middleware.static:<clack-middleware-static>
       :path "/static/"
       :root #p"~/quicklisp/local-projects/wf-static/")
@@ -313,10 +327,19 @@
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
      (html-thing-lister:thing-component)
      *app*))
-   :port (if-production 5005 5000)))
+   :port (if-production 5005 5000))
+  (when-production
+   (sb-thread:join-thread
+    (find-if
+     (lambda (th)
+       (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
+     (sb-thread:list-all-threads)))))
 
 (when wf/local-settings:*auto-run*
-  (write-warflagger-js-resources)
+  (unless-production
+   ;;FIXME: we don't have write permission on production, so update through git instead.
+   ;; This isn't quite the best way to do things.
+   (write-warflagger-js-resources))
   ;;FIXME: isn't working for production.
   (if-production
    (clsql:connect wf/local-settings:*db-connect-spec*

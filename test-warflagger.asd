@@ -16,6 +16,7 @@
                         :components ((:file "package")
                                      (:file "textract-test")
                                      (:file "db-test")
+				     (:file "services-test")
                                      (:file "form-validator-test")
                                      (:file "tests")))))
 
