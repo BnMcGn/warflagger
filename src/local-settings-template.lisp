@@ -22,7 +22,8 @@
    #:*test-db-connect-spec*
    #:*warstats-path*
    #:*production*
-   #:*auto-run*))
+   #:*auto-run*
+   #:*test-user-name*))
 
 (in-package :wf/local-settings)
 
@@ -38,5 +39,6 @@
 
 (defparameter *production* nil)
 (defparameter *auto-run* nil)
+(defparameter *test-user-name*)
 
 (pushnew #p"" webhax:*named-text-locations*)

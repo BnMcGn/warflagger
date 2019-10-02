@@ -249,6 +249,12 @@
          (quick-page ()
            (demo-pages))))
 
+  (setf (ningle:route *app* "/private-call-cleanup-test-user/")
+        (quick-page ()
+          (cleanup-test-user)
+          (html-out
+            (:h1 "Done"))))
+
   ;;FIXME: Should be handled internally by webhax service middleware
   (setf (ningle:route *app* "/ask-data/*" :method :POST)
         (input-function-wrapper

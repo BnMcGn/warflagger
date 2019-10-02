@@ -245,3 +245,8 @@ class=\"statcounter\"
 src=\"//c.statcounter.com/11547060/0/13ae87ef/1/\" alt=\"Web
 Analytics\"></a></div></noscript>
 <!-- End of StatCounter Code for Default Guide -->")
+
+;;Not the greatest thing to have on the live server, but we want to have the sign up code tested.
+(defun cleanup-test-user ()
+  (when wf/local-settings:*test-user-name*
+    (userfig:remove-user wf/local-settings:*test-user-name*)))
