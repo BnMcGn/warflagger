@@ -249,4 +249,4 @@ Analytics\"></a></div></noscript>
 ;;Not the greatest thing to have on the live server, but we want to have the sign up code tested.
 (defun cleanup-test-user ()
   (when wf/local-settings:*test-user-name*
-    (userfig:remove-user wf/local-settings:*test-user-name*)))
+    (userfig:remove-user (get-user-by-screenname wf/local-settings:*test-user-name*))))
