@@ -39,6 +39,6 @@
 
 (defparameter *production* nil)
 (defparameter *auto-run* nil)
-(defparameter *test-user-name*)
+(defparameter *test-user-name* nil)
 
 (pushnew #p"" webhax:*named-text-locations*)
