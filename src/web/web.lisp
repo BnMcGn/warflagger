@@ -7,6 +7,7 @@
 
 ;;Compile resources
 
+;;FIXME: How do we update? Won't run if recompiled
 (defun write-warflagger-js-resources ()
   (write-js-resources
    (concatenate 'string wf/local-settings:*static-path* "javascript/warflagger-resources.js")
