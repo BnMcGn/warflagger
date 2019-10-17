@@ -110,8 +110,7 @@
       (create line-width
               (let ((q (calculate-intensity opins)))
                 (block found
-                  (do-keyvalue (k v (lisp (alist->ps-object-code
-                                           *intensity-thresholds*)))
+                  (do-keyvalue (k v (lisp (as-ps-data *intensity-thresholds*)))
                     (when (< k q)
                       (return-from found v)))))
               stroke-style

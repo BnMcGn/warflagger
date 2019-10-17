@@ -69,7 +69,7 @@
               (make-id-path id)
               (chain id (to-string))
               "/"
-              (getprop (lisp (ps-gadgets:alist->ps-object-code
+              (getprop (lisp (ps-gadgets:as-ps-data
                               (hu:plist->alist warflagger:*warstats-path-types*)))
                        type)))
 
