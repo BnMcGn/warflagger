@@ -4,11 +4,11 @@ import sys
 import string
 import urllib.request, urllib.error, urllib.parse
 import json
-from BeautifulSoup import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup, SoupStrainer
 import os
 from pattern.web import plaintext
 from readability import Document
-import pyPdf as pp
+import PyPDF2 as pp
 from shutil import move
 from syslog import syslog, openlog, LOG_DEBUG, LOG_INFO
 
@@ -59,7 +59,7 @@ def get_url_fh(url):
     return opener.open(url, timeout=30)
 
 def get_page_type(ufh):
-    t = ufh.info().type
+    t = ufh.info().get("Content-Type")
     if "html" in t:
         return "html"
     elif "pdf" in t:
@@ -68,7 +68,7 @@ def get_page_type(ufh):
         raise ValueError("Unknown document type")
 
 def extract_links(page):
-    links = BeautifulSoup(page, parseOnlyThese=SoupStrainer('a'))
+    links = BeautifulSoup(page, parse_only=SoupStrainer('a'), features="lxml")
     links = [l for l in links if 'href' in l]
     return [(l.get('href'), l.getText()) for l in links]
 
@@ -89,7 +89,7 @@ def page2text(url):
 
 def extract_title(url):
     page = open(page_loc(url))
-    soup = BeautifulSoup(page.read())
+    soup = BeautifulSoup(page.read(), features='lxml')
     title = soup.find('title')
     title = title.string.encode('utf-8')
     gadgets.string_to_file(title, title_loc(url))
@@ -139,7 +139,8 @@ def do_page_save(url):
                 return False
             utype = get_page_type(uh)
             fname = page_loc(url, utype)
-            fh = open(fname, 'w')
+            #FIXME: Added 'b' for python3. Don't know if it is the right thing.
+            fh = open(fname, 'wb')
             #FIXME: see if this works for pdfs? binary? might be slow?
             for ln in uh:
                 fh.write(ln)

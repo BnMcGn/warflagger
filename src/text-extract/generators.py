@@ -8,7 +8,7 @@ from itertools import islice
 def coroutine(func):
     def start(*args,**kwargs):
         cr = func(*args,**kwargs)
-        cr.next()
+        next(cr)
         return cr
     return start
 
@@ -16,7 +16,7 @@ def coroutine(func):
 def context(an_iter):
     an_iter = iter(an_iter)
     prev_item = None
-    this_item = an_iter.next()
+    this_item = next(an_iter)
     for next_item in an_iter:
         yield (prev_item, this_item, next_item)
         prev_item = this_item
@@ -46,7 +46,7 @@ def group(an_iter, length=2):
 
 def dump(aniter):
     for itm in aniter:
-        print itm
+        print(itm)
         yield itm
 
 def progress(aniter, tick):
@@ -56,7 +56,7 @@ def progress(aniter, tick):
         count+=1
         if count>tick:
             bigdig+=1
-            print "%d x %d" % (bigdig, tick)
+            print("%d x %d" % (bigdig, tick))
             count=0
         yield itm
 
@@ -122,7 +122,7 @@ class StateMachinery(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if not self.state:
             self.state = (getattr(self, self.initial),)
         return self.state[0](*self.state[1:])
@@ -130,22 +130,22 @@ class StateMachinery(object):
     def state_sample(self, param=False):
         #set next state
         self.state=(self.state_sample, True)
-        return self.iter.next()
+        return next(self.iter)
 
 #test
 class MyState(StateMachinery):
 
     def state_one(self):
-        v = self.iter.next()
+        v = next(self.iter)
         if v < 3:
-            print 'here'
+            print('here')
             self.state=(self.state_two, v)
         return 'one'
 
     def state_two(self, param):
         v = 0
         for x in range(param):
-            v = self.iter.next()
+            v = next(self.iter)
         self.state = (self.state_three, v)
         return 'two'
 
@@ -155,7 +155,7 @@ class MyState(StateMachinery):
             return self.state_one()
         else:
             self.state = (self.state_three, param - 1)
-            return self.iter.next()
+            return next(self.iter)
     initial = 'state_one'
 
 def states2(iterable, test, state2, filter1=lambda x: x, include_match=True):
@@ -187,11 +187,11 @@ class readahead():
         self.stack = []
     def __iter__(self):
         return self
-    def next(self):
+    def __next__(self):
         if len(self.stack):
             return self.stack.pop()
         else:
-            return self.gen.next()
+            return next(self.gen)
     def readahead(self, count=1):
         """Feeds items from the source iterator into the stack. count
         tells how many times to call next. You may preview or tamper with 
@@ -201,7 +201,7 @@ class readahead():
         in your iterator
         """
         for x in range(count):
-            itm = self.gen.next()
+            itm = next(self.gen)
             self.stack.insert(0, itm)
     def iter(self):
         data = reversed(self.stack)
@@ -265,7 +265,7 @@ def denumerate(finite_iterable):
     starting with the end of the list/highest index and proceeding to the
     beginning/lowest"""
     data = list(reversed(finite_iterable))
-    for i, x in zip(range(len(data)-1, -1, -1), data):
+    for i, x in zip(list(range(len(data)-1, -1, -1)), data):
         yield i, x
 
 def rotations(finite_iterable):
@@ -274,4 +274,4 @@ def rotations(finite_iterable):
         yield itr[x:] + itr[:x]
 
 def take(iter, quantity):
-    return [x for i, x in zip(range(quantity), iter)]
+    return [x for i, x in zip(list(range(quantity)), iter)]

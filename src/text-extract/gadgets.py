@@ -28,7 +28,7 @@ def list_difference(l1, l2, key1=None, key2=None):
     if not key2:
         key2 = lambda x: x
     res = list(l1)
-    keys = map(key1, res)
+    keys = list(map(key1, res))
     for x in l2:
         try:
             i = keys.index(key2(x))
@@ -46,12 +46,12 @@ def list_intersection(l1, l2, key1=None, key2=None):
     ind = generators.dictize([(key1(x), i) for i, x in enumerate(l1)],
                              "append")
     for x in map(key2, l2):
-        if ind.has_key(x):
+        if x in ind:
             if len(ind[x])==1:
                 del(ind[x])
             else:
                 del(ind[x][0])
-    notfound = set(generators.flatten1(ind.values()))
+    notfound = set(generators.flatten1(list(ind.values())))
     return [x for i, x in enumerate(l1) if i not in notfound]
 
 def sort_to_buckets(buclist, data_iter, keyfunc=None):
@@ -75,7 +75,7 @@ def sort_to_buckets(buclist, data_iter, keyfunc=None):
 
 def middlezip(alist):
     lnth = (len(alist)/2)+(len(alist)&1)
-    return zip(alist[:lnth], alist[-1:lnth-1:-1])
+    return list(zip(alist[:lnth], alist[-1:lnth-1:-1]))
 
 def indexes(alist, srch):
 	"""return a list of all the indexes of srch in alist"""
@@ -107,7 +107,7 @@ def first_match(iterable, predicate, equals=None,
                 return x
             elif return_index:
                 return i
-    raise ValueError, "No match found"
+    raise ValueError("No match found")
 
 def _could_match_pairs(txt):
     txt = "^{0}$".format(txt.lower())
@@ -115,7 +115,7 @@ def _could_match_pairs(txt):
 
 def could_match(str1, str2):
     closenuf = .7
-    s1, s2 = map(_could_match_pairs, (str1, str2))
+    s1, s2 = list(map(_could_match_pairs, (str1, str2)))
     isec = s1.intersection(s2)
     return fudqual(len(s1), len(isec), closenuf*len(s1)) and \
         fudqual(len(s2), len(isec), closenuf*len(s2))
@@ -130,7 +130,7 @@ def whitespace_index(text):
     for i, t in enumerate(text):
         if t in string.whitespace:
             return i
-    raise ValueError, "whitespace not found"
+    raise ValueError("whitespace not found")
 
 def whitespace_rindex(text):
     return len(text)-whitespace_index(reversed(text))-1
@@ -142,7 +142,7 @@ def fudgex(alist, key, fudge):
     for i, tm in enumerate(alist):
         if fudqual(key, tm, fudge):
             return i
-    raise ValueError, "Nothing approximately equal to %s found" % str(key)
+    raise ValueError("Nothing approximately equal to %s found" % str(key))
 
 def infudge(alist, key, fudge):
     try:
@@ -222,9 +222,9 @@ def exceptmap(specfunc, alist, maintain_spacing=False):
     return (good, bad)
 
 def dict_spread(adict):
-    ks, vals = zip(*adict.items())
-    for valslice in itertools.izip(*vals):
-        yield dict(zip(ks, valslice))
+    ks, vals = list(zip(*list(adict.items())))
+    for valslice in zip(*vals):
+        yield dict(list(zip(ks, valslice)))
 
 def dict_merge(*dicts):
     res = {}
@@ -249,7 +249,7 @@ def supermap(func, *args, **kwargs):
     assert len(args) or len(kwargs)
     diters, dstatic = splitfilter(
         lambda x: is_non_string_iterable(x[1]),
-        kwargs.items())
+        list(kwargs.items()))
     dstatic = [(k, v.item) if isinstance(v, SmSingle) else (k, v)\
                for k, v in dstatic]
     itered_args = [itertools.repeat(None)]
@@ -262,7 +262,7 @@ def supermap(func, *args, **kwargs):
             itered_args.append(itertools.repeat(x))
     diters = dict(diters)
     diters['_drop']=itertools.repeat(None)
-    for xargs, xkws in itertools.izip(itertools.izip(*itered_args),
+    for xargs, xkws in zip(zip(*itered_args),
                                       dict_spread(diters)):
         xargs = xargs[1:]
         del(xkws['_drop'])
@@ -270,7 +270,7 @@ def supermap(func, *args, **kwargs):
 
 def tryit(func, *data):
     if not hasattr(func, '__call__'):
-        raise ValueError, "First parameter is not a function"
+        raise ValueError("First parameter is not a function")
     try:
         func(*data)
         return True
@@ -286,16 +286,16 @@ def showparams(func):
     """decorator for debugging functions. prints the parameters"""
     def wrapper(*args, **kw):
         for x in args:
-            print args
-        for itm in kw.items():
-            print '%s: %s' % itm
+            print(args)
+        for itm in list(kw.items()):
+            print('%s: %s' % itm)
         return func(*args, **kw)
     return wrapper
 
 def coroutine(func):
     def start(*args,**kwargs):
         cr = func(*args,**kwargs)
-        cr.next()
+        next(cr)
         return cr
     return start
 
@@ -314,10 +314,10 @@ def getbasename(fname):
     return fname.split('.')[0]
 
 def choose_from_list(alist, returnkey=False):
-    print "Choose an option:"
+    print("Choose an option:")
     for i, item in enumerate(alist):
-        print i+1, item
-    res = raw_input("1-%d:" % len(alist))
+        print(i+1, item)
+    res = input("1-%d:" % len(alist))
     try:
         return int(res)-1 if returnkey else alist[int(res)-1]
     except:
@@ -348,7 +348,7 @@ def paste_to_self(txt):
 
 def fraw_input(prompt=''):
     sys.stdout.flush()
-    return raw_input(prompt=prompt)
+    return input(prompt=prompt)
 
 def string_bool(itm):
     if not itm:
@@ -388,10 +388,10 @@ class RegexBattery():
             if r:
                 lkeys.add(k)
                 res[k] = r.groups()[i]
-        diff = self.keys.difference(res.keys())
+        diff = self.keys.difference(list(res.keys()))
         self.error = diff
         if self.strict and diff:
-            raise ValueError, "Match Failed: {0} missing".format(diff)
+            raise ValueError("Match Failed: {0} missing".format(diff))
         return res
 
 def adds_to_val(value, thelist):
@@ -429,8 +429,8 @@ def adds_to_val_linear(value, thelist):
 @contextmanager
 def file_lock(lock_file):
     if os.path.exists(lock_file):
-        print 'Only one script can run at once. '\
-              'Script is locked with %s' % lock_file
+        print('Only one script can run at once. '\
+              'Script is locked with %s' % lock_file)
         sys.exit(-1)
     else:
         open(lock_file, 'w').write("1")
@@ -450,16 +450,16 @@ class vars_set():
             self.env = module
     def __enter__(self):
         m = self.env
-        keys = self.data.keys()
+        keys = list(self.data.keys())
         for k in keys:
-            if m.has_key(k):
+            if k in m:
                 self.stor[k] = m[k]
             else:
                 self.nonx.append(k)
             m[k] = self.data[k]
     def __exit__(self, ttype, value, traceback):
         m = self.env
-        keys = self.data.keys()
+        keys = list(self.data.keys())
         for k in keys:
             if k in self.nonx:
                 del(m[k])
@@ -473,7 +473,8 @@ def touch(fname, times=None):
         os.utime(fname, times)
 
 def string_to_file(a_string, fname):
-    with open(fname, 'w') as fh:
+    #FIXME: Should be a unicode file? doesn't want to write bytes without 'b'
+    with open(fname, 'wb') as fh:
         fh.write(a_string)
 
 def fractindex(numbers, index):
