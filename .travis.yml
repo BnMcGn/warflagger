@@ -36,7 +36,7 @@ install:
   - pip3 install --user pyPdf
   - pip3 install --user readability-lxml
 
-  - sudo apt-get install python
+  - sudo apt-get install python3
 
 before_script:
 
