@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import string
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 import os
@@ -37,7 +37,7 @@ def page_loc(url, utype=None):
         fname = cache_loc(url) + 'page.pdf' + cache_tmp
         if os.path.exists(fname):
             return fname
-        raise ValueError, "Can't calculate page location without type"
+        raise ValueError("Can't calculate page location without type")
 
 def text_loc(url):
     return cache_loc(url) + 'text' + cache_tmp
@@ -53,9 +53,9 @@ def links_loc(url):
 
 def get_url_fh(url):
     """Returns a filehandle to the opened URL"""
-    redhand = urllib2.HTTPRedirectHandler()
-    cookhand = urllib2.HTTPCookieProcessor()
-    opener = urllib2.build_opener(redhand, cookhand)
+    redhand = urllib.request.HTTPRedirectHandler()
+    cookhand = urllib.request.HTTPCookieProcessor()
+    opener = urllib.request.build_opener(redhand, cookhand)
     return opener.open(url, timeout=30)
 
 def get_page_type(ufh):
@@ -65,11 +65,11 @@ def get_page_type(ufh):
     elif "pdf" in t:
         return "pdf"
     else:
-        raise ValueError, "Unknown document type"
+        raise ValueError("Unknown document type")
 
 def extract_links(page):
     links = BeautifulSoup(page, parseOnlyThese=SoupStrainer('a'))
-    links = [l for l in links if l.has_key('href')]
+    links = [l for l in links if 'href' in l]
     return [(l.get('href'), l.getText()) for l in links]
 
 def process_links(linktext):
@@ -104,7 +104,7 @@ def pdf2text(fh):
     pdf = pp.PdfFileReader(fh)
     for i in range(0, pdf.getNumPages()):
         content += pdf.getPage(i).extractText() + "\n"
-    content = " ".join(content.replace(u"\xa0", " ").strip().split())
+    content = " ".join(content.replace("\xa0", " ").strip().split())
     return content
 
 def process_pdf(url):
@@ -159,7 +159,7 @@ def do_page_save(url):
 cachepath = sys.argv[1]
 if not cachepath.endswith("/"):
     cachepath += "/"
-url = sys.stdin.next()
+url = next(sys.stdin)
 syslog(LOG_INFO, "Called for URL:{0}".format(url))
 syslog(LOG_DEBUG, "Cachepath: {0}".format(cachepath))
 do_page_save(url)

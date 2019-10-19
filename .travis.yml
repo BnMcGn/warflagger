@@ -31,10 +31,10 @@ install:
 
   - cp src/local-settings-template.lisp src/local-settings.lisp
 
-  - pip install --user pattern
-  - pip install --user BeautifulSoup
-  - pip install --user pyPdf
-  - pip install --user readability-lxml
+  - pip3 install --user pattern
+  - pip3 install --user BeautifulSoup
+  - pip3 install --user pyPdf
+  - pip3 install --user readability-lxml
 
   - sudo apt-get install python
 
