@@ -142,6 +142,23 @@
       (dolist (url v)
         (format s "~d ~a~%" k url)))))
 
+(let ((highest nil))
+  (defun new-index (&optional set)
+    (declare (type (or null integer) set))
+    (if set
+        (setf highest set)
+        (if highest
+            (let ((new (1+ (apply #'max highest (hash-table-keys *bynum*)))))
+              (setf highest new)
+              new)
+            (error "Attempt to fetch new index before initialized")))))
+
+(defun highest-existing ()
+  (apply
+   #'max -1
+   (mapcar (lambda (d) (or (parse-integer (lastcar (pathname-directory d)) :junk-allowed t)))
+           (directory (concatenate 'string *cache-path* "*")))))
+
 (defun initialize-indices ()
   (if (probe-file (index-file-name))
       (multiple-value-bind (bynum byurl)
@@ -150,7 +167,9 @@
         (setf *bynum* bynum))
       (progn
         (setf *byurl* (make-hash-table :test #'equal))
-        (setf *bynum* (make-hash-table)))))
+        (setf *bynum* (make-hash-table))))
+  ;; Initialize new-index so as not to get mixed up with existing items in cache
+  (new-index (highest-existing)))
 
 ;;;FIXME: More checking of urls required. No file/local urls.
 (defun valid-url-p (url)
@@ -159,7 +178,8 @@
 (defun get-url-index (url)
   (aif2 (gethash url *byurl*)
         it
-        (let ((newkey (1+ (apply #'max -1 (hash-table-keys *bynum*)))))
+        (let ((newkey (new-index)))
+          ;;FIXME: No check to see if loc is used. Either avoid or erase.
           (setf (gethash newkey *bynum*) (list url))
           (setf (gethash url *byurl*) newkey)
           (write-index-file (index-file-name) *bynum*)

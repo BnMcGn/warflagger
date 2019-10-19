@@ -56,7 +56,7 @@
                   :comment comment
                   :reference (handle-reference authid reference reference-excerpt)))))
       (when (opinion-may-exist data authid)
-        (error "Opinion may already exist in database"))
+        (warn "Opinion may already exist in database"))
       (save-opinion-from-user data authid))))
 
 (defun divide-on-end-of-keywords (items)
