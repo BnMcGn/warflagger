@@ -6,9 +6,8 @@ env:
     - LISP=sbcl
     - LISP=ccl
 
-matrix:
-  include:
-    - python: 3.6
+python:
+  - 3.6
 
 services:
     - postgresql
