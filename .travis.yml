@@ -34,9 +34,9 @@ install:
 
   - cp src/local-settings-template.lisp src/local-settings.lisp
 
-  - sudo apt-get install python3.6
   - sudo apt-get install python3-pip
 
+  - pip3 install --user lxml==4.3.5  
   - pip3 install --user pattern
   - pip3 install --user BeautifulSoup
   - pip3 install --user pyPdf
