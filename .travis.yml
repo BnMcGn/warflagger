@@ -6,8 +6,10 @@ env:
     - LISP=sbcl
     - LISP=ccl
 
-python:
-  - 3.6
+addons:
+  apt:
+    packages:
+    - python3.6
 
 services:
     - postgresql
