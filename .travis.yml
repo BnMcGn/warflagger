@@ -5,12 +5,13 @@ env:
  matrix:   
     - LISP=sbcl
     - LISP=ccl
+    include:
+        - language: python
+          python: 3.7
 
 services:
     - postgresql
 
-python:
-    - 3.6
 
 addons:
     postgresql: 9.5
@@ -36,7 +37,6 @@ install:
 
   - sudo apt-get install python3-pip
 
-  - pip3 install --user lxml==4.3.5  
   - pip3 install --user pattern
   - pip3 install --user BeautifulSoup
   - pip3 install --user pyPdf
