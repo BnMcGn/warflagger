@@ -1,6 +1,8 @@
 language: common-lisp
 sudo: required
 
+dist: bionic
+
 env:
  matrix:   
     - LISP=sbcl
@@ -37,10 +39,10 @@ install:
 
   - cp src/local-settings-template.lisp src/local-settings.lisp
 
-  - sudo add-apt-repository ppa:deadsnakes/ppa
-  - sudo apt-get update
-  - sudo apt-get install -y python3.5
-  - sudo apt-get install python3-pip
+  #- sudo add-apt-repository ppa:deadsnakes/ppa
+  #- sudo apt-get update
+  #- sudo apt-get install -y python3.5
+  #- sudo apt-get install python3-pip
 
   - pip3 install --user pattern
   - pip3 install --user BeautifulSoup
