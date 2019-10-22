@@ -20,6 +20,10 @@ services:
 addons:
     postgresql: 9.5
 
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install python3
+
 install:
   # Install cl-travis
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
