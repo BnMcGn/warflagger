@@ -42,12 +42,12 @@ install:
   #- sudo add-apt-repository ppa:deadsnakes/ppa
   #- sudo apt-get update
   #- sudo apt-get install -y python3.5
-  #- sudo apt-get install python3-pip
+  - sudo apt-get install python3-pip
 
-  - pip install --user pattern
-  - pip install --user BeautifulSoup
-  - pip install --user pyPdf
-  - pip install --user readability-lxml
+  - pip3 install --user pattern
+  - pip3 install --user BeautifulSoup
+  - pip3 install --user pyPdf
+  - pip3 install --user readability-lxml
 
 
 before_script:
