@@ -20,26 +20,28 @@ jobs:
       - run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | bash
 
       - run:
-          git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
-          git clone https://github.com/bnmcgn/Parenscript quicklisp/local-projects/Parenscript
-          git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
-          git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
-          git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
-          git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
-          git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
-          git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
-          git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
-          git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
-          git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
-          git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
+          command: |
+            git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
+            git clone https://github.com/bnmcgn/Parenscript quicklisp/local-projects/Parenscript
+            git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
+            git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
+            git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
+            git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
+            git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
+            git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
+            git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
+            git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
+            git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
+            git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
 
-          cp src/local-settings-template.lisp src/local-settings.lisp
+            cp src/local-settings-template.lisp src/local-settings.lisp
 
       - run:
-          pip install --user pattern
-          pip install --user BeautifulSoup
-          pip install --user pyPdf
-          pip install --user readability-lxml
+          command: |
+            pip install --user pattern
+            pip install --user BeautifulSoup
+            pip install --user pyPdf
+            pip install --user readability-lxml
 
       - run: ros install prove # for run-prove
 
