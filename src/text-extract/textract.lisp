@@ -156,8 +156,10 @@
 (defun highest-existing ()
   (apply
    #'max -1
-   (mapcar (lambda (d) (or (parse-integer (lastcar (pathname-directory d)) :junk-allowed t)))
-           (directory (concatenate 'string *cache-path* "*")))))
+   (remove-if
+    #'null
+    (mapcar (lambda (d) (or (parse-integer (lastcar (pathname-directory d)) :junk-allowed t)))
+            (directory (concatenate 'string *cache-path* "*"))))))
 
 (defun initialize-indices ()
   (if (probe-file (index-file-name))
