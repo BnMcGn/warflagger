@@ -36,10 +36,10 @@ jobs:
           cp src/local-settings-template.lisp src/local-settings.lisp
 
       - run:
-          - pip install --user pattern
-          - pip install --user BeautifulSoup
-          - pip install --user pyPdf
-          - pip install --user readability-lxml
+          pip install --user pattern
+          pip install --user BeautifulSoup
+          pip install --user pyPdf
+          pip install --user readability-lxml
 
       - run: ros install prove # for run-prove
 
