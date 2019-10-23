@@ -7,6 +7,7 @@ jobs:
     docker:
       #- image: circleci/buildpack-deps:stretch-curl
       - image: circleci/python:3.6.9-stretch
+      - image: circleci/postgres:9.5.18
     environment:
       LISP: sbcl-bin
     steps:
@@ -44,6 +45,7 @@ jobs:
             pip install --user pyPdf
             pip install --user readability-lxml
 
+      - run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
       - run: ros install prove # for run-prove
 
       - run: run-prove test-warflagger.asd
