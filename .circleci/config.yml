@@ -8,6 +8,11 @@ jobs:
       #- image: circleci/buildpack-deps:stretch-curl
       - image: circleci/python:3.6.9-stretch
       - image: circleci/postgres:9.5.18
+        environment:
+        - POSTGRES_USER=circleci
+        - POSTGRES_PASSWORD=password
+        - POSTGRES_DB=template1
+
     environment:
       LISP: sbcl-bin
     steps:
