@@ -66,9 +66,9 @@ jobs:
 
       - run:
           command: |
-            psql -h 127.0.0.1 -c -d 'test_opinions' "create user ben with password 'test_password';"
+            psql -h 127.0.0.1 -d 'test_opinions' -c "create user ben with password 'test_password';"
             #psql -h 127.0.0.1 -c 'create database test_opinions;' -U postgres 
-            psql -h 127.0.0.1 -c -d 'test_opinions' 'grant all privileges on database test_opinions to ben;'
+            psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
             psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
 
       - run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
