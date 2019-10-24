@@ -51,6 +51,7 @@ jobs:
             pip install --user readability-lxml
 
       - run: sudo apt install -y postgresql-client || true
+      - run: sudo apt install libpq-dev
 
       - run:
           name: Waiting for Postgres to be ready

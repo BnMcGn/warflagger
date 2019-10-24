@@ -8,8 +8,9 @@
        (*static-path* "quicklisp/local-projects/wf-static/")
        ;;FIXME: Need better general way to handle db credentials.
        (*test-db-connect-spec*
-        (if-travis '( :unix "test_opinions" "ben" "test_password")
-                   *test-db-connect-spec*))
+         #+ci '("localhost" "test_opinions" "ben" "test_password")
+         ;; '( :unix "test_opinions" "ben" "test_password")
+         #-ci *test-db-connect-spec*)
        (*db-connect-type* :postgresql-socket3))
   (ensure-directories-exist *cache-path*)
   (ensure-directories-exist *warstats-path*)
