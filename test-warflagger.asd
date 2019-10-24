@@ -9,7 +9,8 @@
                #:gadgets
                #:prove
                #:liql
-               #:wf-web) 
+               #:wf-web
+               #:ci-utils) 
   :serial t
   :components ((:module :t
                         :serial t

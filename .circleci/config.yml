@@ -45,12 +45,25 @@ jobs:
             pip install --user pyPdf
             pip install --user readability-lxml
 
+      - run: sudo apt install -y postgresql-client || true
+
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+
       - run:
           command: |
-            psql -c "create user ben with password 'test_password';"
-            psql -c 'create database test_opinions;' -U postgres 
-            psql -c 'grant all privileges on database test_opinions to ben;'
-            psql -d 'test_opinions' -1 -f src/opinions.schema.sql
+            psql -h 127.0.0.1 -c "create user ben with password 'test_password';"
+            psql -h 127.0.0.1 -c 'create database test_opinions;' -U postgres 
+            psql -h 127.0.0.1 -c 'grant all privileges on database test_opinions to ben;'
+            psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
 
       - run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
       - run: ros install prove # for run-prove
