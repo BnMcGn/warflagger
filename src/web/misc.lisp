@@ -1,23 +1,5 @@
 (in-package :wf/web)
 
-
-(defmethod json:encode-json ((object clsql-sys:wall-time) &optional stream)
-  (write-char #\" stream)
-  (clsql:format-time stream object :format :iso8601)
-  ;;FIXME: quick hack to make this work on the live server (GMT). Javascript is touchy
-  ;; about parsing dates.
-  (write-string "+0000" stream)
-  (write-char #\" stream))
-
-(defmethod json:encode-json ((object local-time:timestamp) &optional stream)
-  (write-char #\" stream)
-  ;; FIXME: verify correct. Who uses local-time?
-  (local-time:format-timestring
-   stream object
-   :format '((:year 4) #\- (:month 2) #\- (:day 2) #\T
-             (:hour 2) #\: (:min 2) #\: (:sec 2) :gmt-offset-hhmm))
-  (write-char #\" stream))
-
 (defun large-logo ()
   (html-out
     (:img :src "/static/img/wf_logo_large.png"
