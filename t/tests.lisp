@@ -11,7 +11,8 @@
          #+ci '("localhost" "test_opinions" "ben" "test_password")
          ;; '( :unix "test_opinions" "ben" "test_password")
          #-ci *test-db-connect-spec*)
-       (*db-connect-type* :postgresql-socket3))
+       (*db-connect-type* #-ci :postgresql-socket3
+                          #+ci :postgresql))
   (ensure-directories-exist *cache-path*)
   (ensure-directories-exist *warstats-path*)
   (ensure-directories-exist (merge-pathnames "javascript/" *static-path*))
