@@ -47,7 +47,7 @@ jobs:
           command: |
             pip install --user pattern
             pip install --user beautifulsoup4
-            pip install --user pyPdf
+            pip install --user PyPDF2
             pip install --user readability-lxml
 
       - run: sudo apt install -y postgresql-client || true

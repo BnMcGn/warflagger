@@ -85,7 +85,7 @@
     (if (probe-file tname)
         (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
           (read-file-into-string tname))
-        (error (grab-messages url)))))
+        (error (format nil "Text not available: ~a" (grab-messages url))))))
 
 (defun grab-title (url &key (alternate "[No Title]") (update t))
   (when update (update-page url))
@@ -137,7 +137,7 @@
      (alist-hash-table data :test #'equal))))
 
 (defun write-index-file (fname bynum)
-  (with-open-file (s fname :direction :output :if-exists :supersede)
+  (with-open-file (s fname :direction :output :if-exists :supersede :if-does-not-exist :create)
     (do-hash-table (k v bynum)
       (dolist (url v)
         (format s "~d ~a~%" k url)))))
