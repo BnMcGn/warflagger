@@ -75,9 +75,6 @@
    #:url-p
    #:bulk-enter-file
    #:target-replies
-   #:if-travis
-   #:when-travis
-   #:unless-travis
    #:tree-address
    #:warstats-url-server
    #:target-seek-server))
