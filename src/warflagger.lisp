@@ -62,3 +62,12 @@
                :message "URL not listed on server")))))
 
 
+;; These methods are defined here because local-time and clsql are available here.
+(defmethod ps-gadgets:as-ps-data ((item clsql-sys:wall-time))
+  (format nil "~a+0000" (clsql:format-time nil item :format :iso8601)))
+
+(defmethod ps-gadgets:as-ps-data ((item local-time:timestamp))
+  (local-time:format-timestring
+   nil item
+   :format '((:year 4) #\- (:month 2) #\- (:day 2) #\T
+             (:hour 2) #\: (:min 2) #\: (:sec 2) :gmt-offset-hhmm)))

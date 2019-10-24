@@ -44,7 +44,7 @@
     (webhax-core:html-out-str
       (:div :id line-id)
       (mount-component (opinion-line :mount-id (lisp line-id))
-        :opinion (lisp-raw (json:encode-json-alist-to-string opinion))
+        :opinion (lisp (ps-gadgets:as-ps-data opinion))
         :trim (lisp thing-lister:*thing-summary-width*)))))
 
 (defun display-target-line (target)

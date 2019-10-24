@@ -55,8 +55,8 @@
          (:h2 "Enter an opinion")
          (mount-component (webhax-form)
            :fieldspecs
-           (lisp-raw
-            (webhax-validate:convert-fieldspecs-to-json *opinion-form-specs*))
+           (lisp
+            (webhax-validate:convert-fieldspecs-to-ps-data *opinion-form-specs*))
            :data (create :target (lisp target)
                          :excerpt (lisp excerpt)
                          :excerpt-offset (lisp offset))
@@ -134,8 +134,8 @@
         (psx (:span (prop message))))
 
     (def-component flag-description
-        (let ((descs (lisp-raw (json:encode-json-to-string
-                                (format-flag-descriptions)))))
+        (let ((descs (lisp (ps-gadgets:as-ps-data
+                            (format-flag-descriptions)))))
           (psx (:div
                 (:h5 :key 1 "Flag Info:")
                 (getprop descs (prop formdata flag))))))

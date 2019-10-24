@@ -167,8 +167,8 @@
                 :url (lisp url)
                 :rootid (lisp id)
                 :title (lisp (grab-title url))
-                :looks (lisp-raw (json:encode-json-to-string
-                                  (get-looks (get-user-name) id)))
+                :looks (lisp (ps-gadgets:as-ps-data
+                              (get-looks (get-user-name) id)))
                 :focus '()
                 :tmode (lisp tmode)
                 :username (lisp (webhax-user:get-user-name))
@@ -186,8 +186,8 @@
                 :url (lisp rooturl)
                 :rootid (lisp (assoc-cdr :rooturl opin))
                 :title (lisp (grab-title rooturl))
-                :looks (lisp-raw (json:encode-json-to-string
-                                  (get-looks (get-user-name) (assoc-cdr :rooturl opin))))
+                :looks (lisp (ps-gadgets:as-ps-data
+                              (get-looks (get-user-name) (assoc-cdr :rooturl opin))))
                 :focus (lisp (list* 'list (tree-address id)))
                 :username (lisp (webhax-user:get-user-name))
                 :child opinion-page)))))

@@ -145,8 +145,8 @@
                             (car v)))))))
              tree))))
     (mount-component (grouped-main)
-                     :roots (lisp-raw (json:encode-json-to-string roots))
-                     :tree (lisp-raw (json:encode-json-to-string (hu:plist->hash tree)))
-                     :order (lisp-raw (if discroots
-                                         (json:encode-json-to-string discroots)
-                                         "[]")))))
+                     :roots (lisp (ps-gadgets:as-ps-data roots))
+                     :tree (lisp (ps-gadgets:as-ps-data (hu:plist->hash tree)))
+                     :order (lisp (if discroots
+                                      (ps-gadgets:as-ps-data discroots)
+                                         '(list))))))
