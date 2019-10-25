@@ -11,12 +11,17 @@
 
 (defun test-services ()
 
-  ;;Target-seek-server
+  (plan 3)
+
+  (diag "Target seek server:")
+
   (let ((result (target-seek-server "asdf")))
     (is (gethash :status result) "missing"))
   (let ((result (target-seek-server *target*)))
     (is (gethash :status result) "success")
-    (ok (sequence-starts-with (gethash :warstats result) "http"))))
+    (ok (sequence-starts-with (gethash :warstats result) "http")))
+
+  (finalize))
 
 
 #|

@@ -1,5 +1,7 @@
 # WarFlagger.net Source Repository
 
+[![CircleCI](https://circleci.com/gh/BnMcGn/warflagger.svg?style=svg)](https://circleci.com/gh/BnMcGn/warflagger)
+
 This is the source code for the [WarFlagger](http://warflagger.net/) website. 
 
 ## User Documentation

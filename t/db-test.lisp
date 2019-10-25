@@ -28,19 +28,20 @@
         (opin1id nil)
         (opin2id nil)
         (ourl nil))
+    (plan 24)
 
     ;;May need to set up author
     (unless (integerp userid)
       (setf userid (insert-new-author :display-name *user*)))
 
-    ;;Some basic sanity checks
+    (diag "Basic sanity checks:")
     (ok (integerp userid))
     (ok (integerp rootid))
     (ok (rooturl-p *target*))
     (is (warflagger::flag-to-lisp (warflagger::flag-to-db '(:negative :is-wrong)))
         '(:negative :is-wrong))
 
-    ;; Do checks on author functionality
+    (diag "Author functionality:")
     (let* ((authdata (get-author-data userid))
            (wfuser (assoc-cdr :wf-user authdata)))
       ;; FIXME: Why no wf-user in some cases?
@@ -51,6 +52,7 @@
       ;;(is (get-local-user-from-id (get-local-user-id wfuser)) wfuser)
       )
     ;;Create opinion with excerpt, reference, offset
+    (diag "Create opinion:")
     (setf opin1id (save-opinion-from-user opin1 userid))
     (ok (integerp opin1id))
     (let ((saved-opin (opinion-by-id opin1id)))
@@ -64,6 +66,7 @@
       (is (get-rooturl-for-url ourl) *target*)
       (is (get-rooturl-by-id (get-rooturl-id *target*)) *target*)
 
+      (diag "Create child opinion:")
       ;;Create second opinion on first
       (setf opin2id (save-opinion-from-user
                      (cons (cons :target ourl) opin2) userid))
@@ -75,7 +78,7 @@
     (is-values (get-target-id-from-url *target*) (list rootid :rooturl))
     (is-values (get-target-id-from-url ourl) (list opin1id :opinion))
 
-    ;;Do opinion tree checks
+    (diag "Opinion tree checks:")
     (let* ((tree (opinion-tree-for-rooturl *target*))
            (subtree (find-if (lambda (x) (eq (car x) opin1id)) tree)))
       (is (car subtree) opin1id)
@@ -85,12 +88,12 @@
     (ok (rooturl-p *target*))
     (ok (null (rooturl-p ourl)))
 
-    ;;Delete opinions
-
+    (diag "Delete opinions:")
     (delete-opinion opin1id)
     (delete-opinion opin2id)
     (is-error (opinion-by-id opin1id) 'simple-error)
     (is-error (opinion-by-id opin2id) 'simple-error)
+    (finalize)
     ))
 
 
