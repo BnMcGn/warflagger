@@ -98,38 +98,38 @@
                   (map-by-2 (lambda (&rest params) (car (second params))) tree)))
          (roots
            (collecting-hash-table (:mode :replace)
-                                  (dolist (id refids)
-                                    (let* ((refopin (opinion-by-id id))
-                                           (refurl (assoc-cdr :reference refopin))
-                                           (rootid (when (rooturl-p refurl)
-                                                     (get-rooturl-id refurl)))
-                                           (parent-rootid (assoc-cdr :rooturl refopin)))
-                                      (unless (opinion-exists-p refurl)
-                                        (hu:collect
-                                            (or rootid refurl)
-                                          (hu:plist->hash
-                                           (if rootid
-                                               (list
-                                                :url refurl
-                                                :refparent parent-rootid
-                                                :refid id
-                                                :title (grab-title refurl)
-                                                :looks (get-looks (get-user-name) rootid)
-                                                :rootid rootid)
-                                               (list
-                                                :url refurl
-                                                :refparent parent-rootid
-                                                :refid id)))))))
+             (dolist (id refids)
+               (let* ((refopin (opinion-by-id id))
+                      (refurl (assoc-cdr :reference refopin))
+                      (rootid (when (rooturl-p refurl)
+                                (get-rooturl-id refurl)))
+                      (parent-rootid (assoc-cdr :rooturl refopin)))
+                 (unless (opinion-exists-p refurl)
+                   (hu:collect
+                       (or rootid refurl)
+                     (hu:plist->hash
+                      (if rootid
+                          (list
+                           :url refurl
+                           :refparent parent-rootid
+                           :refid id
+                           :title (grab-title refurl)
+                           :looks (get-looks (get-user-name) rootid)
+                           :rootid rootid)
+                          (list
+                           :url refurl
+                           :refparent parent-rootid
+                           :refid id)))))))
 
-                                  (dolist (id discroots)
-                                    (let ((url (get-rooturl-by-id id)))
-                                      (hu:collect
-                                          id
-                                        (hu:plist->hash
-                                         (list
-                                          :url url
-                                          :title (grab-title url)
-                                          :looks (get-looks (get-user-name) id))))))))
+             (dolist (id discroots)
+               (let ((url (get-rooturl-by-id id)))
+                 (hu:collect
+                     id
+                   (hu:plist->hash
+                    (list
+                     :url url
+                     :title (grab-title url)
+                     :looks (get-looks (get-user-name) id))))))))
          (tree
            (flatten-1
             (map-by-2
@@ -145,8 +145,9 @@
                             (car v)))))))
              tree))))
     (mount-component (grouped-main)
-                     :roots (lisp (ps-gadgets:as-ps-data roots))
-                     :tree (lisp (ps-gadgets:as-ps-data (hu:plist->hash tree)))
-                     :order (lisp (if discroots
-                                      (ps-gadgets:as-ps-data discroots)
-                                         '(list))))))
+      :roots (lisp (ps-gadgets:as-ps-data roots))
+      :tree (lisp (let ((ps-gadgets:*assume-list* t))
+                    (ps-gadgets:as-ps-data (hu:plist->hash tree))))
+      :order (lisp (if discroots
+                       (ps-gadgets:as-ps-data discroots)
+                       '(list))))))
