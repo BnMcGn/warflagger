@@ -474,6 +474,8 @@ def touch(fname, times=None):
 
 def string_to_file(a_string, fname):
     #FIXME: Should be a unicode file? doesn't want to write bytes without 'b'
+    if type(a_string) == str:
+        a_string = a_string.encode()
     with open(fname, 'wb') as fh:
         fh.write(a_string)
 
