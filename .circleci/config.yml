@@ -29,7 +29,7 @@ jobs:
       - run:
           command: |
             git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
-            git clone https://github.com/bnmcgn/Parenscript quicklisp/local-projects/Parenscript
+           # git clone https://github.com/bnmcgn/Parenscript quicklisp/local-projects/Parenscript
             git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
             git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
             git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
