@@ -29,7 +29,8 @@
      (:integer :description "Excerpt Offset")
      :flag
      ((:pickone :options ,(format-flags) :notnull)
-            :widget pickone-long)
+      ;;FIXME: pickone-long was a bare symbol. What should it be? 
+            :widget "pickoneLong")
      :votevalue
      ((:pickone :options ((-1 "-1") (0 "0") (1 "1"))
                       :notnull)
