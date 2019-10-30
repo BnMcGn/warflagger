@@ -108,8 +108,7 @@
             (:div
              (:h3 :key 2 "Questions and answers:")
              (collecting
-                 (dolist (id (filter-opins-question
-                              (prop tree-addresses) (prop opinion-store) (prop warstats)))
+                 (dolist (id data)
                    (collect
                        (psx
                         (:question-summary
@@ -132,6 +131,7 @@
                    (collect
                        (psx
                         (:opinion-summary
+                         :key (unique-id)
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
                          :warstats (prop warstats)))))))))))

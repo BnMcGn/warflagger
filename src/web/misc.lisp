@@ -64,14 +64,15 @@
     (defun make-missing-rootid-url (url)
       (strcat "/target/?newurl=" (encode-u-r-i-component url)))
 
-     (defun opinion-children (tree-address opinions)
-      (let ((curr opinions))
-        (dolist (id tree-address)
-          (dotimes (i (@ curr length))
-            (when (= id (getprop curr i 0 id))
-              (setf curr (chain (@ curr i) (slice 1)))
-              (break))))
-        curr))
+    (defun opinion-children (tree-address opinions)
+      (let ((res (some (lambda (x)
+                         (when (eql (getprop tree-address 0) (@ x 0 id)))
+                         x)
+                       opinions)))
+        (if (< 1 (length tree-address))
+            (opinion-children (array-cdr tree-address)
+                              (array-cdr res))
+            (array-cdr res))))
 
     (defun filter-opins-score (tree-addresses opinions warstats)
       (let ((res
@@ -119,7 +120,8 @@
                 (lambda (a b) (- (+ (getprop warstats a 'controversy)
                                     (getprop warstats a 'effect))
                                  (+ (getprop warstats b 'controversy)
-                                    (getprop warstats b 'effect))))))))
+                                    (getprop warstats b 'effect))))))
+        res))
 
     ;;
     ;;Utilies taken from opinion-form
