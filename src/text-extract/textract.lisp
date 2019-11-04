@@ -258,6 +258,7 @@
          (cl-hash-util:collect :status "success")
          (cl-hash-util:collect :message ""))
         ((fresh-failure url)
+         ;;FIXME: Should return the http status code, plus maybe the failure message.
          (cl-hash-util:collect :text (get-old))
          (cl-hash-util:collect :title (grab-title url :alternate "" :update nil))
          (cl-hash-util:collect :status "failure")

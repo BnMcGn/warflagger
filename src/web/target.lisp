@@ -181,11 +181,99 @@
           (json-bind (res (strcat url-root "questions.json"))
               (set-state questions res))
           (json-bind (res (strcat url-root "opinions.json"))
-              (set-state opinions res))
+                     (set-state opinions res))
+          ;;FIXME: can we do this with text-server?
           (text-bind (res (strcat url-root "page.txt"))
                      (set-state text res))))
       get-initial-state
       (lambda () (create warstats nil opinions nil text nil)))
+
+    ;;New target stuff
+
+    (def-component text-server-client
+        (children-map (prop children)
+                      (lambda (child)
+                        (clone-element child (state data))))
+      get-initial-state
+      (lambda () (create data (create text "")
+                         interval (or (prop interval) 3000)
+                         attempts (or (prop attempts) 10)))
+      component-will-mount
+      (lambda ()
+        (chain this (load-from-server)))
+      load-from-server
+      (lambda ()
+        (json-bind (results "/text-server/" :url (prop url))
+            (let ((data (create text (@ results text)
+                                'text-status (@ results status)
+                                'text-message (@ results message))))
+              (case (@ results status)
+                ("success" (set-state data data))
+                ("failure" (set-state data data))
+                ("wait"
+                 (if (< 0 (state attempts))
+                     (progn
+                       (set-state data data attempts (1- (state attempts)))
+                       (set-timeout (@ this load-from-server) (state interval)))
+                     (progn
+                       (setf (@ data text-status) "failure"
+                             (@ data text-message) "Timed out")
+                       (set-state data data)))))))))
+
+    (def-component new-target
+        (psx
+         (:text-server-client
+          :url (prop url)
+          (:new-target-body :... (@ this props)))))
+
+    (def-component new-target-body
+        (if (eq "success" (prop text-status))
+            (psx (:target-root-article
+                  :text (prop text)
+                  :opinions (list)
+                  :url (prop url)
+                  :opinion-store (create)
+                  :warstats (lisp (as-ps-data (blank-warstat-for-web)))))
+            (psx (:text-missing
+                  :... (@ this props)
+                  :warstats (lisp (as-ps-data (blank-warstat-for-web)))))))
+
+    ;; Display of missing text:
+    ;; What can the user do about a missing text?
+    ;; FIXME: check that the opinion form will allow a non-found excerpt to be posted.
+    ;; Why might the text be missing?
+    ;; - text-server has not had time to process. Wait
+    ;; - 404 error. User might supply the text, or supply an alternate URL.
+    ;; - robots.txt forbids. User could supply.
+    ;; - Copyright issue. Original publisher forbids us from displaying whole text. Can we check
+    ;; excerpts while not displaying text?
+    ;; - Misc. error. User can supply text.
+    ;; - Textract decides that text is too large. What was the user trying to do???
+    ;; - User can post declaration that a given page contains a given text at a given date. Other users
+    ;; can dispute the truth of this.
+    ;; FIXME: we do not have such a mechanism at this time.
+
+    (def-component text-missing
+        (psx
+         (:div
+          (:target-title
+           :key 1
+           :... (@ this props))
+          (:h3
+           :style (create 'font-style "italic" :background "lightgrey")
+           :key 2
+           "Text from article at " (url-domain (prop url)) " is not currently available." )
+          (:h4
+           :key 3
+           "Reason: " (prop text-message))
+          (:ul :key 4
+               (:li :key 1
+                    "You may still post flags on this article, though excerpts must be filled by hand.")
+               (:li :key 2
+                    "If the same text is available at another URL, please inidicate the alternative with the SameThing flag.")
+               (:li :key 3
+                    "Texts may be manually inserted using [not implemented]")))))
+
 
     ))
 

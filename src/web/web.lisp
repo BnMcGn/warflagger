@@ -174,6 +174,16 @@
                 :username (lisp (webhax-user:get-user-name))
                 )))))
 
+  (setf (ningle:route *app* "/new-target/")
+        (quick-page
+            (#'target-parts)
+          (bind-validated-input
+              (&key
+               (url :url))
+            (mount-component (new-target)
+              :url (lisp url)
+              :username (lisp (webhax-user:get-user-name))))))
+
   ;;FIXME: Think about taking over the /opinion/ URL for this
   (setf (ningle:route *app* "/opinion-page/*")
         (quick-page
