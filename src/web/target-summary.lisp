@@ -69,6 +69,7 @@
          (:json-loader
           :sources (%format-referenced (prop referenced))
           :store-name "inrefs"
+          :reducer #'copy-merge-all
           (:referenced :... (@ this props)))))
 
     (defun %question-answers (treead opinions opstore)

@@ -168,6 +168,7 @@
                     :opinion-store (@ opdat 1)
                     :text (state text))))
             ;;FIXME: decorate
+            ;; Should have a link to opine even when missing. Also, a link to supply text.
             (psx (:h3 "Loading...")))
       component-did-mount
       (lambda ()

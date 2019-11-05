@@ -69,7 +69,7 @@
          (:json-loader
           :store-name "warstats"
           :sources (%grouped-warstats-urls (prop group))
-          :dispatch
+          :reducer #'copy-merge-all
           (lambda (existing incoming)
             (create-from-list
              (list :warstats (copy-merge-all (@ existing warstats)
