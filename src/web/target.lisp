@@ -175,13 +175,13 @@
         (let ((url-root (strcat "/static/warstats"
                                 (make-id-path (prop rootid))
                                 (chain (prop rootid) (to-string)) "/")))
-          (json-bind (res (strcat url-root "warstats.json"))
+          (json-bind (res (strcat url-root "warstats.json") ())
               (set-state warstats res))
-          (json-bind (res (strcat url-root "references.json"))
+          (json-bind (res (strcat url-root "references.json") ())
               (set-state references res))
-          (json-bind (res (strcat url-root "questions.json"))
+          (json-bind (res (strcat url-root "questions.json") ())
               (set-state questions res))
-          (json-bind (res (strcat url-root "opinions.json"))
+          (json-bind (res (strcat url-root "opinions.json") ())
                      (set-state opinions res))
           ;;FIXME: can we do this with text-server?
           (text-bind (res (strcat url-root "page.txt"))
@@ -204,7 +204,7 @@
         (chain this (load-from-server)))
       load-from-server
       (lambda ()
-        (json-bind (results "/text-server/" :url (prop url))
+        (json-bind (results "/text-server/" (:url (prop url)))
             (let ((data (create text (@ results text)
                                 'text-status (@ results status)
                                 'text-message (@ results message))))

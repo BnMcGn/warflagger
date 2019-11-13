@@ -70,10 +70,12 @@
           :store-name "warstats"
           :sources (%grouped-warstats-urls (prop group))
           :reducer #'copy-merge-all
+#|
           (lambda (existing incoming)
             (create-from-list
              (list :warstats (copy-merge-all (@ existing warstats)
                                              (@ incoming warstats)))))
+          |#
           (:grouped :... (@ this props)))))
 
     (def-component grouped-main

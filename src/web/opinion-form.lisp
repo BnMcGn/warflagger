@@ -211,7 +211,7 @@
       load-from-server
       (lambda (url)
         (let ((msgfunc (@ this set-message)))
-          (json-bind (results "/text-server/" :url url)
+          (json-bind (results "/text-server/" (:url url))
               (case (@ results status)
                 ("success"
                  (set-state text (@ results text))
