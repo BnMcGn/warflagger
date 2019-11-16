@@ -117,7 +117,9 @@
             (strcat " (" immed "/" tot ")")))))
 
     ;;FIXME: Headline will get considerably more complex in future. Placeholder.
-    (def-component headline
+
+    ;;Note: renamed to headline-core to make room for a loader in headline
+    (def-component headline-core
         (let* ((title (prop title))
                (ext-link (when (prop external-link)
                            (psx (:a :key 1 :href (prop external-link)
@@ -127,13 +129,20 @@
                (domain (if (prop domain)
                            (strcat " (" (prop domain) ")")
                            ""))
-               (core (if title
+               (core (if (not-empty title)
                          (psx (:span :key 2 title domain))
                          (psx (:span :key 2 "[Title Not Available]" domain)))))
           (if (prop url)
               (psx (:span :key 3 :class elclass
                           (:a :key 4 :href (prop url) core) ext-link))
               (psx (:span :key 3 :class elclass core ext-link)))))
+
+    (def-component headline
+        (if (prop title)
+            (psx (:headline-core :... (@ this props)))
+            (psx (:text-server-client
+                  :url (prop external-link)
+                  (:headline-core :... (@ this props))))))
 
     (def-component comment-summary
         (let* ((opin (prop opinion))

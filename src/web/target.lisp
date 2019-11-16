@@ -196,18 +196,19 @@
                       (lambda (child)
                         (clone-element child (state data))))
       get-initial-state
-      (lambda () (create data (create text "")
+      (lambda () (create data (create text "" title "")
                          interval (or (prop interval) 3000)
                          attempts (or (prop attempts) 10)))
-      component-will-mount
+      component-did-mount
       (lambda ()
         (chain this (load-from-server)))
       load-from-server
       (lambda ()
         (json-bind (results "/text-server/" (:url (prop url)))
-            (let ((data (create text (@ results text)
-                                'text-status (@ results status)
-                                'text-message (@ results message))))
+           (let ((data (create text (@ results text)
+                               title (@ results title)
+                               'text-status (@ results status)
+                               'text-message (@ results message))))
               (case (@ results status)
                 ("success" (set-state data data))
                 ("failure" (set-state data data))
