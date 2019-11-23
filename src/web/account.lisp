@@ -12,8 +12,9 @@
 
 (defun %logo ()
   (html-out
-    (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"
-          :style "position: absolute; top: 2px;")))
+    (:a :href wf/local-settings:*base-url*
+        (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"
+           :style "position: absolute; top: 2px;"))))
 
 (defun account-bar ()
   (let ((info (warflagger-user-info-bundle)))

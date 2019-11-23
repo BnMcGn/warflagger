@@ -191,6 +191,7 @@
 
     ;;New target stuff
 
+    ;;FIXME: This is not reliably retrying on "wait"
     (def-component text-server-client
         (children-map (prop children)
                       (lambda (child)
