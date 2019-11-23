@@ -21,7 +21,8 @@
             :on-mouse-enter (@ this handle-mouse-enter)
             :on-mouse-leave (@ this handle-mouse-leave)
             (if (prop tree-address)
-                (psx (:display-tree-address :key 1 :tree-address (prop tree-address)))
+                (psx (:display-tree-address :key 1 :tree-address (prop tree-address)
+                                            :opinion-store (prop opinion-store)))
                 (psx (:vote-value :key 1 :opinion opinion)))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "

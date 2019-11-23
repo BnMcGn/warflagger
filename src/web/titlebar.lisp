@@ -6,8 +6,21 @@
     (def-component flag-name
         (let ((label (prop opinion flag 1)))
           (psx
-           (:span (+ (chain label (char-at 0) (to-upper-case))
+           (:span (+ " "
+                     (chain label (char-at 0) (to-upper-case))
                      (chain label (slice 1)))))))
+
+    (def-component opinion-icon
+        (psx (:img
+              :class "opinion-badge"
+              :src (strcat "/static/img/small/wf_flag-"
+                           (chain
+                            (getprop (lisp
+                                      (ps-gadgets:as-ps-data
+                                       (hu:plist->hash warflagger:*flag-colors*)))
+                                     (prop opinion flag 1))
+                            (slice 1))
+                           ".svg"))))
 
     (def-component vote-value
         (psx (:img
@@ -18,6 +31,20 @@
                            "/opinion-badge.svg"))))
 
     (def-component display-tree-address
+        (psx
+         (:span
+          :class "tree_address"
+          (collecting
+            (dolist (id (prop tree-address))
+              (unless (eq id (prop tree-address 0))
+                (collect " > "))
+              (collect
+                  (psx
+                   (:opinion-icon
+                    :key (unique-id)
+                    :opinion (getprop (prop opinion-store) id)))))))))
+
+    (def-component xdisplay-tree-address
         (psx
          (:span
           (collecting
