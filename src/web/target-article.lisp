@@ -287,7 +287,7 @@
             :... (format-styling-data (@ this props))
             :on-click (lambda ()
                         (setf (@ window location) (make-opinionid-url (@ opinion id))))
-            (:vote-value :key 1 :opinion opinion) " "
+            (:opinion-icon :key 1 :opinion opinion) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "

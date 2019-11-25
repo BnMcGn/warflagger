@@ -11,18 +11,47 @@
                      (chain label (slice 1)))))))
 
     (def-component opinion-icon
-        (psx (:img
-              :class "opinion-badge"
-              :src (strcat "/static/img/small/wf_flag-"
-                           (chain
-                            (getprop (lisp
-                                      (ps-gadgets:as-ps-data
-                                       (hu:plist->hash warflagger:*flag-colors*)))
-                                     (prop opinion flag 1))
-                            (slice 1))
-                           ".svg"))))
+        ;;This opinion may be represented in other places on page, hence unid
+        (let ((elid (strcat "opinion-icon-" (state unid))))
+          (psx (:span
+                :class "opinion-badge"
+                :id elid
+                :on-mouse-enter (@ this handle-mouse-enter)
+                :on-mouse-leave (@ this handle-mouse-leave)
+                (:a :key 0 :href (make-opinionid-url (prop opinion id))
+                    (:img
+                     :src (strcat "/static/img/small/wf_flag-"
+                                  (chain
+                                   (getprop (lisp
+                                             (ps-gadgets:as-ps-data
+                                              (hu:plist->hash warflagger:*flag-colors*)))
+                                            (prop opinion flag 1))
+                                   (slice 1))
+                                  ".svg")))
+                (:display-if
+                 :key 1
+                 :test (and (prop opinion-store) (prop warstats))
+                 (:tool-tip
+                  :active (state viewable) :position "bottom"
+                  :arrow "right"
+                  :group "two"
+                  :parent (strcat "#" elid)
+                  (:opinion-info
+                   :... (@ this props)
+                   :opinion (prop opinion)))))))
+      get-initial-state
+      (lambda () (create viewable false unid (unique-id)))
+      handle-mouse-enter
+      (lambda (e)
+        (set-state viewable true))
+      handle-mouse-leave
+      (lambda (e)
+        (set-state viewable false)))
 
     (def-component vote-value
+        (psx (:opinion-icon :opinion (prop opinion))))
+
+    (def-component xvote-value
         (psx (:img
               :class "opinion-badge"
               :src (strcat "/static/warstats"
@@ -42,7 +71,9 @@
                   (psx
                    (:opinion-icon
                     :key (unique-id)
-                    :opinion (getprop (prop opinion-store) id)))))))))
+                    :opinion (getprop (prop opinion-store) id)
+                    :warstats (prop warstats)
+                    :opinion-store (prop opinion-store)))))))))
 
     (def-component xdisplay-tree-address
         (psx
