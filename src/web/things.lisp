@@ -19,14 +19,14 @@
     (def-component opinion-line-short
         (psx (:div
               :class "summary_line"
-              (:vote-value :key 1 :opinion (prop opinion))
+              (:opinion-icon :key 1 :opinion (prop opinion))
               (:flag-name :key 2 :opinion (prop opinion))
               (:author-long :key 4 :opinion (prop opinion)))))
 
     (def-component opinion-line-long
         (psx (:div
               :class "summary_line"
-              (:vote-value :key 1 :opinion (prop opinion))
+              (:opinion-icon :key 1 :opinion (prop opinion))
               (:flag-name :key 2 :opinion (prop opinion))
               (:date-stamp :key 3 :opinion (prop opinion))
               (:author-long :key 4 :opinion (prop opinion))

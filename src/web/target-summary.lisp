@@ -22,7 +22,7 @@
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)
                                             :opinion-store (prop opinion-store)
                                             :warstats (prop warstats)))
-                (psx (:vote-value :key 1 :opinion opinion)))
+                (psx (:opinion-icon :key 1 :opinion opinion)))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "

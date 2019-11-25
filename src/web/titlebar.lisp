@@ -48,16 +48,9 @@
       (lambda (e)
         (set-state viewable false)))
 
-    (def-component vote-value
-        (psx (:opinion-icon :opinion (prop opinion))))
-
-    (def-component xvote-value
-        (psx (:img
-              :class "opinion-badge"
-              :src (strcat "/static/warstats"
-                           (make-id-path (prop opinion id))
-                           (chain (prop opinion id) (to-string))
-                           "/opinion-badge.svg"))))
+    ;;Reuse the vote-value name
+    ;;(def-component vote-value
+    ;;    (psx (:opinion-icon :opinion (prop opinion))))
 
     (def-component display-tree-address
         (psx
@@ -74,20 +67,6 @@
                     :opinion (getprop (prop opinion-store) id)
                     :warstats (prop warstats)
                     :opinion-store (prop opinion-store)))))))))
-
-    (def-component xdisplay-tree-address
-        (psx
-         (:span
-          (collecting
-              (dolist (id (prop tree-address))
-                ;;FIXME: Should also indicate score of each parent, plus link to them.
-                (collect
-                    (psx
-                     (:img
-                      :key (unique-id)
-                      :class "opinion-badge"
-                      :src (strcat "/static/warstats" (make-id-path id)
-                                   (chain id (to-string)) "/opinion-badge.svg")))))))))
 
     ;;FIXME: React/CSS version of display-warstats in mood.lisp. Other should probably
     ;; go away eventually.
