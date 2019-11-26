@@ -21,8 +21,10 @@
             (if (prop tree-address)
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)
                                             :opinion-store (prop opinion-store)
-                                            :warstats (prop warstats)))
-                (psx (:opinion-icon :key 1 :opinion opinion)))
+                                            :warstats (prop warstats)
+                                            :look-handler (prop look-handler)))
+                (psx (:opinion-icon :key 1 :opinion opinion
+                                   :look-handler (prop look-handler))))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
@@ -46,7 +48,8 @@
                  :key (unique-id)
                  :opinion-store (create-from-list (list r data))
                  :tree-address (@ data tree-address)
-                 :warstats (@ data warstats))))))))
+                 :warstats (@ data warstats)
+                 :look-handler (prop look-handler))))))))
 
     (def-component referenced-loader
         (psx
@@ -72,7 +75,8 @@
              :key 1
              :opinion-store (prop opinion-store)
              :tree-address (@ opin tree-address)
-             :warstats (prop warstats))
+             :warstats (prop warstats)
+             :look-handler (prop look-handler))
             (collecting
                 (dolist (ansid (%question-answers (@ opin tree-address) (prop opinions)
                                                   (prop opinion-store)))
@@ -82,6 +86,7 @@
                         :key (unique-id)
                         :opinion-store (prop opinion-store)
                         :warstats (prop warstats)
+                        :look-handler (prop look-handler)
                         :opid ansid)))))))))
 
     (def-component questions
@@ -101,6 +106,7 @@
                          :opinion-id id
                          :opinions (prop opinions)
                          :opinion-store (prop opinion-store)
+                         :look-handler (prop look-handler)
                          :warstats (prop warstats)))))))))))
 
     (def-component high-scores
@@ -119,7 +125,8 @@
                          :key (unique-id)
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
-                         :warstats (prop warstats)))))))))))
+                         :warstats (prop warstats)
+                         :look-handler (prop look-handler)))))))))))
 
     (def-component controversial
         (let ((data (filter-opins-controversial
@@ -137,7 +144,8 @@
                          :key (unique-id)
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
-                         :warstats (prop warstats)))))))))))
+                         :warstats (prop warstats)
+                         :look-handler (prop look-handler)))))))))))
 
     (def-component references-summary
         (psx (:div
@@ -151,7 +159,8 @@
                           :key (unique-id)
                           :tree-address (getprop (prop opinion-store) id 'tree-address)
                           :opinion-store (prop opinion-store)
-                          :warstats (prop warstats)))))))))
+                          :warstats (prop warstats)
+                          :look-handler (prop look-handler)))))))))
 
     (def-component target-root-summary
         (let ((rwstats (prop warstats root)))

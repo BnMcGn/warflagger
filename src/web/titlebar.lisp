@@ -43,6 +43,7 @@
       (lambda () (create viewable false unid (unique-id)))
       handle-mouse-enter
       (lambda (e)
+        (funcall (prop look-handler) (prop opinion id))
         (set-state viewable true))
       handle-mouse-leave
       (lambda (e)
@@ -66,7 +67,8 @@
                     :key (unique-id)
                     :opinion (getprop (prop opinion-store) id)
                     :warstats (prop warstats)
-                    :opinion-store (prop opinion-store)))))))))
+                    :opinion-store (prop opinion-store)
+                    :look-handler (prop look-handler)))))))))
 
     ;;FIXME: React/CSS version of display-warstats in mood.lisp. Other should probably
     ;; go away eventually.
