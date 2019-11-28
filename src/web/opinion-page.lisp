@@ -41,7 +41,8 @@
                   (copy-merge-all (@ this props) (create 'tree-address treead)))
             :on-click (lambda (e)
                         (setf (@ window location) (make-opinionid-url (@ opinion id))))
-            (:opinion-icon :key 1 :opinion opinion) " "
+            (:opinion-icon :key 1 :opinion opinion
+                           :look-handler (prop look-handler) :looks (prop looks)) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
@@ -94,15 +95,17 @@
         (psx
          (:div
           :class "opinion-page"
-          (:opinion-root
-           :... (@ this props))
-          (collecting
-              (prop focus)
-            (dolist (id (prop focus))
-              (collect
-                  (psx
-                   (:opinion-layer
-                    :key (unique-id)
-                    :... (@ this props)
-                    :opinion-id id))))))))))
+          (:look-loader
+           (:opinion-root
+            :... (@ this props))
+           (collecting
+
+             (prop focus)
+             (dolist (id (prop focus))
+               (collect
+                   (psx
+                    (:opinion-layer
+                     :key id
+                     :... (@ this props)
+                     :opinion-id id)))))))))))
 

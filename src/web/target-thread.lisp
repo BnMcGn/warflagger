@@ -86,7 +86,8 @@
                         (setf (@ window location)
                               (make-opinionid-url (@ opinion id)))
                         (chain e (stop-propagation)))
-            (:opinion-icon :key 1 :opinion opinion) " "
+            (:opinion-icon :key 1 :opinion opinion
+                           :look-handler (prop look-handler) :looks (prop looks)) " "
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "

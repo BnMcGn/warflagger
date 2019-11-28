@@ -44,7 +44,8 @@
       handle-mouse-enter
       (lambda (e)
         (set-state viewable true)
-        (funcall (prop look-handler) (prop opinion id)))
+        (when (and (prop opinion-store) (prop warstats)) ;Wasn't looked at! see above.
+          (funcall (prop look-handler) (prop opinion id))))
       handle-mouse-leave
       (lambda (e)
         (set-state viewable false)))
