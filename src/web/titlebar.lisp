@@ -43,8 +43,8 @@
       (lambda () (create viewable false unid (unique-id)))
       handle-mouse-enter
       (lambda (e)
-        (funcall (prop look-handler) (prop opinion id))
-        (set-state viewable true))
+        (set-state viewable true)
+        (funcall (prop look-handler) (prop opinion id)))
       handle-mouse-leave
       (lambda (e)
         (set-state viewable false)))
@@ -64,7 +64,7 @@
               (collect
                   (psx
                    (:opinion-icon
-                    :key (unique-id)
+                    :key id
                     :opinion (getprop (prop opinion-store) id)
                     :warstats (prop warstats)
                     :opinion-store (prop opinion-store)
@@ -83,7 +83,7 @@
                                                     *warstat-text*))))
                         (collect
                             (psx (:span
-                                  :key (unique-id)
+                                  :key k
                                   :class k
                                   (:img
                                    :src

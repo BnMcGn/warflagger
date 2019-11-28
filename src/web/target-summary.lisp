@@ -45,7 +45,7 @@
              (when data
                (psx
                 (:opinion-summary
-                 :key (unique-id)
+                 :key r
                  :opinion-store (create-from-list (list r data))
                  :tree-address (@ data tree-address)
                  :warstats (@ data warstats)
@@ -83,7 +83,7 @@
                   (collect
                       (psx
                        (:opinion-summary
-                        :key (unique-id)
+                        :key ansid
                         :opinion-store (prop opinion-store)
                         :warstats (prop warstats)
                         :look-handler (prop look-handler)
@@ -102,7 +102,7 @@
                    (collect
                        (psx
                         (:question-summary
-                         :key (unique-id)
+                         :key id
                          :opinion-id id
                          :opinions (prop opinions)
                          :opinion-store (prop opinion-store)
@@ -122,7 +122,7 @@
                    (collect
                        (psx
                         (:opinion-summary
-                         :key (unique-id)
+                         :key id
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
                          :warstats (prop warstats)
@@ -141,7 +141,7 @@
                    (collect
                        (psx
                         (:opinion-summary
-                         :key (unique-id)
+                         :key id
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
                          :warstats (prop warstats)
@@ -156,7 +156,7 @@
                     (collect
                         (psx
                          (:opinion-summary
-                          :key (unique-id)
+                          :key id
                           :tree-address (getprop (prop opinion-store) id 'tree-address)
                           :opinion-store (prop opinion-store)
                           :warstats (prop warstats)
