@@ -117,19 +117,29 @@
 
     (def-component target-root
         (psx
-         (:target-tabs
-          :... (@ this props)
-          :looks (state looks)
-          :look-handler (@ this look-handler)))
+         (:look-saver-for-rooturl
+          (:look-loader
+           (:target-tabs
+            :... (@ this props))))))
+
+    (def-component look-loader
+        (children-map (prop children)
+                      (lambda (child)
+                        (clone-element child (create :looks (state looks)
+                                                     'look-handler (@ %thisref look-handler)))))
       get-initial-state
       (lambda ()
+        ;;FIXME: Looks should be loaded directly from server. Needs REST or something.
         (create looks (%format-looks (prop looks))))
       look-handler
       (lambda (opinid)
         (unless (getprop (state looks) opinid)
           (when (prop username)
             (json-post-bind (res "/look-post/" (create :opinion opinid))))
-          (set-state looks (set-copy (state looks) opinid t))))
+          (set-state looks (set-copy (state looks) opinid t)))))
+
+    (def-component look-saver-for-rooturl
+        (prop children)
       component-did-mount
       (lambda ()
         (when (prop username)
