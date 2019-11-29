@@ -48,10 +48,11 @@
     (:div :id "footer" :@copyright)
     (str (tracking-code))))
 
+;;FIXME: react, react-dom should be loaded from the npm bundle.
 (define-default-parts warflagger-base
   :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"
-  :@javascript-link "https://unpkg.com/react@16.4.2/umd/react.development.js"
-  :@javascript-link "https://unpkg.com/react-dom@16.4.2/umd/react-dom.development.js"
+  :@javascript-link "https://unpkg.com/react@16.12.0/umd/react.development.js"
+  :@javascript-link "https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"
   :@javascript (ps:ps (setf (ps:@ -react #:create-class) (require "create-react-class"))
                       (setf (ps:@ -react -d-o-m) (require "react-dom-factories")))
   :@javascript-link "/static/javascript/warflagger-bundle.js"

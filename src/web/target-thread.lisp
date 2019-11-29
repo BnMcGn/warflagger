@@ -8,6 +8,8 @@
 (define-ps-lib target-thread ()
   (ps
 
+    (defvar on-screen (@ (require "react-on-screen") default))
+
     (defun previous-break (text index)
       (let ((res (chain text (substring 0 index) (last-index-of #\linefeed))))
         (when (<= 0 res)
@@ -139,7 +141,11 @@
       (lambda (action)
         (when (eq (@ action type) :selection)
           (set-state :reply-excerpt (@ action excerpt)
-                     :reply-offset (@ action offset)))))
+                     :reply-offset (@ action offset))))
+      component-did-update
+      (lambda ()
+        (when (prop is-visible)
+          (funcall (prop look-handler) (list-last (prop tree-address))))))
 
     (defun sort-compare-opinions (opa opb)
       ;;FIXME: Special treatment of missing excerpt opinions?
@@ -165,21 +171,25 @@
               (let ((data (%reformat-opinions (prop opinions))))
                 (dolist (op (prop tree-addresses))
                   (collect
-                      (psx (:thread-opinion
-                            :key (unique-id)
-                            :opinions (prop opinions)
-                            :opinion-store (prop opinion-store)
-                            :text (prop text)
-                            :styling-data
-                            (format-styling-data
-                             (copy-merge-all (@ %thisref props)
-                                            (create
-                                             'opinion-store (@ data 1)
-                                             'tree-address op
-                                             'opinions (@ data 1))))
-                            :tree-address op
-                            :warstats (prop warstats)
-                            :reference
-                            (getprop (prop references) (list-last op)))))))))))
+                      (psx (:on-screen
+                            :key (list-last op)
+                            ;; :once t ;; Isn't working anyways.
+                            (:thread-opinion
+                             :opinions (prop opinions)
+                             :opinion-store (prop opinion-store)
+                             :text (prop text)
+                             :styling-data
+                             (format-styling-data
+                              (copy-merge-all (@ %thisref props)
+                                              (create
+                                               'opinion-store (@ data 1)
+                                               'tree-address op
+                                               'opinions (@ data 1))))
+                             :tree-address op
+                             :warstats (prop warstats)
+                             :looks (prop looks)
+                             :look-handler (prop look-handler)
+                             :reference
+                             (getprop (prop references) (list-last op))))))))))))
 
     ))

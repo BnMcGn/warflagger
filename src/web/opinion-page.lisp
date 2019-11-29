@@ -48,6 +48,8 @@
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
             (when topmost
+              ;;FIXME: Maybe shouldn't instantly set look if comment text is longer than a page?
+              (funcall (prop look-handler) (@ opinion id))
               (psx (:reply-link
                     :key 6 :url (@ opinion url)
                     :excerpt (state :reply-excerpt) :offset (state :reply-offset))))
