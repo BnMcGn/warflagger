@@ -335,14 +335,15 @@
                     (unless (has-excerpt-p opin)
                       (collect
                           (psx
-                           (:thread-opinion
-                            :key (unique-id)
-                            :... (@ this props)
-                            :tree-address (@ opin tree-address)
-                            :styling-data (format-styling-data
-                                           (set-copy (@ this props)
-                                                     'tree-address (@ opin tree-address)))
-                            :reference (getprop (prop references) opid))))))))))))
+                           (:on-screen
+                            :key opid
+                            (:thread-opinion
+                             :... (@ this props)
+                             :tree-address (@ opin tree-address)
+                             :styling-data (format-styling-data
+                                            (set-copy (@ this props)
+                                                      'tree-address (@ opin tree-address)))
+                             :reference (getprop (prop references) opid)))))))))))))
 
     (def-component target-root-article
         (psx
