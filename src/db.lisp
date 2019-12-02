@@ -448,10 +448,12 @@ the page text can be found in the cache."
 
 (defun get-looks (user rootid)
   (declare (type integer rootid))
-  (select (colm :firstlook) (colm :opinionid)
-          :from (tabl :looks)
-          :where (sql-and (sql-= (colm :wf_user) (sql-escape user))
-                          (sql-= (colm :rootid) rootid))))
+  (collecting-hash-table (:mode :replace)
+    (loop for (k v) in (select (colm :opinionid) (colm :firstlook)
+                               :from (tabl :looks)
+                               :where (sql-and (sql-= (colm :wf_user) (sql-escape user))
+                                               (sql-= (colm :rootid) rootid)))
+          do (hu:collect (or k :root) v))))
 
 (defun set-look (user &key rootid opinionid)
   (let ((rootid (or rootid
