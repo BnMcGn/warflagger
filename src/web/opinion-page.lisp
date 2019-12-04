@@ -98,6 +98,7 @@
          (:div
           :class "opinion-page"
           (:look-loader
+           :looks (prop looks)
            (:opinion-root
             :... (@ this props))
            (collecting

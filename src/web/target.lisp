@@ -84,15 +84,6 @@
            (when (prop show-count)
              (psx (:reply-count :key 4 :warstats (prop warstats root))))))))
 
-    (defun %format-looks (looks)
-      (let ((res (create)))
-        (when looks
-          (dolist (itm looks)
-            (when (@ itm 1)
-              (setf (getprop res (@ itm 1))
-                    (@ itm 0)))))
-        res))
-
     ;;FIXME: Url should remember tab settings. Also remember user's pref in session
     (def-component target-tabs
         (psx
@@ -119,6 +110,7 @@
         (psx
          (:look-saver-for-rooturl
           (:look-loader
+           :looks (prop looks)
            (:target-tabs
             :... (@ this props))))))
 
@@ -130,7 +122,7 @@
       get-initial-state
       (lambda ()
         ;;FIXME: Looks should be loaded directly from server. Needs REST or something.
-        (create looks (%format-looks (prop looks))))
+        (create looks (prop looks)))
       look-handler
       (lambda (opinid)
         (unless (getprop (state looks) opinid)

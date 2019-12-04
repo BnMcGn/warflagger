@@ -49,6 +49,7 @@
                  :opinion-store (create-from-list (list r data))
                  :tree-address (@ data tree-address)
                  :warstats (@ data warstats)
+                 :looks (prop looks)
                  :look-handler (prop look-handler))))))))
 
     (def-component referenced-loader
@@ -76,6 +77,7 @@
              :opinion-store (prop opinion-store)
              :tree-address (@ opin tree-address)
              :warstats (prop warstats)
+             :looks (prop looks)
              :look-handler (prop look-handler))
             (collecting
                 (dolist (ansid (%question-answers (@ opin tree-address) (prop opinions)
@@ -86,6 +88,7 @@
                         :key ansid
                         :opinion-store (prop opinion-store)
                         :warstats (prop warstats)
+                        :looks (prop looks)
                         :look-handler (prop look-handler)
                         :opid ansid)))))))))
 
@@ -107,6 +110,7 @@
                          :opinions (prop opinions)
                          :opinion-store (prop opinion-store)
                          :look-handler (prop look-handler)
+                         :looks (prop looks)
                          :warstats (prop warstats)))))))))))
 
     (def-component high-scores
@@ -126,6 +130,7 @@
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
                          :warstats (prop warstats)
+                         :looks (prop looks)
                          :look-handler (prop look-handler)))))))))))
 
     (def-component controversial
@@ -145,6 +150,7 @@
                          :tree-address (getprop (prop opinion-store) id 'tree-address)
                          :opinion-store (prop opinion-store)
                          :warstats (prop warstats)
+                         :looks (prop looks)
                          :look-handler (prop look-handler)))))))))))
 
     (def-component references-summary
@@ -160,6 +166,7 @@
                           :tree-address (getprop (prop opinion-store) id 'tree-address)
                           :opinion-store (prop opinion-store)
                           :warstats (prop warstats)
+                          :looks (prop looks)
                           :look-handler (prop look-handler)))))))))
 
     (def-component target-root-summary

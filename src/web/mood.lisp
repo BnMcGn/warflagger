@@ -194,11 +194,14 @@
       (setf (@ stor :data-votevalue) (@ opinion votevalue)))
     ;;Add datestamp?
 
-    (defun format-looks-data (stor id looks username)
-      (when username
-        (setf (@ stor :data-looks-available) "true")
-        (when (chain looks (has-own-property id))
-          (setf (@ stor :data-looked) "true"))))
+    (defun format-looks-data (stor id looks)
+      (if (equal (typeof looks) "object")
+          (if (chain looks (has-own-property id))
+              ;; If it is a string, it came from the server. Was looked before the last page reload.
+              (unless (equal (typeof (getprop looks id)) "string")
+                (setf (@ stor :data-looked) "recent"))
+              (setf (@ stor :data-looked) "false"))
+          (setf (@ stor :data-looks-unavailable) "true")))
 
     (defun format-reference-data (stor reference)
       (when reference
@@ -221,7 +224,7 @@
                     (list-last (@ props tree-address)))))
         (format-warstats-data
          res (if opid (getprop (@ props warstats) opid) (@ props warstats root)))
-        (format-looks-data res opid (@ props looks) (@ props username) )
+        (format-looks-data res (or opid :root) (@ props looks))
         (when opid
           (format-opinion-data res (getprop (@ props opinion-store) opid))
           (when (@ props references)
