@@ -51,18 +51,22 @@
               (prop opinion excerpt)))))
 
     (def-component reference
-        (psx
-         (:div
-          :class "reference"
-          :... (or (prop styling-data) (create :data-replies-total 0))
-          (:headline
-           :key 1
-           :title (prop headline title)
-           :domain (prop reference-domain)
-           :url (prop warflagger-link)
-           :external-link (when (not (equal (prop reference) (prop warflagger-link)))
-                            (prop reference))
-           (:display-warstats2)))))
+        (let ((styling (prop styling-data)))
+          (unless styling
+            (setf styling (create :data-replies-total 0))
+            (format-looks-data styling :root (prop looks)))
+          (psx
+           (:div
+            :class "reference"
+            :... styling
+            (:headline
+             :key 1
+             :title (prop headline title)
+             :domain (prop reference-domain)
+             :url (prop warflagger-link)
+             :external-link (when (not (equal (prop reference) (prop warflagger-link)))
+                              (prop reference))
+             (:display-warstats2))))))
 
     (def-component question
         (psx
@@ -165,7 +169,7 @@
 
     (def-component target-root-thread
         (psx
-         (:div
+         (:div :style (create position "relative")
           (:target-title :key "x" :... (@ this props))
           (collecting
               (let ((data (%reformat-opinions (prop opinions))))

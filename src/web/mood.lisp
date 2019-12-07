@@ -196,12 +196,13 @@
 
     (defun format-looks-data (stor id looks)
       (if (equal (typeof looks) "object")
-          (if (chain looks (has-own-property id))
-              ;; If it is a string, it came from the server. Was looked before the last page reload.
-              (unless (equal (typeof (getprop looks id)) "string")
-                (setf (@ stor :data-looked) "recent"))
-              (setf (@ stor :data-looked) "false"))
-          (setf (@ stor :data-looks-unavailable) "true")))
+          (progn (if (chain looks (has-own-property id))
+               ;; If it is a string, it came from the server. Was looked before the last page reload.
+               (unless (equal (typeof (getprop looks id)) "string")
+                 (setf (@ stor :data-looked) "recent"))
+               (setf (@ stor :data-looked) "false"))
+                 (setf (@ stor :data-looks-available) "true"))
+          (setf (@ stor :data-looks-available) "false")))
 
     (defun format-reference-data (stor reference)
       (when reference

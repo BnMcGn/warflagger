@@ -5,7 +5,7 @@
 
     (def-component grouped
         (psx
-         (:div :style (create 'margin-bottom "2em")
+         (:div :style (create 'margin-bottom "2em" position "relative")
                :key 1
                :class "grouped"
                (when (prop warstats)

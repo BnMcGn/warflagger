@@ -66,6 +66,11 @@
                   (psx
                    (:opinion-icon
                     :key id
+                    ;;FIXME: Should maybe have full styling data, which means it should be cached
+                    ;; elsewhere
+                    :... (if (prop looks)
+                             (format-looks-data {} id (prop looks))
+                             {})
                     :opinion (getprop (prop opinion-store) id)
                     :warstats (prop warstats)
                     :opinion-store (prop opinion-store)

@@ -11,6 +11,7 @@
                           (if (prop tree-address)
                               (list-last (prop tree-address))
                               (prop opid))))
+               ;; FIXME: Can have multiple copies of opinion on same page. Shouldn't use id!
                (id (strcat "opinion-summary-" (@ opinion id))))
           (psx
            (:div
@@ -22,6 +23,7 @@
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)
                                             :opinion-store (prop opinion-store)
                                             :warstats (prop warstats)
+                                            :looks (prop looks)
                                             :look-handler (prop look-handler)))
                 (psx (:opinion-icon :key 1 :opinion opinion
                                    :look-handler (prop look-handler))))
