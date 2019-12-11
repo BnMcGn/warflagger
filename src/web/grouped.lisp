@@ -116,7 +116,8 @@
                            :refparent parent-rootid
                            :refid id
                            :title (grab-title refurl)
-                           :looks (get-looks (get-user-name) rootid)
+                           :looks (when (authenticated?)
+                                    (get-looks (get-user-name) rootid))
                            :rootid rootid)
                           (list
                            :url refurl
@@ -131,7 +132,8 @@
                     (list
                      :url url
                      :title (grab-title url)
-                     :looks (get-looks (get-user-name) id))))))))
+                     :looks (when (authenticated?)
+                              (get-looks (get-user-name) id)))))))))
          (tree
            (flatten-1
             (map-by-2

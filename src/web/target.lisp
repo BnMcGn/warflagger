@@ -125,10 +125,11 @@
         (create looks (prop looks)))
       look-handler
       (lambda (opinid)
-        (unless (getprop (state looks) opinid)
-          (when (prop username)
-            (json-post-bind (res "/look-post/" (create :opinion opinid))))
-          (set-state looks (set-copy (state looks) opinid t)))))
+        (when (state looks) ;;Are looks enabled?
+          (unless (getprop (state looks) opinid)
+           (when (prop username)
+             (json-post-bind (res "/look-post/" (create :opinion opinid))))
+           (set-state looks (set-copy (state looks) opinid t))))))
 
     (def-component look-saver-for-rooturl
         (prop children)
