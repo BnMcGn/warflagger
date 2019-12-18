@@ -37,22 +37,24 @@
       (let ((res (create)))
         (dolist (r refs)
           (setf (getprop res r)
-                (make-warstats-url r 'opinion)))))
+                (make-warstats-url r 'opinion)))
+        res))
 
     (def-component referenced
-        (:div
-         (:h3 :key 1 "Incoming references:")
-         (dolist (r (prop referenced))
-           (let ((data (getprop (prop inrefs) r)))
-             (when data
-               (psx
-                (:opinion-summary
-                 :key r
-                 :opinion-store (create-from-list (list r data))
-                 :tree-address (@ data tree-address)
-                 :warstats (@ data warstats)
-                 :looks (prop looks)
-                 :look-handler (prop look-handler))))))))
+        (psx
+         (:div
+          (:h3 :key 1 "Incoming references:")
+          (dolist (r (prop referenced))
+            (let ((data (getprop (prop inrefs) r)))
+              (when data
+                (psx
+                 (:opinion-summary
+                  :key r
+                  :opinion-store (create-from-list (list r data))
+                  :tree-address (@ data tree-address)
+                  :warstats (@ data warstats)
+                  :looks (prop looks)
+                  :look-handler (prop look-handler)))))))))
 
     (def-component referenced-loader
         (psx
