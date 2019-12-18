@@ -190,7 +190,7 @@
           (text-bind (res (strcat url-root "page.txt"))
                      (set-state text res))))
       get-initial-state
-      (lambda () (create warstats nil opinions nil text nil)))
+      (lambda () (create warstats nil opinions nil text nil references {})))
 
     ;;New target stuff
 
