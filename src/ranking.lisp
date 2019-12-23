@@ -332,12 +332,18 @@ Some of these factors will obviously affect the respect points more than others.
 (defun calculate-axdat-controversy (axis-data)
   (labels ((getx (key)
              (car (getf axis-data key))))
-    (let ((positive (+ (getx :x-supported) (getx :x-right)
+    (let* ((positive (+ (getx :x-supported) (getx :x-right)
                        (getf axis-data :referenced-effect)))
-          (negative (+ (getx :x-wrong) (getx :x-dissed) (getx :x-problematic)
-                       (getx :x-irrelevant))))
+           (negative (+ (getx :x-wrong) (getx :x-dissed) (getx :x-problematic)
+                        (getx :x-irrelevant)))
+           (larger (max positive negative)))
       ;; Pick a number, any number... see how it works.
-      (+ (getx :x-unverified) (* 0.1 positive negative)))))
+      (+ (getx :x-unverified)
+         (if (< 0 larger)
+             (* 1.2
+                (relative-to-range 0 (max positive negative) (min positive negative))
+                (+ positive negative))
+             0)))))
 
 ;;FIXME: There should be some form of time calculation on effect. Opinions that are
 ;; new shouldn't have the same effect as well seasoned opinions. Otherwise people
@@ -357,14 +363,16 @@ Some of these factors will obviously affect the respect points more than others.
   (let* ((opinion (or opinion (opinion-by-id (car optree))))
          (axdat (opinion-axis-data optree))
          (effect (calculate-axdat-effect axdat opinion))
-         (controv (calculate-axdat-controversy axdat))
-         (ref-effects (calculate-reference-effects
-                       effect controv
-                       (getf axdat :reference-effect-main)
-                       (getf axdat :reference-controversy-main))))
-    (setf effect (+ effect (car ref-effects) (getf axdat :reference-effect-extra)))
-    (setf controv
-          (+ controv (second ref-effects) (getf axdat :reference-controversy-extra)))
+         (controv (calculate-axdat-controversy axdat)))
+    ;;FIXME: Can't have both reference and referenced becaese it creates a loop. Maybe re-enable when
+    ;; User influence is factored in. Should prevent the problem.
+    ;;     (ref-effects (calculate-reference-effects
+    ;;                   effect controv
+    ;;                   (getf axdat :reference-effect-main)
+    ;;                   (getf axdat :reference-controversy-main))))
+    ;;(setf effect (+ effect (car ref-effects) (getf axdat :reference-effect-extra)))
+    ;;(setf controv
+    ;;      (+ controv (second ref-effects) (getf axdat :reference-controversy-extra)))
     (when (hash-table-p *opinion-effect-cache*)
       (setf (gethash (car optree) *opinion-effect-cache*)
             (list* :effect effect :controversy controv axdat)))
