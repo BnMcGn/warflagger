@@ -1,0 +1,70 @@
+language: common-lisp
+sudo: required
+
+dist: bionic
+
+env:
+ matrix:   
+    - LISP=sbcl
+    - LISP=ccl
+
+addons:
+  apt:
+    packages:
+    - python3.6
+
+services:
+    - postgresql
+
+
+addons:
+    postgresql: 9.5
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install python3
+
+install:
+  # Install cl-travis
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+
+  - git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
+  - git clone https://github.com/bnmcgn/Parenscript quicklisp/local-projects/Parenscript
+  - git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
+  - git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
+  - git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
+  - git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
+  - git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
+  - git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
+  - git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
+  - git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
+  - git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
+  - git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
+
+  - cp src/local-settings-template.lisp src/local-settings.lisp
+
+  #- sudo add-apt-repository ppa:deadsnakes/ppa
+  #- sudo apt-get update
+  #- sudo apt-get install -y python3.5
+  - sudo apt-get install python3-pip
+
+  - pip3 install --user pattern
+  - pip3 install --user BeautifulSoup
+  - pip3 install --user pyPdf
+  - pip3 install --user readability-lxml
+
+
+before_script:
+
+
+  - psql -c "create user ben with password 'test_password';"
+  - psql -c 'create database test_opinions;' -U postgres 
+  - psql -c 'grant all privileges on database test_opinions to ben;'
+  - psql -d 'test_opinions' -1 -f src/opinions.schema.sql
+
+script:
+  - cl -l prove -e '(or (prove:run :test-warflagger) (uiop:quit -1))' 
+
+notifications:
+  email:
+    - bnmcgn@gmail.com

@@ -2,6 +2,7 @@
 *lisp~
 *lisp#
 *.swp
+*.pyc
 src/local-settings.lisp
 warflagger.wiki/
 src/static/targinfo/
