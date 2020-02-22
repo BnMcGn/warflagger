@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>
+    <meta name='description' content='Learn Lisp The Hard Way'>
+    <meta name='author' content='Toronto Lisp User Group'>
+    <link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css'>
+    <link rel='stylesheet' href='//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'>
+    <link rel='stylesheet' href='/static/css/llthw.css'>
+    <title>L(λ)THW
+    </title>
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-51817003-1', 'learnlispthehardway.org');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+
+</script>
+  </head>
+  <body>
+    <nav class='navbar navbar-inverse navbar-fixed-top' role='navigation'>
+      <div class='container'>
+        <div class='navbar-header'></div>
+      </div>
+    </nav><div class='jumbotron masthead'><div class='container'><h1 align='center'>L(λ)THW</h1><p class='lead' align='center'>Learn Lisp The Hard Way</p><p align='center' style='color: silver;'>Brought to you by the Toronto Lisp User Group</p><div class='row'><div class='col-md-8 col-md-offset-2'><pre><code><span class="code"><span class="comment">;; Welcome to L(λ)THW!
+</span><span class="paren1">(<span class="code"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="code"><span class="paren3">(<span class="code">llthw '<span class="paren4">(<span class="code">learn lisp <i><span class="symbol">the</span></i> hard way</span>)</span></span>)</span></span>)</span>
+  <span class="paren2">(<span class="code">format t <span class="string">"~{~@(~A~)~^ ~}, because ~{~A~^ ~} is easier!"</span> llthw <span class="paren3">(<span class="code">cddr llthw</span>)</span></span>)</span></span>)</span>
+
+<span class="comment">;; Common Lisp: Powerful, Expressive, Programmable, General Purpose, Multi-Paradigm.
+</span></span></code></pre>
+</div></div><p align='center'><a href='/book/' class='btn btn-info btn-lg'><span class='glyphicon glyphicon-book'></span> Read the HTML Ebook</a> <a href='/get-lisp/' class='btn btn-primary btn-lg' alt='Download Common Lisp' title='Download Common Lisp'><span class='glyphicon glyphicon-cloud-download'></span> Download Common Lisp</a> <a href='/try-lisp/' class='btn btn-primary btn-lg'><span class='glyphicon glyphicon-road'></span> Try Lisp Now in Your Browser</a></p><ul class='masthead-links' align='center'><li><a href='#' class='btn btn-default' disabled='disabled'>Paperback Edition (Coming Soon)</a></li><li><a href='/book/' class='btn btn-default'>Free Online HTML Ebook</a></li><li><a href='/resources/' class='btn btn-default'>Additional Lisp Language Resources</a><li><a href='#' class='btn btn-default' disabled='disabled'>Draft Version 0.2.4 (alpha)</a></li></li></ul></div></div><div class='social-banner'><div class='container'><ul class='social-banner-buttons'><li>Contribute:</li><li><a href='http://github.com/LispTO/llthw' target='_blank' title='Learn Lisp The Hard Way on GitHub'><i class='fa fa-code-fork fa-2x'></i></a></li><li>Connect with the Authors:</li><li><a href='http://github.com/LispTO' target='_blank' title='Toronto Lisp User Group on GitHub'><i class='fa fa-github-square fa-2x'></i></a></li><li><a href='http://facebook.com/llthw' target='_blank' title='Learn Lisp The Hard Way on Facebook'><i class='fa fa-facebook-square fa-2x'></i></a></li><li><a href='http://lisptoronto.org/' target='_blank' title='Toronto Lisp User Group website'><i class='fa fa-globe fa-2x'></i></a></li><li>Support this project:</li><li><a href='https://www.digitalocean.com/?refcode=ef3cf1ffcbb7' title='Get Cloud Hosting on Digital Ocean'><i class='fa fa-cloud fa-2x'></i></a></li><li><a href='/donate/#paypal' title='Donate by PayPal'><i class='fa fa-paypal fa-2x'></i></a></li><li><a href='/donate/#bitcoin' title='Donate Bitcoin'><i class='fa fa-bitcoin fa-2x'></i></a></li><li><a href='/donate/#litecoin' title='Donate Litecoin'><span style='font-size: 30px; font-weight: bold; text-decoration: none;'>&#321;</span></a></li></ul></div></div><div class='container'><div class='row'><div class='col-md-12'><h2>Frequently Asked Questions</h2>
+
+<h4 class="text-info">What is Lisp?</h4>
+
+<p>Lisp&mdash;AKA, <em>Common Lisp</em>&mdash;is a member of the Lisp-family of programming languages that descends from the original LISP language proposed by John McCarthy in the 1950s.  All Lisp-family languages share common features, such as the S-Expression syntax based on a subset of Lambda Calculus and Polish prefix notation, but Common Lisp in particular is known for its concise syntax, extensibility, multi-paradigm approach to programming, and macro system for code expansion.</p>
+
+<p>Common Lisp is ANSI Standardized, actively supported in both commercial and open-source implementations, available for nearly every platform (coming to new ones all the time), has a lively community and a large and actively maintained collection of user-contributed libraries.</p>
+
+<h4 class="text-info">Who should learn Lisp?</h4>
+
+<p>Complete beginners to programming, who want to be assured of learning a powerful language that will help them develop unique insights of their field.  Someone who has struggled with programming before.  Hobbyists, who are looking for a new challenge.  A professional developer looking to take their performance and productivity to the next level. In a word, everyone.</p>
+
+<h4 class="text-info">Is Lisp as hard as people say it is?</h4>
+
+<p>No. Lisp is actually the simplest programming language, and has no syntactic cruft.  While it wasn&apos;t designed to be &ldquo;easy to learn&rdquo; like Swift, Python, Ruby, or Basic, there is less overall to learn and you will be writing real, useful programs in Lisp sooner than you could with other languages.</p>
+
+<h4 class="text-info">What do I need to know <em>before</em> learning Lisp?</h4>
+
+<p>Lisp, like all other programming languages, requires a certain degree of advanced computer skills. You should be a strong typist, comfortable in a variety of text editors, and know how to use the command line to run text-based applications and compile software from source code.  In addition, up-front familiarity with powerful programmer&apos;s text editors such as Emacs or VIM will help you be more productive through Lisp&apos;s incremental, interactive development cycle&mdash;but for now all you really need to know is how to enter text into a file, save it to disk, and run it from the command line.</p>
+
+<h4 class="text-info">What do I need to learn Lisp with this site?</h4>
+
+<p>You can get started learning Lisp right away, without downloading anything; just visit the <a href="/try-lisp/" >Try Lisp</a> page and follow the instructions to get going with the in-browser Lisp REPL.  All you need is a relatively recent browser, such as Chrome, Firefox, Safari, or IE 10+.</p>
+
+<p>To write and distribute your own Lisp software, however, you will need a computer where you have the administrative rights to install software without anyone else&apos;s help.  Pretty much any personal computer will do, Lisp runs everywhere, on Windows, Mac OS X, Linux, and UNIX.  Complete instructions for setting up your development environment are included in the preface of the book.</p>
+
+<h4 class="text-info">Why don't all the exercises in the book work on the Try Lisp page?</h4>
+
+<p>The in-browser REPL on the Try Lisp page is <a href="https://github.com/davazp/jscl" target="_blank">powered by JSCL</a>; it&apos;s not a complete implementation of Common Lisp yet, and is only intended to get new students of Lisp familiarized with working at a REPL.</p>
+
+<p>When using the in-browser REPL, be sure to follow the examples listed in that section.  When you&apos;re ready to start the book, you will need to follow the instructions to install SBCL first.</p>
+
+<h4 class="text-info">What is Lisp used for?</h4>
+
+<p>Common Lisp is an ANSI standardized high-level, general purpose, dynamic, multi-paradigm, programmable programming language.  So any application, script, or web site can be written in Lisp, generally in less time and with substantially fewer lines of code than could be achieved with other programming languages.</p>
+
+<p>Some of the most exciting projects in the history of computing are being developed in Lisp right now.  In fact, Common Lisp is still the most advanced, robust, expressive, and powerful programming language ever invented, giving it an edge both in everyday programming challenges as well as exploratory programming; and its ANSI standardization gives it a stability that no other language can match, meaning your code is far less susceptible to bit-rot over time.</p>
+
+<h4 class="text-info">Is Lisp a functional programming language?</h4>
+
+<p>This is a common misconception, but no, it is not.  Functional programming is a style of writing code, a <em>paradigm</em>, based on the lambda calculus, where the programmer aims to eliminate side-effects and reduce software to mathematical purity.  This means that a function is not permitted to change state outside of its lexical scope, and that if it is run multiple times with the exact same parameters, it will always return the same result.</p>
+
+<p>Common Lisp is not a &lsquo;pure&rsquo; functional language, however, such as Haskell; it is multi-paradigm like OCaml.  You can choose to use the functional paradigm in Common Lisp if you like, but you can also use Procedural, Object-Oriented, Event-Oriented, novel new paradigms like Aspect-Oriented, or mix and match to your hearts content.  Strict Functional programming languages do not offer this flexibility.</p>
+
+<h4 class="text-info">What kind of programs will I learn to write with this book?</h4>
+
+<p>In this course, we will be writing command-line applications, text-based adventure games, web applications, cross-platform desktop software, native apps for mobile devices, 2D and 3D games, and exploring advanced use cases in the industries that favour Lisp over other programming languages&mdash;specifically, enterprise, big data, financial services, natural language processing, robotics, space tech, artificial intelligence, neuroscience, quantum computing, cryptography/security, government and military, exploratory programming, and academic research such as computational physics.</p>
+
+<h4 class="text-info">What about other Lisp-family languages, like Scheme or Clojure? Will this site teach me them too?</h4>
+
+<p>The focus of this site is entirely on Common Lisp.  While all Lisp-family languages share certain common features, such as the S-Expression syntax, Scheme and Clojure are very different languages than Common Lisp in practice.  That being said, you will be better equipped to learn Scheme or Clojure after learning Common Lisp first, and have a better understanding of when Scheme or Clojure is a better choice for a specific project.</p>
+
+<h4 class="text-info">Is this site affiliated with Zed Shaw and Learn Code The Hard Way?</h4>
+
+<p>No.  This is a separately run and managed site, based on the format of Zed Shaw&apos;s <a href="https://gitorious.org/learn-x-the-hard-way/learn-x-the-hard-way" target="_blank">LxTHW</a> open-source package for writing your own programming language course.  You should check out the project and see what others are up to! More information is available at: <a href="http://learncodethehardway.org/" target="_blank">Learn Code The Hard Way</a>.</p>
+</div></div></div><div id='footer'><div class='container'><p align='center'><a href='http://common-lisp.net/' alt='Crafted in Common Lisp' title='Crafted in Common Lisp'>(λ)</a></p><p align='center'>Copyright &copy; 2012 &ndash; 2015, "the Phoeron" Colin J.E. Lupton and the Authors. See <a href='http://github.com/LispTO/llthw' target='_blank'>the Project README</a> for license and contribution guidelines.</p><p align='center'>Powered by <a href='https://www.digitalocean.com/?refcode=ef3cf1ffcbb7' target='_blank'>DigitalOcean</a>, <a href='http://www.sbcl.org/' target='_blank'>SBCL</a>, <a href='https://github.com/davazp/jscl' target='_blank'>JSCL</a>, <a href='http://www.quicklisp.org/' target='_blank'>Quicklisp</a>, <a href='http://weitz.de/hunchentoot/' target='_blank'>Hunchentoot</a>, <a href='https://github.com/Inaimathi/cl-css' target='_blank'>CL-CSS</a>, <a href='http://weitz.de/cl-who/' target='_blank'>CL-WHO</a>, <a href='https://github.com/vsedach/Parenscript' target='_blank'>Parenscript</a>, <a href='https://github.com/3b/3bmd' target='_blank'>3bmd</a>, <a href='https://github.com/redline6561/colorize' target='_blank'>Colorize</a>, <a href='http://jquery.com/' target='_blank'>jQuery</a>, <a href='http://www.mathjax.org/' target='_blank'>MathJax</a>, and <a href='http://getbootstrap.com/' target='_blank'>Bootstrap</a>.</p></div></div>
+    <script src='//code.jquery.com/jquery-1.11.0.min.js'></script>
+    <script src='//code.jquery.com/jquery-migrate-1.2.1.min.js'></script>
+    <script src='//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js'></script>
+  </body>
+</html>
