@@ -37,6 +37,7 @@
 ;;FIXME: we are ignoring excerpt offsets
 (defun enter-bulk-opinion (target &key comment author flag votevalue excerpt reference
                                     reference-excerpt)
+  ;;Why is :display-name used here? Could use :screen-name, but might need a login? What is the difference?
   (let* ((authid (or (find-author-id author :display-name)
                     ;;FIXME: Should add some URL to indicate fake author?
                     (insert-new-author :display-name author)))

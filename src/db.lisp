@@ -309,7 +309,12 @@ the page text can be found in the cache."
 
 (defun get-local-user-from-id (aid)
   (declare (type integer aid))
-  (assoc-cdr :wf-user (get-author-data aid)))
+  (when-let*
+      ((data (get-author-data aid))
+       (luser (assoc-all :wf-user data)))
+    (when (> 1 (length luser))
+      (error "Multiple :wf-user fields for id"))
+    (car luser)))
 
 ;;FIXME: doesn't look like a very reliable way to do things.
 (defun author-type (author)
@@ -364,6 +369,23 @@ the page text can be found in the cache."
                                   :where (sql-= (colm 'type) "wf_user"))
             (order-by-mixin order-by)
             (limit-mixin limit offset)))))
+
+(defun attach-wf-user-to-author (userid authid)
+  "Temporary utility to allow a given login to post as a given author. Eventually users maybe should be allowed multiple user names, since it must be assumed that they will create them anyways. For now this is admin only."
+  (when (eq userid authid)
+    (error "Userid and authid are already equal"))
+  (let ((locuse (get-local-user-from-id userid))
+        (authdat (get-author-data authid)))
+    (when (assoc-cdr :wf-user authdat)
+      (error "Author already has a :wf-user"))
+    (unless locuse
+      (error "No :wf-user found for id"))
+    (clsql:update-records
+     (tabl 'author)
+     :av-pairs
+     (list (list (colm 'id) authid))
+     :where (sql-and (sql-= (colm 'type) "wf_user")
+                     (sql-= (colm 'id) userid)))))
 
 
 (defun save-opinion-from-user (opinion authorid
@@ -437,6 +459,8 @@ the page text can be found in the cache."
                     (sql-= target (colm 'target))
                     (sql-= flag (colm 'flag))
                     (sql-= authorid (colm 'author))))))
+
+
 
 ;;;;;;;;;;;;;;
 ;; Looks stuff
