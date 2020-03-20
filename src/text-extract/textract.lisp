@@ -187,7 +187,7 @@
           (write-index-file (index-file-name) *bynum*)
           newkey)))
 
-(defun save-page-to-cache (url)
+(defun save-page-to-cache (url &optional filename)
   (let ((index (get-url-index url)))
     (ensure-directories-exist (make-pathname :directory (cache-loc url)))
     ;;FIXME: Need a way to not cache non-existent urls. Otherwise will get major clutter
@@ -197,7 +197,8 @@
     (when (probe-file (messages-loc url))
       (delete-file (messages-loc url)))
     (let ((process (external-program:start *text-extractor-script*
-                                           (list (cache-loc url))
+                                           (list* (cache-loc url)
+                                                 (when filename (list filename)))
                                            :input :stream
                                            :error (messages-loc url))))
       (write-line url (external-program:process-input-stream process))

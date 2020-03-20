@@ -11,6 +11,8 @@ from readability import Document
 import PyPDF2 as pp
 from shutil import move
 from syslog import syslog, openlog, LOG_DEBUG, LOG_INFO
+import subprocess
+from shutil import copyfile
 
 import gadgets
 from filelock import FileLock, FailLock
@@ -123,7 +125,41 @@ def process_pdf(url):
         syslog(LOG_DEBUG, "PDF title not found: {0}".format(cache_loc(url)))
     gadgets.string_to_file(title.encode('utf-8'), title_loc(url))
 
-def do_page_save(url):
+def get_file_type(fname):
+    res = subprocess.run(("/usr/bin/file", fname), stdout=subprocess.PIPE)
+    retval = str(res.stdout)
+    if "HTML document" in retval:
+        return "html"
+    elif "PDF document" in retval:
+        return "pdf"
+    else:
+        return False
+
+def remote_page_save(url):
+    try:
+        uh = get_url_fh(url)
+    except:
+        gadgets.string_to_file(str(sys.exc_info()[1]),
+                                failure_loc(url))
+        return False
+    utype = get_page_type(uh)
+    fname = page_loc(url, utype)
+    #FIXME: Added 'b' for python3. Don't know if it is the right thing.
+    fh = open(fname, 'wb')
+    #FIXME: see if this works for pdfs? binary? might be slow?
+    for ln in uh:
+        fh.write(ln)
+    fh.close()
+    uh.close()
+    return utype, fname
+
+def local_page_save(url, fname):
+    ftype = get_file_type(fname)
+    oname = page_loc(url, ftype)
+    copyfile(fname, oname)
+    return ftype, oname
+
+def do_page_save(url, localfname=None):
     fname = tname = titlename = None
     if os.path.exists(failure_loc(url)):
         os.remove(failure_loc(url))
@@ -131,25 +167,16 @@ def do_page_save(url):
         if lck.failed:
             return
         with gadgets.vars_set(globals(), cache_tmp='.tmp'):
-            try:
-                uh = get_url_fh(url)
-            except:
-                gadgets.string_to_file(str(sys.exc_info()[1]),
-                                        failure_loc(url))
-                return False
-            utype = get_page_type(uh)
-            fname = page_loc(url, utype)
-            #FIXME: Added 'b' for python3. Don't know if it is the right thing.
-            fh = open(fname, 'wb')
-            #FIXME: see if this works for pdfs? binary? might be slow?
-            for ln in uh:
-                fh.write(ln)
-            fh.close()
-            uh.close()
+            if localfname:
+                utype, fname = local_page_save(url, localfname)
+            else:
+                utype, fname = remote_page_save(url)
             if utype == "html":
                 process_html(url)
-            else:
+            elif utype == "pdf":
                 process_pdf(url)
+            else:
+                raise ValueError("Unknown document type")
             tname = text_loc(url)
             titlename = title_loc(url)
         with FileLock(cache_loc(url)+'main') as lck2:
@@ -161,7 +188,11 @@ cachepath = sys.argv[1]
 if not cachepath.endswith("/"):
     cachepath += "/"
 url = next(sys.stdin)
-syslog(LOG_INFO, "Called for URL:{0}".format(url))
+localfname = None
+syslog(LOG_INFO, "Called for URL: {0}".format(url))
+if len(sys.argv) > 2:
+    syslog(LOG_INFO, "File supplied: {0}".format(sys.argv[2]))
+    localfname = sys.argv[2]
 syslog(LOG_DEBUG, "Cachepath: {0}".format(cachepath))
-do_page_save(url)
+do_page_save(url, localfname)
 
