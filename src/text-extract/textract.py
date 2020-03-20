@@ -154,6 +154,8 @@ def remote_page_save(url):
     return utype, fname
 
 def local_page_save(url, fname):
+    if not (os.access(fname, os.R_OK) and os.path.isfile(fname)):
+        raise FileNotFoundError("File not available: check name and permissions.")
     ftype = get_file_type(fname)
     oname = page_loc(url, ftype)
     copyfile(fname, oname)
