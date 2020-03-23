@@ -32,7 +32,10 @@
 (in-package :wf/text-extract)
 
 ;;;(defparameter *cache-path* "/home/ben/opinml/")
-(defparameter *cache-age* (encode-time-delta 0 10 0 0))
+;;(defparameter *cache-age* (encode-time-delta 0 10 0 0))
+;; FIXME: We don't really need to refresh the texts. Whole thing needs rethinking. Should we store
+;; texts at all?
+(defparameter *cache-age* (encode-time-delta 0 0 0 90))
 (defvar *bynum*)
 (defvar *byurl*)
 ;;(defparameter *text-extractor-script*
@@ -47,6 +50,9 @@
 
 (defun text-loc (url)
   (concatenate 'string (cache-loc url) "text"))
+
+(defun locked-text-loc (url)
+  (concatenate 'string (cache-loc url) "text.locked"))
 
 (defun title-loc (url)
   (concatenate 'string (cache-loc url) "title"))
@@ -72,16 +78,12 @@
   (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
     (open (make-pathname :directory (cache-loc url) :name "page.html"))))
 
-;;;FIXME: Need to clean up after crash that leaves main.lock in place. 
+;;;FIXME: Need to clean up after crash that leaves main.lock in place.
 (defun grab-text (url &key (update t))
   (when update (update-page url))
-  (let ((tname
-          (make-pathname
-           :directory (cache-loc url)
-           :name
-           (if (probe-file
-                (make-pathname :directory (cache-loc url) :name "text.locked"))
-               "text.locked" "text"))))
+  (let ((tname (if (probe-file (locked-text-loc url))
+                   (locked-text-loc url)
+                   (text-loc url))))
     (if (probe-file tname)
         (with-file-lock ((make-pathname :directory (cache-loc url) :name "main"))
           (read-file-into-string tname))
@@ -222,6 +224,11 @@
    (probe-file (text-loc url))
    (fresh-file-p (text-loc url))))
 
+(defun is-locked (url)
+  (and
+   (is-cached url)
+   (probe-file (locked-text-loc url))))
+
 (defun has-failure (url)
   (and (is-cached url) (probe-file (failure-loc url))))
 
@@ -253,7 +260,7 @@
          (cl-hash-util:collect :title "")
          (cl-hash-util:collect :status "failure")
          (cl-hash-util:collect :message "Not a valid URL"))
-        ((is-fresh url)
+        ((or (is-locked url) (is-fresh url))
          (cl-hash-util:collect :text (grab-text url))
          (cl-hash-util:collect :title (grab-title url :alternate "" :update nil))
          (cl-hash-util:collect :status "success")
