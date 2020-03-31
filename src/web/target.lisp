@@ -238,6 +238,7 @@
                   :text (prop text)
                   :opinions (list)
                   :url (prop url)
+                  ;;FIXME: It might not be new by the time the link is followed. We should check.
                   :opinion-store (create)
                   :warstats (lisp (as-ps-data (blank-warstat-for-web)))))
             (psx (:text-missing
@@ -276,7 +277,7 @@
                (:li :key 1
                     "You may still post flags on this article, though excerpts must be filled by hand.")
                (:li :key 2
-                    "If the same text is available at another URL, please inidicate the alternative with the SameThing flag.")
+                    "If the same text is available at another URL, please indicate the alternative with the SameThing flag.")
                (:li :key 3
                     "Texts may be manually inserted using [not implemented]")))))
 

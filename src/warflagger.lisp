@@ -27,7 +27,7 @@
 
 (defun make-missing-rootid-url (url)
   "Sometimes we want to display a target that is not yet entered into WarFlagger. Make a link that will result in such a display."
-  (strcat *base-url* "target/?newurl=" (quri:url-encode url)))
+  (strcat *base-url* "new-target/?url=" (quri:url-encode url)))
 
 ;;FIXME: rethink user urls
 (defun warflagger-user-from-url (url)

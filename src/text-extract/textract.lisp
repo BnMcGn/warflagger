@@ -278,3 +278,41 @@
          (cl-hash-util:collect :status "wait")
          (cl-hash-util:collect :message "Loading page text..."))))))
 
+;;Tools for manually fixing missing pages and texts.
+;;FIXME: This is temporary. Need something that is available to users.
+
+(defun supply-page (&key url number filename)
+  (unless (or url number)
+    (error "Need a target :url or :number"))
+  (let ((url (if url url (gethash number *bynum*))))
+    (save-page-to-cache url :filename (or filename wf/local-settings:*supply-file*))))
+
+(defun supply-text (&key url number filename dont-lock)
+  (unless (or url number)
+    (error "Need a target :url or :number"))
+  (let* ((url (if url url (gethash number *bynum*)))
+         (filename (or filename wf/local-settings:*supply-text*))
+         (dest (if dont-lock (text-loc url) (locked-text-loc url))))
+    (unless (probe-file filename)
+      (error "File not found"))
+    (uiop:copy-file filename dest)))
+
+(defun failures-by-number ()
+  (sort (mapcar (alexandria:rcurry #'gethash *byurl*)
+           (remove-if-not (lambda (x)
+                            (or (is-locked x) (is-fresh x)))
+                          (alexandria:hash-table-keys *byurl*)))
+        #'>))
+
+(defun failure-report (id)
+  (let ((url (car (gethash id *bynum*))))
+    (format t
+            "~a ~a~%~% ~a ~a~%" id url
+            (if (has-failure url) (grab-failed-message url) "")
+            (grab-messages url))))
+
+(defun recent-failures ()
+  (loop for i from 1 to 5
+        for x in (failures-by-number)
+        do (failure-report x)))
+
