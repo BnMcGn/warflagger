@@ -437,6 +437,7 @@ the page text can be found in the cache."
                                         val))))
       id)))
 
+;; Opinion will still appear on site until write-all-rootid-warstats is run for the root target.
 (defun delete-opinion (oid &key (remove-rooturl t))
   (let* ((oid (if (numberp oid) oid (parse-integer oid)))
          (rooturl (car (col-from-pkey (colm 'opinion 'rooturl) oid))))

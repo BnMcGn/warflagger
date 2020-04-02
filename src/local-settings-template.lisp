@@ -23,7 +23,9 @@
    #:*warstats-path*
    #:*production*
    #:*auto-run*
-   #:*test-user-name*))
+   #:*test-user-name*
+   #:*supply-file*
+   #:*supply-text*))
 
 (in-package :wf/local-settings)
 
@@ -40,5 +42,8 @@
 (defparameter *production* nil)
 (defparameter *auto-run* nil)
 (defparameter *test-user-name* nil)
+
+(defparameter *supply-file* "")
+(defparameter *supply-text* "")
 
 (pushnew #p"" webhax:*named-text-locations*)

@@ -141,7 +141,7 @@ def remote_page_save(url):
     except:
         gadgets.string_to_file(str(sys.exc_info()[1]),
                                 failure_loc(url))
-        return False
+        raise IOError("Page Failed to Load")
     utype = get_page_type(uh)
     fname = page_loc(url, utype)
     #FIXME: Added 'b' for python3. Don't know if it is the right thing.
