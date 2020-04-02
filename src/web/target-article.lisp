@@ -269,11 +269,13 @@
                             :... (@ this props)
                             :tree-address (@ opin tree-address)
                             :opid itm))))))
-              (psx
-               (:opinion-info
-                :key 3
-                :... (@ this props)
-                :opinion (getprop (prop opinion-store) (prop excerpt-opinions 0))))))))
+              (let ((opin (getprop (prop opinion-store) (prop excerpt-opinions 0))))
+                (psx
+                 (:opinion-info
+                  :key 3
+                  :... (@ this props)
+                  :tree-address (@ opin tree-address)
+                  :opinion opin)))))))
 
     ;;FIXME: Needs different look, more long form.
     (def-component opinion-info
