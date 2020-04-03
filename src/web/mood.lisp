@@ -221,8 +221,11 @@
       ;;Wants: opinion-store, warstats
       ;;Optional: tree-address (if opinion), references (if reference)
       (let ((res (create))
-            (opid (when (chain props (has-own-property 'tree-address))
-                    (list-last (@ props tree-address)))))
+            (opid (or
+                   (when (chain props (has-own-property 'tree-address))
+                     (list-last (@ props tree-address)))
+                   (when (chain props (has-own-property 'opinion))
+                     (@ props opinion id)))))
         (format-warstats-data
          res (if opid (getprop (@ props warstats) opid) (@ props warstats root)))
         (format-looks-data res (or opid :root) (@ props looks))
