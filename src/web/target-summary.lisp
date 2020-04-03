@@ -44,17 +44,21 @@
         (psx
          (:div
           (:h3 :key 1 "Incoming references:")
-          (dolist (r (prop referenced))
-            (let ((data (getprop (prop inrefs) r)))
-              (when data
-                (psx
-                 (:opinion-summary
-                  :key r
-                  :opinion-store (create-from-list (list r data))
-                  :tree-address (@ data tree-address)
-                  :warstats (@ data warstats)
-                  :looks (prop looks)
-                  :look-handler (prop look-handler)))))))))
+          (collecting
+            (dolist (r (prop referenced))
+              (let ((data (getprop (prop inrefs) r)))
+                (when data
+                  (collect
+                      (psx
+                       (:opinion-summary
+                        :key r
+                        :opinion-store (create-from-list (list r (@ data opinion)))
+                        :tree-address (@ data tree-address)
+                        ;;Warstats needs to be an opinid keyed object, but we only have a single warstat
+                        :warstats (create-from-list (list (list-last (@ data tree-address))
+                                                          (@ data warstats)))
+                        :looks (prop looks)
+                        :look-handler (prop look-handler)))))))))))
 
     (def-component referenced-loader
         (psx
@@ -188,7 +192,7 @@
              (:h3 :key 7 "Immediate responses: " (@ rwstats replies-immediate))
              (:h3 :key 8 "Total responses: " (@ rwstats replies-total))
              (:display-if :key 9 :test (@ rwstats referenced)
-                          (:referenced-loader :referenced (@ rwstats referenced)))
+                          (:referenced-loader :... (@ this props) :referenced (@ rwstats referenced)))
              (:display-if :key 10 :test (not-empty (prop references))
                           (:references-summary :... (@ this props)))
              (:questions :key 11 :... (@ this props))
