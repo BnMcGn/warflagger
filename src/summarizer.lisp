@@ -383,7 +383,7 @@
       (with-open-file (fh statpath
                          :direction :output :if-exists :supersede
                          :if-does-not-exist :create)
-       (json:encode-json ref)))))
+       (json:encode-json ref fh)))))
 
 (defun write-all-rootid-warstats (rootid)
   (let* ((url (get-rooturl-by-id rootid))
