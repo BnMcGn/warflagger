@@ -299,9 +299,9 @@
 
 (defun failures-by-number ()
   (sort (mapcar (alexandria:rcurry #'gethash *byurl*)
-           (remove-if-not (lambda (x)
-                            (or (is-locked x) (is-fresh x)))
-                          (alexandria:hash-table-keys *byurl*)))
+                (remove-if (lambda (x)
+                             (or (is-locked x) (is-fresh x)))
+                           (alexandria:hash-table-keys *byurl*)))
         #'>))
 
 (defun failure-report (id)
