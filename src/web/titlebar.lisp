@@ -138,7 +138,7 @@
                           :value (prop url))
                   (when excerpt
                     (psx (:input :type "hidden" :name "excerpt" :key 3
-                                 :value excerpt)))
+                                 :value (encode-u-r-i-component excerpt))))
                   (when offset
                     (psx (:input :type "hidden" :name "offset" :key 4
                                  :value offset)))

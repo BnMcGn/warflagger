@@ -59,7 +59,7 @@
            (lisp
             (webhax-validate:convert-fieldspecs-to-ps-data *opinion-form-specs*))
            :data (create :target (lisp target)
-                         :excerpt (lisp excerpt)
+                         :excerpt (lisp (quri:url-decode excerpt))
                          :excerpt-offset (lisp offset))
            :layout custom-opform-layout
            :wrapwidget false

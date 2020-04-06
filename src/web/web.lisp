@@ -30,6 +30,7 @@
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
+   :@head (html-out (:meta :charset "utf-8"))
    :@css-link "/static/css/style.css")
   (html-out
                                         ;;Header
