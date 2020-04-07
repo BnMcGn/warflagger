@@ -36,7 +36,7 @@
                       :notnull)
             :description "Vote Value")
      :reference (:url :description "Reference URL")
-     :comment (:string))))
+     :comment (:string :widget :textentry))))
 
 (watch-for-recompile
   (defun opinion-form-page ()
