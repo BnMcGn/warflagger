@@ -313,31 +313,26 @@
 
 (defun reference-list-for-rooturl (rooturl)
   (collecting-hash-table (:mode :replace)
-    (let ((tree (opinion-tree-for-rooturl rooturl)))
-      (labels ((proc (tree location)
-                 (dolist (node tree)
-                   (when (grab-column (liql (car node) 'reference.opinion))
-                     (let* ((refopin (opinion-by-id (car node)))
-                            (refurl (assoc-cdr :reference refopin)))
-                       (hu:collect (assoc-cdr :id refopin)
-                         (hu:plist->hash
-                          (list
-                           :reference refurl
-                           :reference-domain (nth-value 2 (quri:parse-uri refurl))
-                           :warflagger-link (make-wf-url-for-url refurl)
-                           :tree-address (nreverse (cons (car node) location))
-                           :refbot (system-generated-p (car node))
-                           :refopinid (assoc-cdr :id refopin)
-                           :refopinurl (assoc-cdr :url refopin)
-                           :warstats (request-warstats-for-url refurl)
-                           :warstats-src-url
-                           (when-let ((spec (%warstats-pathdata-for-url refurl)))
-                             (strcat wf/local-settings:*base-url*
-                                     (apply #'make-warstats-url spec)))
-                           :headline (get-headline-for-url refurl))))))
-                   (when (cdr node)
-                     (proc (cdr node) (cons (car node) location))))))
-        (proc tree nil)))))
+    (dolist (id (opinion-ids-for-rooturl rooturl))
+      (when (grab-column (liql id 'reference.opinion))
+        (let* ((refopin (opinion-by-id id))
+               (refurl (assoc-cdr :reference refopin)))
+          (hu:collect id
+            (hu:plist->hash
+             (list
+              :reference refurl
+              :reference-domain (nth-value 2 (quri:parse-uri refurl))
+              :warflagger-link (make-wf-url-for-url refurl)
+              :tree-address (tree-address id)
+              :refbot (system-generated-p id)
+              :refopinid id
+              :refopinurl (assoc-cdr :url refopin)
+              :warstats (request-warstats-for-url refurl)
+              :warstats-src-url
+              (when-let ((spec (%warstats-pathdata-for-url refurl)))
+                (strcat wf/local-settings:*base-url*
+                        (apply #'make-warstats-url spec)))
+              :headline (get-headline-for-url refurl)))))))))
 
 (defun question-opinion-p (opinid)
   (member (grab-one (liql opinid 'opinion 'opinion.flag))
