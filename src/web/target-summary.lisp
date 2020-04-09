@@ -8,25 +8,25 @@
     ;;FIXME: relocate
     (def-component opinion-summary
         (let* ((opinion (@ (prop opinion-store)
-                          (if (prop tree-address)
-                              (list-last (prop tree-address))
-                              (prop opid))))
+                          (if (prop opid)
+                              (prop opid)
+                              (list-last (prop tree-address)))))
                ;; FIXME: Can have multiple copies of opinion on same page. Shouldn't use id!
                (id (strcat "opinion-summary-" (@ opinion id))))
           (psx
            (:div
             :id id
             :... (or (prop styling-data)
-                     (format-styling-data (@ this props)))
+                     (format-styling-data (set-copy (@ this props) :opinion opinion)))
             :class "opinion-summary"
-            (if (prop tree-address)
+            (if (prop opid)
+                (psx (:opinion-icon :key 1 :opinion opinion
+                                   :look-handler (prop look-handler)))
                 (psx (:display-tree-address :key 1 :tree-address (prop tree-address)
                                             :opinion-store (prop opinion-store)
                                             :warstats (prop warstats)
                                             :looks (prop looks)
-                                            :look-handler (prop look-handler)))
-                (psx (:opinion-icon :key 1 :opinion opinion
-                                   :look-handler (prop look-handler))))
+                                            :look-handler (prop look-handler))))
             (:flag-name :key 2 :opinion opinion) " "
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
@@ -53,7 +53,12 @@
                        (:opinion-summary
                         :key r
                         :opinion-store (create-from-list (list r (@ data opinion)))
-                        :tree-address (@ data tree-address)
+                        ;; We specify opid rather than tree address to prevent opinion-summary from
+                        ;; attempting to render the whole icon stack for the opinion. If we decide
+                        ;; that we want the whole stack, we will need to load warstats for all of
+                        ;; those opins and icons in referenced-loader. A bit heavy...
+                        :opid r
+                        ;; :tree-address (@ data tree-address)
                         ;;Warstats needs to be an opinid keyed object, but we only have a single warstat
                         :warstats (create-from-list (list (list-last (@ data tree-address))
                                                           (@ data warstats)))
