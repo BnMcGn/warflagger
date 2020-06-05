@@ -31,7 +31,13 @@
             (:date-stamp :key 3 :opinion opinion) " "
             (:author-long :key 4 :opinion opinion) " "
             (:display-warstats2 :key 5)
-            (:reply-link :key 6 :url (@ opinion url))))))
+            (:reply-link :key 6 :url (@ opinion url)))))
+      component-did-catch
+      (lambda (err err-info)
+        (say "Something missing in opinion-summary")
+        (say (@ this props))
+        (say err)
+        (say err-info)))
 
     (defun %format-referenced (refs)
       (let ((res (create)))

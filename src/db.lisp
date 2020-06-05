@@ -143,6 +143,8 @@
        (assoc-cdr :rooturl it)
        (error "Rooturl ID not found")))
 
+;;;FIXME: Each opinion should record its rooturl. Needs access to targetted opinion, therefore.
+;;; this will save hunting down the rooturl and all of the uncertainty code
 (defun rooturl-real-p (id)
   "Means that target chain has been traced back to a non-opinml page, and that
 the page text can be found in the cache."

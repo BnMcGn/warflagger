@@ -71,3 +71,29 @@
    nil item
    :format '((:year 4) #\- (:month 2) #\- (:day 2) #\T
              (:hour 2) #\: (:min 2) #\: (:sec 2) :gmt-offset-hhmm)))
+
+;;; Tools for managing a change of flag name
+
+(eval-always
+  (defun recognized-flag-p (flag)
+    (when-let ((i (first-match-index (curry #'eq (car flag)) *flag-category-keys*)))
+      (getf (nth i *flag-types-source*) (second flag)))))
+
+(defmacro check-recognized-flag (flag)
+  (unless (recognized-flag-p flag)
+    (error "Flag not found")))
+
+(defun rename-flag (old new)
+  "A function to aid in renaming an existing recogized flag. Renaming should first be done in the constants.lisp file."
+  (when (or (recognized-flag-p old)
+            (getf *flag-colors* old))
+    (error "Old flag is still extant. Please manually replace it in *flag-types-source* and *flag-colors* (see constants.lisp) before running rename-flag"))
+  (unless (recognized-flag-p new)
+    (error "New flag should be in *flag-types-source*, *flag-colors* and *flag-labels* before running rename-flag"))
+  (clsql:update-records
+   (tabl 'opinion)
+   :av-pairs
+   (list (list (colm 'flag) (flag-to-db new)))
+   :where (sql-= (colm 'flag) (flag-to-db old)))
+  (print "To complete the rename operation, run write-all-warstats. Remember to check the wiki at the source repository and other documentation."))
+

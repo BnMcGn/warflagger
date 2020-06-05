@@ -27,7 +27,8 @@
                                      :depends-on ("local-settings"))
                               (:file "package")
                               (:file "constants")
-                              (:file "warflagger")
+                              (:file "warflagger"
+                                     :depends-on ("constants"))
                               (:file "db")
                               (:file "bulk-enter")
                               (:file "references")
