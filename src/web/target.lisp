@@ -53,13 +53,6 @@
       (and (has-excerpt-p opin)
            (not (equal null (@ opin 'text-position 0)))))
 
-    (defun %get-excerptless-opinions (opins)
-      (collecting
-          (dolist (o opins)
-            (unless (and (@ o 0 excerpt)
-                         (< 0 (@ o 0 excerpt length)))
-              (collect o)))))
-
     ;;FIXME: Overall use of url, external-link, warflagger-link is inconsistent.
     (def-component target-title
         (psx
