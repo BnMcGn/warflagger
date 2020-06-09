@@ -226,13 +226,6 @@
           ;(incf total (@ props warstats op replies-total)))
         total))
 
-    (defun excerpt-reply-link (url excerpt)
-      (let ((exstr (when excerpt (strcat "&excerpt=" (encode-u-r-i-component excerpt)))))
-        (strcat
-         "/opinion/?target="
-         (encode-u-r-i-component url)
-         exstr)))
-
     (def-component sub-opinion-list
         (psx
          (:div
