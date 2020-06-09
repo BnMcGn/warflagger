@@ -47,7 +47,10 @@
 
 (define-ps-lib wf-web-library ()
   (ps
-    ;;FIXME: Duplicate of CL version
+
+    ;;;Paths and urls
+
+    ;; Also in lisp
     (defun make-id-path (id)
       (if (< id 1000)
           "/0000/"
@@ -71,6 +74,16 @@
     (defun make-missing-rootid-url (url)
       (strcat "/new-target/?url=" (encode-u-r-i-component url)))
 
+    (defun excerpt-reply-link (url excerpt)
+      (let ((exstr (when excerpt (strcat "&excerpt=" (encode-u-r-i-component excerpt)))))
+        (strcat
+         "/opinion/?target="
+         (encode-u-r-i-component url)
+         exstr)))
+
+    ;;; Tree tools
+
+    ;;FIXME: is this same/similar to immediate-children-ids?
     (defun opinion-children (tree-address opinions)
       (let ((res (some (lambda (x)
                          (when (eql (getprop tree-address 0) (@ x 0 id)))
@@ -81,182 +94,10 @@
                               (array-cdr res))
             (array-cdr res))))
 
-    (defun filter-opins-score (tree-addresses opinions warstats)
-      (let ((res
-             (collecting
-                 (dolist (ta tree-addresses)
-                   (let ((id (list-last ta)))
-                     (when (< 2 (getprop warstats id 'effect))
-                       (collect id)))))))
-        (chain res
-               (sort (lambda (a b) (- (getprop warstats a 'effect)
-                                      (getprop warstats b 'effect)))))
-        res))
-
-    (defun filter-opins-controversial (tree-addresses opinions warstats)
-      (let ((res
-             (collecting
-                 (dolist (ta tree-addresses)
-                   (let ((id (list-last ta)))
-                     (when (< 2 (getprop warstats id 'controversy))
-                       (collect id)))))))
-        (chain res
-               (sort (lambda (a b) (- (getprop warstats a 'controversy)
-                                      (getprop warstats b 'controversy)))))
-        res))
-
-    (defun filter-opins-question (tree-addresses opinions warstats)
-      (let ((res
-             (collecting
-                 (dolist (ta tree-addresses)
-                   (let* ((id (list-last ta))
-                          (opin (getprop opinions id))
-                          (stats (getprop warstats id)))
-                     (when
-                         ;;FIXME: This is a crude definition of a question. Reconsider
-                         ;; if/when we implement "Accepted" flag. Also if directives
-                         ;; are added.
-                         (or (chain (list "needsEvidence" "raiseQuestion")
-                                    (includes (@ opin flag 1)))
-                             ;; Wrong axis is a stand in for being answered. For now.
-                             (< 1 (@ stats x-wrong 0)))
-                       (collect id)))))))
-        (chain res
-               (sort
-                ;; Have arbitrarily decided to sort by combined controversy and effect
-                (lambda (a b) (- (+ (getprop warstats a 'controversy)
-                                    (getprop warstats a 'effect))
-                                 (+ (getprop warstats b 'controversy)
-                                    (getprop warstats b 'effect))))))
-        res))
-
-    ;;
-    ;;Utilies taken from opinion-form
-    ;;
-
-    ;;FIXME: Duplicate of lisp functions in excerpt.lisp
-    ;;Would be nice to only implement once.
-    (defun create-textdata (text)
-      (let ((res (create :text text :whitespace (create)))
-            (found nil))
-        (dotimes (i (length text))
-          (when (member (elt text i) *whitespace-characters*)
-            (unless found (setf found i))
-            (dolist (j (range found (1+ i)))
-              (incf (getprop res 'whitespace j)))
-            (setf found nil)))
-        res))
-
-    (defun contiguous-whitespace? (tdat index)
-      (or (getprop tdat 'whitespace index) 0))
-
-    (defun excerpt-here? (tdat excerpt index)
-      (let ((exdat (create-textdata excerpt))
-            (text (@ tdat text)))
-        (loop with tind = index
-              with eind = 0
-              with tlen = (length text)
-              with elen = (length excerpt)
-              do (progn
-                   (when (eq elen eind) (return-from excerpt-here? tind))
-                   (when (eq tlen tind) (return-from excerpt-here? nil))
-                   (let ((ewhite (contiguous-whitespace? exdat eind))
-                         (twhite (contiguous-whitespace? tdat tind)))
-                     (if (and (eq 0 ewhite) (eq 0 twhite)
-                              (eq (elt excerpt eind) (elt text tind)))
-                         (progn (incf tind) (incf eind))
-                         (if (or (eq 0 ewhite) (eq 0 twhite))
-                             (return-from excerpt-here? nil)
-                             (progn (incf tind twhite)
-                                    (incf eind ewhite)))))))))
-
-    (defun find-excerpt-position (tdat excerpt &optional (offset 0))
-      (dotimes (i (length (@ tdat text)))
-        (let ((loc (excerpt-here? tdat excerpt i)))
-          (when loc
-            (if (< 0 offset)
-                (decf offset)
-                (return (list i (- loc i))))))))
-
-    ;;End of duplicate functions
-
-    (defun clean-string-for-excerpt (the-string)
-      (collecting-string
-        (let ((last-was-white nil))
-          (dotimes (i (length the-string))
-            (if (member (elt the-string i) *whitespace-characters*)
-                (unless last-was-white
-                  (setf last-was-white t)
-                  (collect #\ ))
-                (progn
-                  (setf last-was-white nil)
-                  (collect (elt the-string i))))))))
-
-    (defun calculate-offset (tdat excerpt startloc)
-      (if (not-empty excerpt)
-          (let ((res 0))
-            (dotimes (i startloc)
-              (when (excerpt-here? tdat excerpt i)
-                (incf res)))
-            res)
-          nil))
-
-    (defun get-location-excerpt (tdat start end)
-      (let* ((excerpt (chain tdat text (slice start end)))
-             (excerpt (clean-string-for-excerpt excerpt))
-             (offset (calculate-offset tdat excerpt start)))
-        (list excerpt offset)))
-
-    (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
-      (let ((pos (find-excerpt-position tdat excerpt offset)))
-        (when pos
-          (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
-
-    ;;
-    ;; End opinion-form utilities
-    ;;
-
-
-    ;; Utilities from target.lisp
-    (let ((counter 0))
-      (defun unique-id ()
-        (incf counter)))
-
-    (defun rebreak (text)
-      (chain (collecting
-                 (dolist (string (chain text (split #\linefeed)))
-                   (collect string)
-                   (collect (psx (:br :key (unique-id))))))
-             (slice 0 -1)))
-
     ;;FIXME: votevalue might not remain
     (defun opinion-p (itm)
       (and (not (atom itm))
            (chain itm (has-own-property "votevalue"))))
-
-    (defun %overlap-p (start1 end1 start2 end2)
-      (not (or (> start1 end2) (> start2 end1))))
-
-    ;;Find all the indices where excerpts start or stop.
-    (defun excerpt-segment-points (opset end)
-      "End is the length of the text."
-      (chain
-       (collecting-set
-           (dolist (itm opset)
-             (collect (@ itm text-position 0))
-             (collect (+ (@ itm text-position 0) (@ itm text-position 1))))
-         (collect 0)
-         (collect (1+ end)))
-       (sort (lambda (a b) (- a b)))))
-
-    (defun has-excerpt-p (opin)
-      (chain opin (has-own-property :excerpt)))
-
-    (defun has-found-excerpt-p (opin)
-      (and (has-excerpt-p opin)
-           (not (equal null (@ opin 'text-position 0)))))
-
-    ;; End target.lisp
 
     (defun focus-p (props?)
       (if (and (@ props? focus) (not-empty (@ props? focus)))
@@ -293,6 +134,168 @@
                     (collect (@ opin id)))))))
           (chain -object (keys opinstore))))
 
+    ;;; Excerpt and text tools
+
+    ;; Also in lisp
+    (defun create-textdata (text)
+      (let ((res (create :text text :whitespace (create)))
+            (found nil))
+        (dotimes (i (length text))
+          (when (member (elt text i) *whitespace-characters*)
+            (unless found (setf found i))
+            (dolist (j (range found (1+ i)))
+              (incf (getprop res 'whitespace j)))
+            (setf found nil)))
+        res))
+
+    ;; Also in lisp
+    (defun contiguous-whitespace? (tdat index)
+      (or (getprop tdat 'whitespace index) 0))
+
+    ;; Also in lisp
+    (defun excerpt-here? (tdat excerpt index)
+      (let ((exdat (create-textdata excerpt))
+            (text (@ tdat text)))
+        (loop with tind = index
+              with eind = 0
+              with tlen = (length text)
+              with elen = (length excerpt)
+              do (progn
+                   (when (eq elen eind) (return-from excerpt-here? tind))
+                   (when (eq tlen tind) (return-from excerpt-here? nil))
+                   (let ((ewhite (contiguous-whitespace? exdat eind))
+                         (twhite (contiguous-whitespace? tdat tind)))
+                     (if (and (eq 0 ewhite) (eq 0 twhite)
+                              (eq (elt excerpt eind) (elt text tind)))
+                         (progn (incf tind) (incf eind))
+                         (if (or (eq 0 ewhite) (eq 0 twhite))
+                             (return-from excerpt-here? nil)
+                             (progn (incf tind twhite)
+                                    (incf eind ewhite)))))))))
+
+    ;; Also in lisp
+    (defun find-excerpt-position (tdat excerpt &optional (offset 0))
+      (dotimes (i (length (@ tdat text)))
+        (let ((loc (excerpt-here? tdat excerpt i)))
+          (when loc
+            (if (< 0 offset)
+                (decf offset)
+                (return (list i (- loc i))))))))
+
+    (defun clean-string-for-excerpt (the-string)
+      (collecting-string
+        (let ((last-was-white nil))
+          (dotimes (i (length the-string))
+            (if (member (elt the-string i) *whitespace-characters*)
+                (unless last-was-white
+                  (setf last-was-white t)
+                  (collect #\ ))
+                (progn
+                  (setf last-was-white nil)
+                  (collect (elt the-string i))))))))
+
+    (defun calculate-offset (tdat excerpt startloc)
+      (if (not-empty excerpt)
+          (let ((res 0))
+            (dotimes (i startloc)
+              (when (excerpt-here? tdat excerpt i)
+                (incf res)))
+            res)
+          nil))
+
+    (defun get-location-excerpt (tdat start end)
+      (let* ((excerpt (chain tdat text (slice start end)))
+             (excerpt (clean-string-for-excerpt excerpt))
+             (offset (calculate-offset tdat excerpt start)))
+        (list excerpt offset)))
+
+    (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
+      (let ((pos (find-excerpt-position tdat excerpt offset)))
+        (when pos
+          (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
+
+    (defun rebreak (text)
+      (chain (collecting
+               (dolist (string (chain text (split #\linefeed)))
+                 (collect string)
+                 (collect (psx (:br :key (unique-id))))))
+             (slice 0 -1)))
+
+    (defun %overlap-p (start1 end1 start2 end2)
+      (not (or (> start1 end2) (> start2 end1))))
+
+    ;;Find all the indices where excerpts start or stop.
+    (defun excerpt-segment-points (opset end)
+      "End is the length of the text."
+      (chain
+       (collecting-set
+           (dolist (itm opset)
+             (collect (@ itm text-position 0))
+             (collect (+ (@ itm text-position 0) (@ itm text-position 1))))
+         (collect 0)
+         (collect (1+ end)))
+       (sort (lambda (a b) (- a b)))))
+
+    (defun has-excerpt-p (opin)
+      (chain opin (has-own-property :excerpt)))
+
+    (defun has-found-excerpt-p (opin)
+      (and (has-excerpt-p opin)
+           (not (equal null (@ opin 'text-position 0)))))
+
+    ;;Misc tools
+    (defun filter-opins-score (tree-addresses opinions warstats)
+      (let ((res
+              (collecting
+                (dolist (ta tree-addresses)
+                  (let ((id (list-last ta)))
+                    (when (< 2 (getprop warstats id 'effect))
+                      (collect id)))))))
+        (chain res
+               (sort (lambda (a b) (- (getprop warstats a 'effect)
+                                      (getprop warstats b 'effect)))))
+        res))
+
+    (defun filter-opins-controversial (tree-addresses opinions warstats)
+      (let ((res
+              (collecting
+                (dolist (ta tree-addresses)
+                  (let ((id (list-last ta)))
+                    (when (< 2 (getprop warstats id 'controversy))
+                      (collect id)))))))
+        (chain res
+               (sort (lambda (a b) (- (getprop warstats a 'controversy)
+                                      (getprop warstats b 'controversy)))))
+        res))
+
+    (defun filter-opins-question (tree-addresses opinions warstats)
+      (let ((res
+              (collecting
+                (dolist (ta tree-addresses)
+                  (let* ((id (list-last ta))
+                         (opin (getprop opinions id))
+                         (stats (getprop warstats id)))
+                    (when
+                        ;;FIXME: This is a crude definition of a question. Reconsider
+                        ;; if/when we implement "Accepted" flag. Also if directives
+                        ;; are added.
+                        (or (chain (list "needsEvidence" "raiseQuestion")
+                                   (includes (@ opin flag 1)))
+                            ;; Wrong axis is a stand in for being answered. For now.
+                            (< 1 (@ stats x-wrong 0)))
+                      (collect id)))))))
+        (chain res
+               (sort
+                ;; Have arbitrarily decided to sort by combined controversy and effect
+                (lambda (a b) (- (+ (getprop warstats a 'controversy)
+                                    (getprop warstats a 'effect))
+                                 (+ (getprop warstats b 'controversy)
+                                    (getprop warstats b 'effect))))))
+        res))
+
+    (let ((counter 0))
+      (defun unique-id ()
+        (incf counter)))
 
     ))
 
