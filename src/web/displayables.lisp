@@ -29,18 +29,6 @@
            (when (prop show-count)
              (psx (:reply-count :key 4 :warstats (prop warstats root))))))))
 
-    (defun focus-p (props?)
-      (if (and (@ props? focus) (not-empty (@ props? focus)))
-          (eql (list-last (@ props? tree-address) (list-last (@ props? focus))))
-          t))
-
-    (defun focus-parent-p (props?)
-      (let ((fparent (getprop (chain (@ props? focus) (slice -2)) 0)))
-        (when (eql (list-last (@ props? tree-address) fparent))
-          (getprop (@ props? opinion-store) fparent)))
-      (when
-          (eql (list-last (@ props? tree-address)) fparent)))
-
     (defun popup-side (position)
       (if position
           (if (< (* (chain -math (abs (@ position right))) 2)
@@ -48,29 +36,6 @@
               "right"
               "left")
           "left"))
-
-    (defun immediate-children-ids (id opinstore)
-      (if id
-          (let ((len (@ (getprop opinstore id) 'tree-address length)))
-            (collecting
-                (dolist (itm (all-descendant-ids id opinstore))
-                  (when (eq (1+ len) (@ (getprop opinstore itm) 'tree-address length))
-                    (collect itm)))))
-          (collecting
-              (do-keyvalue (k opin opinstore)
-                (when (eq 1 (@ opin 'tree-address length))
-                  (collect (@ opin id)))))))
-
-    (defun all-descendant-ids (id opinstore)
-      (if id
-          (let* ((trad (@ (getprop opinstore id) 'tree-address))
-                 (len (@ trad length)))
-            (collecting
-                (do-keyvalue (k opin opinstore)
-                  (when (< len (@ opin 'tree-address length))
-                    (when (array-equal trad (chain (@ opin 'tree-address) (slice 0 len)))
-                      (collect (@ opin id)))))))
-          (chain -object (keys opinstore))))
 
     (defun %find-parent-hilited (element)
       (if element
