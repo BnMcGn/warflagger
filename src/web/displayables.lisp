@@ -159,6 +159,7 @@
                               :focusfunc (@ props focusfunc)
                               :looks (@ props looks)
                               :warstats (@ props warstats)
+                              :references (@ props references)
                               'opinion-store (@ props opinion-store)
                               'hilited-text-id (@ props hilited-text-id)
                               'root-target-url (@ props root-target-url)
@@ -260,7 +261,7 @@
 ;;; Opinion-info is used in popups and sub-opinion-list. Not meant to be a complete view of opinion.
     (def-component opinion-info
         (let* ((opinion (prop opinion))
-               (reference (when (and (prop references)
+               (refdat (when (and (prop references)
                                      (chain (prop references)
                                             (has-own-property (prop opinion id))))
                             (getprop (prop references) (prop opinion id)))))
@@ -280,12 +281,12 @@
                   (:div
                    :key 12
                    :class "opinion-extras"
-                   (when reference
+                   (when refdat
                      (psx (:reference
                            :key 10
-                           :... (prop reference)
-                          :styling-data
-                          (format-reference-styling-data reference))))))))))
+                           :... refdat
+                           :styling-data
+                           (format-reference-styling-data refdat))))))))))
 
     (def-component excerptless-opinions
         (let* ((ta-len (when (prop tree-address) (@ (prop tree-address) length)))

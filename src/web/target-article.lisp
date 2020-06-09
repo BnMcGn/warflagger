@@ -28,6 +28,7 @@
            :tree-address (list)
            :warstats (prop warstats)
            :opinion-store (prop opinion-store)
+           :references (prop references)
            :dispatch (@ this dispatch)
            :looks (prop looks)
            :look-handler (prop look-handler))
