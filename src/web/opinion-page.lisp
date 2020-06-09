@@ -1,7 +1,5 @@
 (in-package :wf/web)
 
-(defparameter *grandchild-shift* 15)
-
 (define-ps-lib opinion-page ()
   (ps
 

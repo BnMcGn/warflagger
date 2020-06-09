@@ -5,7 +5,7 @@
   ;;FIXME: Need better way to include:
   :@css-link "/static/css/react-tabs.css")
 
-;; Depends on titlebar-components target-article target-thread target-summary
+;; Depends on titlebar-components displayables target-article target-thread target-summary
 
 (define-ps-lib target-components ()
   (ps
@@ -15,67 +15,6 @@
     (setf tab (@ -react-tabs -tab))
     (setf tab-list (@ -react-tabs -tab-list))
     (setf tab-panel (@ -react-tabs -tab-panel))
-
-    (let ((counter 0))
-      (defun unique-id ()
-        (incf counter)))
-
-    (defun rebreak (text)
-      (chain (collecting
-                 (dolist (string (chain text (split #\linefeed)))
-                   (collect string)
-                   (collect (psx (:br :key (unique-id))))))
-             (slice 0 -1)))
-
-    (defun opinion-p (itm)
-      (and (not (atom itm))
-           (chain itm (has-own-property "votevalue"))))
-
-    (defun %overlap-p (start1 end1 start2 end2)
-      (not (or (> start1 end2) (> start2 end1))))
-
-    ;;Find all the indices where excerpts start or stop.
-    (defun excerpt-segment-points (opset end)
-      "End is the length of the text."
-      (chain
-       (collecting-set
-           (dolist (itm opset)
-             (collect (@ itm text-position 0))
-             (collect (+ (@ itm text-position 0) (@ itm text-position 1))))
-         (collect 0)
-         (collect (1+ end)))
-       (sort (lambda (a b) (- a b)))))
-
-    (defun has-excerpt-p (opin)
-      (chain opin (has-own-property :excerpt)))
-
-    (defun has-found-excerpt-p (opin)
-      (and (has-excerpt-p opin)
-           (not (equal null (@ opin 'text-position 0)))))
-
-    ;;FIXME: Overall use of url, external-link, warflagger-link is inconsistent.
-    (def-component target-title
-        (psx
-         (:div
-          :... (format-styling-data (@ this props))
-          (:h3
-           :class (strcat (flavor-from-own-warstats (prop warstats root))
-                          "-old target-title")
-           (or (prop intro-text) "Target Page: ")
-           (:headline :key 1
-                      :title (prop title)
-                      :url (prop warflagger-link)
-                      :external-link (prop url))
-           (:display-warstats2 :key 2)
-           (prop children)
-           (unless (prop hide-reply)
-             (psx (:reply-link
-                   :key 3
-                   :url (prop url)
-                   :excerpt (prop reply-excerpt)
-                   :offset (prop reply-offset))))
-           (when (prop show-count)
-             (psx (:reply-count :key 4 :warstats (prop warstats root))))))))
 
     ;;FIXME: Url should remember tab settings. Also remember user's pref in session
     (def-component target-tabs
@@ -130,6 +69,22 @@
       (lambda ()
         (when (prop username)
           (json-post-bind (res "/look-post/" (create :root (prop rootid)))))))
+
+    (defun sort-compare-opinions (opa opb)
+      ;;FIXME: Special treatment of missing excerpt opinions?
+      (let ((posa (and (chain opa (has-own-property 'text-position))
+                       (< 0 (@ opa 'text-position length))
+                       (@ opa 'text-position 0)))
+            (posb (and (chain opb (has-own-property 'text-position))
+                       (< 0 (@ opb 'text-position length))
+                       (@ opb 'text-position 0))))
+        (if posa
+            (if posb
+                (- posa posb)
+                1) ;;Excerptless comes first
+            (if posb
+                -1 ;; Ditto
+                (- (@ opa datestamp) (@ opb datestamp))))))
 
     (defun %reformat-opinions (opins)
       (let* ((opinstore (create))

@@ -5,40 +5,6 @@
 (define-ps-lib target-summary ()
   (ps
 
-    ;;FIXME: relocate
-    (def-component opinion-summary
-        (let* ((opinion (@ (prop opinion-store)
-                          (if (prop opid)
-                              (prop opid)
-                              (list-last (prop tree-address)))))
-               ;; FIXME: Can have multiple copies of opinion on same page. Shouldn't use id!
-               (id (strcat "opinion-summary-" (@ opinion id))))
-          (psx
-           (:div
-            :id id
-            :... (or (prop styling-data)
-                     (format-styling-data (set-copy (@ this props) :opinion opinion)))
-            :class "opinion-summary"
-            (if (prop opid)
-                (psx (:opinion-icon :key 1 :opinion opinion
-                                   :look-handler (prop look-handler)))
-                (psx (:display-tree-address :key 1 :tree-address (prop tree-address)
-                                            :opinion-store (prop opinion-store)
-                                            :warstats (prop warstats)
-                                            :looks (prop looks)
-                                            :look-handler (prop look-handler))))
-            (:flag-name :key 2 :opinion opinion) " "
-            (:date-stamp :key 3 :opinion opinion) " "
-            (:author-long :key 4 :opinion opinion) " "
-            (:display-warstats2 :key 5)
-            (:reply-link :key 6 :url (@ opinion url)))))
-      component-did-catch
-      (lambda (err err-info)
-        (say "Something missing in opinion-summary")
-        (say (@ this props))
-        (say err)
-        (say err-info)))
-
     (defun %format-referenced (refs)
       (let ((res (create)))
         (dolist (r refs)

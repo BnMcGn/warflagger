@@ -135,86 +135,128 @@
     ;;
 
     ;;FIXME: Duplicate of lisp functions in excerpt.lisp
-      ;;Would be nice to only implement once.
-      (defun create-textdata (text)
-        (let ((res (create :text text :whitespace (create)))
-              (found nil))
-          (dotimes (i (length text))
-            (when (member (elt text i) *whitespace-characters*)
-              (unless found (setf found i))
-              (dolist (j (range found (1+ i)))
-                (incf (getprop res 'whitespace j)))
-              (setf found nil)))
-          res))
+    ;;Would be nice to only implement once.
+    (defun create-textdata (text)
+      (let ((res (create :text text :whitespace (create)))
+            (found nil))
+        (dotimes (i (length text))
+          (when (member (elt text i) *whitespace-characters*)
+            (unless found (setf found i))
+            (dolist (j (range found (1+ i)))
+              (incf (getprop res 'whitespace j)))
+            (setf found nil)))
+        res))
 
-      (defun contiguous-whitespace? (tdat index)
-        (or (getprop tdat 'whitespace index) 0))
+    (defun contiguous-whitespace? (tdat index)
+      (or (getprop tdat 'whitespace index) 0))
 
-      (defun excerpt-here? (tdat excerpt index)
-        (let ((exdat (create-textdata excerpt))
-              (text (@ tdat text)))
-          (loop with tind = index
-             with eind = 0
-             with tlen = (length text)
-             with elen = (length excerpt)
-             do (progn
-                  (when (eq elen eind) (return-from excerpt-here? tind))
-                  (when (eq tlen tind) (return-from excerpt-here? nil))
-                  (let ((ewhite (contiguous-whitespace? exdat eind))
-                        (twhite (contiguous-whitespace? tdat tind)))
-                    (if (and (eq 0 ewhite) (eq 0 twhite)
-                             (eq (elt excerpt eind) (elt text tind)))
-                        (progn (incf tind) (incf eind))
-                        (if (or (eq 0 ewhite) (eq 0 twhite))
-                            (return-from excerpt-here? nil)
-                            (progn (incf tind twhite)
-                                   (incf eind ewhite)))))))))
+    (defun excerpt-here? (tdat excerpt index)
+      (let ((exdat (create-textdata excerpt))
+            (text (@ tdat text)))
+        (loop with tind = index
+              with eind = 0
+              with tlen = (length text)
+              with elen = (length excerpt)
+              do (progn
+                   (when (eq elen eind) (return-from excerpt-here? tind))
+                   (when (eq tlen tind) (return-from excerpt-here? nil))
+                   (let ((ewhite (contiguous-whitespace? exdat eind))
+                         (twhite (contiguous-whitespace? tdat tind)))
+                     (if (and (eq 0 ewhite) (eq 0 twhite)
+                              (eq (elt excerpt eind) (elt text tind)))
+                         (progn (incf tind) (incf eind))
+                         (if (or (eq 0 ewhite) (eq 0 twhite))
+                             (return-from excerpt-here? nil)
+                             (progn (incf tind twhite)
+                                    (incf eind ewhite)))))))))
 
-      (defun find-excerpt-position (tdat excerpt &optional (offset 0))
-        (dotimes (i (length (@ tdat text)))
-          (let ((loc (excerpt-here? tdat excerpt i)))
-            (when loc
-              (if (< 0 offset)
-                  (decf offset)
-                  (return (list i (- loc i))))))))
+    (defun find-excerpt-position (tdat excerpt &optional (offset 0))
+      (dotimes (i (length (@ tdat text)))
+        (let ((loc (excerpt-here? tdat excerpt i)))
+          (when loc
+            (if (< 0 offset)
+                (decf offset)
+                (return (list i (- loc i))))))))
 
-      ;;End of duplicate functions
+    ;;End of duplicate functions
 
-      (defun clean-string-for-excerpt (the-string)
-        (collecting-string
-          (let ((last-was-white nil))
-            (dotimes (i (length the-string))
-              (if (member (elt the-string i) *whitespace-characters*)
-                  (unless last-was-white
-                    (setf last-was-white t)
-                    (collect #\ ))
-                  (progn
-                    (setf last-was-white nil)
-                    (collect (elt the-string i))))))))
+    (defun clean-string-for-excerpt (the-string)
+      (collecting-string
+        (let ((last-was-white nil))
+          (dotimes (i (length the-string))
+            (if (member (elt the-string i) *whitespace-characters*)
+                (unless last-was-white
+                  (setf last-was-white t)
+                  (collect #\ ))
+                (progn
+                  (setf last-was-white nil)
+                  (collect (elt the-string i))))))))
 
-      (defun calculate-offset (tdat excerpt startloc)
-        (if (not-empty excerpt)
-            (let ((res 0))
-              (dotimes (i startloc)
-                (when (excerpt-here? tdat excerpt i)
-                  (incf res)))
-              res)
-            nil))
+    (defun calculate-offset (tdat excerpt startloc)
+      (if (not-empty excerpt)
+          (let ((res 0))
+            (dotimes (i startloc)
+              (when (excerpt-here? tdat excerpt i)
+                (incf res)))
+            res)
+          nil))
 
-      (defun get-location-excerpt (tdat start end)
-        (let* ((excerpt (chain tdat text (slice start end)))
-               (excerpt (clean-string-for-excerpt excerpt))
-               (offset (calculate-offset tdat excerpt start)))
-          (list excerpt offset)))
+    (defun get-location-excerpt (tdat start end)
+      (let* ((excerpt (chain tdat text (slice start end)))
+             (excerpt (clean-string-for-excerpt excerpt))
+             (offset (calculate-offset tdat excerpt start)))
+        (list excerpt offset)))
 
-      (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
-        (let ((pos (find-excerpt-position tdat excerpt offset)))
-          (when pos
-            (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
+    (defun find-excerpt-start/end (tdat excerpt &optional (offset 0))
+      (let ((pos (find-excerpt-position tdat excerpt offset)))
+        (when pos
+          (list (elt pos 0) (+ (elt pos 0) (elt pos 1))))))
 
-      ;;
-      ;; End opinion-form utilities
-      ;;
+    ;;
+    ;; End opinion-form utilities
+    ;;
+
+
+    ;; Utilities from target.lisp
+    (let ((counter 0))
+      (defun unique-id ()
+        (incf counter)))
+
+    (defun rebreak (text)
+      (chain (collecting
+                 (dolist (string (chain text (split #\linefeed)))
+                   (collect string)
+                   (collect (psx (:br :key (unique-id))))))
+             (slice 0 -1)))
+
+    (defun opinion-p (itm)
+      (and (not (atom itm))
+           (chain itm (has-own-property "votevalue"))))
+
+    (defun %overlap-p (start1 end1 start2 end2)
+      (not (or (> start1 end2) (> start2 end1))))
+
+    ;;Find all the indices where excerpts start or stop.
+    (defun excerpt-segment-points (opset end)
+      "End is the length of the text."
+      (chain
+       (collecting-set
+           (dolist (itm opset)
+             (collect (@ itm text-position 0))
+             (collect (+ (@ itm text-position 0) (@ itm text-position 1))))
+         (collect 0)
+         (collect (1+ end)))
+       (sort (lambda (a b) (- a b)))))
+
+    (defun has-excerpt-p (opin)
+      (chain opin (has-own-property :excerpt)))
+
+    (defun has-found-excerpt-p (opin)
+      (and (has-excerpt-p opin)
+           (not (equal null (@ opin 'text-position 0)))))
+
+
+
 
     ))
 

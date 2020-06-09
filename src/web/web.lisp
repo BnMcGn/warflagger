@@ -17,8 +17,9 @@
    'ps-react-gadgets:ps-react-gadgets
    'webhax-ask
    'wf-web-library
-   'opinion-components
    'mood-lib
+   'displayables
+   'opinion-components
    'grouped-components
    'titlebar-components
    'target-article

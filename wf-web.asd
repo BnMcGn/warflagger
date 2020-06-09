@@ -30,6 +30,7 @@
                               (:file "web/things")
                               (:file "web/mood")
                               (:file "web/titlebar")
+                              (:file "web/displayables")
                               (:file "web/target-article")
                               (:file "web/target-thread")
                               (:file "web/target-summary")
