@@ -260,33 +260,41 @@
 
 ;;; Opinion-info is used in popups and sub-opinion-list. Not meant to be a complete view of opinion.
     (def-component opinion-info
-        (let* ((opinion (prop opinion))
+      (let* ((opinion (prop opinion))
                (refdat (when (and (prop references)
                                      (chain (prop references)
                                             (has-own-property (prop opinion id))))
-                            (getprop (prop references) (prop opinion id)))))
-          (psx
-           (:div
-            :... (format-styling-data (@ this props))
-            :on-click (lambda ()
-                        (setf (@ window location) (make-opinionid-url (@ opinion id))))
-            (:opinion-icon :key 1 :opinion opinion) " "
-            (:flag-name :key 2 :opinion opinion) " "
-            (:date-stamp :key 3 :opinion opinion) " "
-            (:author-long :key 4 :opinion opinion) " "
-            (:display-warstats2 :key 5)
-            (:div :key 9 :class "opinion-comment-wrapper"
-                  (when (@ opinion comment)
-                    (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
-                  (:div
-                   :key 12
-                   :class "opinion-extras"
-                   (when refdat
-                     (psx (:reference
-                           :key 10
-                           :... refdat
-                           :styling-data
-                           (format-reference-styling-data refdat))))))))))
+                         (getprop (prop references) (prop opinion id)))))
+        (psx
+         (:div
+          :style (create :display "grid" grid-template-columns "30px auto")
+          :... (format-styling-data (@ this props))
+          :on-click (lambda ()
+                      (setf (@ window location) (make-opinionid-url (@ opinion id))))
+          (:opinion-icon :key 1 :opinion opinion)
+          (:div
+           :key 2
+           :style (create :display "grid"
+                          align-items "center"
+                          grid-template-columns "auto auto auto auto auto"
+                          :border "solid 2px black")
+           (:flag-name :key 2 :opinion opinion)
+           (:date-stamp :key 3 :opinion opinion)
+           (:author-long :key 4 :opinion opinion)
+           (:display-warstats2 :key 5)
+           (:div :key 6 :class "opinion-comment-wrapper"
+                 :style (create grid-column-start 1 grid-column-end 5)
+                 (when (@ opinion comment)
+                   (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
+                 (:div
+                  :key 12
+                  :class "opinion-extras"
+                  (when refdat
+                    (psx (:reference
+                          :key 10
+                          :... refdat
+                          :styling-data
+                          (format-reference-styling-data refdat)))))))))))
 
     (def-component excerptless-opinions
         (let* ((ta-len (when (prop tree-address) (@ (prop tree-address) length)))
