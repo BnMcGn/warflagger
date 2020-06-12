@@ -277,13 +277,15 @@
            :style (create :display "grid"
                           align-items "center"
                           grid-template-columns "auto auto auto auto auto"
-                          :border "solid 2px black")
+                          grid-template-rows "1.8em"
+                          column-gap "0.5em"
+                          :border "solid 3px black")
            (:flag-name :key 2 :opinion opinion)
            (:date-stamp :key 3 :opinion opinion)
            (:author-long :key 4 :opinion opinion)
            (:display-warstats2 :key 5)
            (:div :key 6 :class "opinion-comment-wrapper"
-                 :style (create grid-column-start 1 grid-column-end 5)
+                 :style (create grid-column-start 1 grid-column-end 6)
                  (when (@ opinion comment)
                    (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
                  (:div
@@ -293,6 +295,7 @@
                     (psx (:reference
                           :key 10
                           :... refdat
+                          :minify t
                           :styling-data
                           (format-reference-styling-data refdat)))))))))))
 
@@ -411,6 +414,8 @@
           (unless styling
             (setf styling (create :data-replies-total 0))
             (format-looks-data styling :root (prop looks)))
+          (when (prop minify)
+            (setf (@ styling :data-reference-minify) t))
           (psx
            (:div
             :class "reference"
@@ -420,8 +425,9 @@
              :title (prop headline title)
              :domain (prop reference-domain)
              :url (prop warflagger-link)
-             :external-link (when (not (equal (prop reference) (prop warflagger-link)))
-                              (prop reference))
+             :external-link (unless (prop minify)
+                              (when (not (equal (prop reference) (prop warflagger-link)))
+                                (prop reference)))
              (:display-warstats2))))))
 
     (def-component question
