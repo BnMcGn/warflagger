@@ -287,7 +287,7 @@
            (:div :key 6 :class "opinion-comment-wrapper"
                  :style (create grid-column-start 1 grid-column-end 6)
                  (when (@ opinion comment)
-                   (psx (:div :key 8 :class "opinion-comment" (@ opinion comment))))
+                   (psx (:div :key 8 :class "opinion-comment" (rebreak (@ opinion comment)))))
                  (:div
                   :key 12
                   :class "opinion-extras"
