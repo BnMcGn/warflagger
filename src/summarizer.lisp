@@ -155,7 +155,8 @@
 
 (defun question-opinion-p (opinid)
   (member (grab-one (liql opinid 'opinion 'opinion.flag))
-          '("Negative RaiseQuestion" "Negative NeedsReference")))
+          '("Negative RaiseQuestion" "Negative NeedsEvidence")
+          :test #'equal))
 
 (defun question-list-for-rooturl (rooturl warstats)
   (collecting
@@ -165,14 +166,14 @@
                    (when (question-opinion-p (car node))
                      (let ((opin (opinion-by-id (car node))))
                        (collect
-                         (hu:plist->hash
-                          (list
-                           :tree-address (nreverse (cons (car node) location))
-                           :questopinid (assoc-cdr :id opin)
-                           :questopinurl (assoc-cdr :url opin)
-                           :warstats (gethash (car node) warstats)))))))
-                   (when (cdr tree)
-                     (proc (cdr tree) (cons (car tree) location)))))
+                           (hu:plist->hash
+                            (list
+                             :tree-address (reverse (cons (car node) location))
+                             :questopinid (assoc-cdr :id opin)
+                             :questopinurl (assoc-cdr :url opin)
+                             :warstats (gethash (car node) warstats))))))
+                   (when (cdr node)
+                     (proc (cdr node) (cons (car node) location))))))
         (proc tree nil)))))
 
 (defun %prep-for-json (warstats)
