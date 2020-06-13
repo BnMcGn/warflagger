@@ -7,6 +7,7 @@
 
 (defparameter *re-head-punctuation* "\"'{(>")
 (defparameter *re-tail-punctuation* "\"'.,;)}")
+;;FIXME: That domain list looks too short...
 (defparameter *re-url-domains* '("com" "net" "org" "edu" "de" "uk"))
 (defparameter *re-url-head*
   (format nil "[~a|\\[|\\s]" (string-join #\| (sequence->list *re-head-punctuation*))))

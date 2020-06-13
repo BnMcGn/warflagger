@@ -61,8 +61,6 @@
    #:make-warstats-url
    #:write-all-rootid-warstats
    #:*direction-colors*
-   #:create-badges-for-rootid
-   #:redraw-all-badges
    #:write-all-warstats
    #:make-opinion-url
    #:make-rootid-url

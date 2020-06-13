@@ -95,8 +95,6 @@
           (let* ((newid (save-opinion-from-user (hu:hash->alist values) aid))
                  (savedopin (opinion-by-id newid)))
             ;;FIXME: Should be done in separate thread to reduce delay for user
-            ;;FIXME: this will shortly be obsolete. Done by write-all-rootid-warstats
-            (create-badges-for-rootid (assoc-cdr :rooturl savedopin))
             ;;Generate references
             (save-new-references (assoc-cdr :url savedopin))
             (write-all-rootid-warstats (assoc-cdr :rooturl savedopin)))))
