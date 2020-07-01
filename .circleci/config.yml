@@ -50,7 +50,7 @@ jobs:
             pip install --user PyPDF2
             pip install --user readability-lxml
 
-      - run: sudo apt upgrade
+      - run: sudo apt update
       - run: sudo apt install -y postgresql-client || true
       - run: sudo apt install libpq-dev
 
