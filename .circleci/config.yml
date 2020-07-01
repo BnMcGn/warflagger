@@ -33,6 +33,7 @@ jobs:
             git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
             git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
             git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
+            git clone https://github.com/bnmcgn/proto.git quicklisp/local-projects/proto
             git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
             git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
             git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
@@ -49,6 +50,7 @@ jobs:
             pip install --user PyPDF2
             pip install --user readability-lxml
 
+      - run: sudo apt upgrade
       - run: sudo apt install -y postgresql-client || true
       - run: sudo apt install libpq-dev
 
