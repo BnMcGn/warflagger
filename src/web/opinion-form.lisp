@@ -1,13 +1,13 @@
 (in-package #:wf/web)
 
 (defun format-flags ()
-  (gadgets:collecting
-      (gadgets:collect (list nil "--Choose a Flag--"))
+  (cl-utilities:collecting
+      (cl-utilities:collect (list nil "--Choose a Flag--"))
     (loop for cat in *flag-categories*
        for flags in *flag-labels*
        do (dolist (flag flags)
             (let ((flagstring (format nil "~a: ~a" cat flag)))
-              (gadgets:collect (list flagstring flagstring)))))))
+              (cl-utilities:collect (list flagstring flagstring)))))))
 
 (defun format-flag-descriptions ()
   (cl-hash-util:collecting-hash-table (:mode :replace)
@@ -38,7 +38,7 @@
      :reference (:url :description "Reference URL")
      :comment (:string :widget :textentry))))
 
-(watch-for-recompile
+(proto:watch-for-recompile
   (defun opinion-form-page ()
     (check-signed-up)
     (bind-validated-input
@@ -75,7 +75,7 @@
    ;;:homepage (make-user-url (get-display-name))
    ))
 
-(watch-for-recompile
+(proto:watch-for-recompile
   (defun opinion-post-response ()
     (check-signed-up)
     (multiple-value-bind (values sig)

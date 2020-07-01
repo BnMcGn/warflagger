@@ -13,6 +13,7 @@
                #:cl-who
                #:cl-json
                #:anaphora
+               #:kebab
                #:cl-fad
                #:external-program
                #:cl-postgres

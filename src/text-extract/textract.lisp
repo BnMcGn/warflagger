@@ -124,17 +124,17 @@
 
 (defun read-index-file (fname)
   (let ((data
-          (multiple-value-apply
-           #'pairlis
-           (with-collectors (url< num<)
-             (do-file-by-line (line fname)
-               (destructuring-bind (num url) (split-sequence #\space line)
-                 (num< (parse-integer num))
-                 (url< (string-trim '(#\space #\newline) url))))))))
+          (multiple-value-bind (urls nums)
+              (cl-utilities:with-collectors (url< num<)
+                (do-file-by-line (line fname)
+                  (destructuring-bind (num url) (cl-utilities:split-sequence #\space line)
+                    (num< (parse-integer num))
+                    (url< (string-trim '(#\space #\newline) url)))))
+            (pairlis urls nums))))
     (values
-     (collecting-hash-table (:mode :append)
+     (hu:collecting-hash-table (:mode :append)
        (mapc (lambda (x)
-               (collect (cdr x) (car x)))
+               (hu:collect (cdr x) (car x)))
              data))
      (alist-hash-table data :test #'equal))))
 
@@ -180,14 +180,15 @@
   (ratify:url-p url))
 
 (defun get-url-index (url)
-  (aif2 (gethash url *byurl*)
-        it
+  (multiple-value-bind (val sig) (gethash url *byurl*)
+    (if (and val sig)
+        val
         (let ((newkey (new-index)))
           ;;FIXME: No check to see if loc is used. Either avoid or erase.
           (setf (gethash newkey *bynum*) (list url))
           (setf (gethash url *byurl*) newkey)
           (write-index-file (index-file-name) *bynum*)
-          newkey)))
+          newkey))))
 
 (defun save-page-to-cache (url &optional filename)
   (let ((index (get-url-index url)))

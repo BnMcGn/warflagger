@@ -142,7 +142,7 @@
                 k (list
                    (list*
                     k (and (car v)
-                           (mapleaves
+                           (proto:mapleaves
                             (lambda (x)
                               (warflagger::reference-end-result
                                (assoc-cdr :reference (opinion-by-id x))))

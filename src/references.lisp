@@ -125,20 +125,20 @@
 
 (defun find-new-references (url)
   (let ((existing
-          (collecting-hash-table (:test #'equal)
+          (hu:collecting-hash-table (:test #'equal)
             (dolist (opid (get-references-from url))
               (let ((ref (%format-reference opid)))
-                (collect (car ref) ref)))))
+                (hu:collect (car ref) ref)))))
         (stor (make-hash-table :test #'equal)))
     (flatten-1
      (nreverse
       (hash-table-values
-       (collecting-hash-table (:existing stor)
+       (hu:collecting-hash-table (:existing stor)
          (dolist (ref (extract-links-from-target url))
            (unless (find-if (rcurry #'reference-redundant-p ref)
-                            (cat (gethash (car ref) existing)
-                                 (gethash (car ref) stor)))
-             (collect (car ref) ref)))))))))
+                            (append (gethash (car ref) existing)
+                                    (gethash (car ref) stor)))
+             (hu:collect (car ref) ref)))))))))
 
 (defun save-new-references (url)
   (loop for (link excerpt) in (find-new-references url)
@@ -187,21 +187,21 @@
       (when-let*
           ((opin (opinion-by-id refid))
            (rootid (assoc-cdr :rooturl opin)))
-        (collect rootid)))))
+        (set< rootid)))))
 
 (defun get-reference-opinions-under-rooturl (url)
   "Returns all of the reference opinions in the discussion tree under url, including references made in the root article itself."
   (let ((ids
          (collecting-set ()
            (dolist (id (flatten (opinion-tree-for-target url)))
-             (collect id))
+             (set< id))
            (dolist (id (get-references-from url))
-             (collect id)))))
-    (collecting
+             (set< id)))))
+    (cl-utilities:collecting
         (dolist (id ids)
           (let ((opin (opinion-by-id id)))
             (when (assoc-cdr :reference opin)
-              (collect opin)))))))
+              (cl-utilities:collect opin)))))))
 
 (defun reference-end-result (refurl)
   (if (rooturl-p refurl)
@@ -222,7 +222,7 @@
     (setf (gethash discroot found) t)
     (labels ((proc (curr)
                (when (integerp curr)
-                 (collecting
+                 (cl-utilities:collecting
                      (loop for opin in (get-reference-opinions-under-rooturl
                                         (get-rooturl-by-id curr))
                         for id = (reference-end-result (assoc-cdr :reference opin))
@@ -232,7 +232,7 @@
                                (setf (gethash id found) t)
                                (when (integerp id)
                                  (push id rootids))
-                               (collect
+                               (cl-utilities:collect
                                    (if (member id discroots)
                                        (progn (push id otherdisc)
                                               (list rid))
@@ -253,9 +253,9 @@
          (rootids (mapcar #'get-rooturl-id rooturls))
          (discroots (remove-if-not #'discussion-root-p rootids)))
     (sort-discussions
-     (collecting
+     (cl-utilities:collecting
          (dolist (dr discroots)
-           (collect
+           (cl-utilities:collect
                (cons dr
                      (multiple-value-list
                       (discussion-tree-for-root dr discroots)))))))))

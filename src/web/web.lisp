@@ -116,7 +116,7 @@
 
 (defvar *app* (make-instance 'ningle:<app>))
 
-(dependency-auto-watcher routes
+(proto:dependency-auto-watcher routes
   (setf (ningle:route *app* "/text-server/")
         (lambda (params)
           (let ((url (cdr (assoc "url" params :test #'string=))))

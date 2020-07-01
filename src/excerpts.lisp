@@ -31,7 +31,7 @@
   (nreverse
    (apply #'pairlis
           (multiple-value-list
-           (with-collectors (offsets< lengths<)
+           (cl-utilities:with-collectors (offsets< lengths<)
              (dotimes (i (length text))
                (when (eq (elt excerpt 0) (elt text i))
                  (awhen (%is-whitespaceless-match text excerpt i)
@@ -56,21 +56,21 @@
   (ret data (make-tdat)
     (setf (tdat-text data) text)
     (setf (tdat-whitespace data)
-          (collecting-hash-table (:mode :tally)
+          (hu:collecting-hash-table (:mode :tally)
               (let ((found nil))
                 (dotimes (i (length text))
                   (if (member (elt text i) *whitespace-characters*)
                       (progn
                         (unless found (setf found i))
                         (dolist (j (range found (1+ i)))
-                          (collect j t)))
+                          (hu:collect j t)))
                       (setf found nil))))))))
 
 (defun contiguous-whitespace? (tdat index)
   (gethash index (tdat-whitespace tdat) 0))
 
 (defun excerpt-here? (tdat excerpt index)
-  (declare (inline contiguous-whitespace?)) 
+  (declare (inline contiguous-whitespace?))
   (let ((exdat (create-textdata excerpt))
         (text (tdat-text tdat)))
     (loop with tind = index

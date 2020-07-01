@@ -117,7 +117,7 @@
 (defun get-headline-for-url (url)
   (multiple-value-bind (id type) (get-target-id-from-url url)
     (declare (ignore id))
-    (collecting-hash-table (:mode :replace)
+    (hu:collecting-hash-table (:mode :replace)
       (cond
         ((eq type :opinion)
          ;;FIXME: Could make default title from start of comment
@@ -131,7 +131,7 @@
         (t nil)))))
 
 (defun reference-list-for-rooturl (rooturl)
-  (collecting-hash-table (:mode :replace)
+  (hu:collecting-hash-table (:mode :replace)
     (dolist (id (opinion-ids-for-rooturl rooturl))
       (when (grab-column (liql id 'reference.opinion))
         (let* ((refopin (opinion-by-id id))
@@ -159,13 +159,13 @@
           :test #'equal))
 
 (defun question-list-for-rooturl (rooturl warstats)
-  (collecting
+  (cl-utilities:collecting
     (let ((tree (opinion-tree-for-rooturl rooturl)))
       (labels ((proc (tree location)
                  (dolist (node tree)
                    (when (question-opinion-p (car node))
                      (let ((opin (opinion-by-id (car node))))
-                       (collect
+                       (cl-utilities:collect
                            (hu:plist->hash
                             (list
                              :tree-address (reverse (cons (car node) location))
@@ -177,7 +177,7 @@
         (proc tree nil)))))
 
 (defun %prep-for-json (warstats)
-  (collecting-hash-table (:mode :replace)
+  (hu:collecting-hash-table (:mode :replace)
     (gadgets:do-hash-table (k v warstats)
       (hu:collect k (hu:plist->hash v)))))
 
@@ -210,7 +210,7 @@
                  (grab-text url)))
          (references (reference-list-for-rooturl url))
          (url-keyed-references
-          (collecting-hash-table (:mode :replace :test #'equal)
+          (hu:collecting-hash-table (:mode :replace :test #'equal)
             (dolist (ref (hash-table-values references))
               (hu:collect (gethash :reference ref) ref))))
          (warstats

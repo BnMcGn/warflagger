@@ -24,7 +24,7 @@
 
 (defun opinion-tree-for-rooturl (rurl)
   ;;FIXME: fails to check for loops and dead trees.
-  (tree-by-feature
+  (proto:tree-by-feature
    (merge-query
     (opinion-ids-for-rooturl rurl)
     (select (colm 'opinion 'target)
@@ -37,7 +37,7 @@
 (defun opinion-tree-for-target (turl)
   (if (rooturl-p turl)
       (opinion-tree-for-rooturl turl)
-      (tree-by-feature
+      (proto:tree-by-feature
        (merge-query
         (opinion-ids-for-rooturl (get-rooturl-for-url turl))
         (select (colm 'opinion 'target)
@@ -134,13 +134,13 @@
     (values nil nil)))
 
 (defun get-rooturl-id (rurl)
-  (aif (get-assoc-by-col (colm 'rooturl 'rooturl) rurl)
-       (assoc-cdr :id it)
+  (if-let ((rec (get-assoc-by-col (colm 'rooturl 'rooturl) rurl)))
+       (assoc-cdr :id rec)
        (error "Root url not found")))
 
 (defun get-rooturl-by-id (rootid)
-  (aif (get-assoc-by-pkey 'rooturl rootid)
-       (assoc-cdr :rooturl it)
+  (if-let ((rec (get-assoc-by-pkey 'rooturl rootid)))
+       (assoc-cdr :rooturl rec)
        (error "Rooturl ID not found")))
 
 ;;;FIXME: Each opinion should record its rooturl. Needs access to targetted opinion, therefore.
@@ -162,14 +162,14 @@ the page text can be found in the cache."
 
 (defun find/store-root-url (rurl)
   (let ((rootid
-         (block top
-           (awhen2 (tryit (get-rooturl-id rurl))
-             (return-from top it))
-           (awhen (get-rooturl-for-url rurl)
-             (return-from top (get-rooturl-id it)))
-           (insert-record
-            'rooturl
-            `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false))))))
+          (block top
+            (multiple-value-bind (val sig) (tryit (get-rooturl-id rurl))
+              (when sig (return-from top val)))
+            (when-let ((val (get-rooturl-for-url rurl)))
+              (return-from top (get-rooturl-id val)))
+            (insert-record
+             'rooturl
+             `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false))))))
     (make-rooturl-real rootid) ;worth a try: might have been fetched by opinion page.
     rootid))
 
@@ -183,21 +183,21 @@ the page text can be found in the cache."
 
 (defun get-excerpt-data (eid)
   (map-tuples
-   (compose #'keywordize-foreign (curry #'assoc-cdr :type))
+   (compose #'proto:keywordize-foreign (curry #'assoc-cdr :type))
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'excerpt 'opinion) eid))))
 
 (defun flag-to-lisp (dbflag)
   (mapcar (compose #'make-keyword #'string-upcase #'to-lisp-case)
-          (split-sequence #\  dbflag)))
+          (cl-utilities:split-sequence #\  dbflag)))
 
 (defun flag-to-db (lispflag)
   (apply #'format nil "~a ~a"
          (mapcar (compose #'sql-escape #'to-pascal-case #'mkstr) lispflag)))
 
 (defun opinion-from-db-row (row)
-  (let ((res (alist->hash row)))
-    (with-keys (:id :author :flag :votevalue :target :datestamp :url
+  (let ((res (hu:alist->hash row)))
+    (hu:with-keys (:id :author :flag :votevalue :target :datestamp :url
                     :comment :reference :authorname :author-id)
         res
       (let ((authdata (get-author-data author)))
@@ -209,7 +209,7 @@ the page text can be found in the cache."
       (setf reference (car (col-from-pkey (colm 'reference 'reference) id))))
     (concatenate 'list
                  (get-excerpt-data (gethash :id res))
-                 (hash->alist res))))
+                 (hu:hash->alist res))))
 
 (defun opinion-by-id (oid)
   (opinion-from-db-row (get-assoc-by-pkey 'opinion oid)))
@@ -276,7 +276,7 @@ the page text can be found in the cache."
 (defun get-author-data (aid)
   (declare (type integer aid))
   (map-tuples
-   (compose #'keywordize-foreign (curry #'assoc-cdr :type))
+   (compose #'proto:keywordize-foreign (curry #'assoc-cdr :type))
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
 
@@ -405,21 +405,21 @@ the page text can be found in the cache."
 
 (defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
-  (with-keys (:target :votevalue :datestamp :url :comment :reference :flag)
-      (alist->hash opin)
+  (hu:with-keys (:target :votevalue :datestamp :url :comment :reference :flag)
+      (hu:alist->hash opin)
     (let ((id
            (insert-record
             'opinion
-            (collecting
-                (collect
+            (cl-utilities:collecting
+                (cl-utilities:collect
                     (cons (colm :rooturl) (find/store-root-url target)))
               (dolist (k '(:votevalue :target :datestamp :url))
                 (when-let ((field (assoc k opin)))
-                  (collect (cons (colm (car field)) (sql-escape (cdr field))))))
+                  (cl-utilities:collect (cons (colm (car field)) (sql-escape (cdr field))))))
               (when id
-                (collect (cons (colm :id) id)))
-              (collect (cons (colm :flag) (flag-to-db flag)))
-              (collect (cons (colm :author) authorid))))))
+                (cl-utilities:collect (cons (colm :id) id)))
+              (cl-utilities:collect (cons (colm :flag) (flag-to-db flag)))
+              (cl-utilities:collect (cons (colm :author) authorid))))))
       (when (and (stringp comment) (not-empty comment))
         (insert-records :into 'comment :attributes
                         (list (colm :opinion) (colm :comment))
@@ -475,7 +475,7 @@ the page text can be found in the cache."
 
 (defun get-looks (user rootid)
   (declare (type integer rootid))
-  (collecting-hash-table (:mode :replace)
+  (hu:collecting-hash-table (:mode :replace)
     (loop for (k v) in (select (colm :opinionid) (colm :firstlook)
                                :from (tabl :looks)
                                :where (sql-and (sql-= (colm :wf_user) (sql-escape user))
