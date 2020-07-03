@@ -60,14 +60,14 @@
         (warn "Opinion may already exist in database"))
       (save-opinion-from-user data authid))))
 
-(defun divide-on-end-of-keywords (items)
+(defun part-on-end-of-keywords (items)
   (if-let ((divindex
             (some (lambda (i)
                     (and (not (keywordp (elt items i))) i))
                   (remove-if #'oddp (range (length items))))))
     (if (eq 0 divindex)
         (values nil items)
-        (divide-on-index items divindex))
+        (part-on-index items divindex))
     (values items nil)))
 
 (defun %proc-forms (forms target)
@@ -81,14 +81,14 @@
 
 (defun %proc-opinion (form target)
   (multiple-value-bind (keys other)
-      (divide-on-end-of-keywords (cdr form))
+      (part-on-end-of-keywords (cdr form))
     ;;First item in the opinion body (other) is the comment
     (let ((opid (apply #'enter-bulk-opinion target :comment (car other) keys)))
       (%proc-forms (cdr other) (make-opinion-url nil opid)))))
 
 (defun %proc-vote (form target)
   (multiple-value-bind (keys other)
-      (divide-on-end-of-keywords (cdr form))
+      (part-on-end-of-keywords (cdr form))
     ;;No comment. Any non-keyword items are replies
     (let ((opid (apply #'enter-bulk-opinion target keys)))
       (%proc-forms other (make-opinion-url nil opid)))))
