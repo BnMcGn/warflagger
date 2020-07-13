@@ -10,52 +10,47 @@
                :class "grouped"
                (when (prop warstats)
                  (collecting
-                     (dotree (itm (ensure-array (prop group))
-                              :proc-branch nil :proc-leaf t)
-                       ;;*tree-stack* is from dotree
-                       (let ((depth (@ *tree-stack* length)))
-                         (cond ((numberp itm)
-                                (collect
-                                    (if (getprop (prop warstats) itm)
-                                        (psx
-                                         (:target-title
-                                          :key (unique-id)
-                                          :display-depth depth
-                                          :hide-reply t
-                                          :show-count t
-                                          :intro-text " "
-                                          :warflagger-link (make-rootid-url itm)
-                                          :extra-styling
-                                          (grouped-styling-data itm
-                                                                (@ %thisref props))
-                                          :warstats (getprop (prop warstats) itm)
-                                          :... (getprop (prop roots) itm)))
-                                        ;;FIXME: creates error or ugly
-                                        (psx (:div "Loading...")))))
-                               ((stringp itm)
-                                (collect
-                                    (psx
-                                     (:reference
-                                      :key (unique-id)
-;;;FIXME: URL generation should only be in one place!
-                                      :headline {}
-                                      :styling-data
-                                      (create :data-display-depth depth
-                                              :data-replies-total 0)
-                                      :warflagger-link (make-missing-rootid-url itm)
-                                      :reference-domain (url-domain itm)
-                                      :reference itm))))))))))))
+                   (dolist (itm (prop group))
+                     (cond
+                       ((eq (@ itm rowtype) :rooturl)
+                        (collect
+                            (if (getprop (prop warstats) (@ itm rootid))
+                                (psx
+                                 (:target-title
+                                  :key (unique-id)
+                                  :hide-reply t
+                                  :show-count t
+                                  :intro-text " "
+                                  :warflagger-link (make-rootid-url (@ itm rootid))
+                                  :extra-styling
+                                  (grouped-styling-data itm (@ %thisref props))
+                                  :warstats (getprop (prop warstats) (@ itm rootid))
+                                  :... itm))
+                                (psx (:div :key (unique-id) "Loading...")))))
+                       ((eq (@ itm rowtype) :reference)
+                        (collect
+                            (psx
+                             (:reference
+                              :key (unique-id)
+                              ;;FIXME: URL generation should only be in one place!
+                              :headline {}
+                              :styling-data
+                              (create :data-display-depth (prop display-depth)
+                                      :data-replies-total 0)
+                              :warflagger-link (make-missing-rootid-url (@ itm url))
+                              :reference-domain (url-domain (@ itm url))
+                              :reference (@ itm url))))))))))))
 
-    (defun %grouped-warstats-urls (tree)
+    (defun %grouped-warstats-urls (group)
       (let ((res (create)))
-          (dolist (id (flatten tree) res)
-            (when (equal (typeof id) "number")
-              (setf (getprop res id)
-                    (make-warstats-url id 'warstats))))))
+        (dolist (item group)
+          (when (chain item (has-own-property :rootid))
+            (setf (getprop res (@ item rootid))
+                  (make-warstats-url (@ item rootid) 'warstats))))
+        res))
 
-    (defun grouped-styling-data (id props)
-      (let* ((data (getprop (@ props roots) id))
-             (pardata
+    (defun grouped-styling-data (data props)
+      (let* ((pardata
               (when (@ data refparent)
                 (getprop (@ props warstats) (@ data refparent))))
              (warstats
@@ -71,12 +66,6 @@
           :store-name "warstats"
           :sources (%grouped-warstats-urls (prop group))
           :reducer #'copy-merge-all
-#|
-          (lambda (existing incoming)
-            (create-from-list
-             (list :warstats (copy-merge-all (@ existing warstats)
-                                             (@ incoming warstats)))))
-          |#
           (:grouped :... (@ this props)))))
 
     (def-component grouped-main
@@ -84,13 +73,11 @@
          (:div
           (:h2 :key "a1" "Discussions:")
           (collecting
-              (dolist (rootid (prop order))
-                (collect
-                    (psx (:grouped-loader
-                          :key (unique-id)
-                          :... (@ %thisref props)
-                          :root-article-id (parse-int rootid)
-                          :group (getprop (prop tree) rootid 0)))))))))
+            (dolist (group (prop data))
+              (collect
+                  (psx (:grouped-loader
+                        :key (unique-id)
+                        :group group))))))))
 
     ))
 
@@ -130,11 +117,12 @@
           :rowtype :rooturl
           :display-depth 0
           :url url
+          :rootid discrootid
           :title (grab-title url)
           :looks (when (authenticated?)
                    (get-looks (get-user-name) discrootid))))))
-    (proto:dotree (refid tree)
-      (when-let ((row (format-group-component-data refid (length proto:*tree-stack*))))
+    (proto:dotree (refid tree :proc-leaf t :proc-branch nil)
+      (when-let ((row (format-group-component-data refid (1- (length proto:*tree-stack*)))))
         (cl-utilities:collect row)))))
 
 (defun grouped-data ()
@@ -152,7 +140,7 @@
 
 (defun grouped-page ()
   (mount-component (grouped-main)
-    :data (lisp (ps-gadgets:as-ps-data (grouped-data)))))
+    :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
 
 ;;OBSOLETE
 (defun grouped-pagex ()
