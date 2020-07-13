@@ -243,13 +243,6 @@
 (defun %discussion-sort-key (idlist)
   (clsql-helper:print-timestamp (second (car (replies-by-date idlist)))))
 
-;;OBSOLETE
-(defun sort-discussions (dlist)
-  (hu:alist->plist
-   (sort dlist
-         #'string>
-         :key (lambda (itm) (%discussion-sort-key (third itm))))))
-
 (defun order-discussions-by-most-recent-opinion (alist-rootids)
   (mapcar #'car
           (sort alist-rootids
@@ -259,14 +252,4 @@
 (defun discussion-roots ()
   (remove-if-not #'discussion-root-p (mapcar #'get-rooturl-id (all-rooturls))))
 
-;;OBSOLETE
-(defun cluster-discussions ()
-  (let ((discroots (discussion-roots)))
-    (sort-discussions
-     (cl-utilities:collecting
-         (dolist (dr discroots)
-           (cl-utilities:collect
-               (cons dr
-                     (multiple-value-list
-                      (discussion-tree-for-root dr discroots)))))))))
 

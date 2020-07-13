@@ -75,5 +75,8 @@
    #:target-replies
    #:tree-address
    #:warstats-url-server
-   #:target-seek-server))
+   #:target-seek-server
+   #:discussion-tree-for-root
+   #:order-discussions-by-most-recent-opinion
+   #:discussion-roots))
 
