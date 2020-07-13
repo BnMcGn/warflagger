@@ -215,7 +215,7 @@
 ;;FIXME: Possibly we want to include every reference to a rootURL in the discussion,
 ;; but for simplicity we are just taking the first occurence.
 (defun discussion-tree-for-root (discroot discroots)
-  "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the reference opinion ids in the discussion. Returns a list of other discroots that get touched in the discussion as the second value."
+  "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the reference opinion ids in the discussion. Second value is a list of rootURL ids in the discussion. Returns a list of other discroots that get touched in the discussion as the third value."
   (let ((found (make-hash-table :test #'equal))
         (otherdisc nil)
         (rootids (list discroot)))
@@ -223,35 +223,45 @@
     (labels ((proc (curr)
                (when (integerp curr)
                  (cl-utilities:collecting
-                     (loop for opin in (get-reference-opinions-under-rooturl
-                                        (get-rooturl-by-id curr))
-                        for id = (reference-end-result (assoc-cdr :reference opin))
-                        for rid = (assoc-cdr :id opin)
-                        do (when id
-                             (unless (gethash id found)
-                               (setf (gethash id found) t)
-                               (when (integerp id)
-                                 (push id rootids))
-                               (cl-utilities:collect
-                                   (if (member id discroots)
-                                       (progn (push id otherdisc)
-                                              (list rid))
-                                       (list* rid (proc id)))))))))))
+                   (loop for opin in (get-reference-opinions-under-rooturl
+                                      (get-rooturl-by-id curr))
+                         ;; id is an integer if ref is a rooturl, url if unlisted link.
+                         for id = (reference-end-result (assoc-cdr :reference opin))
+                         for refopid = (assoc-cdr :id opin)
+                         do (when id
+                              (unless (gethash id found)
+                                (setf (gethash id found) t)
+                                (when (integerp id)
+                                  (push id rootids))
+                                (cl-utilities:collect
+                                    (if (member id discroots)
+                                        (progn (push id otherdisc)
+                                               (list refopid))
+                                        (list* refopid (proc id)))))))))))
       (values (proc discroot) rootids otherdisc))))
 
 (defun %discussion-sort-key (idlist)
   (clsql-helper:print-timestamp (second (car (replies-by-date idlist)))))
 
+;;OBSOLETE
 (defun sort-discussions (dlist)
   (hu:alist->plist
    (sort dlist
          #'string>
          :key (lambda (itm) (%discussion-sort-key (third itm))))))
 
+(defun order-discussions-by-most-recent-opinion (alist-rootids)
+  (mapcar #'car
+          (sort alist-rootids
+                #'string>
+                :key (lambda (itm) (%discussion-sort-key (cdr itm))))))
+
+(defun discussion-roots ()
+  (remove-if-not #'discussion-root-p (mapcar #'get-rooturl-id (all-rooturls))))
+
+;;OBSOLETE
 (defun cluster-discussions ()
-  (let* ((rooturls (all-rooturls))
-         (rootids (mapcar #'get-rooturl-id rooturls))
-         (discroots (remove-if-not #'discussion-root-p rootids)))
+  (let ((discroots (discussion-roots)))
     (sort-discussions
      (cl-utilities:collecting
          (dolist (dr discroots)

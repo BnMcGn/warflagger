@@ -11,7 +11,8 @@
                (when (prop warstats)
                  (collecting
                      (dotree (itm (ensure-array (prop group))
-                                  :proc-branch nil :proc-leaf t)
+                              :proc-branch nil :proc-leaf t)
+                       ;;*tree-stack* is from dotree
                        (let ((depth (@ *tree-stack* length)))
                          (cond ((numberp itm)
                                 (collect
@@ -93,8 +94,71 @@
 
     ))
 
+(defun format-group-component-data (refid depth)
+  (let* ((refopin (opinion-by-id refid))
+         (refurl (assoc-cdr :reference refopin))
+         (rootid (when (rooturl-p refurl)
+                   (get-rooturl-id refurl)))
+         (parent-rootid (assoc-cdr :rooturl refopin)))
+    ;;We are ignoring references to opinions (for now?)
+    (unless (opinion-exists-p refurl)
+      (hu:plist->hash
+       (if rootid
+           (list
+            :url refurl
+            :display-depth depth
+            :rowtype :rooturl
+            :refparent parent-rootid
+            :refid refid
+            :title (grab-title refurl)
+            :looks (when (authenticated?)
+                     (get-looks (get-user-name) rootid))
+            :rootid rootid)
+           (list
+            :url refurl
+            :display-depth depth
+            :rowtype :reference
+            :refparent parent-rootid
+            :refid refid))))))
+
+(defun format-group-data (discrootid tree)
+  (cl-utilities:collecting
+    (cl-utilities:collect
+      (let ((url (get-rooturl-by-id discrootid)))
+        (hu:plist->hash
+         (list
+          :rowtype :rooturl
+          :display-depth 0
+          :url url
+          :title (grab-title url)
+          :looks (when (authenticated?)
+                   (get-looks (get-user-name) discrootid))))))
+    (proto:dotree (refid tree)
+      (when-let ((row (format-group-component-data refid (length proto:*tree-stack*))))
+        (cl-utilities:collect row)))))
+
+(defun grouped-data ()
+  (let ((discroots (discussion-roots)))
+    (multiple-value-bind (groups rootids)
+        (cl-utilities:with-collectors (groups< rootids<)
+          (dolist (dr discroots)
+            (multiple-value-bind (tree rtids) (discussion-tree-for-root dr discroots)
+              (groups< dr)
+              (groups< tree)
+              (rootids< (cons dr rtids)))))
+      (cl-utilities:collecting
+        (dolist (discroot (order-discussions-by-most-recent-opinion rootids))
+          (cl-utilities:collect (format-group-data discroot (getf groups discroot))))))))
+
 (defun grouped-page ()
+  (mount-component (grouped-main)
+    :data (lisp (ps-gadgets:as-ps-data (grouped-data)))))
+
+;;OBSOLETE
+(defun grouped-pagex ()
+        ;;Treed list of refopin ids.
   (let* ((tree (cluster-discussions))
+         ;;Ordered list of discussion root keys
          (discroots (map-by-2 (lambda (&rest params) (car params)) tree))
          (refids (flatten
                   (map-by-2 (lambda (&rest params) (car (second params))) tree)))
@@ -106,6 +170,7 @@
                       (rootid (when (rooturl-p refurl)
                                 (get-rooturl-id refurl)))
                       (parent-rootid (assoc-cdr :rooturl refopin)))
+                 ;;We are ignoring references to opinions (for now?)
                  (unless (opinion-exists-p refurl)
                    (hu:collect
                        (or rootid refurl)
