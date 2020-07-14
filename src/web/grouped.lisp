@@ -35,7 +35,7 @@
                               ;;FIXME: URL generation should only be in one place!
                               :headline {}
                               :styling-data
-                              (create :data-display-depth (prop display-depth)
+                              (create :data-display-depth (@ itm display-depth)
                                       :data-replies-total 0)
                               :warflagger-link (make-missing-rootid-url (@ itm url))
                               :reference-domain (url-domain (@ itm url))
