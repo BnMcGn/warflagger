@@ -433,7 +433,12 @@
     (def-component question
         (psx
          (:div
-          :class "question")))
+          :class "question"
+          :... (prop styling-data)
+          (:span
+           (:comment-summary
+            :key 1
+            :... (@ this props))))))
 
     (def-component thread-opinion
         (let* ((opinion (@ (prop opinion-store) (list-last (prop tree-address))))

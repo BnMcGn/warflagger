@@ -39,7 +39,20 @@
                                       :data-replies-total 0)
                               :warflagger-link (make-missing-rootid-url (@ itm url))
                               :reference-domain (url-domain (@ itm url))
-                              :reference (@ itm url))))))))))))
+                              :reference (@ itm url)))))
+                       ((eq (@ itm rowtype) :question)
+                        (collect
+                            (psx
+                             (:question
+                              :key (unique-id)
+                              :comment (@ itm comment)
+                              :warstats (getprop (prop warstats) (@ itm rootid))
+                              ;;FIXME: Want grouped-styling-data for direction-on-root arrow?
+                              ;;FIXME: Might want full styling-data, but need opinion-store
+                              :styling-data
+                              (create :data-display-depth (@ itm display-depth)
+                                      :data-replies-total 0)
+                              :... itm)))))))))))
 
     (defun %grouped-warstats-urls (group)
       (let ((res (create)))
@@ -81,7 +94,22 @@
 
     ))
 
-(defun format-group-component-data (refid depth)
+(defun format-group-component-data (opinid depth)
+  (if (question-opinion-p opinid)
+      (format-group-question-data opinid depth)
+      (format-group-reference-data opinid depth)))
+
+(defun format-group-question-data (opinid depth)
+  (let ((opinion (opinion-by-id opinid)))
+    (hu:plist->hash
+     (list
+      :id opinid
+      :rowtype :question
+      :display-depth depth
+      :rootid (assoc-cdr :rooturl opinion)
+      :comment (assoc-cdr :comment opinion)))))
+
+(defun format-group-reference-data (refid depth)
   (let* ((refopin (opinion-by-id refid))
          (refurl (assoc-cdr :reference refopin))
          (rootid (when (rooturl-p refurl)
@@ -121,8 +149,8 @@
           :title (grab-title url)
           :looks (when (authenticated?)
                    (get-looks (get-user-name) discrootid))))))
-    (proto:dotree (refid tree :proc-leaf t :proc-branch nil)
-      (when-let ((row (format-group-component-data refid (1- (length proto:*tree-stack*)))))
+    (proto:dotree (opid tree :proc-leaf t :proc-branch nil)
+      (when-let ((row (format-group-component-data opid (1- (length proto:*tree-stack*)))))
         (cl-utilities:collect row)))))
 
 (defun reply-to-question-p (opinid)
@@ -177,7 +205,7 @@
           (dolist (dr discroots)
             (multiple-value-bind (tree rtids) (discussion-tree-for-root dr discroots)
               (groups< dr)
-              (groups< tree)
+              (groups< (add-questions-to-discussion-tree tree))
               (rootids< (cons dr rtids)))))
       (cl-utilities:collecting
         (dolist (discroot (order-discussions-by-most-recent-opinion rootids))

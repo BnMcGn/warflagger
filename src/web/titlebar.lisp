@@ -190,10 +190,13 @@
                   (:headline-core :... (@ this props))))))
 
     (def-component comment-summary
-        (let* ((opin (prop opinion))
-               (comment (if (chain opin (has-own-property 'comment))
-                            (@ opin comment)
-                            nil)))
+        (let ((comment
+                (if (prop comment)
+                    (prop comment)
+                    (let ((opin (prop opinion)))
+                      (if (chain opin (has-own-property 'comment))
+                          (@ opin comment)
+                          nil)))))
           (if comment
               (if (> (prop trimto) (@ comment length))
                   (psx (:span comment))
