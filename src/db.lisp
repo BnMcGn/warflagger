@@ -251,6 +251,9 @@ the page text can be found in the cache."
     (when-let ((op (opinion-exists-p url)))
       (values (assoc-cdr :id op) :opinion))))
 
+(defun get-target-id (opinid)
+  (get-target-id-from-url (assoc-cdr :target (opinion-by-id opinid))))
+
 (defun make-wf-url-for-url (url)
   (multiple-value-bind (id type) (get-target-id-from-url url)
     (case type

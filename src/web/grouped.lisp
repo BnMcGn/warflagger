@@ -125,6 +125,51 @@
       (when-let ((row (format-group-component-data refid (1- (length proto:*tree-stack*)))))
         (cl-utilities:collect row)))))
 
+(defun reply-to-question-p (opinid)
+  (multiple-value-bind (targid type) (get-target-id opinid)
+    (and (eq type :opinion) (question-opinion-p targid) targid)))
+
+(defun question-in-tree-address-p (opinid)
+  (first-match #'question-opinion-p (cdr (reverse (tree-address opinid)))))
+
+(defun %superquestion (qid questionids)
+  "Are any of the items in questionids an ancestor of qid?"
+  (first-match (lambda (x) (member x questionids)) (cdr (reverse (tree-address qid)))))
+
+(defun add-questions-to-discussion-tree (tree)
+  ;;Expects a list of lists. Each sublist has an opinid as its car.
+  (when tree
+    (let ((accum nil)
+          (primary-questions
+            (dolist (br tree)
+              (cl-utilities:collecting
+                (when (question-in-tree-address-p (car br))
+                  (cl-utilities:collect (car br))))))
+          (questions (make-hash-table)))
+      (hu:collecting-hash-table (:mode :append :existing questions)
+        (dolist (branch tree)
+          (if-let ((qid (question-in-tree-address-p (car branch))))
+            (progn
+              (unless (key-in-hash? qid questions)
+                ;; question and its answers will get inserted at first reply to question.
+                (if-let ((superq (%superquestion qid primary-questions)))
+                  (hu:collect superq qid)
+                  (push qid accum)))
+              (hu:collect qid branch))
+            (push branch accum))))
+      (labels ((proc (currlist &optional first)
+                 (cl-utilities:collecting
+                   (dolist (itm currlist)
+                     (if (atom itm)
+                         (if first
+                             (progn
+                               (cl-utilities:collect (list itm))
+                               (mapc #'cl-utilities:collect (proc (gethash itm questions))))
+                             (cl-utilities:collect (list itm (proc (gethash itm questions)))))
+                         (cl-utilities:collect
+                             (cons (car itm) (add-questions-to-discussion-tree (cdr itm)))))))))
+        (proc (nreverse accum) t)))))
+
 (defun grouped-data ()
   (let ((discroots (discussion-roots)))
     (multiple-value-bind (groups rootids)
