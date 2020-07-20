@@ -434,6 +434,8 @@
         (psx
          (:div
           :class "question"
+          ;;FIXME: would be nice if this could happen in comment summary
+          :style (create 'white-space "nowrap" overflow "hidden" 'text-overflow "ellipsis")
           :... (prop styling-data)
           (:span
            (if (prop opinion)
