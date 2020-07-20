@@ -198,7 +198,7 @@
                           (@ opin comment)
                           nil)))))
           (if comment
-              (if (> (prop trimto) (@ comment length))
+              (if (> (or (prop trimto) 100) (@ comment length))
                   (psx (:span comment))
                   (psx (:span (chain comment (slice 0 (prop trimto))) "…")))
               (psx (:span "")))))

@@ -46,6 +46,7 @@
                              (:question
                               :key (unique-id)
                               :comment (@ itm comment)
+                              :opinion (getprop (prop opinion-store) (@ itm id))
                               :warstats (getprop (prop warstats) (@ itm rootid))
                               ;;FIXME: Want grouped-styling-data for direction-on-root arrow?
                               ;;FIXME: Might want full styling-data, but need opinion-store
@@ -76,21 +77,40 @@
     (def-component grouped-loader
         (psx
          (:json-loader
+          :key 1
           :store-name "warstats"
           :sources (%grouped-warstats-urls (prop group))
           :reducer #'copy-merge-all
-          (:grouped :... (@ this props)))))
+          (:grouped :key 1 :... (@ this props)))))
+
+    (def-component opinion-store-loader
+        (psx
+         (:json-loader
+          :store-name 'opinion-store
+          :sources (mapcar (lambda (id) (make-warstats-url id :opinions)) (prop rootids))
+          :reducer
+          (lambda (store incoming)
+            (let ((res (reformat-opinions incoming)))
+              (copy-merge-all store (@ res 1))))
+          (prop children))))
 
     (def-component grouped-main
         (psx
          (:div
           (:h2 :key "a1" "Discussions:")
-          (collecting
-            (dolist (group (prop data))
-              (collect
-                  (psx (:grouped-loader
-                        :key (unique-id)
-                        :group group))))))))
+          (:opinion-store-loader
+           :key 2
+           :rootids (unique (collecting
+                              (dolist (group (prop data))
+                                (dolist (itm group)
+                                  (when (chain itm (has-own-property :rootid))
+                                    (collect (@ itm rootid)))))))
+           (collecting
+             (dolist (group (prop data))
+               (collect
+                   (psx (:grouped-loader
+                         :key (unique-id)
+                         :group group)))))))))
 
     ))
 

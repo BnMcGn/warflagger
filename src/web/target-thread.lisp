@@ -13,7 +13,7 @@
          (:div :style (create position "relative")
           (:target-title :key "x" :... (@ this props))
           (collecting
-              (let ((data (%reformat-opinions (prop opinions))))
+              (let ((data (reformat-opinions (prop opinions))))
                 (dolist (op (prop tree-addresses))
                   (collect
                       (psx (:on-screen

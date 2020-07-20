@@ -86,7 +86,7 @@
                 -1 ;; Ditto
                 (- (@ opa datestamp) (@ opb datestamp))))))
 
-    (defun %reformat-opinions (opins)
+    (defun reformat-opinions (opins)
       (let* ((opinstore (create))
              (opins
               (collecting
@@ -107,7 +107,7 @@
     (def-component target-loader
         ;;FIXME: Needs error handling
         (if (and (state warstats) (state opinions) (state text))
-            (let ((opdat (%reformat-opinions (state opinions)))
+            (let ((opdat (reformat-opinions (state opinions)))
                   (child-element (or (prop child) target-root)))
               (psx (:child-element
                     :... (@ this props)

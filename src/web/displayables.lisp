@@ -436,9 +436,11 @@
           :class "question"
           :... (prop styling-data)
           (:span
-           (:comment-summary
-            :key 1
-            :... (@ this props))))))
+           (if (prop opinion)
+               (psx (:a :href (make-opinionid-url (prop opinion id))
+                        :key 1
+                        (:comment-summary :... (@ this props))))
+               (psx (:comment-summary :... (@ this props))))))))
 
     (def-component thread-opinion
         (let* ((opinion (@ (prop opinion-store) (list-last (prop tree-address))))
