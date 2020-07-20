@@ -55,6 +55,40 @@
                                       :data-replies-total 0)
                               :... itm)))))))))))
 
+    ;;FIXME: This duplicates tooltip display code from opinion-icon.
+    (def-component direction-arrow
+        (let* ((elid (strcat "direction-arrow-" (state unid)))
+               (opinion (getprop (prop opinion-store) (prop id)))
+               (warstats (getprop (prop warstats) (prop id))))
+          (psx
+           (:span :class "direction-arrow"
+                  :id elid
+                  :on-mouse-enter (@ this handle-mouse-enter)
+                  :on-mouse-leave (@ this handle-mouse-leave)
+                  (:img
+                   :src (strcat "/static/img/direction-" (@ warstats 'direction-on-root) ".svg"))
+                  (:display-if
+                   :key 1
+                   :test (and (prop opinion-store) (prop warstats))
+                   (:tool-tip
+                    :active (state viewable) :position "bottom"
+                    :arrow "right"
+                    :group "two"
+                    :parent (strcat "#" elid)
+                    (:opinion-info
+                     :... (@ this props)
+                     :opinion (prop opinion)))))))
+      get-initial-state
+      (lambda () (create viewable false unid (unique-id)))
+      handle-mouse-enter
+      (lambda (e)
+        (set-state viewable true)
+        (when (and (prop opinion-store) (prop warstats)) ;Wasn't looked at! see above.
+          (funcall (prop look-handler) (@ opinion id))))
+      handle-mouse-leave
+      (lambda (e)
+        (set-state viewable false)))
+
     (defun %grouped-warstats-urls (group)
       (let ((res (create)))
         (dolist (item group)
