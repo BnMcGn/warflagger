@@ -198,9 +198,13 @@
                           (@ opin comment)
                           nil)))))
           (if comment
-              (if (> (or (prop trimto) 100) (@ comment length))
-                  (psx (:span comment))
-                  (psx (:span (chain comment (slice 0 (prop trimto))) "…")))
+              (psx (:span
+                    :style (create 'white-space "nowrap" overflow "hidden" 'text-overflow "ellipsis")
+                    comment))
               (psx (:span "")))))
 
     ))
+
+white-space: nowrap;      /*keep text on one line */
+overflow: hidden;         /*prevent text from being shown outside the border */
+text-overflow: ellipsis;  /*cut off text with an ellipsis*/
