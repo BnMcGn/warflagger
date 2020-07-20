@@ -78,5 +78,7 @@
    #:target-seek-server
    #:discussion-tree-for-root
    #:order-discussions-by-most-recent-opinion
-   #:discussion-roots))
+   #:discussion-roots
+   #:get-target-id
+   #:question-opinion-p))
 
