@@ -21,7 +21,8 @@
                #:ps-gadgets
                #:lack-middleware-mount
                #:clath
-               #:userfig)
+               #:userfig
+               #:snooze)
   :serial t
   :components ((:module 
 		 :src
@@ -40,5 +41,6 @@
                               (:file "web/misc")
                               (:file "web/opinion-form")
                               (:file "web/account")
+                              (:file "web/rest")
                               (:file "web/web")))))
 

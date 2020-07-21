@@ -340,6 +340,7 @@
      (clath:component
       "http://logintest.warflagger.com:5000/")
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+     (:mount "/rest" (snooze:make-clack-app))
      (html-thing-lister:thing-component)
      *app*))
    :port (if-production 5005 5000))
