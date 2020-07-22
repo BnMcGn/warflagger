@@ -1,6 +1,6 @@
 (in-package :wf/web)
 
-(snooze:defroute target (:get :application/json &key id url)
+(snooze:defroute target-data (:get :application/json &key id url)
   (json:encode-json-to-string
    (hu:collecting-hash-table ()
      (let ((url (or url (get-rooturl-by-id id)))
@@ -12,3 +12,5 @@
        (hu:collect :title (grab-title url))
        (hu:collect :text (grab-text url))
        (hu:collect :warstats (warstats-for-target url))))))
+
+(snooze:defgenpath target-data target-data-path)
