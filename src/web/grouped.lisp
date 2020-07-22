@@ -16,30 +16,42 @@
                         (collect
                             (if (getprop (prop warstats) (@ itm rootid))
                                 (psx
-                                 (:target-title
+                                 (:direction-arrow
                                   :key (unique-id)
-                                  :hide-reply t
-                                  :show-count t
-                                  :intro-text " "
-                                  :warflagger-link (make-rootid-url (@ itm rootid))
-                                  :extra-styling
-                                  (grouped-styling-data itm (@ %thisref props))
-                                  :warstats (getprop (prop warstats) (@ itm rootid))
-                                  :... itm))
+                                  :id (@ itm refid)
+                                  :display-depth (@ itm display-depth)
+                                  :... (@ this props)
+                                  (:target-title
+                                   :style (create :margin-left "0px")
+                                   :key (unique-id)
+                                   :hide-reply t
+                                   :show-count t
+                                   :intro-text " "
+                                   :warflagger-link (make-rootid-url (@ itm rootid))
+                                   :extra-styling
+                                   (grouped-styling-data itm (@ %thisref props))
+                                   :warstats (getprop (prop warstats) (@ itm rootid))
+                                   :... itm
+                                   )))
                                 (psx (:div :key (unique-id) "Loading...")))))
                        ((eq (@ itm rowtype) :reference)
                         (collect
                             (psx
-                             (:reference
+                             (:direction-arrow
                               :key (unique-id)
-                              ;;FIXME: URL generation should only be in one place!
-                              :headline {}
-                              :styling-data
-                              (create :data-display-depth (@ itm display-depth)
-                                      :data-replies-total 0)
-                              :warflagger-link (make-missing-rootid-url (@ itm url))
-                              :reference-domain (url-domain (@ itm url))
-                              :reference (@ itm url)))))
+                              :id (@ itm refid)
+                              :display-depth (@ itm display-depth)
+                              :... (@ this props)
+                              (:reference
+                               :key (unique-id)
+                               ;;FIXME: URL generation should only be in one place!
+                               :headline {}
+                               :styling-data
+                               (create :data-display-depth (@ itm display-depth)
+                                       :data-replies-total 0)
+                               :warflagger-link (make-missing-rootid-url (@ itm url))
+                               :reference-domain (url-domain (@ itm url))
+                               :reference (@ itm url))))))
                        ((eq (@ itm rowtype) :question)
                         (collect
                             (psx
@@ -59,32 +71,55 @@
     (def-component direction-arrow
         (let* ((elid (strcat "direction-arrow-" (state unid)))
                (opinion (getprop (prop opinion-store) (prop id)))
-               (warstats (getprop (prop warstats) (prop id))))
+               (warstats (when opinion
+                           ;;FIXME: warstats are not formatted correctly.
+                           (getprop (prop warstats) (@ opinion rooturl))))
+               (warstat (when warstats
+                          (getprop warstats (prop id))))
+               (imgsrc (when warstat
+                         (strcat "/static/img/direction-" (@ warstat 'direction-on-root) ".svg"))))
           (psx
-           (:span :class "direction-arrow"
-                  :id elid
-                  :on-mouse-enter (@ this handle-mouse-enter)
-                  :on-mouse-leave (@ this handle-mouse-leave)
-                  (:img
-                   :src (strcat "/static/img/direction-" (@ warstats 'direction-on-root) ".svg"))
-                  (:display-if
-                   :key 1
-                   :test (and (prop opinion-store) (prop warstats))
-                   (:tool-tip
-                    :active (state viewable) :position "bottom"
-                    :arrow "right"
-                    :group "two"
-                    :parent (strcat "#" elid)
-                    (:opinion-info
-                     :... (@ this props)
-                     :opinion (prop opinion)))))))
+           (:div
+            :style (create :position :relative)
+            (:span :class "direction-arrow"
+                   :id elid
+                   :key 4
+                   :... (create :data-display-depth (prop display-depth))
+                   :style (create :position :absolute
+                                  :top "-7px"
+                                  :left "-24px")
+                   :on-mouse-enter (@ this handle-mouse-enter)
+                   :on-mouse-leave (@ this handle-mouse-leave)
+                   (:display-if
+                    :key 0
+                    :test imgsrc
+                    (:img
+                     :key 0
+                     :style (create :width "18px" :height "45px")
+                     :src imgsrc))
+                   (:display-if
+                    :key 1
+                    :test (and (prop opinion-store) (prop warstats))
+                    (:tool-tip
+                     :key 1
+                     :active (state viewable) :position "bottom"
+                     :arrow "right"
+                     :group "two"
+                     :parent (strcat "#" elid)
+                     (:opinion-info
+                      :... (@ this props)
+                      :warstats warstats
+                      :opinion opinion))))
+            (prop children))))
       get-initial-state
       (lambda () (create viewable false unid (unique-id)))
       handle-mouse-enter
       (lambda (e)
         (set-state viewable true)
-        (when (and (prop opinion-store) (prop warstats)) ;Wasn't looked at! see above.
-          (funcall (prop look-handler) (@ opinion id))))
+        ;;FIXME: looks disabled here. Does it make sense to enable? Perhaps we aren't seeing enough
+        ;; of the conversation?
+        (when (and nil (prop opinion-store) (prop warstats)) ;Wasn't looked at! see above.
+          (funcall (prop look-handler) (prop id))))
       handle-mouse-leave
       (lambda (e)
         (set-state viewable false)))
