@@ -27,7 +27,8 @@
    'target-summary
    'target-components
    'opinion-page
-   'warflagger-things))
+   'warflagger-things
+   'radmin))
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
@@ -53,15 +54,19 @@
 ;;FIXME: react, react-dom should be loaded from the npm bundle.
 (define-default-parts warflagger-base
   :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"
-  :@javascript-link "https://unpkg.com/react@16.12.0/umd/react.development.js"
-  :@javascript-link "https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"
-  :@javascript (ps:ps (setf (ps:@ -react #:create-class) (require "create-react-class"))
-                      (setf (ps:@ -react -d-o-m) (require "react-dom-factories")))
+  ;;:@javascript-link "https://unpkg.com/react@16.12.0/umd/react.development.js"
+  ;;:@javascript-link "https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"
   :@javascript-link "/static/javascript/warflagger-bundle.js"
-  :@javascript-link
-  "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.js"
-  :@javascript-link
-  "https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.js"
+  :@javascript (ps:ps
+                 (setf -react (require "react"))
+                 (setf (ps:@ -react #:create-class) (require "create-react-class"))
+                 (setf (ps:@ -react -d-o-m) (require "react-dom-factories"))
+                 (setf -redux (require "redux"))
+                 (setf -react-redux (require "react-redux")))
+  ;;:@javascript-link
+  ;;"https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.js"
+  ;;:@javascript-link
+  ;;"https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.js"
 
   :@account-info #'account-bar
   :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
@@ -266,6 +271,11 @@
          (quick-page ()
            (demo-pages))))
 
+  (unless-production
+   (setf (ningle:route *app* "/radmin/")
+         (quick-page ()
+           (mount-component (admin-page)))))
+
   (setf (ningle:route *app* "/private-call-cleanup-test-user/")
         (quick-page ()
           (cleanup-test-user)
@@ -328,7 +338,7 @@
      (html-thing-lister:thing-component)
      *app*)
     (clack-pretend:pretend-builder
-     (:insert 3) ;clack.builder:builder
+     (:insert 0) ;clack.builder:builder
      (clack.middleware.clsql:<clack-middleware-clsql>
       :database-type :postgresql-socket3
       :connection-spec *test-db-connect-spec*)
@@ -340,7 +350,7 @@
      (clath:component
       "http://logintest.warflagger.com:5000/")
      (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-     (:mount "/rest" (snooze:make-clack-app))
+     (snooze:make-clack-middleware)
      (html-thing-lister:thing-component)
      *app*))
    :port (if-production 5005 5000))

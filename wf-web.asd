@@ -42,5 +42,6 @@
                               (:file "web/opinion-form")
                               (:file "web/account")
                               (:file "web/rest")
+                              (:file "web/radmin")
                               (:file "web/web")))))
 
