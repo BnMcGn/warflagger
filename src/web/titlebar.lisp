@@ -32,6 +32,7 @@
                  :key 1
                  :test (and (prop opinion-store) (prop warstats))
                  (:tool-tip
+                  :style (popup-style)
                   :active (state viewable) :position "bottom"
                   :arrow "right"
                   :group "two"

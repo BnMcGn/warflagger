@@ -67,6 +67,17 @@
                                       :data-replies-total 0)
                               :... itm)))))))))))
 
+    (defun popup-style ()
+      (create
+       :style
+       (create
+        :background "rgba(255, 255, 255, 0.7)"
+        :padding "7px")
+       'arrow-style
+       (create
+        :background "transparent"
+        :border-bottom-color "transparent")))
+
     ;;FIXME: This duplicates tooltip display code from opinion-icon.
     (def-component direction-arrow
         (let* ((elid (strcat "direction-arrow-" (state unid)))
@@ -102,8 +113,10 @@
                     :test (and (prop opinion-store) (prop warstats))
                     (:tool-tip
                      :key 1
-                     :active (state viewable) :position "bottom"
-                     :arrow "right"
+                     :active (state viewable)
+                     :style (popup-style)
+                     :position "bottom"
+                     :arrow "left"
                      :group "two"
                      :parent (strcat "#" elid)
                      (:opinion-info

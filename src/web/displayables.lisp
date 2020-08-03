@@ -70,6 +70,7 @@
                  (let ((count (%get-replies-count (prop excerpt-opinions) (@ this props))))
                    (if (< 1 count) count "")))
           (:tool-tip :key "a1"
+                     :style (popup-style)
                      :active (and (state viewable) (not (prop hide-popup)))
                      :position "bottom"
                      :group "one"
@@ -267,7 +268,8 @@
                          (getprop (prop references) (prop opinion id)))))
           (psx
            (:div
-            :style (create :display "grid" grid-template-columns "30px auto")
+            :style (create :display "grid" grid-template-columns "30px auto"
+                           margin-left "0px" background-color "white")
             :... (format-styling-data (@ this props))
             :on-click (lambda ()
                         (setf (@ window location) (make-opinionid-url (@ opinion id))))
