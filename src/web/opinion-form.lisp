@@ -88,7 +88,8 @@
             (setf aid (apply #'insert-new-author
                              (create-author-spec-from-current-user))))
           (setf (gethash :flag values)
-                (split-sequence-on-subseq ": " (gethash :flag values)))
+                (multiple-value-bind (cat flag) (split-sequence-on-subseq ": " (gethash :flag values))
+                  (list cat flag)))
           ;;FIXME: db needs a constraint for this
           (setf (gethash :datestamp values)
                 (clsql:get-time))

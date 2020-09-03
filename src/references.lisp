@@ -28,7 +28,7 @@
     (nsubstitute #\. (code-char #x2024) string)
     (dolist (regex (list *re-url1* *re-url2* *re-url3*))
       (ppcre:do-matches-as-strings (match regex string)
-        (push (car (split-sequence-on-subseq '("\">" "'>") match)) res)))
+        (push (split-sequence-on-subseq '("\">" "'>") match) res)))
     (nreverse res)))
 
 
