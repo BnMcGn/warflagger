@@ -315,24 +315,28 @@
                (idlist (mapcar #'list-last idlist)))
           (psx
            (:div
+            :class "excerptless"
             :style (create 'margin-top "2em")
             (when (< 0 (@ idlist length))
               (psx (:h3 :key 1 "Replies:")))
-            (collecting
-                (dolist (opid idlist)
-                  (let ((opin (getprop (prop opinion-store) opid)))
-                    (unless (has-excerpt-p opin)
-                      (collect
-                          (psx
-                           (:on-screen
-                            :key opid
-                            (:thread-opinion
-                             :... (@ this props)
-                             :tree-address (@ opin tree-address)
-                             :styling-data (format-styling-data
-                                            (set-copy (@ this props)
-                                                      'tree-address (@ opin tree-address)))
-                             :reference (getprop (prop references) opid)))))))))))))
+            (:div
+             :key 2
+             :style (create :position :relative :left (or (prop comment-left) "0px"))
+             (collecting
+               (dolist (opid idlist)
+                 (let ((opin (getprop (prop opinion-store) opid)))
+                   (unless (has-excerpt-p opin)
+                     (collect
+                         (psx
+                          (:on-screen
+                           :key opid
+                           (:thread-opinion
+                            :... (@ this props)
+                            :tree-address (@ opin tree-address)
+                            :styling-data (format-styling-data
+                                           (set-copy (@ this props)
+                                                     'tree-address (@ opin tree-address)))
+                            :reference (getprop (prop references) opid))))))))))))))
 
 ;;; Opinion-summary is used to display opinions in one line situations. It may be displayed with
 ;;; tree address icons. 
