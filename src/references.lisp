@@ -182,7 +182,7 @@
 
 ;;FIXME: Should also return references to any child of URL?
 (defun get-rootids-of-references-to (url)
-  (collecting-set ()
+  (proto:collecting-set ()
     (dolist (refid (get-references-to url))
       (when-let*
           ((opin (opinion-by-id refid))
