@@ -187,16 +187,16 @@
       (when-let*
           ((opin (opinion-by-id refid))
            (rootid (assoc-cdr :rooturl opin)))
-        (set< rootid)))))
+        (proto:set< rootid)))))
 
 (defun get-reference-opinions-under-rooturl (url)
   "Returns all of the reference opinions in the discussion tree under url, including references made in the root article itself."
   (let ((ids
          (collecting-set ()
            (dolist (id (flatten (opinion-tree-for-target url)))
-             (set< id))
+             (proto:set< id))
            (dolist (id (get-references-from url))
-             (set< id)))))
+             (proto:set< id)))))
     (cl-utilities:collecting
         (dolist (id ids)
           (let ((opin (opinion-by-id id)))

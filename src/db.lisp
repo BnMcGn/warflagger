@@ -182,7 +182,7 @@ the page text can be found in the cache."
     (get-assoc-by-col (colm 'opinion 'url) url)))
 
 (defun get-excerpt-data (eid)
-  (map-tuples
+  (proto:map-tuples
    (compose #'proto:keywordize-foreign (curry #'assoc-cdr :type))
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'excerpt 'opinion) eid))))
@@ -278,7 +278,7 @@ the page text can be found in the cache."
 
 (defun get-author-data (aid)
   (declare (type integer aid))
-  (map-tuples
+  (proto:map-tuples
    (compose #'proto:keywordize-foreign (curry #'assoc-cdr :type))
    (curry #'assoc-cdr :value)
    (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
