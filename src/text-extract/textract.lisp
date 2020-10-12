@@ -31,6 +31,8 @@
 
 (in-package :wf/text-extract)
 
+;; inotify might be useful
+
 ;;;(defparameter *cache-path* "/home/ben/opinml/")
 ;;(defparameter *cache-age* (encode-time-delta 0 10 0 0))
 ;; FIXME: We don't really need to refresh the texts. Whole thing needs rethinking. Should we store

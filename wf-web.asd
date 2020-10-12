@@ -18,7 +18,9 @@
                #:html-thing-lister
                #:ratify
                #:warflagger
+               #:ps-lib-tool
                #:ps-gadgets
+               #:ps-react-gadgets
                #:lack-middleware-mount
                #:clath
                #:userfig

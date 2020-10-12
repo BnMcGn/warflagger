@@ -192,7 +192,7 @@
 (defun get-reference-opinions-under-rooturl (url)
   "Returns all of the reference opinions in the discussion tree under url, including references made in the root article itself."
   (let ((ids
-         (collecting-set ()
+         (proto:collecting-set ()
            (dolist (id (flatten (opinion-tree-for-target url)))
              (proto:set< id))
            (dolist (id (get-references-from url))

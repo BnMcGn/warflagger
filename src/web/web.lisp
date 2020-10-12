@@ -14,7 +14,7 @@
    'react:build
    'ps-gadgets
    'webhax-widgets:ps-widgets
-   'ps-react-gadgets:ps-react-gadgets
+   (ps-lib-tool:get-code 'ps-react-gadgets)
    'webhax-ask
    'wf-web-library
    'mood-lib
