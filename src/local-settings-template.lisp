@@ -25,7 +25,10 @@
    #:*auto-run*
    #:*test-user-name*
    #:*supply-file*
-   #:*supply-text*))
+   #:*supply-text*
+   #:*ssl-key-file*
+   #:*ssl-cert-file*
+   #:*ssl-password*))
 
 (in-package :wf/local-settings)
 
@@ -45,5 +48,9 @@
 
 (defparameter *supply-file* "")
 (defparameter *supply-text* "")
+
+(defparameter *ssl-key-file* nil)
+(defparameter *ssl-cert-file* nil)
+(defparameter *ssl-password* nil)
 
 (pushnew #p"" webhax:*named-text-locations*)

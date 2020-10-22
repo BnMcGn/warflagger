@@ -319,47 +319,53 @@
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)
 ;;;Then evaluate code below.
-
-(defun run-server ()
+(defun run-test-server ()
   (clack-server-manager
    *handler*
-   (if-production
-    (lack:builder
-     (:backtrace
-      :output #p"/var/log/warflagger.err"
-      :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
-     (clack.middleware.clsql:<clack-middleware-clsql>
-      :database-type :postgresql-socket3
-      :connection-spec *db-connect-spec*)
-     :session
-     (clath:component
-      *base-url*)
-     (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-     (html-thing-lister:thing-component)
-     *app*)
-    (clack-pretend:pretend-builder
-     (:insert 0) ;clack.builder:builder
-     (clack.middleware.clsql:<clack-middleware-clsql>
-      :database-type :postgresql-socket3
-      :connection-spec *test-db-connect-spec*)
-     (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
-     (clack.middleware.static:<clack-middleware-static>
-      :path "/static/"
-      :root #p"~/quicklisp/local-projects/wf-static/")
-     :session
-     (clath:component
-      "http://logintest.warflagger.com:5000/")
-     (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-     (snooze:make-clack-middleware)
-     (html-thing-lister:thing-component)
-     *app*))
-   :port (if-production 5005 5000))
-  (when-production
-   #+sbcl (sb-thread:join-thread
-           (find-if
-            (lambda (th)
-              (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
-            (sb-thread:list-all-threads)))))
+   (clack-pretend:pretend-builder
+       (:insert 0) ;clack.builder:builder
+       (clack.middleware.clsql:<clack-middleware-clsql>
+        :database-type :postgresql-socket3
+        :connection-spec *test-db-connect-spec*)
+       (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
+       (clack.middleware.static:<clack-middleware-static>
+        :path "/static/"
+        :root #p"~/quicklisp/local-projects/wf-static/")
+       :session
+       (clath:component
+        "https://logintest.warflagger.com:5000/")
+       (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+       (snooze:make-clack-middleware)
+       (html-thing-lister:thing-component)
+       *app*)
+   :port 5000
+   :ssl t
+   :ssl-key-file wf/local-settings:*ssl-key-file*
+   :ssl-cert-file wf/local-settings:*ssl-cert-file*
+   :ssl-key-password wf/local-settings:*ssl-password*))
+
+(defun run-production-server ()
+  (clack-server-manager
+   *handler*
+   (lack:builder
+    (:backtrace
+     :output #p"/var/log/warflagger.err"
+     :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
+    (clack.middleware.clsql:<clack-middleware-clsql>
+     :database-type :postgresql-socket3
+     :connection-spec *db-connect-spec*)
+    :session
+    (clath:component
+     *base-url*)
+    (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+    (html-thing-lister:thing-component)
+    *app*)
+   :port 5005)
+  #+sbcl (sb-thread:join-thread
+          (find-if
+           (lambda (th)
+             (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
+           (sb-thread:list-all-threads))))
 
 (when wf/local-settings:*auto-run*
   (unless-production
@@ -372,4 +378,4 @@
                   :database-type wf/local-settings:*db-connect-type*)
    (clsql:connect wf/local-settings:*test-db-connect-spec*
                   :database-type wf/local-settings:*db-connect-type*))
-  (run-server))
+  (if-production (run-production-server) (run-test-server)))
