@@ -12,7 +12,9 @@
   (write-js-resources
    (concatenate 'string wf/local-settings:*static-path* "javascript/warflagger-resources.js")
    'react:build
-   'ps-gadgets
+   ;;FIXME: Shouldn't need to specify this
+   (ps-lib-tool:get-code 'ps-lisp-library)
+   (ps-lib-tool:get-code 'ps-gadgets)
    'webhax-widgets:ps-widgets
    (ps-lib-tool:get-code 'ps-react-gadgets)
    'webhax-ask

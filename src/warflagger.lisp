@@ -57,7 +57,8 @@
      (if id
          (list :status "success"
                :message ""
-               :warstats (make-warstats-url id :warstats))
+               :warstats (make-warstats-url id :warstats)
+               :opinions (make-warstats-url id :opinions))
          (list :status "missing"
                :message "URL not listed on server")))))
 
