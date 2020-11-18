@@ -1,4 +1,18 @@
-(in-package :warflagger)
+(in-package #:cl-user)
+
+(defpackage #:warflagger-core
+  (:use #:cl #:gadgets #:alexandria)
+  (:export
+   #:*flag-types-source*
+   #:*flag-categories*
+   #:*flag-category-keys*
+   #:*flag-labels*
+   #:*vote-ranges*
+   #:*default-vote*
+   #:*flag-colors*
+   #:*direction-colors*))
+
+(in-package :warflagger-core)
 
 ;FIXME: This should be stored in a format readable by both lisp and python.
 
@@ -204,7 +218,7 @@ throw the discussion tree out of whack."
         :arcane "#ffe843"
         :same-thing "#ffe843"
         :blank "#fff"))
-
+ 
 (defparameter *direction-colors*
   (list :negative "rgba(256,0,0,0.75)"
         :neutral "rgba(171,163,163,0.75)"

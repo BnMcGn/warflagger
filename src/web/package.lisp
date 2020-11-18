@@ -10,6 +10,7 @@
         #:cl-hash-util
         #:clack-pretend
         #:webhax
+        #:warflagger-core
         #:warflagger
         #:wf/local-settings
         #:wf/text-extract

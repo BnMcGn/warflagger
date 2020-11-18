@@ -4,7 +4,8 @@
   :description "The warflagger.net website"
   :author "Ben McGunigle <bnmcgn@gmail.com>"
   :license "Apache License, version 2.0"
-  :depends-on (#:webhax
+  :depends-on (#:warflagger-core
+               #:webhax
                #:webhax-user
                #:gadgets
                #:sql-stuff
@@ -27,9 +28,7 @@
                               (:file "text-extract/textract"
                                      :depends-on ("local-settings"))
                               (:file "package")
-                              (:file "constants")
-                              (:file "warflagger"
-                                     :depends-on ("constants"))
+                              (:file "warflagger")
                               (:file "db")
                               (:file "bulk-enter")
                               (:file "references")

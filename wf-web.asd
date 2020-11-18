@@ -17,6 +17,7 @@
                #:thing-lister
                #:html-thing-lister
                #:ratify
+               #:warflagger-core
                #:warflagger
                #:ps-lib-tool
                #:ps-gadgets
