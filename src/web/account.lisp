@@ -24,8 +24,8 @@
            (:div
             (%logo)
             (:a :style "position:relative; left: 180px;"
-                ;;FIXME: Should be link at /home/ to :user-url
-                :href "/home/" ;(assoc-cdr :user-url info)
+                ;;FIXME: Should be link at /user/ to :user-url
+                :href "/user/" ;(assoc-cdr :user-url info)
                 (str (let ((userfig:*userfig-user*
                             (gethash :username webhax:*session*)))
                        (userfig:userfig-value 'webhax-user:screen-name))))

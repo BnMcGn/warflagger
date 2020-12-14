@@ -120,7 +120,7 @@
 
 (wf/text-extract:initialize-indices)
 
-(setf (webhax-user::login-destination) "/home/")
+(setf (webhax-user::login-destination) "/user/")
 
 (defvar *app* (make-instance 'ningle:<app>))
 
@@ -261,7 +261,7 @@
    (setf (ningle:route *app* "/flag-color/")
          #'flag-color-page))
 
-  (setf (ningle:route *app* "/home/")
+  (setf (ningle:route *app* "/user/")
         (quick-page ()
           (user-home-page)))
 
