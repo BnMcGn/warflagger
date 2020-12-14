@@ -86,7 +86,7 @@
        (:h3 "Index")
        (:div (:a :href "/" "Home"))
        (:div (:a :href "/introduction/" "Introduction"))
-       (:div (:a :href "/things/things/opinion" "Recent Opinions"))
+       (:div (:a :href "/opinions-recent/" "Recent Opinions"))
        (:div (:a :href "/grouped/" "Current Discussions"))
        (:div (:a :href "/opinion/" "Write an Opinion"))
        (:div (:a :href "/faq/" "FAQ"))
@@ -165,10 +165,11 @@
              (lambda ()
                (bind-validated-input
                    ((id :integer))
-                 (funcall
-                  (html-thing-lister:connector-display-func
-                   'target 'participants)
-                  id))))
+                 ;;(funcall
+                  ;;(html-thing-lister:connector-display-func
+                   ;;'target 'participants)
+                  ;;id)
+                 (target-participants-sidebar id))))
           (bind-validated-input
               ((id :integer)
                &key
@@ -266,7 +267,7 @@
           (user-home-page)))
 
   (setf (ningle:route *app* "/author/*")
-        (quick-page ()))
+        (quick-page (#'author-page-parts)))
 
   (unless-production
    (setf (ningle:route *app* "/demo/")
