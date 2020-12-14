@@ -31,7 +31,7 @@
               (:date-stamp :key 3 :opinion (prop opinion))
               (:author-long :key 4 :opinion (prop opinion))
                                         ;(:target-short :target)
-              (:comment-summary :key 5 :opinion (prop opinion) :trimto 40))))))
+              (:comment-summary :key 5 :opinion (prop opinion) :trimto 30))))))
 
 (setf html-thing-lister:*html-thing-user-parts* nil)
 (push #'things-parts html-thing-lister:*html-thing-user-parts*)
@@ -89,6 +89,36 @@
                         (apply #'author-lister params)))))
   :html-thing-link #'author-thing-link
   :limitable t)
+
+(defun recent-opinions (&key index limit getcount)
+  (let ((query (sql-stuff:unexecuted
+                 (clsql:select
+                  (colm 'id)
+                  :from (tabl 'opinion)
+                  :where (clsql:sql-< (clsql:sql-expression :string "age(datestamp)")
+                                      (clsql:sql-expression :string "interval '900 days'"))))))
+    (if getcount
+        (get-count query)
+        (mapcar
+         #'car
+         (merge-query
+          query
+          (sql-stuff:limit-mixin limit index)
+          (list :order-by (list (list (colm 'datestamp) :desc))))))))
+
+(setf (ningle:route *app* "/opinions-recent/")
+      (quick-page ()
+        (bind-validated-input
+            (&key
+             (index :integer))
+          (let ((thing-lister:*thing-summary-width* 40))
+            (html-thing-lister:display-things-with-pagers
+             #'recent-opinions
+             (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+             "/opinions-recent/"
+             (or index 0))))))
+
+
 
 (def-db-thing
     'opinion
