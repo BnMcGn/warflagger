@@ -81,32 +81,9 @@
      #'author-replies
      (list (get-local-user-id (get-user-name)))
      (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
-     nil
+     (format nil "/author-replies/~a" uid)
      :label "Replies to your Posts:"
-     :class "featurebox"))
-
-  (html-thing-lister:render-list-for-sidebar
-   (list :lister-type :connector :thing 'user :name 'recently-viewed
-         :lister-param (get-user-name))
-   :label "Recently Viewed:"
-   :class "featurebox" ;;??? This is a guess
-   :summary-width 40
-   :pagequantity 20)
-  (when-let ((aid (get-local-user-id (get-user-name))))
-    (html-thing-lister:render-list-for-sidebar
-     (list :lister-type :connector :thing 'author :name 'opinion
-           :lister-param aid)
-     :label "Your Opinions:"
-     :class "featurebox"
-     :summary-width 40
-     :pagequantity 20))
-  (html-thing-lister:render-list-for-sidebar
-   (list :lister-type :connector :thing 'user :name 'replies
-         :lister-param (get-user-name))
-   :label "Replies to Your Posts:"
-   :class "featurebox"
-   :summary-width 40
-   :pagequantity 20))
+     :class "featurebox")))
 
 (define-parts author-page-parts
   :@side-content

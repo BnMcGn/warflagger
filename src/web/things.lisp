@@ -369,7 +369,7 @@
               (colm :rootid) (colm :opinionid) :from (tabl :looks)
                                                :where (clsql:sql-= (colm :wf_user) (sql-escape user))
                                                :order-by (colm :firstlook))
-             (sql-stuff:recent-mixin 'firstlook "30 days")))))
+             (sql-stuff:recent-mixin 'firstlook "60 days")))))
     (if getcount
         (get-count query)
         (mapcar
@@ -390,13 +390,24 @@
                          (colm :target)
                          (clsql:sql-query
                           (colm :opinion :url)
-                          :from (list (tabl :author) (tabl :opinion))
-                          :where (clsql:sql-and
-                                  (clsql:sql-= (colm :author :id) (colm :opinion :author))
-                                  (clsql:sql-= (colm :author :type) "wf_user")
-                                  (clsql:sql-= (colm :author :value) (sql-escape authid)))))))))
+                          :from (tabl :opinion)
+                          :where (clsql:sql-= (colm :author) authid)))))))
+    (gadgets:dump query)
     (if getcount
         (get-count query)
         (merge-query
          query
          (list :order-by (list (list (colm 'datestamp) :desc)))))))
+
+(setf (ningle:route *app* "/author-replies/*")
+      (quick-page ()
+        (bind-validated-input
+            ((id :integer)
+             &key
+             (index :integer))
+          (display-things-with-pagers
+           #'author-replies
+           (list id)
+           (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+           (format nil "/author-replies/~a" id)
+           (or index 0)))))
