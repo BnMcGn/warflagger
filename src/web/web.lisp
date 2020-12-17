@@ -165,10 +165,6 @@
              (lambda ()
                (bind-validated-input
                    ((id :integer))
-                 ;;(funcall
-                  ;;(html-thing-lister:connector-display-func
-                   ;;'target 'participants)
-                  ;;id)
                  (target-participants-sidebar id))))
           (bind-validated-input
               ((id :integer)

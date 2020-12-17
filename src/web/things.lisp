@@ -100,17 +100,19 @@
   :sortkeys '(target author datestamp excerpt rooturl)
   :html-thing-link #'opinion-thing-link)
 
+(defun target-info-for-line (rootid)
+  (let ((url (get-rooturl-by-id rootid)))
+    (list
+     :id rootid
+     ;;FIXME: tryit isn't the safest thing to use
+     :title (or (tryit (grab-title url)) "PAGE UNAVAILABLE")
+     :text (or (tryit (grab-text url)) "PAGE UNAVAILABLE")
+     :url url
+     :warstats (warstats-for-target url))))
+
 (def-thing
     'target
-    (lambda (rootid)
-      (let ((url (get-rooturl-by-id rootid)))
-        (list
-         :id rootid
-         ;;FIXME: tryit isn't the safest thing to use
-         :title (or (tryit (grab-title url)) "PAGE UNAVAILABLE")
-         :text (or (tryit (grab-text url)) "PAGE UNAVAILABLE")
-         :url url
-         :warstats (warstats-for-target url))))
+    #'target-info-for-line
   #'display-target-line
   ;(lambda (targdata)
   ;  (truncate-string (getf targdata :title) :length 80))
@@ -228,13 +230,17 @@
                 (clsql:sql-= (colm :author :value) (sql-escape (car x)))))))))
   :other-thing 'opinion)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; New thing-lister stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun recent-opinions (&key getcount)
   (let ((query (sql-stuff:unexecuted
-                 (clsql:select
-                  (colm 'id)
-                  :from (tabl 'opinion)
-                  :where (clsql:sql-< (clsql:sql-expression :string "age(datestamp)")
-                                      (clsql:sql-expression :string "interval '900 days'"))))))
+                 (merge-query
+                  (clsql:select
+                   (colm 'id)
+                   :from (tabl 'opinion))
+                  (recent-mixin 'datestamp "30 days")))))
     (if getcount
         (get-count query)
         (mapcar
@@ -288,3 +294,109 @@
            #'display-author-line
            (format nil "/target-participants/~a" id)
            (or index 0)))))
+
+(defun author-opinions (authid &key getcount)
+  (let ((query (sql-stuff:unexecuted
+                 (clsql:select (colm 'opinion 'id)
+                               :from (tabl 'opinion)
+                               :where
+                               (clsql:sql-= (colm 'author) (sql-escape authid))))))
+   (if getcount
+        (get-count query)
+        (mapcar
+         #'car
+         (merge-query
+          query
+          (sql-stuff:limit-mixin *thing-limit* *thing-index*)
+          (list :order-by (list (list (colm 'datestamp) :desc))))))))
+
+(defun author-opinions-sidebar (id)
+  (display-things-sidebar
+   #'author-opinions
+   (list id)
+   (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+   (format nil "/author-opinions/~a" id)
+   :label "Author: Opinions"))
+
+(setf (ningle:route *app* "/author-opinions/*")
+      (quick-page ()
+        (bind-validated-input
+            ((id :integer)
+             &key
+             (index :integer))
+          (display-things-with-pagers
+           #'author-opinions
+           (list id)
+           (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+           (format nil "/author-opinions/~a" id)
+           (or index 0)))))
+
+(defun author-discussions (authid &key getcount)
+  (let ((rslt  (ordered-unique (mapcar #'car (clsql:select (colm 'opinion 'rooturl)
+                                            :from (tabl 'opinion)
+                                            :where
+                                            (clsql:sql-= (colm 'author) (sql-escape authid)))))))
+   (if getcount
+       (length rslt)
+       (thing-slice rslt))))
+
+(defun author-discussions-sidebar (id)
+  (display-things-sidebar
+   #'author-discussions
+   (list id)
+   (lambda (id) (princ (display-target-line (target-info-for-line id)) *webhax-output*))
+   (format nil "/author-discussions/~a" id)
+   :label "Author: Discussions"))
+
+(setf (ningle:route *app* "/author-discussions/*")
+      (quick-page ()
+        (bind-validated-input
+            ((id :integer)
+             &key
+             (index :integer))
+          (display-things-with-pagers
+           #'author-discussions
+           (list id)
+           (lambda (id) (princ (display-target-line (target-info-for-line id)) *webhax-output*))
+           (format nil "/author-discussions/~a" id)
+           (or index 0)))))
+
+(defun user-recently-viewed (user &key getcount)
+  (let ((query
+          (sql-stuff:unexecuted
+            (merge-query
+             (clsql:select
+              (colm :rootid) (colm :opinionid) :from (tabl :looks)
+                                               :where (clsql:sql-= (colm :wf_user) (sql-escape user))
+                                               :order-by (colm :firstlook))
+             (sql-stuff:recent-mixin 'firstlook "30 days")))))
+    (if getcount
+        (get-count query)
+        (mapcar
+         (lambda (row)
+           (destructuring-bind (root opin) row
+             (list (or opin root) (if opin 'opinion 'target))))
+         (merge-query
+          query
+          (order-by-mixin 'firstlook))))))
+
+(defun author-replies (authid &key getcount)
+  (let ((query
+          (unexecuted
+            (clsql:select
+             (colm :id) :from (tabl :opinion)
+                        :where
+                        (clsql:sql-in
+                         (colm :target)
+                         (clsql:sql-query
+                          (colm :opinion :url)
+                          :from (list (tabl :author) (tabl :opinion))
+                          :where (clsql:sql-and
+                                  (clsql:sql-= (colm :author :id) (colm :opinion :author))
+                                  (clsql:sql-= (colm :author :type) "wf_user")
+                                  (clsql:sql-= (colm :author :value) (sql-escape authid)))))))))
+    (if getcount
+        (get-count query)
+        (merge-query
+         query
+         (list :order-by (list (list (colm 'datestamp) :desc)))))))
