@@ -248,7 +248,7 @@
          (merge-query
           query
           (sql-stuff:limit-mixin *thing-limit* *thing-index*)
-          (list :order-by (list (list (colm 'datestamp) :desc))))))))
+          (order-by-mixin (colm 'datestamp) :desc))))))
 
 (setf (ningle:route *app* "/opinions-recent/")
       (quick-page ()

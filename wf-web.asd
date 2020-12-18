@@ -31,7 +31,6 @@
 		 :src
 		 :serial t
 		 :components ((:file "web/package")
-                              (:file "web/things")
                               (:file "web/mood")
                               (:file "web/titlebar")
                               (:file "web/displayables")
@@ -46,5 +45,6 @@
                               (:file "web/account")
                               (:file "web/rest")
                               (:file "web/radmin")
-                              (:file "web/web")))))
+                              (:file "web/web")
+                              (:file "web/things")))))
 
