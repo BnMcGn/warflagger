@@ -40,6 +40,9 @@ jobs:
             git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
             git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
             git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
+            git clone https://github.com/bnmcgn/ps-lib-tool.git quicklisp/local-projects/ps-lib-tool
+            git clone https://github.com/bnmcgn/reacl.git quicklisp/local-projects/reacl
+            git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
 
             cp src/local-settings-template.lisp src/local-settings.lisp
 
