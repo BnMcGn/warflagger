@@ -73,7 +73,7 @@ jobs:
             psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
             psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
 
-      - run: ros run "(ql:register-local-projects)" --
+      - run: echo "(ql:register-local-projects)" | ros run -- 
       - run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
       - run: ros install ci-utils
       - run: ros install prove # for run-prove
