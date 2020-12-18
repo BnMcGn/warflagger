@@ -40,10 +40,10 @@
                               (:file "web/opinion-page")
                               (:file "web/grouped")
                               (:file "web/misc")
+                              (:file "web/things")
                               (:file "web/opinion-form")
                               (:file "web/account")
                               ;;(:file "web/rest")
-                              (:file "web/radmin")
-                              (:file "web/web")
-                              (:file "web/things")))))
+                              ;;(:file "web/radmin")
+                              (:file "web/web")))))
 

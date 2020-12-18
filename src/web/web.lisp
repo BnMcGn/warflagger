@@ -122,7 +122,6 @@
 
 (setf (webhax-user::login-destination) "/user/")
 
-(defvar *app* (make-instance 'ningle:<app>))
 
 (proto:dependency-auto-watcher routes
   (setf (ningle:route *app* "/text-server/")
@@ -334,7 +333,7 @@
        (clath:component
         "https://logintest.warflagger.com:5000/")
        (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-       (snooze:make-clack-middleware)
+       ;;(snooze:make-clack-middleware)
        (html-thing-lister:thing-component)
        *app*)
    :port 5000

@@ -1,5 +1,7 @@
 (in-package :wf/web)
 
+(defvar *app* (make-instance 'ningle:<app>))
+
 (defun large-logo ()
   (html-out
     (:img :src "/static/img/wf_logo_large.png"
