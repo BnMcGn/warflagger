@@ -30,7 +30,8 @@
    'target-components
    'opinion-page
    'warflagger-things
-   'radmin))
+  ;; 'radmin
+   ))
 
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
