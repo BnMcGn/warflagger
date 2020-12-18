@@ -24,8 +24,7 @@
                #:ps-react-gadgets
                #:lack-middleware-mount
                #:clath
-               #:userfig
-               #:snooze)
+               #:userfig)
   :serial t
   :components ((:module 
 		 :src
