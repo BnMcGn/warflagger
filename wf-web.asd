@@ -42,7 +42,7 @@
                               (:file "web/misc")
                               (:file "web/opinion-form")
                               (:file "web/account")
-                              (:file "web/rest")
+                              ;;(:file "web/rest")
                               (:file "web/radmin")
                               (:file "web/web")
                               (:file "web/things")))))
