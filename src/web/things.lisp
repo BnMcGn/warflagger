@@ -39,19 +39,22 @@
 (setf html-thing-lister:*thing-summary-sidebar-width* 18)
 
 
-(defun display-opinion-line (opinion)
-  (let ((line-id (gadgets:mkstr (gensym "mount-opinion-"))))
-    (webhax-core:html-out-str
+(defun display-opinion-line (opid)
+  (let ((opinion (opinion-by-id opid))
+        (line-id (gadgets:mkstr (gensym "mount-opinion-"))))
+    (html-out
       (:div :id line-id)
       (mount-component (opinion-line :mount-id (lisp line-id))
         :opinion (lisp (ps-gadgets:as-ps-data opinion))
         :trim (lisp thing-lister:*thing-summary-width*)))))
 
-(defun display-target-line (target)
-  (let ((warstats (getf target :warstats)))
-    (html-out-str
+(defun display-target-line (rootid)
+  (let* ((target (target-info-for-line rootid))
+         (warstats (getf target :warstats)))
+    (html-out
       (:div
-       (str (truncate-string (getf target :title) :length 80))
+       (:a :href (make-rootid-url rootid)
+           (str (truncate-string (getf target :title) :length 80)))
        (:span
         :title
         (format nil "~a direct responses, ~a in conversation"
@@ -127,7 +130,7 @@
             (html-thing-lister:display-things-with-pagers
              #'recent-opinions
              nil
-             (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+             #'display-opinion-line
              "/opinions-recent/"
              (or index 0))))))
 
@@ -182,7 +185,7 @@
   (display-things-sidebar
    #'author-opinions
    (list id)
-   (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+   #'display-opinion-line
    (format nil "/author-opinions/~a" id)
    :label "Author: Opinions"))
 
@@ -195,7 +198,7 @@
           (display-things-with-pagers
            #'author-opinions
            (list id)
-           (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+           #'display-opinion-line
            (format nil "/author-opinions/~a" id)
            (or index 0)))))
 
@@ -212,7 +215,7 @@
   (display-things-sidebar
    #'author-discussions
    (list id)
-   (lambda (id) (princ (display-target-line (target-info-for-line id)) *webhax-output*))
+   #'display-target-line
    (format nil "/author-discussions/~a" id)
    :label "Author: Discussions"))
 
@@ -225,7 +228,7 @@
           (display-things-with-pagers
            #'author-discussions
            (list id)
-           (lambda (id) (princ (display-target-line (target-info-for-line id)) *webhax-output*))
+           #'display-target-line
            (format nil "/author-discussions/~a" id)
            (or index 0)))))
 
@@ -260,7 +263,6 @@
                           (colm :opinion :url)
                           :from (tabl :opinion)
                           :where (clsql:sql-= (colm :author) authid)))))))
-    (gadgets:dump query)
     (if getcount
         (get-count query)
         (merge-query
@@ -276,6 +278,6 @@
           (display-things-with-pagers
            #'author-replies
            (list id)
-           (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+           #'display-opinion-line
            (format nil "/author-replies/~a" id)
            (or index 0)))))

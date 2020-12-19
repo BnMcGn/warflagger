@@ -64,8 +64,8 @@
      (lambda (row)
        (destructuring-bind (key type) row
          (case type
-           (target (princ (display-target-line (target-info-for-line key)) *webhax-output*))
-           (opinion (princ (display-opinion-line (opinion-by-id key)) *webhax-output*)))))
+           (target (display-target-line key))
+           (opinion (display-opinion-line key)))))
      ;;FIXME: For now:
      nil
      :label "Recently Viewed:"
@@ -73,14 +73,14 @@
     (html-thing-lister:display-things-sidebar
      #'author-opinions
      (list (get-local-user-id (get-user-name)))
-     (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+     #'display-opinion-line
      (format nil "/author-opinions/~a" uid)
      :label "Your Opinions:"
      :class "featurebox")
     (html-thing-lister:display-things-sidebar
      #'author-replies
      (list (get-local-user-id (get-user-name)))
-     (lambda (id) (princ (display-opinion-line (opinion-by-id id)) *webhax-output*))
+     #'display-opinion-line
      (format nil "/author-replies/~a" uid)
      :label "Replies to your Posts:"
      :class "featurebox")))
