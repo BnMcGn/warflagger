@@ -76,30 +76,6 @@
 (defun opinion-thing-link (opid)
   (format nil "/opinion-page/~a" opid))
 
-(def-thing
-    'author
-    #'get-author-data
-  #'author-representation-from-row
-  :lister (list
-           #'author-lister
-           :sortkeys '(values id)
-           :length (lambda (&rest params)
-                     (get-count
-                      (unexecuted
-                        (apply #'author-lister params)))))
-  :html-thing-link #'author-thing-link
-  :limitable t)
-
-
-(def-db-thing
-    'opinion
-    'opinion
-  #'display-opinion-line
-  :keyfunc (lambda (id)
-             (opinion-from-db-row (get-assoc-by-pkey 'opinion id)))
-  :sortkeys '(target author datestamp excerpt rooturl)
-  :html-thing-link #'opinion-thing-link)
-
 (defun target-info-for-line (rootid)
   (let ((url (get-rooturl-by-id rootid)))
     (list
@@ -109,37 +85,6 @@
      :text (or (tryit (grab-text url)) "PAGE UNAVAILABLE")
      :url url
      :warstats (warstats-for-target url))))
-
-(def-thing
-    'target
-    #'target-info-for-line
-  #'display-target-line
-  ;(lambda (targdata)
-  ;  (truncate-string (getf targdata :title) :length 80))
-   ; (concatenate 'string
-   ;              (truncate-string (getf targdata :title) :length 15)
-   ;              " - "
-   ;              (truncate-string (getf targdata :text) :length 15)))
-  :lister
-  (list
-   (wrap-with-paging-handler
-    (lambda (&key order-by)
-      (declare (ignore order-by))
-      ;;Only have relevance for now
-      (get-ranked-rootids)))
-   :sortkeys '(relevance))
-  :html-thing-link (lambda (id) (format nil "/target/~a" id)))
-
-(html-thing-lister:def-thing-action 'opinion 'reply
-  '(lambda (id) (setf (@ window location href) (+ "/opinion/?opinion-id=" id))))
-
-(def-thing-connector
-    'opinion
-    'replies
-  (lambda (&rest x)
-    (mapcar #'car (opinion-tree-for-target
-                   (assoc-cdr :url (opinion-by-id (car x))))))
-  :other-thing 'opinion)
 
 ;;FIXME: Should all be done in query or else with something like an ordered
 ;; hash table.
@@ -152,83 +97,6 @@
             (for-rooturl-mixin rooturl)
             (order-by-mixin (colm 'opinion 'datestamp))))
    :test #'eq))
-
-(def-thing-connector
-    'opinion
-    'participants
-  (lambda (&rest x)
-    (flaggers-for-rooturl
-     (get-rooturl-by-id
-      (assoc-cdr :rooturl
-                 (get-assoc-by-pkey 'opinion (string-unless-number (car x)))))))
-  :other-thing 'author)
-
-(def-thing-connector
-    'author
-    'opinion
-  (lambda (&rest id)
-    (mapcar #'car
-            (clsql:select (colm 'opinion 'id)
-                          :from (tabl 'opinion)
-                          :where
-                          (clsql:sql-= (colm 'author) (sql-escape (car id)))))))
-
-
-
-(def-thing-connector
-    'author
-    'discussions
-  (lambda (&rest id)
-    (ordered-unique
-     (mapcar #'car
-             (clsql:select (colm 'opinion 'rooturl)
-                           :from (tabl 'opinion)
-                           :where
-                           (clsql:sql-= (colm 'author) (sql-escape (car id)))))
-     :test #'eq))
-  :other-thing 'target)
-
-(def-thing-connector
-    'target
-    'participants
-  (lambda (&rest x)
-    (flaggers-for-rooturl
-     (get-rooturl-by-id (car x))))
-  :other-thing 'author)
-
-
-(def-thing-connector
-    'user
-    'recently-viewed
-  (lambda (&rest x)
-    (mapcar
-     (lambda (row)
-       (destructuring-bind (root opin) row
-         (list (or opin root) (if opin 'opinion 'target))))
-     (clsql:select
-      (colm :rootid) (colm :opinionid) :from (tabl :looks)
-      :where (clsql:sql-= (colm :wf_user) (sql-escape (car x)))
-      :order-by (colm :firstlook))))
-  :other-thing :multiple)
-
-(def-thing-connector
-    'user
-    'replies
-  (lambda (&rest x)
-    (mapcar
-     #'car
-     (clsql:select
-      (colm :id) :from (tabl :opinion)
-      :where
-      (clsql:sql-in
-       (colm :target)
-       (clsql:sql-query
-        (colm :opinion :url) :from (list (tabl :author) (tabl :opinion))
-        :where (clsql:sql-and
-                (clsql:sql-= (colm :author :id) (colm :opinion :author))
-                (clsql:sql-= (colm :author :type) "wf_user")
-                (clsql:sql-= (colm :author :value) (sql-escape (car x)))))))))
-  :other-thing 'opinion)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; New thing-lister stuff
