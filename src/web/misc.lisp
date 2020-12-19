@@ -38,13 +38,7 @@
          "You don't seem to have posted on WarFlagger yet."
          (:a :href "/introduction/" "Click here")
          " for a guide to posting.")))
-    #|(html-thing-lister:render-list-for-sidebar
-     (list :lister-type :thing :thing 'target)
-     :label "Active targets:"
-     :class "featurebox"
-     :summary-width 40
-    :pagequantity 20)|#
-    (grouped-page)
+       (grouped-page)
     ))
 
 (define-ps-lib wf-web-library ()

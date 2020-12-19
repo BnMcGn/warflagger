@@ -55,10 +55,10 @@
             (elt local-time:+month-names+ (local-time:timestamp-month since))
             (local-time:timestamp-year since)))
       (:br)))
-  (let ((*html-thing-sidebox-limit* 20)
-        (*thing-summary-sidebar-width* 40)
+  (let ((*thing-sidebox-length* 20)
+        (*thing-sidebox-width* 40)
         (uid (get-local-user-id (get-user-name))))
-    (html-thing-lister:display-things-sidebar
+    (thing-lister:display-things-sidebar
      #'user-recently-viewed
      (list (get-user-name))
      (lambda (row)
@@ -70,14 +70,14 @@
      nil
      :label "Recently Viewed:"
      :class "featurebox")
-    (html-thing-lister:display-things-sidebar
+    (thing-lister:display-things-sidebar
      #'author-opinions
      (list (get-local-user-id (get-user-name)))
      #'display-opinion-line
      (format nil "/author-opinions/~a" uid)
      :label "Your Opinions:"
      :class "featurebox")
-    (html-thing-lister:display-things-sidebar
+    (thing-lister:display-things-sidebar
      #'author-replies
      (list (get-local-user-id (get-user-name)))
      #'display-opinion-line

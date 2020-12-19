@@ -16,7 +16,6 @@
         #:wf/text-extract
         #:sql-stuff
         #:thing-lister
-        #:html-thing-lister
         #:parenscript
         #:cl-react
         #:ps-gadgets

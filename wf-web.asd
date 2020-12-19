@@ -15,7 +15,6 @@
                #:cl-who
                #:anaphora
                #:thing-lister
-               #:html-thing-lister
                #:ratify
                #:warflagger-core
                #:warflagger

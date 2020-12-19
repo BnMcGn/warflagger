@@ -33,10 +33,10 @@
                                         ;(:target-short :target)
               (:comment-summary :key 5 :opinion (prop opinion) :trimto 30))))))
 
-(setf html-thing-lister:*html-thing-user-parts* nil)
-(push #'things-parts html-thing-lister:*html-thing-user-parts*)
+;;(setf html-thing-lister:*html-thing-user-parts* nil)
+;;(push #'things-parts html-thing-lister:*html-thing-user-parts*)
 
-(setf html-thing-lister:*thing-summary-sidebar-width* 18)
+(setf thing-lister:*thing-sidebox-width* 18)
 
 
 (defun display-opinion-line (opid)
@@ -127,7 +127,7 @@
             (&key
              (index :integer))
           (let ((thing-lister:*thing-summary-width* 40))
-            (html-thing-lister:display-things-with-pagers
+            (thing-lister:display-things-with-pagers
              #'recent-opinions
              nil
              #'display-opinion-line

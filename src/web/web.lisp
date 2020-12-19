@@ -335,7 +335,6 @@
         "https://logintest.warflagger.com:5000/")
        (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
        ;;(snooze:make-clack-middleware)
-       (html-thing-lister:thing-component)
        *app*)
    :port 5000
    :ssl t
@@ -357,7 +356,6 @@
     (clath:component
      *base-url*)
     (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-    (html-thing-lister:thing-component)
     *app*)
    :port 5005)
   #+sbcl (sb-thread:join-thread
