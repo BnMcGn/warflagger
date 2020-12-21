@@ -209,7 +209,7 @@
             (let* ((textel (chain document (get-element-by-id (state id))))
                    (range (chain rangy (get-selection) (get-range-at 0)
                                  (to-character-range textel)))
-                   (excerpt (get-location-excerpt (create-textdata (prop text))
+                   (excerpt (get-location-excerpt (create-textdata (chain (prop text) (trim)))
                                                   (@ range start) (@ range end))))
               (funcall
                (prop dispatch)

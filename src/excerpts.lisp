@@ -53,10 +53,12 @@
 (defstruct tdat text whitespace)
 
 (defun create-textdata (text)
-  (ret data (make-tdat)
-    (setf (tdat-text data) text)
-    (setf (tdat-whitespace data)
-          (hu:collecting-hash-table (:mode :tally)
+  ;;Leading whitespace can throw things off
+  (let ((text (string-trim gadgets:*whitespace-characters* text)))
+    (ret data (make-tdat)
+      (setf (tdat-text data) text)
+      (setf (tdat-whitespace data)
+            (hu:collecting-hash-table (:mode :tally)
               (let ((found nil))
                 (dotimes (i (length text))
                   (if (member (elt text i) *whitespace-characters*)
@@ -64,7 +66,7 @@
                         (unless found (setf found i))
                         (dolist (j (range found (1+ i)))
                           (hu:collect j t)))
-                      (setf found nil))))))))
+                      (setf found nil)))))))))
 
 (defun contiguous-whitespace? (tdat index)
   (gethash index (tdat-whitespace tdat) 0))
