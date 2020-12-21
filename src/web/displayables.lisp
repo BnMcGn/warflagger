@@ -194,7 +194,8 @@
           :on-mouse-up (@ this selection-change)
           :on-key-press (@ this selection-change)
           (when (prop text)
-            (%make-segments (prop text)
+            ;;Stray whitespace can confuse location of reply to excerpt, hence the trim
+            (%make-segments (chain (prop text) (trim))
                             (set-copy (@ this props)
                                       'hilited-text-id
                                       (state id))))))
