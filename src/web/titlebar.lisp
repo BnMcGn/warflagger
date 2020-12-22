@@ -140,7 +140,7 @@
                   (when excerpt
                     (psx (:input :type "hidden" :name "excerpt" :key 3
                                  :value (encode-u-r-i-component excerpt))))
-                  (when offset
+                  (when (and offset (< 0 offset))
                     (psx (:input :type "hidden" :name "offset" :key 4
                                  :value offset)))
                   (if excerpt
