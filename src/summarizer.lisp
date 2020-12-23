@@ -62,7 +62,7 @@
           :text-position
           (multiple-value-list
            (find-excerpt-position text (assoc-cdr :excerpt data)
-                                  (or (assoc-cdr :excerptoffset data) 0))))
+                                  (or (assoc-cdr :excerpt-offset data) 0))))
          data)
         data)))
 

@@ -182,10 +182,12 @@ the page text can be found in the cache."
     (get-assoc-by-col (colm 'opinion 'url) url)))
 
 (defun get-excerpt-data (eid)
-  (proto:map-tuples
-   (compose #'proto:keywordize-foreign (curry #'assoc-cdr :type))
-   (curry #'assoc-cdr :value)
-   (nth-value 1 (get-assoc-by-col (colm 'excerpt 'opinion) eid))))
+  (ret res (proto:map-tuples
+            (compose #'proto:keywordize-foreign (curry #'assoc-cdr :type))
+            (curry #'assoc-cdr :value)
+            (nth-value 1 (get-assoc-by-col (colm 'excerpt 'opinion) eid)))
+    (when-let ((offset (assoc :excerpt-offset res)))
+      (setf (cdr offset) (parse-integer (cdr offset))))))
 
 (defun flag-to-lisp (dbflag)
   (mapcar (compose #'make-keyword #'string-upcase #'to-lisp-case)
@@ -433,7 +435,9 @@ the page text can be found in the cache."
                         :values (list id reference)))
       (dolist (k '(:excerpt :excerpt-offset :time-excerpt :excerpt-length))
         (when-let* ((pair (assoc k opin))
-                    (val (not-empty (cdr pair))))
+                    (val (typecase (cdr pair)
+                           (sequence (not-empty (cdr pair)))
+                           (integer (and (positive-real-p (cdr pair)) (cdr pair))))))
           (insert-records :into 'excerpt
                           :attributes
                           (list (colm :opinion) (colm :type) (colm :value))
