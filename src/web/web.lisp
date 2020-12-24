@@ -343,6 +343,9 @@
    :ssl-key-password wf/local-settings:*ssl-password*))
 
 (defun run-production-server ()
+  ;; Because we aren't running the block below on live server
+  (clsql:connect wf/local-settings:*db-connect-spec*
+                 :database-type wf/local-settings:*db-connect-type*)
   (clack-server-manager
    *handler*
    (lack:builder
@@ -365,14 +368,14 @@
            (sb-thread:list-all-threads))))
 
 (when wf/local-settings:*auto-run*
-  (unless-production
-   ;;FIXME: we don't have write permission on production, so update through git instead.
-   ;; This isn't quite the best way to do things.
-   (write-warflagger-js-resources))
   ;;FIXME: isn't working for production.
   (if-production
    (clsql:connect wf/local-settings:*db-connect-spec*
                   :database-type wf/local-settings:*db-connect-type*)
    (clsql:connect wf/local-settings:*test-db-connect-spec*
                   :database-type wf/local-settings:*db-connect-type*))
+  (unless-production
+   ;;FIXME: we don't have write permission on production, so update through git instead.
+   ;; This isn't quite the best way to do things.
+   (write-warflagger-js-resources))
   (if-production (run-production-server) (run-test-server)))
