@@ -12,4 +12,4 @@
   (wf/web::run-production-server))
 
 (sb-ext:save-lisp-and-die
- "wf-server.img" :toplevel #'main :executable t)
+ "wf-server.new" :toplevel #'main :executable t)
