@@ -53,6 +53,9 @@
         (psx
          (:span
           :id (prop id)
+          :... (create :data-segment-count
+                (let ((count (%get-replies-count (prop excerpt-opinions) (@ this props))))
+                  (if (< 1 count) count "")))
           :style (create font-weight :bold position :relative)
           :class (apply #'flavor (prop warstats) (prop excerpt-opinions))
           :on-mouse-enter (@ this handle-mouse-enter)
@@ -66,9 +69,6 @@
                 (unless (chain _ (is-equal (state position) res))
                   (set-state position res)))))
           (rebreak (prop text))
-          (:span :class "segment-count" :key (unique-id)
-                 (let ((count (%get-replies-count (prop excerpt-opinions) (@ this props))))
-                   (if (< 1 count) count "")))
           (:tool-tip :key "a1"
                      :style (popup-style)
                      :active (and (state viewable) (not (prop hide-popup)))
