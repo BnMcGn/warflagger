@@ -18,18 +18,19 @@
    'webhax-widgets:ps-widgets
    (ps-lib-tool:get-code 'ps-react-gadgets)
    'webhax-ask
-   'wf-web-library
-   'mood-lib
-   'displayables
+   (ps-lib-tool:get-code 'flaglib)
+   ;'wf-web-library
+   ;'mood-lib
+   ;'displayables
    'opinion-components
-   'grouped-components
-   'titlebar-components
-   'target-article
-   'target-thread
-   'target-summary
-   'target-components
-   'opinion-page
-   'warflagger-things
+   ;'grouped-components
+   ;'titlebar-components
+   ;'target-article
+   ;'target-thread
+   ;'target-summary
+   ;'target-components
+   ;'opinion-page
+   ;'warflagger-things
   ;; 'radmin
    ))
 
@@ -345,7 +346,7 @@
 (defun run-production-server ()
   ;; Because we aren't running the block below on live server
   (clsql:connect wf/local-settings:*db-connect-spec*
-                 :database-type wf/local-settings:*db-connect-type*)
+                 :database-type wf/local-settings:*db-connect-type* :if-exists :old)
   (clack-server-manager
    *handler*
    (lack:builder
@@ -373,7 +374,7 @@
    (clsql:connect wf/local-settings:*db-connect-spec*
                   :database-type wf/local-settings:*db-connect-type*)
    (clsql:connect wf/local-settings:*test-db-connect-spec*
-                  :database-type wf/local-settings:*db-connect-type*))
+                  :database-type wf/local-settings:*db-connect-type* :if-exists :old))
   (unless-production
    ;;FIXME: we don't have write permission on production, so update through git instead.
    ;; This isn't quite the best way to do things.

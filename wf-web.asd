@@ -21,6 +21,7 @@
                #:ps-lib-tool
                #:ps-gadgets
                #:ps-react-gadgets
+               #:flaglib
                #:lack-middleware-mount
                #:clath
                #:userfig)
