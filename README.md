@@ -12,13 +12,8 @@ There is an [introduction](http://warflagger.net/introduction/) that contains li
 
 At this point the WarFlagger source code is not cleaned up for public consumption. It's not documented and has a bunch of dependencies that are not in quicklisp. Building your own working copy will need a fair amount of fiddling.
 
-These two dependencies are custom forks of other projects:
 
-- [cl-react](https://github.com/BnMcGn/cl-react)
-- [Parenscript](https://github.com/BnMcGn/Parenscript)
-
-You will also want to clone these to your local-projects directory:
-- [gadgets](https://github.com/BnMcGn/gadgets)
+You will want to clone these to your local-projects directory:
 - [ps-gadgets](https://github.com/BnMcGn/ps-gadgets)
 - [sql-stuff](https://github.com/BnMcGn/sql-stuff)
 - [thing-labels](https://github.com/BnMcGn/thing-labels)

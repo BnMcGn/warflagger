@@ -22,6 +22,7 @@
                #:ps-gadgets
                #:ps-react-gadgets
                #:flaglib
+               #:reacl
                #:lack-middleware-mount
                #:clath
                #:userfig)

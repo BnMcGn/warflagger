@@ -17,7 +17,7 @@
         #:sql-stuff
         #:thing-lister
         #:parenscript
-        #:cl-react
+        #:reacl
         #:ps-gadgets
         #:webhax-user
         )
