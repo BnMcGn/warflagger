@@ -1,6 +1,6 @@
 (in-package :wf/web)
 
-(define-ps-lib grouped-components ()
+'(define-ps-lib grouped-components ()
   (ps
 
     (def-component grouped

@@ -146,31 +146,33 @@
 
 
     (def-pure-component text-sample-core
+      nil
+      (defun render ()
         (psx
          (:pre :id "textsample"
                :style (create :overflow "auto" :background "lightgrey"
                               'white-space "pre-wrap":border "1px"
                               :height "15em" :width "40em" :cursor "text")
                :on-mouse-up (lambda (ev)
-                              (chain %thisref (selection-change ev)))
+                              (chain (thisref) (selection-change ev)))
                :on-key-press (lambda (ev)
-                               (chain %thisref (selection-change ev)))
+                               (chain (thisref) (selection-change ev)))
                (hilite-excerpt (prop textdata) (prop excerpt)
-                               (prop excerpt-offset))))
+                               (prop excerpt-offset)))))
       (defun selection-change (ev)
-       (let* ((tsample (chain document (get-element-by-id "textsample")))
-              (range (when (< 0 (chain rangy (get-selection) range-count))
-                       (chain rangy (get-selection) (get-range-at 0)
-                              (to-character-range tsample)))))
-         (when range
-           (destructuring-bind (excerpt offset)
-               (get-location-excerpt (prop textdata)
-                                     (@ range start)
-                                     (@ range end))
-             (funcall (prop dispatch)
-                      (create :type :edit
-                              :data (create :excerpt excerpt
-                                            'excerpt-offset offset))))))))
+        (let* ((tsample (chain document (get-element-by-id "textsample")))
+               (range (when (< 0 (chain rangy (get-selection) range-count))
+                        (chain rangy (get-selection) (get-range-at 0)
+                               (to-character-range tsample)))))
+          (when range
+            (destructuring-bind (excerpt offset)
+                (get-location-excerpt (prop textdata)
+                                      (@ range start)
+                                      (@ range end))
+              (funcall (prop dispatch)
+                       (create :type :edit
+                               :data (create :excerpt excerpt
+                                             'excerpt-offset offset))))))))
 
     ;;FIXME: Find a way to make this not pound the server per keystroke.
     (def-component text-sample
@@ -184,8 +186,9 @@
            :excerpt (prop excerpt)
            :excerpt-offset (prop excerpt-offset))))
 
-      (defun get-default-props ()
-        (create :url ""))
+      ;;(defun get-default-props ()
+      ;; (create :url ""))
+      (static default-props (create :url ""))
 
       (defun component-will-mount ()
         (chain this (start-load-from-server (prop url))))
@@ -226,7 +229,7 @@
                  (when (equal url (state url))
                    (set-state timeout
                               (set-timeout
-                               (@ %thisref load-from-server)
+                               (@ (thisref) load-from-server)
                                2000 url)))))))))
 
     (def-component opform-item
@@ -264,32 +267,34 @@
             (:form
              (:table
               (:tbody
-               (children-map
-                (prop children)
-                (lambda (child)
-                  (let ((name (@ child props name)))
-                    (psx
-                     (:opform-item
-                      :keydata (incf count)
-                      :description (@ child props fieldspec description)
-                      :name name
-                      :error (getprop (prop errors) name)
-                      child
-                      (case name
-                        ("target"
-                         (psx (:message :message (@ state message) :key 1)))
-                        ("excerpt"
-                         (psx (:text-sample
-                               :key 1
-                               :url (@ props formdata target)
-                               :excerpt (@ props formdata excerpt)
-                               :excerpt-offset
-                               (@ props formdata excerpt-offset)
-                               :dispatch cdispatch)))
-                        ("flag"
-                         (psx
-                          (:flag-description :formdata (@ props formdata)
-                                             :key 1)))))))))
+               ;;FIXME: why is package needed?
+               (ps-lib-tool:chainl :reacl -react -children
+                       (map
+                        (prop children)
+                        (lambda (child)
+                          (let ((name (@ child props name)))
+                            (psx
+                             (:opform-item
+                              :keydata (incf count)
+                              :description (@ child props fieldspec description)
+                              :name name
+                              :error (getprop (prop errors) name)
+                              child
+                              (case name
+                                ("target"
+                                 (psx (:message :message (@ state message) :key 1)))
+                                ("excerpt"
+                                 (psx (:text-sample
+                                       :key 1
+                                       :url (@ props formdata target)
+                                       :excerpt (@ props formdata excerpt)
+                                       :excerpt-offset
+                                       (@ props formdata excerpt-offset)
+                                       :dispatch cdispatch)))
+                                ("flag"
+                                 (psx
+                                  (:flag-description :formdata (@ props formdata)
+                                                     :key 1))))))))))
                (:tr
                 :key "user1"
                 (:td

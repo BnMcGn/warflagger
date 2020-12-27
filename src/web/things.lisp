@@ -7,7 +7,7 @@
   :@javascript-link *warflagger-js-resources*)
 
 ;; Depends on: titlebar-components
-(define-ps-lib warflagger-things ()
+'(define-ps-lib warflagger-things ()
   (ps
     (def-component opinion-line
         (if (< (prop trim) 20)

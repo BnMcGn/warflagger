@@ -31,20 +31,10 @@
 		 :src
 		 :serial t
 		 :components ((:file "web/package")
-                              (:file "web/mood")
-                              (:file "web/titlebar")
-                              (:file "web/displayables")
-                              (:file "web/target-article")
-                              (:file "web/target-thread")
-                              (:file "web/target-summary")
-                              (:file "web/target")
-                              (:file "web/opinion-page")
-                              (:file "web/grouped")
                               (:file "web/misc")
+                              (:file "web/grouped")
                               (:file "web/things")
                               (:file "web/opinion-form")
                               (:file "web/account")
-                              ;;(:file "web/rest")
-                              ;;(:file "web/radmin")
                               (:file "web/web")))))
 

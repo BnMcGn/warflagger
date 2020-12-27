@@ -37,7 +37,9 @@
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
    :@head (html-out (:meta :charset "utf-8"))
-   :@css-link "/static/css/style.css")
+   :@css-link "/static/css/style.css"
+   :@css-link "/static/css/target.css"
+   :@css-link "/static/css/react-tabs.css")
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"
@@ -161,7 +163,7 @@
   ;;FIXME: Target page needs to handle URLs that don't have a rootid yet.
   (setf (ningle:route *app* "/target/*")
         (quick-page
-            (#'target-parts
+            (
              :@side-content
              (lambda ()
                (bind-validated-input
@@ -186,7 +188,7 @@
 
   (setf (ningle:route *app* "/new-target/")
         (quick-page
-            (#'target-parts)
+            ()
           (bind-validated-input
               (&key
                (url :url))
@@ -197,7 +199,7 @@
   ;;FIXME: Think about taking over the /opinion/ URL for this
   (setf (ningle:route *app* "/opinion-page/*")
         (quick-page
-            (#'target-parts)
+            ()
           (bind-validated-input
               ((id :integer))
             (let* ((opin (opinion-by-id id))
@@ -215,7 +217,7 @@
 
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
-            (#'target-parts)
+            ()
           (grouped-page)))
 
   (setf (ningle:route *app* "/faq/")
@@ -308,7 +310,7 @@
          :headers '("Access-Control-Allow-Origin" "*")))
 
   (setf (ningle:route *app* "/")
-        (quick-page (#'target-parts
+        (quick-page (
                      #'main-page-parts))))
 
 ;;FIXME: Need to handle the user information that will be passed out in OpinML

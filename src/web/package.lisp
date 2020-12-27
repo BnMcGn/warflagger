@@ -20,8 +20,9 @@
         #:reacl
         #:ps-gadgets
         #:webhax-user
-        )
+        #:ps-lib-tool)
   ;;(:shadowing-import-from #:gadgets #:call)
+  (:shadowing-import-from #:wf/local-settings #:*cache-path*)
   (:shadowing-import-from #:ps-gadgets #:collecting-set #:strcat
                           #:collecting-string #:collecting #:do-window
                           #:collect #:dotree)

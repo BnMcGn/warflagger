@@ -41,7 +41,7 @@
        (grouped-page)
     ))
 
-(define-ps-lib wf-web-library ()
+'(define-ps-lib wf-web-library ()
   (ps
 
     ;;;Paths and urls
