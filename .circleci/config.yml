@@ -43,6 +43,7 @@ jobs:
             git clone https://github.com/bnmcgn/ps-lib-tool.git quicklisp/local-projects/ps-lib-tool
             git clone https://github.com/bnmcgn/reacl.git quicklisp/local-projects/reacl
             git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
+            git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
 
             cp src/local-settings-template.lisp src/local-settings.lisp
 
