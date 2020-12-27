@@ -6,33 +6,6 @@
   :@javascript-link "/static/javascript/warflagger-bundle.js"
   :@javascript-link *warflagger-js-resources*)
 
-;; Depends on: titlebar-components
-'(define-ps-lib warflagger-things ()
-  (ps
-    (def-component opinion-line
-        (if (< (prop trim) 20)
-            (psx (:opinion-line-short
-                  :... (@ this props)))
-            (psx (:opinion-line-long
-                  :... (@ this props)))))
-
-    (def-component opinion-line-short
-        (psx (:div
-              :class "summary_line"
-              (:opinion-icon :key 1 :opinion (prop opinion))
-              (:flag-name :key 2 :opinion (prop opinion))
-              (:author-long :key 4 :opinion (prop opinion)))))
-
-    (def-component opinion-line-long
-        (psx (:div
-              :class "summary_line"
-              (:opinion-icon :key 1 :opinion (prop opinion))
-              (:flag-name :key 2 :opinion (prop opinion))
-              (:date-stamp :key 3 :opinion (prop opinion))
-              (:author-long :key 4 :opinion (prop opinion))
-                                        ;(:target-short :target)
-              (:comment-summary :key 5 :opinion (prop opinion) :trimto 30))))))
-
 ;;(setf html-thing-lister:*html-thing-user-parts* nil)
 ;;(push #'things-parts html-thing-lister:*html-thing-user-parts*)
 
