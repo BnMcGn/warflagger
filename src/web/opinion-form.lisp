@@ -302,9 +302,11 @@
                          :on-click (@ this post-form))))
                (:tr
                 :key "user0"
-                (:td (if (%has-errors (prop errors))
-                         "Opinion not posted: Some fields have errors"
-                         (if (@ props success) "Opinion Posted" ""))))))))))
+                (:td (if (@ props success)
+                         "Opinion Posted"
+                         (if (%has-errors (prop errors))
+                             "Opinion not posted: Some fields have errors"
+                             ""))))))))))
 
       (defun custom-dispatch (data)
         (if (eql :message (@ data :type))
@@ -312,8 +314,10 @@
             (funcall (prop dispatch) data)))
 
       (defun post-form (data)
-        (funcall (prop dispatch)
-                 (create :type :submit))))
+        ;;FIXME: should warn user if already posted. Nothing happens on retry.
+        (unless (prop success)
+          (funcall (prop dispatch)
+                  (create :type :submit)))))
 
     ))
 

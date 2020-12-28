@@ -41,6 +41,7 @@
        (grouped-page)
     ))
 
+
 (defun tracking-code ()
  "<!-- Start of StatCounter Code for Default Guide -->
 <script type=\"text/javascript\">
