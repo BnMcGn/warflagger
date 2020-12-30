@@ -71,8 +71,8 @@
   (list
    :wf-user (get-user-name)
    :screen-name (userfig:userfig-value 'screen-name)
-   ;;:display-name (get-display-name)
-   ;;:homepage (make-user-url (get-display-name))
+   ;;:display-name (get-openid-display-name)
+   ;;:homepage (make-user-url (get-openid-display-name))
    ))
 
 (proto:watch-for-recompile

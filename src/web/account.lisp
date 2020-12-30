@@ -14,7 +14,12 @@
   (html-out
     (:a :href wf/local-settings:*base-url*
         (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"
-           :style "position: absolute; top: 2px;"))))
+              :style "position: absolute; top: 2px;"))))
+
+(defun get-apparent-display-name (loginid)
+  (if-let ((id (get-local-user-id loginid)))
+    (author-representation-from-row (get-author-data id))
+    (userfig:userfig-value-for loginid 'screen-name)))
 
 (defun account-bar ()
   (let ((info (warflagger-user-info-bundle)))
@@ -26,10 +31,8 @@
             (:a :style "position:relative; left: 180px;"
                 ;;FIXME: Should be link at /user/ to :user-url
                 :href "/user/" ;(assoc-cdr :user-url info)
-                (str (let ((userfig:*userfig-user*
-                            (gethash :username webhax:*session*)))
-                       (userfig:userfig-value 'webhax-user:screen-name))))
-            (:div :style "float: right; margin-right: 30px;"
+                (get-apparent-display-name (get-user-name)))
+            (:div :style ""
                   (:a :href (assoc-cdr :settings-url info) "Settings")
                   (:a :href (assoc-cdr :logout-url info) "Sign out"))))
           (htm
@@ -98,9 +101,10 @@
         ((authid :integer))
       (let* ((auth-data (get-author-data authid))
              (user (get-local-user-from-id authid))
-             (screen-name (if user
-                              (userfig:userfig-value-for user 'screen-name)
-                              (author-representation-from-row auth-data)))
+             (screen-name (author-representation-from-row auth-data))
+                      ;;(if user
+                          ;;    (userfig:userfig-value-for user 'screen-name)
+                          ;;    (author-representation-from-row auth-data)))
              (num (get-count
                    (unexecuted (clsql:select
                                 (colm 'author)
