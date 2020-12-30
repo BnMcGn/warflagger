@@ -31,8 +31,8 @@
             (:a :style "position:relative; left: 180px;"
                 ;;FIXME: Should be link at /user/ to :user-url
                 :href "/user/" ;(assoc-cdr :user-url info)
-                (get-apparent-display-name (get-user-name)))
-            (:div :style ""
+                (str (get-apparent-display-name (get-user-name))))
+            (:div :style "float: right; margin-right: 30px;"
                   (:a :href (assoc-cdr :settings-url info) "Settings")
                   (:a :href (assoc-cdr :logout-url info) "Sign out"))))
           (htm
