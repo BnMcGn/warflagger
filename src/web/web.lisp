@@ -134,9 +134,7 @@
             (list 200 '(:content-type "application/json")
                   (list
                    (json:encode-json-to-string
-                    (if (opinion-exists-p url)
-                        (warflagger:opinion-text-server url)
-                        (wf/text-extract:text-server url))))))))
+                    (text-server-dispatcher url)))))))
 
   (setf (ningle:route *app* "/opinion/")
         (quick-page ()

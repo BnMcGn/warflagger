@@ -27,7 +27,9 @@
    #:text-server
    #:grab-links
    #:grab-failed-message
-   #:grab-messages))
+   #:grab-messages
+   #:supply-text
+   #:supply-page))
 
 (in-package :wf/text-extract)
 

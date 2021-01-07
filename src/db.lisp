@@ -243,7 +243,7 @@ the page text can be found in the cache."
              (list :text ""
                    :status "success"
                    :message "[No comment text]")))
-       (list :text
+       (list :text ""
              :status "failure"
              :message "Opinion not found"))))
 

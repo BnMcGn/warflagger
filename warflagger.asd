@@ -19,7 +19,8 @@
                #:external-program
                #:cl-postgres
                #:ratify
-               #:simple-rgb)
+               #:simple-rgb
+               #:lquery)
   :serial t
   :components ((:module 
 		 :src

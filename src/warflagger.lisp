@@ -2,13 +2,47 @@
 
 (in-package #:warflagger)
 
-;;;FIXME: Needs to attempt to load externals and test.
-;;;FIXME: Should error if url not found anywhere?
-;;;FIXME: Is this redundant? Check db.lisp
+(defun extract-opinml-meta-from-html (stream)
+  (let ((nodes (lquery:$ (initialize stream) "[property^=opinml:]")))
+    (loop for node across nodes
+          for attribs = (plump:attributes node)
+          collect (cons (gethash "property" attribs) (gethash "content" attribs)))))
+
+(defun file-points-to-opinml-source? (stream)
+  (let ((res (extract-opinml-meta-from-html stream)))
+    (and (assoc "opinml:opinion" res :test #'equal)
+         (< (length (gadgets:assoc-all "opinml:opinion" res :test #'equal)) 2)
+         (assoc-cdr "opinml:opinion" res :test #'equal))))
+
+;;FIXME: Bit of a hack. Can we do away with this?
+(defun known-translatable-opinurl (url)
+  (sequence-starts-with url (strcat *base-url* "opinion-page/")))
+
+(defun translate-opinurl (url)
+  (ppcre:regex-replace "opinion-page" url "things/thing/opinion"))
+
+;;FIXME: Don't have an OpinML mime-type. Will want to try a link for OpinML. We might return different
+;; things for different request types. Rework opinion urls?
+;;FIXME: Will want to check IPFS/whatever. Don't have that yet.
 (defun is-location-opinml? (url)
-  (or (exists (select (colm 'id) :from (tabl 'opinion)
-		      :where (sql-= (colm 'url) url)))
-      (not (and (is-cached url) (old-page-available url)))))
+  "Returns T when link is OpinML, returns canonical url when appropriate. Returns nil if url is a root url or is unknown."
+  (cond
+    ((opinion-exists-p url) t)
+    ((known-translatable-opinurl url) (translate-opinurl url))
+    ((and (is-cached url) (old-page-available url))
+     (if-let ((link (file-points-to-opinml-source? (grab-page url :update nil))))
+       link nil))
+    (t nil)))
+
+(defun text-server-dispatcher (url)
+  (let ((otest (is-location-opinml? url)))
+    (cond
+      ((not otest) (wf/text-extract:text-server url))
+      ((eq otest t) (warflagger:opinion-text-server url))
+      ((stringp otest)
+       (let ((res (opinion-text-server url)))
+         (setf (getf res :status) "redirect")
+         (list* :url otest res))))))
 
 (defun make-user-url (username)
   (strcat *base-url* "u/" username "/"))
