@@ -115,23 +115,17 @@
   (get-column (tabl 'rooturl) (colm 'rooturl)))
 
 (defun get-rooturl-for-url (url)
-  "Tries to find the url at the root of a tree of comments. The primary value will always be a guess at the url. The second value tells whether get-rooturl is sure of its result. Get-rooturl does not do network lookups."
+  "Tries to find the url at the root of a tree of comments. The primary value will always be a guess at the url. The second value tells whether get-rooturl is sure of its result. Get-rooturl does not do network lookups. The rooturl must exist in the database as a rooturl."
   (declare (type string url))
-  (block top
-    (awhen (get-assoc-by-col (colm 'rooturl 'rooturl) url)
-      (return-from top (values (assoc-cdr :rooturl it)
-                               ;Evidently some bit rot here
-                                    ;(ratify:parse-boolean
-                                     (assoc-cdr :rooturl-real it))))
-    (awhen (select (colm 'rooturl 'rooturl) (colm 'rooturl 'rooturl-real)
-                   :from (list (tabl 'rooturl) (tabl 'opinion))
-                   :where
-                   (sql-and
-                    (sql-= (colm 'opinion 'url) (sql-escape url))
-                    (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))))
-      (return-from top (values (caar it) (second (car it)))))
-                                    ;(ratify:parse-boolean (second (car it))))))
-    (values nil nil)))
+  (let ((opinfo (is-location-opinml? url)))
+    (if opinfo
+        (if (stringp opinfo)
+            (get-rooturl-for-url opinfo)
+            (let* ((oid (get-target-id-from-url url))
+                   (opinion (opinion-by-id oid)))
+              (get-rooturl-for-url (get-rooturl-by-id (assoc-cdr :rooturl opinion)))))
+        (when (get-rooturl-id url)
+          url))))
 
 (defun get-rooturl-id (rurl)
   (if-let ((rec (get-assoc-by-col (colm 'rooturl 'rooturl) rurl)))
@@ -140,7 +134,7 @@
 
 (defun get-rooturl-by-id (rootid)
   (if-let ((rec (get-assoc-by-pkey 'rooturl rootid)))
-       (assoc-cdr :rooturl rec)
+    (values (assoc-cdr :rooturl rec) (assoc-cdr :rooturl-real rec))
        (error "Rooturl ID not found")))
 
 ;;;FIXME: Each opinion should record its rooturl. Needs access to targetted opinion, therefore.
@@ -148,10 +142,11 @@
 (defun rooturl-real-p (id)
   "Means that target chain has been traced back to a non-opinml page, and that
 the page text can be found in the cache."
-  (boolify (assoc-cdr :rooturl-real (get-assoc-by-pkey 'rooturl id))))
+  (nth-value 1 (get-rooturl-by-id id)))
 
 ;;;FIXME: What to do if it isn't the real root? Who corrects the rooturl field
 ;; on all those opinions?
+;;; FIXME: Should this check for opinml meta tags?
 (defun make-rooturl-real (root-id)
   (let ((url (get-rooturl-by-id root-id)))
     (or (rooturl-real-p root-id)
@@ -416,6 +411,7 @@ the page text can be found in the cache."
            (insert-record
             'opinion
             (cl-utilities:collecting
+              ;;FIXME: RootURL should be stored in targetted opin, passed in by client.
                 (cl-utilities:collect
                     (cons (colm :rooturl) (find/store-root-url target)))
               (dolist (k '(:votevalue :target :datestamp :url))
