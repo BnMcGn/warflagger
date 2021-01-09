@@ -40,9 +40,10 @@
       ((not otest) (wf/text-extract:text-server url))
       ((eq otest t) (warflagger:opinion-text-server url))
       ((stringp otest)
-       (let ((res (opinion-text-server url)))
-         (setf (getf res :status) "redirect")
-         (list* :url otest res))))))
+       (let ((res (opinion-text-server otest)))
+         (setf (gethash :status res) "redirect")
+         (setf (gethash :url res) otest)
+         res)))))
 
 (defun make-user-url (username)
   (strcat *base-url* "u/" username "/"))

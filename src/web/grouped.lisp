@@ -35,8 +35,10 @@
             :looks (when (authenticated?)
                      (get-looks (get-user-name) rootid))
             :rootid rootid)
+           ;;FIXME: add a rowtype for opinion refs?
            (list
             :url refurl
+            :warflagger-link (make-wf-url-for-url refurl)
             :display-depth depth
             :rowtype :reference
             :refparent parent-rootid

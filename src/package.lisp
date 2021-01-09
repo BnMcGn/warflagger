@@ -81,5 +81,6 @@
    #:order-discussions-by-most-recent-opinion
    #:discussion-roots
    #:get-target-id
-   #:question-opinion-p))
+   #:question-opinion-p
+   #:text-server-dispatcher))
 

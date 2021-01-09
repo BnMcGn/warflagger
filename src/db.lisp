@@ -256,7 +256,10 @@ the page text can be found in the cache."
     (case type
       (:rooturl (make-rootid-url id))
       (:opinion (make-opinion-url nil id))
-      (otherwise (make-missing-rootid-url url)))))
+      (otherwise
+       (if (stringp (is-location-opinml? url))
+         url
+         (make-missing-rootid-url url))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors

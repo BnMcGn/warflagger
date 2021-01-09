@@ -8,13 +8,6 @@
           :alt "[WarFlagger: Because someone is wrong on the internet]"
           :style "display: block; margin-left: auto; margin-right: auto; margin-top: 3em; margin-bottom: 3em;")))
 
-(defun blank-warstat-for-web ()
-  (let* ((wstat (warflagger:generate-rooturl-warstats ""))
-         (root (hu:plist->hash (gethash :root wstat))))
-    (setf (gethash :effect root) 0)
-    (setf (gethash :root wstat) root)
-    wstat))
-
 (define-parts main-page-parts
   :@css-link "/static/css/push_button.css"
   :@notifications
