@@ -2,9 +2,9 @@
 (in-package #:test-warflagger)
 
 
-(defparameter *target* "http://warflagger.net/static/html/sample.html")
+(defparameter *target* "https://warflagger.net/static/html/sample.html")
 (defparameter *user* "WFTestUser")
-(defparameter *refurl* "http://warflagger.net/faq/")
+(defparameter *refurl* "https://warflagger.net/faq/")
 (defparameter *testcomment* "Test")
 
 (defun test-db ()
