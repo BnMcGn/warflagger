@@ -97,3 +97,22 @@
       (if (< 0 offset)
           (decf offset)
           (return (values i (- it i)))))))
+
+(defun previous-break (text index)
+  (position #\linefeed text :end index :from-end t))
+
+(defun next-break (text index)
+  (position #\linefeed text :start index))
+
+(defun excerpt-context (text position length)
+  (let*
+      ((text (string-trim gadgets:*whitespace-characters* text))
+       (tlength (length text))
+       (estart position)
+       (eend (+ length position))
+       (tstart (previous-break text estart))
+       (tend (next-break text eend))
+       (leading-context (subseq text (if tstart (1+ tstart) 0) estart))
+       (excerpt (subseq text estart eend))
+       (trailing-context (subseq text eend (or tend tlength))))
+    (list :leading leading-context :trailing trailing-context :excerpt excerpt)))
