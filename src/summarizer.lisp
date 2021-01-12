@@ -130,28 +130,46 @@
          ;;FIXME: Don't yet know what to do if reference isn't a target.
         (t nil)))))
 
+(defun target-opinion-data (opinion)
+  (list*
+   :target-opinion-warstats (request-warstats-for-url (assoc-cdr :url opinion))
+   :target-opinion-id (assoc-cdr :id opinion)
+   (when-let* ((excerpt (assoc-cdr :excerpt opinion))
+               (text (text-server-dispatcher (assoc-cdr :target opinion)))
+               (textpos (multiple-value-list
+                         (find-excerpt-position
+                          text excerpt (or (assoc-cdr :excerpt-offset opinion) 0))))
+               (econtext (excerpt-context text (elt textpos 0) (elt textpos 1))))
+     (list :target-opinion-excerpt (getf econtext :excerpt)
+           :target-opinion-leading (getf econtext :leading)
+           :target-opinion-trailing (getf econtext :trailing)))))
+
+(defun reference-data (id)
+  (let* ((refopin (opinion-by-id id))
+         (refurl (assoc-cdr :reference refopin))
+         (target-opin (opinion-for-location refurl))
+         (refroot (or (and target-opin (get-rooturl-by-id (assoc-cdr :rooturl target-opin))) refurl)))
+    `(:reference
+      ,refurl
+      :reference-domain ,(nth-value 2 (quri:parse-uri refroot))
+      :warflagger-link ,(make-wf-url-for-url refurl)
+      :tree-address ,(tree-address id)
+      :refbot ,(system-generated-p id)
+      :refopinid ,id
+      :refopinurl ,(assoc-cdr :url refopin)
+      :warstats ,(request-warstats-for-url refroot)
+      :warstats-src-url ;;FIXME: do we use this? kind of ugly.
+      ,(when-let ((spec (%warstats-pathdata-for-url refroot)))
+        (strcat wf/local-settings:*base-url* (apply #'make-warstats-url spec)))
+      :headline ,(get-headline-for-url refroot)
+      ,@(when target-opin
+          (target-opinion-data target-opin)))))
+
+;;Outgoing references
 (defun reference-list-for-rooturl (rooturl)
-  (hu:collecting-hash-table (:mode :replace)
-    (dolist (id (opinion-ids-for-rooturl rooturl))
-      (when (grab-column (liql id 'reference.opinion))
-        (let* ((refopin (opinion-by-id id))
-               (refurl (assoc-cdr :reference refopin)))
-          (hu:collect id
-            (hu:plist->hash
-             (list
-              :reference refurl
-              :reference-domain (nth-value 2 (quri:parse-uri refurl))
-              :warflagger-link (make-wf-url-for-url refurl)
-              :tree-address (tree-address id)
-              :refbot (system-generated-p id)
-              :refopinid id
-              :refopinurl (assoc-cdr :url refopin)
-              :warstats (request-warstats-for-url refurl)
-              :warstats-src-url
-              (when-let ((spec (%warstats-pathdata-for-url refurl)))
-                (strcat wf/local-settings:*base-url*
-                        (apply #'make-warstats-url spec)))
-              :headline (get-headline-for-url refurl)))))))))
+  (ret res (make-hash-table)
+    (dolist (id (reference-opinion-ids-for-rooturl rooturl))
+      (setf (gethash id res) (hu:plist->hash (reference-data id))))))
 
 (defun question-opinion-p (opinid)
   (member (grab-one (liql opinid 'opinion 'opinion.flag))

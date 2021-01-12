@@ -82,5 +82,8 @@
    #:discussion-roots
    #:get-target-id
    #:question-opinion-p
-   #:text-server-dispatcher))
+   #:text-server-dispatcher
+   #:opinion-for-location
+   #:previous-break
+   #:next-break))
 

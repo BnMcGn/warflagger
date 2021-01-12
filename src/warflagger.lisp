@@ -34,6 +34,10 @@
        link nil))
     (t nil)))
 
+(defun opinion-for-location (url)
+  (when-let ((correct-url (is-location-opinml? url)))
+    (opinion-from-db-row (opinion-exists-p (if (stringp correct-url) correct-url url)))))
+
 (defun text-server-dispatcher (url)
   (let ((otest (is-location-opinml? url)))
     (cond

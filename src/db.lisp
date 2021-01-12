@@ -22,6 +22,15 @@
      (select (colm 'opinion 'id))
      (for-rooturl-mixin rurl)))))
 
+(def-query reference-opinion-ids-for-rooturl (rurl)
+  (mapcar
+   #'car
+   (query-marker
+    (merge-query
+     (opinion-ids-for-rooturl rurl)
+     (list :from (tabl 'reference)
+           :where (sql-= (colm 'reference 'opinion) (colm 'opinion 'id)))))))
+
 (defun opinion-tree-for-rooturl (rurl)
   ;;FIXME: fails to check for loops and dead trees.
   (proto:tree-by-feature
