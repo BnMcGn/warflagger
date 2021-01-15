@@ -35,12 +35,16 @@
             :looks (when (authenticated?)
                      (get-looks (get-user-name) rootid))
             :rootid rootid)
-           ;;FIXME: add a rowtype for opinion refs?
-           (list*
-            :display-depth depth
-            :rowtype :reference
-            :refparent parent-rootid
-            (warflagger::outgoing-reference-data refid)))))))
+           (let ((refdat (warflagger::outgoing-reference-data refid)))
+             ;;FIXME: warstats should come from context
+             (setf (getf refdat :warstats) (hu:plist->hash (getf refdat :warstats)))
+             (setf (getf refdat :target-opinion-warstats)
+                   (hu:plist->hash (getf refdat :target-opinion-warstats)))
+             (list*
+              :display-depth depth
+              :rowtype :reference
+              :refparent parent-rootid
+              refdat)))))))
 
 (defun format-group-data (discrootid tree)
   (cl-utilities:collecting
