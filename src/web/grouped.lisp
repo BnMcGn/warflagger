@@ -22,6 +22,7 @@
                    (get-rooturl-id refurl)))
          (parent-rootid (assoc-cdr :rooturl refopin)))
     ;;We are ignoring references to opinions (for now?)
+    ;;FIXME: No we aren't! This is broken. Ambiguous URLs slip through.
     (unless (opinion-exists-p refurl)
       (hu:plist->hash
        (if rootid
@@ -38,8 +39,8 @@
            (let ((refdat (warflagger::outgoing-reference-data refid)))
              ;;FIXME: warstats should come from context
              (setf (getf refdat :warstats) (hu:plist->hash (getf refdat :warstats)))
-             (setf (getf refdat :target-opinion-warstats)
-                   (hu:plist->hash (getf refdat :target-opinion-warstats)))
+             (setf (getf refdat :refd-opinion-warstats)
+                   (hu:plist->hash (getf refdat :refd-opinion-warstats)))
              (list*
               :display-depth depth
               :rowtype :reference

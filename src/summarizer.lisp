@@ -130,10 +130,10 @@
          ;;FIXME: Don't yet know what to do if reference isn't a target.
         (t nil)))))
 
-(defun target-opinion-data (opinion)
+(defun refd-opinion-data (opinion)
   (list*
-   :target-opinion-warstats (request-warstats-for-url (assoc-cdr :url opinion))
-   :target-opinion-id (assoc-cdr :id opinion)
+   :refd-opinion-warstats (request-warstats-for-url (assoc-cdr :url opinion))
+   :refd-opinion-id (assoc-cdr :id opinion)
    (when-let* ((excerpt (assoc-cdr :excerpt opinion))
                (text (gethash :text (text-server-dispatcher (assoc-cdr :target opinion))))
                (textpos (multiple-value-list
@@ -142,15 +142,15 @@
                (index (elt textpos 0))
                (length (elt textpos 1))
                (econtext (excerpt-context text index length)))
-     (list :target-opinion-excerpt (getf econtext :excerpt)
-           :target-opinion-leading (getf econtext :leading)
-           :target-opinion-trailing (getf econtext :trailing)))))
+     (list :refd-opinion-excerpt (getf econtext :excerpt)
+           :refd-opinion-leading (getf econtext :leading)
+           :refd-opinion-trailing (getf econtext :trailing)))))
 
 (defun outgoing-reference-data (id)
   (let* ((refopin (opinion-by-id id))
          (refurl (assoc-cdr :reference refopin))
-         (target-opin (opinion-for-location refurl))
-         (refroot (or (and target-opin (get-rooturl-by-id (assoc-cdr :rooturl target-opin))) refurl)))
+         (refd-opin (opinion-for-location refurl))
+         (refroot (or (and refd-opin (get-rooturl-by-id (assoc-cdr :rooturl refd-opin))) refurl)))
     (assert (stringp refroot))
     `(:reference
       ,refurl
@@ -165,8 +165,8 @@
       ,(when-let ((spec (%warstats-pathdata-for-url refroot)))
         (strcat wf/local-settings:*base-url* (apply #'make-warstats-url spec)))
       :headline ,(get-headline-for-url refroot)
-      ,@(when target-opin
-          (target-opinion-data target-opin)))))
+      ,@(when refd-opin
+          (refd-opinion-data refd-opin)))))
 
 ;;Outgoing references
 (defun reference-list-for-rooturl (rooturl)

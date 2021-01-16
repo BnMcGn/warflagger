@@ -100,6 +100,7 @@
   (funcall
    (webhax-route:quick-page
        (:@title title)
+     (named-text :login-page)
      (princ (funcall body-func) *webhax-output*))))
 
 (defun favicon-links ()
