@@ -8,6 +8,7 @@
 ;; - titles for references?
 ;; - warstats for refs? Doesn't really make sense...
 ;; - group reference data
+;; - keywords (hashtags). These could come out of warstats eventually. But maybe not per group.
 
 (defun gather-grouped-data-requirements (components)
   ;;What about looks?
@@ -64,31 +65,28 @@
          (rootid (when (rooturl-p refurl)
                    (get-rooturl-id refurl)))
          (parent-rootid (assoc-cdr :rooturl refopin)))
-    ;;We are ignoring references to opinions (for now?)
-    ;;FIXME: No we aren't! This is broken. Ambiguous URLs slip through.
-    (unless (opinion-exists-p refurl)
-      (hu:plist->hash
-       (if rootid
-           (list
-            :url refurl
+    (hu:plist->hash
+     (if rootid
+         (list
+          :url refurl
+          :display-depth depth
+          :rowtype :rooturl
+          :refparent parent-rootid
+          :refid refid
+          :title (grab-title refurl)
+          :looks (when (authenticated?)
+                   (get-looks (get-user-name) rootid))
+          :rootid rootid)
+         (let ((refdat (warflagger::outgoing-reference-data refid)))
+           ;;FIXME: warstats should come from context
+           (setf (getf refdat :warstats) (hu:plist->hash (getf refdat :warstats)))
+           (setf (getf refdat :refd-opinion-warstats)
+                 (hu:plist->hash (getf refdat :refd-opinion-warstats)))
+           (list*
             :display-depth depth
-            :rowtype :rooturl
+            :rowtype :reference
             :refparent parent-rootid
-            :refid refid
-            :title (grab-title refurl)
-            :looks (when (authenticated?)
-                     (get-looks (get-user-name) rootid))
-            :rootid rootid)
-           (let ((refdat (warflagger::outgoing-reference-data refid)))
-             ;;FIXME: warstats should come from context
-             (setf (getf refdat :warstats) (hu:plist->hash (getf refdat :warstats)))
-             (setf (getf refdat :refd-opinion-warstats)
-                   (hu:plist->hash (getf refdat :refd-opinion-warstats)))
-             (list*
-              :display-depth depth
-              :rowtype :reference
-              :refparent parent-rootid
-              refdat)))))))
+            refdat))))))
 
 (defun format-group-data (discrootid tree)
   (cl-utilities:collecting
