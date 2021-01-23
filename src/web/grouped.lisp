@@ -1,5 +1,48 @@
 (in-package :wf/web)
 
+;;What will our datafile need?
+;; - opins, warstats (opin and rooturl), headlines
+;; - direction data
+;; - can't do looks. Needs to be per user, but maybe a list of ids to request
+;; - excerpt context (in opinions probably)
+;; - titles for references?
+;; - warstats for refs? Doesn't really make sense...
+;; - group reference data
+
+(defun gather-grouped-data-requirements (components)
+  ;;What about looks?
+  (cl-utilities:with-collectors (opins< warstats< headlines< )
+    (dolist (c components)
+      (case (gethash :rowtype c)
+        (:rooturl
+         (warstats< (gethash :url c))
+         (headlines< (gethash :url c))
+         (when (gethash :refparent c)
+           (opins< (gethash :refid c))
+           (let ((opinion (opinion-by-id (gethash :refid c))))
+             ;;Could also add warstats/headlines for rooturl of opinion. Don't think we use now.
+             (warstats< (assoc-cdr :url opinion))
+             (headlines< (assoc-cdr :url opinion)))))
+        (:reference
+         (let ((opinion (opinion-by-id (gethash :refopinid c))))
+           (warstats< (assoc-cdr :url opinion))
+           (headlines< (assoc-cdr :url opinion))
+           (opins< (gethash :refopinid c))
+           (if (gethash :refd-opinion-id c)
+               (let* ((ropin (opinion-by-id (gethash :refopinid c)))
+                      (url (assoc-cdr :url ropin))
+                      (rootid (assoc-cdr :rooturl ropin))
+                      (rooturl (get-rooturl-by-id rootid)))
+                 (warstats< url) (headlines< url)
+                 (opins< (gethash :refopinid c))
+                 (warstats< rooturl) (headlines< rooturl))
+               (headlines< (assoc-cdr :reference c)))))
+        (:question
+         (let* ((opinion (gethash :id c))
+                (url (assoc-cdr :url opinion)))
+           (opins< (gethash :id c))
+           (headlines< url) (warstats< url)))))))
+
 (defun format-group-component-data (opinid depth)
   (if (question-opinion-p opinid)
       (format-group-question-data opinid depth)
@@ -126,3 +169,18 @@
   (mount-component (grouped-main)
     :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
 
+;;FIXME: rework, maybe, someday
+;; This retrieves a manually created list of discussion roots for the grouped (main) page.
+;; - Grouped might not always be the main page
+;; - Right now we don't have an automated way to collect keywords
+;; - Automatic grouped page is creating a mess
+;; So this will hopefully go away some day. Quick fix for now. MVP, all that stuff...
+(defun load-static-grouped-list ()
+  (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.data"))
+    (read s)))
+
+(defun dump-static-grouped-suggestions ()
+  (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.sugg")
+                     :direction :output :if-exists :supersede :if-does-not-exist :create)
+    (dolist (id (discussion-roots))
+      (print (get-rooturl-by-id id) s))))
