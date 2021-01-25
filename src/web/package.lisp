@@ -27,4 +27,6 @@
                           #:collecting-string #:collecting #:do-window
                           #:collect #:dotree)
   (:shadowing-import-from #:parenscript #:switch #:call)
-  (:shadowing-import-from #:anaphora #:it))
+  (:shadowing-import-from #:anaphora #:it)
+  (:export
+   #:write-grouped-data-file))

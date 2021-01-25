@@ -54,22 +54,22 @@
 ;; Gather the opinion data
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun %opinion-data (opid text)
-  (let ((data (opinion-by-id opid)))
-    (if (assoc-cdr :excerpt data)
-        (cons
-         (list*
-          :text-position
-          (multiple-value-list
-           (find-excerpt-position text (assoc-cdr :excerpt data)
-                                  (or (assoc-cdr :excerpt-offset data) 0))))
-         data)
-        data)))
+(defun opinion-with-excerpt-data (opid text)
+  (let ((opinion (opinion-by-id opid)))
+    (when (assoc :excerpt data)
+      (multiple-value-bind (index length)
+          (find-excerpt-position text (assoc-cdr :excerpt data)
+                                 (or (assoc-cdr :excerpt-offset data) 0))
+        (let ((econtext (excerpt-context text index length)))
+          (push (list* :text-position index length) opinion)
+          (push (cons :leading (getf econtext :leading)) opinion)
+          (push (cons :trailing (getf econtext :trailing)) opinion))))
+    opinion))
 
 (defun %fill-out-opinion-tree (tree text)
   (if (null tree)
       nil
-      (let ((op (%opinion-data (caar tree) text)))
+      (let ((op (opinion-with-excerpt-data (caar tree) text)))
         (cons
          (cons
           op
@@ -116,12 +116,14 @@
 ;;FIXME: Don't yet have system in place for discussing headlines.
 (defun get-headline-for-url (url)
   (multiple-value-bind (id type) (get-target-id-from-url url)
-    (declare (ignore id))
     (hu:collecting-hash-table (:mode :replace)
       (cond
         ((eq type :opinion)
-         ;;FIXME: Could make default title from start of comment
-         nil)
+         (let* ((opinion (opinion-by-id id))
+                (comment (assoc-cdr :comment opinion)))
+           (when comment
+             (hu:collect :natural-title comment)
+             (hu:collect :title comment))))
         ((eq type :rooturl)
          (when-let ((title (and (is-cached url)
                                 (grab-title url :alternate nil :update nil))))
@@ -135,7 +137,7 @@
    :refd-opinion-warstats (request-warstats-for-url (assoc-cdr :url opinion))
    :refd-opinion-id (assoc-cdr :id opinion)
    (when-let* ((excerpt (assoc-cdr :excerpt opinion))
-               (text (gethash :text (text-server-dispatcher (assoc-cdr :target opinion))))
+               (text (get-target-text (assoc-cdr :id opinion)))
                (textpos (multiple-value-list
                          (find-excerpt-position
                           (create-textdata text) excerpt (or (assoc-cdr :excerpt-offset opinion) 0))))

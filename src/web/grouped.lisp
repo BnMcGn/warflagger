@@ -12,7 +12,7 @@
 
 (defun gather-grouped-data-requirements (components)
   ;;What about looks?
-  (cl-utilities:with-collectors (opins< warstats< headlines< )
+  (cl-utilities:with-collectors (opins< warstats< headlines<)
     (dolist (c components)
       (case (gethash :rowtype c)
         (:rooturl
@@ -37,9 +37,9 @@
                  (warstats< url) (headlines< url)
                  (opins< (gethash :refopinid c))
                  (warstats< rooturl) (headlines< rooturl))
-               (headlines< (assoc-cdr :reference c)))))
+               (headlines< (gethash :reference c)))))
         (:question
-         (let* ((opinion (gethash :id c))
+         (let* ((opinion (opinion-by-id (gethash :id c)))
                 (url (assoc-cdr :url opinion)))
            (opins< (gethash :id c))
            (headlines< url) (warstats< url)))))))
@@ -89,6 +89,7 @@
             refdat))))))
 
 (defun format-group-data (discrootid tree)
+  ""
   (cl-utilities:collecting
     (cl-utilities:collect
       (let ((url (get-rooturl-by-id discrootid)))
@@ -150,8 +151,9 @@
                              (cons (car itm) (add-questions-to-discussion-tree (cdr itm)))))))))
         (proc (nreverse accum) t)))))
 
-(defun grouped-data ()
-  (let ((discroots (discussion-roots)))
+(defun grouped-data (&optional discroots)
+  "Returns a list of lists. Each list represents a group. Each item in a group contains data for a single entry (row) on the grouped page. There are three types of entries: :rooturl :reference :question. Parameter discroots supplies rooturl ids upon which to base the groups. If not supplied, a guess will be made."
+  (let ((discroots (or discroots (discussion-roots))))
     (multiple-value-bind (groups rootids)
         (cl-utilities:with-collectors (groups< rootids<)
           (dolist (dr discroots)
@@ -167,6 +169,33 @@
   (mount-component (grouped-main)
     :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
 
+(defun prep-data-for-grouped-json (rootlist)
+  (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
+         (discrootids (mapcar #'get-rooturl-id discroots))
+         (keywords (mapcar (rcurry #'getf :keywords) rootlist))
+         (groups (grouped-data discrootids)))
+    (multiple-value-bind (opinions warstats headlines)
+        (gather-grouped-data-requirements (flatten groups))
+      (list
+       :groups groups
+       :opinion-store
+       (hu:collecting-hash-table (:mode :replace)
+         (dolist (opid opinions)
+           (hu:collect opid (opinion-with-excerpt-data opid (create-textdata (get-target-text opid))))))
+       :warstats-store
+       (hu:collecting-hash-table (:mode :replace)
+         (dolist (target warstats)
+           (hu:collect target (warstats-for-target target))))
+       :headlines
+       (hu:collecting-hash-table (:mode :replace)
+         (dolist (target headlines)
+           (hu:collect target (get-headline-for-url target))))))))
+
+(defun write-grouped-data-file ()
+  (with-open-file (s (merge-pathnames "grouped.json" wf/local-settings:*warstats-path*)
+                     :direction :output :if-exists :supersede :if-does-not-exist :create)
+    (cl-json:encode-json-plist (prep-data-for-grouped-json (load-static-grouped-list)) s)))
+
 ;;FIXME: rework, maybe, someday
 ;; This retrieves a manually created list of discussion roots for the grouped (main) page.
 ;; - Grouped might not always be the main page
@@ -174,8 +203,9 @@
 ;; - Automatic grouped page is creating a mess
 ;; So this will hopefully go away some day. Quick fix for now. MVP, all that stuff...
 (defun load-static-grouped-list ()
-  (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.data"))
-    (read s)))
+  (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.data")
+                     :if-does-not-exist nil)
+    (when s (read s))))
 
 (defun dump-static-grouped-suggestions ()
   (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.sugg")

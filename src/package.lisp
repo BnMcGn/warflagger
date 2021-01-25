@@ -85,5 +85,8 @@
    #:text-server-dispatcher
    #:opinion-for-location
    #:previous-break
-   #:next-break))
+   #:next-break
+   #:opinion-with-excerpt-data
+   #:get-target-text
+   #:get-headline-for-url))
 
