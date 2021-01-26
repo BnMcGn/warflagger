@@ -85,6 +85,7 @@
            (list*
             :display-depth depth
             :rowtype :reference
+            :refid refid
             :refparent parent-rootid
             refdat))))))
 
@@ -178,6 +179,8 @@
         (gather-grouped-data-requirements (flatten groups))
       (list
        :groups groups
+       :keywords
+       (hu:alist->hash (pairlis discroots keywords))
        :opinion-store
        (hu:collecting-hash-table (:mode :replace)
          (dolist (opid opinions)
@@ -185,7 +188,7 @@
        :warstats-store
        (hu:collecting-hash-table (:mode :replace)
          (dolist (target warstats)
-           (hu:collect target (warstats-for-target target))))
+           (hu:collect target (hu:plist->hash (warstats-for-target target)))))
        :headlines
        (hu:collecting-hash-table (:mode :replace)
          (dolist (target headlines)
