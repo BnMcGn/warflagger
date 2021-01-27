@@ -102,7 +102,7 @@ that is winding down. Drops hotness if less than 10% of opinions are new."
      (if (eq parent-dir :con) :con :pro))
     (t (error "Shouldn't have reached this"))))
 
-(defun generate-direction-data (tree)
+(defun generate-direction-data (tree stor)
   (labels ((proc (tree pardir)
              (dolist (branch tree)
                (let* ((opin (opinion-by-id (car branch)))
@@ -110,10 +110,10 @@ that is winding down. Drops hotness if less than 10% of opinions are new."
                       (oprootdir (if pardir
                                      (opinion-chain-direction pardir opdir)
                                      opdir)))
-                 (setf (getf (gethash (car branch) *opinion-effect-cache*)
+                 (setf (getf (gethash (car branch) stor)
                              :direction)
                        opdir)
-                 (setf (getf (gethash (car branch) *opinion-effect-cache*)
+                 (setf (getf (gethash (car branch) stor)
                              :direction-on-root)
                        oprootdir)
                  (proc (cdr branch) oprootdir)))))
@@ -472,7 +472,11 @@ Some of these factors will obviously affect the respect points more than others.
     (setf (getf root-ax :effect) (calculate-axdat-effect root-ax nil))
     (setf (getf root-ax :controversy) (calculate-axdat-controversy root-ax))
     (setf (gethash :root *opinion-effect-cache*) root-ax)
-    (generate-direction-data tree) ;; Output auto-stored in *opinion-effect-cache*
+    (generate-direction-data tree *opinion-effect-cache*)
     ;;FIXME: Side effect!! Need a better way to cache results. This is just a hack for now.
     (setf (gethash rooturl *warstat-store*) root-ax)
+    (gadgets:do-hash-table (id stats *opinion-effect-cache*)
+      (unless (eq id :root)
+        (let ((opinion (opinion-by-id id)))
+          (setf (gethash (assoc-cdr :url opinion) *warstat-store*) stats))))
     *opinion-effect-cache*))

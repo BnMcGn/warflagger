@@ -95,7 +95,8 @@
 
 (defun warstats-for-target (target)
   (unless (gethash target *warstat-store*)
-    (generate-rooturl-warstats target)) ;;Will place the root warstat in the store.
+    ;;Will place the root warstat in the store.
+    (generate-rooturl-warstats (get-rooturl-for-url target)))
   (gethash target *warstat-store*))
 
 ;;;
