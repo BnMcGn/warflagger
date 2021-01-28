@@ -218,8 +218,33 @@ the page text can be found in the cache."
                  (get-excerpt-data (gethash :id res))
                  (hu:hash->alist res))))
 
-(defun opinion-by-id (oid)
-  (opinion-from-db-row (get-assoc-by-pkey 'opinion oid)))
+(defun add-extras-to-opinion (opinion text)
+  (when (assoc :excerpt opinion)
+    (let ((textdata (typecase text
+                      (tdat text)
+                      (string (create-textdata text))))
+          (text (typecase text
+                  (tdat (tdat-text text))
+                  (string text))))
+        (multiple-value-bind (index length)
+            (find-excerpt-position textdata (assoc-cdr :excerpt opinion)
+                                   (or (assoc-cdr :excerpt-offset opinion) 0))
+          (let ((econtext (excerpt-context text index length)))
+            (push (list :text-position index length) opinion)
+            (push (cons :leading (getf econtext :leading)) opinion)
+            (push (cons :trailing (getf econtext :trailing)) opinion)))))
+  (push (cons :tree-address (tree-address (assoc-cdr :id opinion))) opinion)
+  ;;Despite appearances, this is functional. Use the opinion that is returned. Passed in
+  ;; original won't be modified;
+  opinion)
+
+(defun opinion-by-id (oid &key extra text)
+  (when (and text (not extra))
+    (error "Text keyword is not valid without :extra set to T"))
+  (let ((opinion (opinion-from-db-row (get-assoc-by-pkey 'opinion oid))))
+    (if extra
+        (add-extras-to-opinion opinion (or text (get-target-text oid)))
+        opinion)))
 
 (def-query get-opinion-peers (o-url)
   (mapcar

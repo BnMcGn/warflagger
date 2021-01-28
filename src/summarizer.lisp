@@ -54,22 +54,10 @@
 ;; Gather the opinion data
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun opinion-with-excerpt-data (opid text)
-  (let ((opinion (opinion-by-id opid)))
-    (when (assoc :excerpt data)
-      (multiple-value-bind (index length)
-          (find-excerpt-position text (assoc-cdr :excerpt data)
-                                 (or (assoc-cdr :excerpt-offset data) 0))
-        (let ((econtext (excerpt-context text index length)))
-          (push (list* :text-position index length) opinion)
-          (push (cons :leading (getf econtext :leading)) opinion)
-          (push (cons :trailing (getf econtext :trailing)) opinion))))
-    opinion))
-
 (defun %fill-out-opinion-tree (tree text)
   (if (null tree)
       nil
-      (let ((op (opinion-with-excerpt-data (caar tree) text)))
+      (let ((op (opinion-by-id (caar tree) :extra t :text text)))
         (cons
          (cons
           op
@@ -191,6 +179,7 @@
                        (cl-utilities:collect
                            (hu:plist->hash
                             (list
+                             ;;FIXME: refactor.
                              :tree-address (reverse (cons (car node) location))
                              :questopinid (assoc-cdr :id opin)
                              :questopinurl (assoc-cdr :url opin)

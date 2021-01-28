@@ -34,9 +34,10 @@
                       (url (assoc-cdr :url ropin))
                       (rootid (assoc-cdr :rooturl ropin))
                       (rooturl (get-rooturl-by-id rootid)))
+                 (mapcar #'opins< (butlast (tree-address (gethash :refd-opinion-id c))))
                  (warstats< url) (headlines< url)
                  (opins< (gethash :refd-opinion-id c))
-                 (warstats< rooturl) (headlines< rooturl))
+                 (warstats< rooturl) (headlines< rooturl)
                (headlines< (gethash :reference c)))))
         (:question
          (let* ((opinion (opinion-by-id (gethash :id c)))
@@ -90,7 +91,6 @@
             refdat))))))
 
 (defun format-group-data (discrootid tree)
-  ""
   (cl-utilities:collecting
     (cl-utilities:collect
       (let ((url (get-rooturl-by-id discrootid)))
@@ -184,7 +184,7 @@
        :opinion-store
        (hu:collecting-hash-table (:mode :replace)
          (dolist (opid opinions)
-           (hu:collect opid (opinion-with-excerpt-data opid (create-textdata (get-target-text opid))))))
+           (hu:collect opid (opinion-by-id opid :extra t))))
        :warstats-store
        (hu:collecting-hash-table (:mode :replace)
          (dolist (target warstats)
