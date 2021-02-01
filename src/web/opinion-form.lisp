@@ -98,7 +98,7 @@
             ;;FIXME: Should be done in separate thread to reduce delay for user
             ;;Generate references
             (save-new-references (assoc-cdr :url savedopin))
-            (write-all-rootid-warstats (assoc-cdr :rooturl savedopin))
+            (write-all-rootid-warstats (assoc-cdr :rootid savedopin))
             (write-grouped-data-file))))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))

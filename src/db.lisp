@@ -133,7 +133,7 @@
             (get-rooturl-for-url opinfo)
             (let* ((oid (get-target-id-from-url url))
                    (opinion (opinion-by-id oid)))
-              (get-rooturl-for-url (get-rooturl-by-id (assoc-cdr :rooturl opinion)))))
+              (get-rooturl-for-url (assoc-cdr :rooturl opinion))))
         (when (rooturl-p url)
           url))))
 
