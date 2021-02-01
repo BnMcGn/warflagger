@@ -205,12 +205,12 @@
 ;; - Automatic grouped page is creating a mess
 ;; So this will hopefully go away some day. Quick fix for now. MVP, all that stuff...
 (defun load-static-grouped-list ()
-  (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.data")
+  (with-open-file (s (merge-pathnames wf/local-settings:*cache-path* "grouped.data")
                      :if-does-not-exist nil)
     (when s (read s))))
 
 (defun dump-static-grouped-suggestions ()
-  (with-open-file (s (asdf:system-relative-pathname 'warflagger "src/grouped.sugg")
+  (with-open-file (s (merge-pathnames wf/local-settings:*cache-path* "grouped.sugg")
                      :direction :output :if-exists :supersede :if-does-not-exist :create)
     (dolist (id (discussion-roots))
       (print (get-rooturl-by-id id) s))))
