@@ -58,7 +58,7 @@
 
 (defun tree-address (opinid)
   (let* ((opin (opinion-by-id opinid))
-         (tree (opinion-tree-for-rooturl (get-rooturl-by-id (assoc-cdr :rooturl opin)))))
+         (tree (opinion-tree-for-rooturl (get-rooturl-by-id (assoc-cdr :rootid opin)))))
     (labels ((proc (tree address)
                (let ((branches nil))
                  (dolist (node tree)
@@ -234,14 +234,15 @@ the page text can be found in the cache."
             (push (cons :leading (getf econtext :leading)) opinion)
             (push (cons :trailing (getf econtext :trailing)) opinion)))))
   (push (cons :tree-address (tree-address (assoc-cdr :id opinion))) opinion)
-  ;;Despite appearances, this is functional. Use the opinion that is returned. Passed in
-  ;; original won't be modified;
   opinion)
 
 (defun opinion-by-id (oid &key extra text)
   (when (and text (not extra))
     (error "Text keyword is not valid without :extra set to T"))
   (let ((opinion (opinion-from-db-row (get-assoc-by-pkey 'opinion oid))))
+    ;; Might cause trouble...
+    (push (cons :rootid (assoc-cdr :rooturl opinion)) opinion)
+    (setf (cdr (assoc :rooturl opinion)) (get-rooturl-by-id (assoc-cdr :rootid opinion)))
     (if extra
         (add-extras-to-opinion opinion (or text (get-target-text oid)))
         opinion)))
