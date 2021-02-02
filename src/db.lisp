@@ -230,11 +230,12 @@ the page text can be found in the cache."
         (multiple-value-bind (index length)
             (find-excerpt-position textdata (assoc-cdr :excerpt opinion)
                                    (or (assoc-cdr :excerpt-offset opinion) 0))
-          (when index
+          (if index
             (let ((econtext (excerpt-context text index length)))
              (push (list :text-position index length) opinion)
              (push (cons :leading (getf econtext :leading)) opinion)
-             (push (cons :trailing (getf econtext :trailing)) opinion))))))
+              (push (cons :trailing (getf econtext :trailing)) opinion))
+            (push (list :text-position nil nil))))))
   (push (cons :tree-address (tree-address (assoc-cdr :id opinion))) opinion)
   opinion)
 

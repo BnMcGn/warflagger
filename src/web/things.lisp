@@ -230,12 +230,15 @@
             (clsql:select
              (colm :id) :from (tabl :opinion)
                         :where
-                        (clsql:sql-in
-                         (colm :target)
-                         (clsql:sql-query
-                          (colm :opinion :url)
-                          :from (tabl :opinion)
-                          :where (clsql:sql-= (colm :author) authid)))))))
+                        (clsql:sql-and
+                         (clsql:sql-in
+                          (colm :target)
+                          (clsql:sql-query
+                           (colm :opinion :url)
+                           :from (tabl :opinion)
+                           :where (clsql:sql-= (colm :author) authid)))
+                         (clsql:sql-not
+                          (clsql:sql-= (colm :author) authid)))))))
     (if getcount
         (get-count query)
         (merge-query
