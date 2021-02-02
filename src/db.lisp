@@ -235,7 +235,7 @@ the page text can be found in the cache."
              (push (list :text-position index length) opinion)
              (push (cons :leading (getf econtext :leading)) opinion)
               (push (cons :trailing (getf econtext :trailing)) opinion))
-            (push (list :text-position nil nil))))))
+            (push (list :text-position nil nil) opinion)))))
   (push (cons :tree-address (tree-address (assoc-cdr :id opinion))) opinion)
   opinion)
 
