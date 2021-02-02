@@ -202,14 +202,14 @@
           (bind-validated-input
               ((id :integer))
             (let* ((opin (opinion-by-id id))
-                   (rooturl (get-rooturl-by-id (assoc-cdr :rooturl opin))))
+                   (rooturl (assoc-cdr :rooturl opin)))
               (mount-component (target-loader)
                 :url (lisp rooturl)
-                :rootid (lisp (assoc-cdr :rooturl opin))
+                :rootid (lisp (assoc-cdr :rootid opin))
                 :title (lisp (grab-title rooturl))
                 :looks (lisp (when (authenticated?)
                                (ps-gadgets:as-ps-data
-                                (get-looks (get-user-name) (assoc-cdr :rooturl opin)))))
+                                (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
                 :focus (lisp (list* 'list (tree-address id)))
                 :username (lisp (webhax-user:get-user-name))
                 :child opinion-page)))))
