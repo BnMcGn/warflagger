@@ -91,6 +91,7 @@
                          (return nil)
                          (progn (incf tind twhite) (incf eind ewhite)))))))))
 
+;;FIXME: Doesn't handle excerpt that starts (or ends?) with whitespace
 (defun find-excerpt-position (tdat excerpt &optional (offset 0))
   (dotimes (i (length (tdat-text tdat)))
     (awhen (excerpt-here? tdat excerpt i)
