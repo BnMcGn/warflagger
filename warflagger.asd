@@ -20,7 +20,8 @@
                #:cl-postgres
                #:ratify
                #:simple-rgb
-               #:lquery)
+               #:lquery
+               #:cl-ipfs-api2)
   :serial t
   :components ((:module 
 		 :src
@@ -29,6 +30,7 @@
                               (:file "text-extract/textract"
                                      :depends-on ("local-settings"))
                               (:file "package")
+                              (:file "opinml")
                               (:file "warflagger")
                               (:file "db")
                               (:file "bulk-enter")
