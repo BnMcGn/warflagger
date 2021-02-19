@@ -38,7 +38,7 @@
 (defun enter-bulk-opinion (target &key comment author flag votevalue excerpt reference
                                     reference-excerpt)
   ;;Why is :display-name used here? Could use :screen-name, but might need a login? What is the difference?
-  (let* ((authid (or (find-author-id author :display-name)
+  (let* ((authid (or (find-author-id author)
                     ;;FIXME: Should add some URL to indicate fake author?
                     (insert-new-author :display-name author)))
          (flag (expand-flag flag))
@@ -47,7 +47,7 @@
                             (error "Invalid votevalue"))
                         (getf *default-vote* (second flag))))
          (datestamp (clsql:get-time))) ;;FIXME: Want more sophisticated?
-    (let ((data (plist->alist
+    (let ((data (hu:plist->alist
                  (list
                   :target target
                   :flag flag

@@ -39,7 +39,9 @@
    :@head (html-out (:meta :charset "utf-8"))
    :@css-link "/static/css/style.css"
    :@css-link "/static/css/target.css"
-   :@css-link "/static/css/react-tabs.css")
+   :@css-link "/static/css/react-tabs.css"
+   ;:@css-link "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+   )
   (html-out
                                         ;;Header
     (:div :id "header_wrapper"
@@ -263,6 +265,9 @@
   (setf (ningle:route *app* "/user/")
         (quick-page ()
           (user-home-page)))
+
+  (setf (ningle:route *app* "/u/*")
+        (quick-page (#'author-page-parts)))
 
   (setf (ningle:route *app* "/author/*")
         (quick-page (#'author-page-parts)))

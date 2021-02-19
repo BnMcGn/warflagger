@@ -92,14 +92,16 @@
   :@side-content
   (lambda ()
     (bind-validated-input
-        ((authid :integer))
-      (author-discussions-sidebar authid)
-      (author-opinions-sidebar authid)))
+        ((author :string))
+      (let ((authid (find-author-id author)))
+        (author-discussions-sidebar authid)
+        (author-opinions-sidebar authid))))
   :@inner
   (lambda ()
     (bind-validated-input
-        ((authid :integer))
-      (let* ((auth-data (get-author-data authid))
+        ((author :string))
+      (let* ((authid (find-author-id author))
+             (auth-data (get-author-data authid))
              (user (get-local-user-from-id authid))
              (screen-name (author-representation-from-row auth-data))
                       ;;(if user

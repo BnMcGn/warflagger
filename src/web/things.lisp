@@ -37,18 +37,6 @@
        (str (with-output-to-string (*webhax-output*)
               (display-warstats warstats)))))))
 
-;;; FIXME: If reasonable, this should move to the rest of the URL stuff in
-;; warflagger.lisp
-(defun author-thing-link (authid)
-  #|
-  ;;;FIXME: User link not implemented because we need to be sure that there is a 2 way link between screen-name and author id. Should be in db table somewhere but might not be. So only author URL for now.
-  (if-let
-      ((uname (assoc :wf-user (get-author-data authid))))
-    (make-user-url (userfig:userfig-value-for (cdr uname) 'screen-name))
-    (format nil "/author/~a" authid)))
-  |#
-  (format nil "/author/~a" authid))
-
 (defun opinion-thing-link (opid)
   (format nil "/opinion-page/~a" opid))
 
@@ -110,7 +98,7 @@
 (defun display-author-line (authid)
   (html-out
     (:div
-     (:a :href (author-thing-link authid)
+     (:a :href (make-author-url authid)
          (str (warflagger:author-representation-from-row (get-author-data authid)))))))
 
 (defun target-participants (targid &key getcount)

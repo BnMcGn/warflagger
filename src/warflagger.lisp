@@ -49,13 +49,17 @@
          (setf (gethash :url res) otest)
          res)))))
 
-(defun make-user-url (username)
-  (strcat *base-url* "u/" username "/"))
-
-
-;;FIXME: URL should have username, shorter formatting.
-;;(defun make-opinion-url (userid opinid)
-;;  (format nil "~a~d" (make-user-url userid) opinid))
+(defun make-author-url (authid)
+  (let ((authdat (get-author-data authid)))
+    (cond
+      ((assoc :screen-name authdat)
+       (strcat *base-url* "u/" (quri:url-encode (assoc-cdr :screen-name authdat))))
+      ((assoc :display-name authdat)
+       (strcat *base-url* "u/" (quri:url-encode (assoc-cdr :display-name authdat))))
+      ((assoc :homepage authdat)
+       (strcat *base-url* "author/" (quri:url-encode (assoc-cdr :homepage authdat))))
+      ((assoc :email authdat)
+       (strcat *base-url* "author/" (quri:url-encode (assoc-cdr :email authdat)))))))
 
 (defun make-opinion-url (userid opinid)
   (declare (ignore userid))

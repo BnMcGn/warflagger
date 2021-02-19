@@ -87,5 +87,6 @@
    #:previous-break
    #:next-break
    #:get-target-text
-   #:get-headline-for-url))
+   #:get-headline-for-url
+   #:make-author-url))
 

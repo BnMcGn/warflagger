@@ -372,24 +372,18 @@ the page text can be found in the cache."
     ((starts-with "mailto" author) :email)
     (t :string)))
 
-(defun find-author-id (author atype)
-  "Find the PKey of the author given any type of author identifier. Mostly for RDF input."
-  (case atype
-    (:id (when (exists (select (colm 'author 'id)
-                               :where (sql-= (colm 'author 'id)
-                                             (parse-integer author))))
-           (parse-integer author)))
-    (:string
-     (get-local-user-id author))
-    ((or :homepage :email :display-name)
-     (awhen (select (colm 'id) :from 'author
-                    :where (sql-and (sql-= (colm 'type)
-                                           (sql-escape (to-snake-case atype)))
-                                    (sql-= (colm 'value)
-                                           (sql-escape author)))
-                    :flatp t)
-       (car it)))
-    (otherwise (error "AType not found"))))
+(defun find-author-id (author)
+  (let ((author (gadgets:string-unless-number author)))
+    (if (integerp author)
+        (when (get-assoc-by-col (colm 'author 'id) author)
+          author)
+        (take-one
+         (select (colm 'id) :from 'author
+           :where (sql-and (sql-in
+                            (colm 'type)
+                            ;; Limit the types that the public can search
+                            (mapcar #'to-snake-case '(:homepage :email :display-name :screen-name)))
+                           (sql-= (colm 'value) author)))))))
 
 (defun insert-new-author (&rest atypes-and-values)
   (let ((aid (next-val "author_id_seq")))
