@@ -30,17 +30,25 @@
 (defun make-warstats-url (id type)
   (strcat "/static/warstats" (make-subpath id type)))
 
-(defun walltime-to-utcstamp (wall)
+(defgeneric js-compatible-utcstamp (date))
+
+(defmethod js-compatible-utcstamp ((date local-time:timestamp))
   (let ((tformat '((:year 4) #\- (:month 2) #\- (:day 2) #\T
                    (:hour 2) #\: (:min 2) #\: (:sec 2) "+0000")))
     (local-time:format-timestring
      nil
-     (local-time:universal-to-timestamp (clsql-helper:clsql-date/times->utime wall))
+     date
      :format tformat :timezone local-time:+utc-zone+)))
+
+(defmethod js-compatible-utcstamp ((date integer))
+  (js-compatible-utcstamp (local-time:unix-to-timestamp date)))
+
+(defmethod js-compatible-utcstamp ((date clsql:wall-time))
+  (js-compatible-utcstamp (clsql-helper:clsql-date/times->utime date)))
 
 (defmethod json:encode-json ((object clsql-sys:wall-time) &optional stream)
   ;(write-char #\" stream)
-  (write (walltime-to-utcstamp object) :stream stream)
+  (write (js-compatible-utcstamp object) :stream stream)
   ;;FIXME: quick hack to make this work on the live server (GMT). Javascript is touchy
   ;; about parsing dates.
                                         ;(write-char #\" stream)
