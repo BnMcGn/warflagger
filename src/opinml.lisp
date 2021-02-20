@@ -23,7 +23,7 @@
                          ,@body)
          (setf (readtable-case *readtable*) ,case)))))
 
-(defun serialize-opinion (opinion &key author)
+(defun serialize-opinion (opinion &key author datestamp)
   "Create a basic version of an opinion that is suitable for saving to disk or IPFS. No ID is included because this is assumed to be a first save."
   (with-inverted-case
     (prin1-to-string
@@ -43,12 +43,8 @@
           (hu:collect :excerpt-offset excerpt-offset))
         (when-let ((reference (assoc-cdr :reference opinion)))
           (hu:collect :reference reference))
-        ;;WARNING: We might autofill the date!
-        ;;FIXME: this is a mistake. Because we aren't always saving here.
         (hu:collect :datestamp
-          (js-compatible-utcstamp (or (assoc-cdr :datestamp opinion) (get-universal-time))))
-        (hu:collect :target (assoc-cdr :target opinion))
-        (hu:collect :target (assoc-cdr :target opinion)))))))
+          (js-compatible-utcstamp (or datestamp (assoc-cdr :datestamp opinion)))))))))
 
 ;; Problems: datestamp. Might want to deal with :id or :url because maybe is a remote web opinion.
 ;; - how to serialize to string?
@@ -65,6 +61,15 @@
           (write data :stream s)
           (close s)
           (ipfs:add p :pin nil :only-hash t :cid-version 1))))))
+
+(defun save-opinion-to-folder (opinion folder)
+  (let* ((author (unless (assoc-cdr :author opinion)
+                   (make-author-url (assoc-cdr :author-id opinion))))
+         (datestamp (unless (assoc-cdr :datestamp opinion)
+                      (get-universal-time)))
+         (strop (serialize-opinion opinion :author author :datestamp datestamp))
+         (iid (ipfs-data-hash strop)))
+    (alexandria:write-string-into-file strop (make-pathname :directory folder :name iid))))
 
 (defun parse-comment-field (comment)
 
@@ -83,20 +88,32 @@
 |#
   )
 
+(defparameter *max-comment-length* 10000) ;; Too long. Could go much closer to twitter.
+(defparameter *max-excerpt-length* 500) ;; Also too long
+
+(defun check-url (url)
+  (cond
+    ((< 2000 (length url)) (error "URL too long"))
+    ((url-p url) url)
+    (t (error "Not an URL"))))
+
+(defun check-length (itm len)
+  (if (< len (length itm))
+      (error "Field too long")
+      itm))
+
 (defun deserialize-opinion-from-stream (stream)
-
-#|
-Thoughts:
-  - needs to be safe. These will be coming in from the wild.
-  - how to limit allowed symbols? Custom read function?
-  - overall length limit + reasonable field length limits
-  - url length 2000
-  - will we load from IPFS or from web? Will it always have an URL? ipfs URL?
-  - how to check urls? can use quri?
-  - do we need to fix user/author URLs first?
-  |#
-
-  )
+  ;;FIXME: UNSAFE! Can't use read this way!
+  ;;FIXME: Add over all length limit
+  (let ((opinion (read stream)))
+    (mapc (lambda (key) (check-url (getf opinion key))) '(:target :rooturl :author))
+    (when (getf opinion :reference)
+      (check-url (getf opinion :reference)))
+    (check-length (getf opinion :comment) *max-comment-length*)
+    (when (getf opinion :excerpt)
+      (check-length (getf opinion :excerpt) *max-excerpt-length*))
+    (setf (getf opinion :datestamp) (local-time:parse-timestring (getf opinion :datestamp)))
+    (hu:plist->alist opinion)))
 
 ;;;;;
 ;; What do we need to know about opinions/ rooturl?

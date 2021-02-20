@@ -41,7 +41,7 @@
      :format tformat :timezone local-time:+utc-zone+)))
 
 (defmethod js-compatible-utcstamp ((date integer))
-  (js-compatible-utcstamp (local-time:unix-to-timestamp date)))
+  (js-compatible-utcstamp (local-time:universal-to-timestamp date)))
 
 (defmethod js-compatible-utcstamp ((date clsql:wall-time))
   (js-compatible-utcstamp (clsql-helper:clsql-date/times->utime date)))
