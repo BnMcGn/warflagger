@@ -112,9 +112,9 @@
 
 (defun handle-square-bracket (input)
   (let ((curr (funcall input)))
-    (multiple-value-bind (start end text link) (ppcre:scan *md-link-pattern* curr)
-      (let ((text (subseq curr (elt text 0) (elt text 1)))
-            (link (subseq curr (elt link 0) (elt link 1))))
+    (multiple-value-bind (start end starts ends) (ppcre:scan *md-link-pattern* curr)
+      (let ((text (subseq curr (elt starts 0) (elt ends 0)))
+            (link (subseq curr (elt starts 1) (elt ends 1))))
         (if (or (null start)
                 (not (url-p link))
                 (not (eq start 0)))
