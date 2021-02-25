@@ -73,86 +73,93 @@
 
 ;;; Comment parser stuff
 (defun handle-hash (input)
-  "Note: will often have a leading whitespace passed in"
   (let ((curr (funcall input)))
-    (if (or (sequence-starts-with curr "\n#(") (sequence-starts-with curr "#("))
+    (if (sequence-starts-with curr "#(")
         (handle-directive input)
+
         ;;FIXME: Should hashtags be alphanumeric only?
-        (let* ((ind (first-match-index (lambda (x) (member x *whitespace-characters*))
-                                       (sequence->list (subseq curr 1))))
-               (tag (string-trim *whitespace-characters*
-                                 (if ind (subseq curr 0 ind)
-                                     curr))))
-          (push tag *found-hashtags*)
-          (if ind
-              (funcall input ind)
-              (funcall input (length curr)))))))
+        (if (or (null *last-char*) (member *last-char* *whitespace-characters*))
+            (let* ((ind (first-match-index (lambda (x) (member x *whitespace-characters*))
+                                           (sequence->list curr)))
+                   (tag (if ind (subseq curr 0 ind) curr)))
+              (push tag *found-hashtags*)
+              (if ind
+                  (funcall input ind)
+                  (funcall input (length curr)))
+              tag)
+            (progn
+              (funcall input 1)
+              (elt curr 0))))))
 
 ;;FIXME: doesn't allow nested parentheses. Might need some day.
 ;;FIXME: doesn't have an escape mechanism
 (defun handle-directive (input)
   (let* ((curr (funcall input))
          (ind (position #\) curr)))
-    (if (and ind (or (eq (length curr) ind)
-                     (eq #\Newline (elt curr (1+ ind)))))
+    (if (and (member *last-char* '(#\Newline nil))
+             ind (or (eq (length curr) (1+ ind))
+                     (eq #\Newline (elt curr ind))))
         ;;we have a valid directive
         (progn
-          (funcall input ind)
+          (funcall input (1+ ind))
           (push (string-trim *whitespace-characters* (subseq curr 0 ind)) *found-directives*)
-          ""))))
+          "")
+        (progn
+          (funcall input 1)
+          (elt curr 0)))))
 
 (defparameter *md-link-pattern* (ppcre:create-scanner "^\\[(.+)\\]\\((.+?)\\)"))
 
 (defun handle-square-bracket (input)
   (let ((curr (funcall input)))
     (multiple-value-bind (start end text link) (ppcre:scan *md-link-pattern* curr)
-      (if (or (null start)
-              (not (url-p link))
-              (not (eq start 0)))
-          ;;Fail!
-          (progn (funcall input 1) #\[)
-          (progn
-            (push (list text link) *found-references*)
-            (funcall input end)
-            ;;Not sure that this is right: Front end will need to reparse.
-            (subseq curr start end))))))
-
-(defun handle-whitespace (input)
-  (let ((curr (funcall input)))
-    (if (eq (elt curr 1) #\#)
-        (handle-hash input)
-        (funcall input 1))))
+      (let ((text (subseq curr (elt text 0) (elt text 1)))
+            (link (subseq curr (elt link 0) (elt link 1))))
+        (if (or (null start)
+                (not (url-p link))
+                (not (eq start 0)))
+            ;;Fail!
+            (progn (funcall input 1) #\[)
+            (progn
+              (push (list text link) *found-references*)
+              (funcall input end)
+              ;;Not sure that this is right: Front end will need to reparse.
+              (subseq curr start end)))))))
 
 (defparameter *found-hashtags* nil)
 (defparameter *found-directives* nil)
 (defparameter *found-references* nil)
+(defparameter *last-char* nil)
 (defparameter *comment-read-table*
   (hu:hash (#\[ #'handle-square-bracket)
-           (#\Newline #'handle-whitespace)
-           (#\  #'handle-whitespace)
-           (#\Tab #'handle-whitespace)))
+           (#\# #'handle-hash)))
+
+(defun find-last-char (stor)
+  (when stor
+    (typecase (car stor)
+      (standard-char (car stor))
+      (sequence (if (not-empty (car stor))
+                    (nelt (car stor) 0)
+                    (find-last-char (cdr stor)))))))
 
 (defun parse-comment-field (comment)
   ;;FIXME: convert all line endings to #\Newline
   (let* ((counter 0)
-         (clen (length comment))
-         (sol-last nil)
          (tracker (lambda (&optional (advance 0))
                     (prog1 (subseq comment counter)
                       (incf counter advance))))
+         (*last-char* nil)
          (*found-hashtags* nil)
          (*found-directives* nil)
          (*found-references* nil)
          (stor nil))
-    ;;Special case: hash as first character
-    (when (eq #\# (elt comment 0))
-      (push (handle-hash tracker) stor))
     (loop
       do
          (if-let (handler (gethash (elt (funcall tracker) 0) *comment-read-table*))
            (push (funcall handler tracker) stor)
            ;;Default handler
            (push (elt (funcall tracker 1) 0) stor))
+      do (setf *last-char* (find-last-char stor))
       while (not-empty (funcall tracker)))
     ;; for now
     (nreverse stor))
