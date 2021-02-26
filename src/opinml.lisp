@@ -95,14 +95,18 @@
 ;;FIXME: doesn't have an escape mechanism
 (defun handle-directive (input)
   (let* ((curr (funcall input))
-         (ind (position #\) curr)))
-    (if (and (member *last-char* '(#\Newline nil))
-             ind (or (eq (length curr) (1+ ind))
-                     (eq #\Newline (elt curr ind))))
-        ;;we have a valid directive
+         (ind (position #\) curr))
+         (correct-start (member *last-char* '(#\Newline nil)))
+         (correct-end (and correct-start ind
+                           (or (eq (length curr) (1+ ind))
+                               (eq #\Newline (elt curr ind)))))
+         (directive (and ind correct-start correct-end
+                         (parse-directive
+                          (string-trim *whitespace-characters* (subseq curr 0 (1+ ind)))))))
+    (if directive
         (progn
           (funcall input (1+ ind))
-          (push (string-trim *whitespace-characters* (subseq curr 0 ind)) *found-directives*)
+          (push directive *found-directives*)
           "")
         (progn
           (funcall input 1)
@@ -143,6 +147,18 @@
                     (find-last-char (cdr stor)))))))
 
 (defun parse-comment-field (comment)
+ "
+- #() if alone on line. Should we strictly stay at start of line?
+- #tag whitespace before and after
+- markdown style links
+- no other markdown for now. Or...
+- should return structure with:
+  - raw text.
+  - clean text
+  - hashtags found
+  - refs found
+  - directives found
+  - indicate if only directives were found "
   ;;FIXME: convert all line endings to #\Newline
   (let* ((counter 0)
          (tracker (lambda (&optional (advance 0))
@@ -161,23 +177,17 @@
            (push (elt (funcall tracker 1) 0) stor))
       do (setf *last-char* (find-last-char stor))
       while (not-empty (funcall tracker)))
-    ;; for now
-    (nreverse stor))
-#|
-- #() if alone on line. Should we strictly stay at start of line?
-- #tag whitespace before and after
-- markdown style links
-- no other markdown for now. Or...
-- should return structure with:
-  - raw text.
-  - clean text
-  - hashtags found
-  - refs found
-  - directives found
-  - indicate if only directives were found
-
-|#
-  )
+    (hash-table-alist
+     (hu:hash
+      (:clean-comment
+       (let ((res (apply #'strcat (nreverse stor))))
+         ;;Nil if comment has nothing remaining but whitespace
+         (unless (every (alexandria:rcurry #'member *whitespace-characters*) res)
+           res)))
+      (:raw-comment comment)
+      (:hashtags (ordered-unique (nreverse *found-hashtags*)))
+      (:references (nreverse *found-references*))
+      (:directives (ordered-unique (nreverse *found-directives*)))))))
 
 (defparameter *max-comment-length* 10000) ;; Too long. Could go much closer to twitter.
 (defparameter *max-excerpt-length* 500) ;; Also too long
@@ -226,4 +236,30 @@
 ;; - Three opinion trees
 ;; - qualifies as a question or list of things?
 ;; - direction stuff is objective, right?
-;; - replies total/immediate might be subjective... or should we not? Count of hidden. 
+;; - replies total/immediate might be subjective... or should we not? Count of hidden.
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Directives
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defun parse-directive (dstring)
+  (let ((data (safe-read:safe-read (make-string-input-stream (string-trim '(#\#) dstring)))))
+    (when-let ((sym (first-match (curry #'string-equal (car data)) *known-directives*)))
+      ;;FIXME: Should send warnings to user on fail.
+      (tryit (apply (symbol-function sym) (cdr data))))))
+
+(defparameter *known-directives* '(vote-value page-text no-cascade))
+
+(defun vote-value (value)
+  (declare (type integer value))
+  (when (< -2 value 2)
+    (list 'vote-value value)))
+
+;;FIXME: do we need separate for commenting on text? Should this be supply-text?
+(defun page-text ()
+  (list 'page-text))
+
+(defun no-cascade ()
+  (list 'no-cascade))
