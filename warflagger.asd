@@ -21,7 +21,8 @@
                #:ratify
                #:simple-rgb
                #:lquery
-               #:cl-ipfs-api2)
+               #:cl-ipfs-api2
+               #:access)
   :serial t
   :components ((:module 
 		 :src
@@ -37,5 +38,6 @@
                               (:file "references")
                               (:file "excerpts")
                               (:file "ranking")
+                              (:file "objective")
                               (:file "summarizer")))))
 

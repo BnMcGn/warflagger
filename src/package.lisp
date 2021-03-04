@@ -88,5 +88,6 @@
    #:next-break
    #:get-target-text
    #:get-headline-for-url
-   #:make-author-url))
+   #:make-author-url
+   #:deserialize-opinion-from-stream))
 

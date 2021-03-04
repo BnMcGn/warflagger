@@ -1,19 +1,9 @@
 (in-package #:warflagger)
 
 ;;;
-;;; OpinML questions:
-#|
+;;; OpinML
+;;;
 
-- What do we need to generate opinml?
-  - A filename/location. Could be under username. Beware of filesystem hacks!
-  - An URL. Need to generate a unique url per opinion. Does not actually need to correspond to filename.
-  - Can we use fragments? put multiple opins in a file? Why? keep simple.
-  - Want to know if target is rooturl. Would be nice to store this in opinion.
-   - at what point do we need this information?
-   - interface should try to supply it.
-   - might not be able to do much without.
-
-|#
 
 (defmacro with-inverted-case (&body body)
   (let ((case (gensym "case")))
@@ -70,6 +60,60 @@
          (strop (serialize-opinion opinion :author author :datestamp datestamp))
          (iid (ipfs-data-hash strop)))
     (alexandria:write-string-into-file strop (make-pathname :directory folder :name iid))))
+
+(defun make-experimental-opinion-url (oiid)
+  (strcat *base-url* "o/" oiid))
+
+;;FIXME: This is temporary code, until converted from db storage
+(defun proc-opinion (opinion newtarget)
+  (when newtarget
+    (push (cons :target newtarget) opinion))
+  (unless (assoc-cdr :author opinion)
+    (push (cons :author (make-author-url (assoc-cdr :author-id opinion))) opinion))
+  (let ((iid (ipfs-data-hash (serialize-opinion opinion))))
+    (push (cons :url (make-experimental-opinion-url iid)) opinion)
+    (push (cons :iid iid) opinion)
+    (values iid opinion)))
+
+(defun convert-opinions-to-iids (opinions)
+  ;; need way to make target urls. Don't know if make-opinion-url is used anywhere
+  (let ((oldnew (make-hash-table :test 'equal))
+        (work opinions)
+        (stor nil)
+        (stop 0)
+        (remaining nil))
+    (loop
+      do (progn
+           (incf stop)
+           (when remaining
+             (format t "~a ~a" (length work) (length remaining))
+             (setf work remaining) (setf remaining nil))
+           (dolist (op work)
+             (cond
+               ((equal (assoc-cdr :target op) (assoc-cdr :rooturl op))
+                (print "in root target")
+                (multiple-value-bind (iid opinion) (proc-opinion op nil)
+                  (setf (gethash (assoc-cdr :url op) oldnew) (make-experimental-opinion-url iid))
+                  (push opinion stor)))
+                ((gethash (assoc-cdr :target op) oldnew)
+                 (multiple-value-bind (iid opinion)
+                     (proc-opinion op (gethash (assoc-cdr :target op) oldnew))
+                   (setf (gethash (assoc-cdr :url op) oldnew) (make-experimental-opinion-url iid))
+                   (push opinion stor)))
+                ((not (gethash (assoc-cdr :target op) oldnew))
+                 (push op remaining)))))
+        until (> stop 1000)
+      while remaining)
+    (values (nreverse stor) oldnew)))
+
+(defun iid-opinions-for-rooturl (rooturl)
+  (convert-opinions-to-iids (mapcar #'opinion-by-id (opinion-ids-for-rooturl rooturl))))
+
+;; end temporary
+
+(defparameter *ipfs-hash-pattern* (ppcre:create-scanner "baf[a-z0-9]{56}"))
+(defun get-ipfs-hash-from-url (string)
+  (ppcre:scan-to-strings *ipfs-hash-pattern* string))
 
 ;;; Comment parser stuff
 (defun handle-hash (input)
