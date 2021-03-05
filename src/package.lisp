@@ -89,5 +89,7 @@
    #:get-target-text
    #:get-headline-for-url
    #:make-author-url
-   #:deserialize-opinion-from-stream))
+   #:deserialize-opinion-from-stream
+   #:get-ipfs-hash-from-url
+   #:*opinion-store*))
 

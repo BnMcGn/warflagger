@@ -240,13 +240,19 @@ the page text can be found in the cache."
     (push (cons :tree-address (tree-address (assoc-cdr :id opinion))) opinion))
   opinion)
 
+(defparameter *opinion-store* nil "Allows us to shim opinion-by-id so that we can avoid the database.")
+
+;;FIXME: we might want to dispatch on string vs. integer here.
 (defun opinion-by-id (oid &key extra text)
   (when (and text (not extra))
     (error "Text keyword is not valid without :extra set to T"))
-  (let ((opinion (opinion-from-db-row (get-assoc-by-pkey 'opinion oid))))
-    ;; Might cause trouble...
-    (push (cons :rootid (assoc-cdr :rooturl opinion)) opinion)
-    (setf (cdr (assoc :rooturl opinion)) (get-rooturl-by-id (assoc-cdr :rootid opinion)))
+  (let ((opinion (if-let  (res (and *opinion-store* (gethash oid *opinion-store*)))
+                   res
+                   (opinion-from-db-row (get-assoc-by-pkey 'opinion oid)))))
+    ;;FIXME: will go away when db goes
+    (when (integerp (assoc-cdr :rooturl opinion))
+      (push (cons :rootid (assoc-cdr :rooturl opinion)) opinion)
+      (setf (cdr (assoc :rooturl opinion)) (get-rooturl-by-id (assoc-cdr :rootid opinion))))
     (if extra
         (add-extras-to-opinion opinion (or text (get-target-text oid)))
         opinion)))
@@ -291,7 +297,8 @@ the page text can be found in the cache."
 (defun get-target-id (opinid)
   (get-target-id-from-url (assoc-cdr :target (opinion-by-id opinid))))
 
-(defun get-target-text (opinid)
+(defgeneric get-target-text (opinish))
+(defmethod get-target-text ((opinid integer))
   (gethash :text (text-server-dispatcher (assoc-cdr :target (opinion-by-id opinid)))))
 
 (defun make-wf-url-for-url (url)
