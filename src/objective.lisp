@@ -28,6 +28,20 @@
         (cl-utilities:collect iid)
         (cl-utilities:collect opinion)))))
 
+(defun extend-opinions (plist)
+  (gadgets:mapcan-by-2
+   (lambda (k v)
+     (list
+      k
+      (let* ((opinion v)
+             (opinion (if (assoc-cdr :comment opinion)
+                          ;;FIXME: parsing error report?
+                          (append (warflagger::parse-comment-field (assoc-cdr :comment opinion)))
+                          opinion)))
+        ;;FIXME: add excerpt context
+        (push (cons :tree-address (tree-address opinion plist)) opinion)
+        opinion)))
+   plist))
 
 (defun iid-equal (id1 id2)
   "Might be the bare id string, or might be an URL with the string on the end"
@@ -43,7 +57,9 @@
 
 (defun opinion-tree-from-opinions (opinions)
   (let ((root (gadgets:assoc-cdr :rooturl (car opinions)))
-        (opinions (sort opinions #'< :key (lambda (x) (assoc-cdr :datestamp x)))))
+        (opinions (sort (copy-list opinions) #'string<
+                        :key (lambda (x)
+                               (warflagger::js-compatible-utcstamp (assoc-cdr :datestamp x))))))
     (proto:tree-by-feature
      opinions
      (lambda (x) (let ((treead (tree-address x)))
@@ -53,3 +69,28 @@
      :root root
      :format (lambda (x) (gadgets:assoc-cdr :iid x))
      :identity-func (alexandria:curry #'gadgets:assoc-cdr :iid))))
+
+
+
+
+;;;;;
+;; What do we need to know about opinions/ rooturl?
+;; - what flags have been applied to target by whom?
+;; - what opinions count for conversation?
+;; - displayableness of opinion
+;;   - summary only?
+;;   - does it have a comment (once directives are subtracted)?
+;; - outgoing references
+;; - do we have all opinions?
+;; - what opinions apply to the text?
+;; - what opinions apply to the title?
+;; - how to handle opinions down the tree? Say a disagree to a side type of flag?
+;;   - maybe a separate category for guesses... Could make quite a difference to a discredited flag if
+;;     someone reputable reinforces it.
+;;   - different algos may treat differently.
+;; - some stuff from the existing summarizer?
+;; - rooturl text info should be included.
+;; - Three opinion trees
+;; - qualifies as a question or list of things?
+;; - direction stuff is objective, right?
+;; - replies total/immediate might be subjective... or should we not? Count of hidden.

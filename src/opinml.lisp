@@ -91,7 +91,6 @@
            (dolist (op work)
              (cond
                ((equal (assoc-cdr :target op) (assoc-cdr :rooturl op))
-                (print "in root target")
                 (multiple-value-bind (iid opinion) (proc-opinion op nil)
                   (setf (gethash (assoc-cdr :url op) oldnew) (make-experimental-opinion-url iid))
                   (push opinion stor)))
@@ -259,28 +258,6 @@
       (check-length (getf opinion :excerpt) *max-excerpt-length*))
     (setf (getf opinion :datestamp) (local-time:parse-timestring (getf opinion :datestamp)))
     (hu:plist->alist opinion)))
-
-;;;;;
-;; What do we need to know about opinions/ rooturl?
-;; - what flags have been applied to target by whom?
-;; - what opinions count for conversation?
-;; - displayableness of opinion
-;;   - summary only?
-;;   - does it have a comment (once directives are subtracted)?
-;; - outgoing references
-;; - do we have all opinions?
-;; - what opinions apply to the text?
-;; - what opinions apply to the title?
-;; - how to handle opinions down the tree? Say a disagree to a side type of flag?
-;;   - maybe a separate category for guesses... Could make quite a difference to a discredited flag if
-;;     someone reputable reinforces it.
-;;   - different algos may treat differently.
-;; - some stuff from the existing summarizer?
-;; - rooturl text info should be included.
-;; - Three opinion trees
-;; - qualifies as a question or list of things?
-;; - direction stuff is objective, right?
-;; - replies total/immediate might be subjective... or should we not? Count of hidden.
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
