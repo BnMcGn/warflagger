@@ -221,6 +221,8 @@ the page text can be found in the cache."
 
 (defun add-extras-to-opinion (opinion text)
   (when (assoc :excerpt opinion)
+    (unless (and text (not-empty text))
+      (error "Opinion has excerpt but target text is empty"))
     (let ((textdata (typecase text
                       (tdat text)
                       (string (create-textdata text))))

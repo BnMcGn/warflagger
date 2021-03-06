@@ -16,6 +16,10 @@
 ;;; Preliminary to transition to IPFS.
 ;;; Should be able to operate without referring to the database.
 
+(declaim (ftype (function ((warflagger::list-of-type pathname))
+                          (warflagger::list-of-type warflagger:opinion-with-iid))
+                load-opinion-files))
+
 (defun load-opinion-files (opfilelist)
   "Assumes that the filename is the iid of the opinion."
   ;;FIXME: check rooturl?
@@ -28,20 +32,39 @@
         (cl-utilities:collect iid)
         (cl-utilities:collect opinion)))))
 
-(defun extend-opinions (plist)
-  (gadgets:mapcan-by-2
-   (lambda (k v)
+;;FIXME: Rethink me. This is temporary for testing opinml import.
+;; - for one, we want a better check for when an url is an iid opinion.
+(defmethod warflagger:get-target-text ((opiniid string))
+  ;;FIXME: would be nice to dispatch on type
+  (unless (typep opiniid 'warflagger::iid)
+    (warn "Expecting type iid"))
+  (let* ((op (warflagger:opinion-by-id opiniid))
+         (treead (assoc-cdr :tree-address op)))
+    (if (length1 treead)
+        (gethash :text (warflagger:text-server-dispatcher (assoc-cdr :target op)))
+        (warflagger:opinion-text (last-car (butlast treead))))))
+
+(defun %extend-opinions (plist)
+  (mapcan-by-2
+   (lambda (k opinion)
      (list
       k
-      (let* ((opinion v)
-             (opinion (if (assoc-cdr :comment opinion)
+      (let ((opinion (if (assoc-cdr :comment opinion)
                           ;;FIXME: parsing error report?
                           (append (warflagger::parse-comment-field (assoc-cdr :comment opinion)))
                           opinion)))
-        ;;FIXME: add excerpt context
         (push (cons :tree-address (tree-address opinion plist)) opinion)
         opinion)))
    plist))
+
+(defun extend-opinions (plist)
+  (let ((warflagger:*opinion-store* (hu:plist->hash (%extend-opinions plist))))
+    (do-hash-table (iid opinion warflagger:*opinion-store*)
+      (dump iid)
+      (setf (gethash iid warflagger:*opinion-store*)
+            ;;FIXME: get-target-text may still rely on db.
+            (warflagger::add-extras-to-opinion opinion (warflagger:get-target-text iid))))
+    warflagger:*opinion-store*))
 
 (defun iid-equal (id1 id2)
   "Might be the bare id string, or might be an URL with the string on the end"

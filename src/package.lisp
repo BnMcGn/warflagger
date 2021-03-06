@@ -91,5 +91,8 @@
    #:make-author-url
    #:deserialize-opinion-from-stream
    #:get-ipfs-hash-from-url
-   #:*opinion-store*))
+   #:*opinion-store*
+   #:iid
+   #:opinion
+   #:opinion-with-iid))
 

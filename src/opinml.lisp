@@ -5,6 +5,46 @@
 ;;;
 
 
+;;; Typedefs
+
+(defun list-of-type-p (type list)
+  (and (listp list)
+       (every (alexandria:rcurry #'typep type) list)))
+
+(deftype list-of-type (type)
+  (let ((predicate (gensym)))
+    (setf (symbol-function predicate)
+          #'(lambda (seq) (list-of-type-p seq type)))
+    `(and list (satisfies ,predicate))))
+
+(defun iid-p (item)
+  (and (stringp item)
+       (eq 59 (length item))
+       (ppcre:scan *ipfs-hash-pattern* item)
+       item))
+
+(deftype iid () `(satisfies iid-p))
+
+(defun opinion-p (item)
+  (and (typep item '(list-of-type cons))
+       (assoc :flag item)
+       (assoc :target item)
+       (assoc :url item)))
+
+(deftype opinion () `(satisfies opinion-p))
+
+(defun opinion-with-iid-p (opinion)
+  (and (opinion-p opinion)
+       (assoc :iid opinion)
+       (typep (assoc :iid opinion) 'iid)))
+
+(deftype opinion-with-iid () `(satisfies opinion-with-iid-p))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Save and load
+;;;;;;;;;;;;;;;;;;;;
+
+
 (defmacro with-inverted-case (&body body)
   (let ((case (gensym "case")))
     `(let ((,case (readtable-case *readtable*)))
@@ -25,6 +65,8 @@
         (hu:collect :flag (assoc-cdr :flag opinion))
         (hu:collect :comment (assoc-cdr :comment opinion))
         (hu:collect :author (or author (assoc-cdr :author opinion)))
+        (when-let ((comment (assoc-cdr :comment opinion)))
+          (hu:collect :comment comment))
         (when-let ((votevalue (assoc-cdr :votevalue opinion)))
           (hu:collect :votevalue votevalue))
         (when-let ((excerpt (assoc-cdr :excerpt opinion)))
@@ -60,6 +102,33 @@
          (strop (serialize-opinion opinion :author author :datestamp datestamp))
          (iid (ipfs-data-hash strop)))
     (alexandria:write-string-into-file strop (make-pathname :directory folder :name iid))))
+
+(defparameter *max-comment-length* 10000) ;; Too long. Could go much closer to twitter.
+(defparameter *max-excerpt-length* 500) ;; Also too long
+
+(defun check-url (url)
+  (cond
+    ((< 2000 (length url)) (error "URL too long"))
+    ((url-p url) url)
+    (t (error "Not an URL"))))
+
+(defun check-length (itm len)
+  (if (< len (length itm))
+      (error "Field too long")
+      itm))
+
+(defun deserialize-opinion-from-stream (stream)
+  ;;FIXME: UNSAFE! Can't use read this way!
+  ;;FIXME: Add over all length limit
+  (let ((opinion (read stream)))
+    (mapc (lambda (key) (check-url (getf opinion key))) '(:target :rooturl :author))
+    (when (getf opinion :reference)
+      (check-url (getf opinion :reference)))
+    (check-length (getf opinion :comment) *max-comment-length*)
+    (when (getf opinion :excerpt)
+      (check-length (getf opinion :excerpt) *max-excerpt-length*))
+    (setf (getf opinion :datestamp) (local-time:parse-timestring (getf opinion :datestamp)))
+    (hu:plist->alist opinion)))
 
 (defun make-experimental-opinion-url (oiid)
   (strcat *base-url* "o/" oiid))
@@ -113,6 +182,13 @@
 (defparameter *ipfs-hash-pattern* (ppcre:create-scanner "baf[a-z0-9]{56}"))
 (defun get-ipfs-hash-from-url (string)
   (ppcre:scan-to-strings *ipfs-hash-pattern* string))
+
+;;FIXME: Just returns canonical text. Reconsider when we have edited available.
+(defun opinion-text (opin)
+  (let* ((opin (if (typep opin 'iid) (opinion-by-id opin) opin))
+         (res (gadgets:assoc-or '(:clean-comment :comment) opin)))
+    (when res
+      (cdr res))))
 
 ;;; Comment parser stuff
 (defun handle-hash (input)
@@ -232,32 +308,6 @@
       (:references (nreverse *found-references*))
       (:directives (ordered-unique (nreverse *found-directives*)))))))
 
-(defparameter *max-comment-length* 10000) ;; Too long. Could go much closer to twitter.
-(defparameter *max-excerpt-length* 500) ;; Also too long
-
-(defun check-url (url)
-  (cond
-    ((< 2000 (length url)) (error "URL too long"))
-    ((url-p url) url)
-    (t (error "Not an URL"))))
-
-(defun check-length (itm len)
-  (if (< len (length itm))
-      (error "Field too long")
-      itm))
-
-(defun deserialize-opinion-from-stream (stream)
-  ;;FIXME: UNSAFE! Can't use read this way!
-  ;;FIXME: Add over all length limit
-  (let ((opinion (read stream)))
-    (mapc (lambda (key) (check-url (getf opinion key))) '(:target :rooturl :author))
-    (when (getf opinion :reference)
-      (check-url (getf opinion :reference)))
-    (check-length (getf opinion :comment) *max-comment-length*)
-    (when (getf opinion :excerpt)
-      (check-length (getf opinion :excerpt) *max-excerpt-length*))
-    (setf (getf opinion :datestamp) (local-time:parse-timestring (getf opinion :datestamp)))
-    (hu:plist->alist opinion)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
