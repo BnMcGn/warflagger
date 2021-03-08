@@ -7,12 +7,12 @@
 
 ;;; Typedefs
 
-(defun list-of-type-p (type list)
+(defun list-of-type-p (list type)
   (and (listp list)
        (every (alexandria:rcurry #'typep type) list)))
 
 (deftype list-of-type (type)
-  (let ((predicate (gensym)))
+  (let ((predicate (gadgets:symbolize (gensym "%LIST-OF-TYPE-"))))
     (setf (symbol-function predicate)
           #'(lambda (seq) (list-of-type-p seq type)))
     `(and list (satisfies ,predicate))))
@@ -26,17 +26,23 @@
 (deftype iid () `(satisfies iid-p))
 
 (defun opinion-p (item)
-  (and (typep item '(list-of-type cons))
+  (and (every #'consp item)
        (assoc :flag item)
        (assoc :target item)
        (assoc :url item)))
 
 (deftype opinion () `(satisfies opinion-p))
 
+(defun extended-opinion-p (item)
+  (and (opinion-p item)
+       (assoc :tree-address item)))
+
+(deftype extended-opinion () `(satisfies extended-opinion-p))
+
 (defun opinion-with-iid-p (opinion)
   (and (opinion-p opinion)
        (assoc :iid opinion)
-       (typep (assoc :iid opinion) 'iid)))
+       (iid-p (assoc :iid opinion))))
 
 (deftype opinion-with-iid () `(satisfies opinion-with-iid-p))
 
@@ -300,6 +306,7 @@
      (hu:hash
       (:clean-comment
        (let ((res (apply #'strcat (nreverse stor))))
+         ;;FIXME: This doesn't handle comments that consist only of hashtags
          ;;Nil if comment has nothing remaining but whitespace
          (unless (every (alexandria:rcurry #'member *whitespace-characters*) res)
            res)))

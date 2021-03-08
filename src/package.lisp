@@ -94,5 +94,13 @@
    #:*opinion-store*
    #:iid
    #:opinion
-   #:opinion-with-iid))
+   #:opinion-with-iid
+   #:opinion-text
+   #:extended-opinion-p
+   #:extended-opinion
+   #:opinion-with-iid-p
+   #:opinion-p
+   #:iid-p
+   #:list-of-type
+   #:list-of-type-p))
 
