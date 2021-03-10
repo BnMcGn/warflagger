@@ -123,6 +123,13 @@
     (when-let ((i (first-match-index (curry #'eq (car flag)) *flag-category-keys*)))
       (getf (nth i *flag-types-source*) (second flag)))))
 
+(defun known-flags ()
+  (cl-utilities:collecting
+    (loop for cat in *flag-category-keys*
+          for flags in *flag-types-source*
+          do (gadgets:do-window (pair flags :size 2 :step 2)
+               (cl-utilities:collect (list cat (car pair)))))))
+
 (defmacro check-recognized-flag (flag)
   (unless (recognized-flag-p flag)
     (error "Flag not found")))

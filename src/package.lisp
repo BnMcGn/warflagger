@@ -103,5 +103,6 @@
    #:iid-p
    #:list-of-type
    #:list-of-type-p
-   #:recognized-flag-p))
+   #:recognized-flag-p
+   #:known-flags))
 
