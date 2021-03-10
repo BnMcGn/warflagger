@@ -59,7 +59,8 @@
    plist))
 
 (defun extend-opinions (plist)
-  (let ((warflagger:*opinion-store* (hu:plist->hash (%extend-opinions plist))))
+  (let ((warflagger:*opinion-store* (hu:plist->hash (%extend-opinions plist)
+                                                    :existing (make-hash-table :test #'equal))))
     (do-hash-table (iid opinion warflagger:*opinion-store*)
       (setf (gethash iid warflagger:*opinion-store*)
             (cons (cons :tree-address (tree-address opinion warflagger:*opinion-store*)) opinion)))
@@ -73,14 +74,16 @@
   "Might be the bare id string, or might be an URL with the string on the end"
   (gadgets:sequences-end-same id1 id2))
 
+;;FIXME: add type checking
 (defun tree-address (opinion &optional opinion-store)
-  (when opinion
-    (or (access opinion :tree-address)
-        (if (string-equal (access opinion :target) (access opinion :rooturl))
-            (list (access opinion :iid))
-            (let ((tiid (warflagger::get-ipfs-hash-from-url (access opinion :target))))
-              (nreverse (cons (access opinion :iid)
-                              (reverse (tree-address (access opinion-store tiid) opinion-store)))))))))
+  (or (access opinion :tree-address)
+      (if (string-equal (access opinion :target) (access opinion :rooturl))
+          (list (access opinion :iid))
+          (let ((tiid (warflagger::get-ipfs-hash-from-url (access opinion :target))))
+            (if (warflagger:iid-p tiid)
+                (append (tree-address (access opinion-store tiid) opinion-store)
+                        (list (access opinion :iid)))
+                (error "Target must be root or iid"))))))
 
 (defun opinion-tree-from-opinions (opinions)
   (let ((root (gadgets:assoc-cdr :rooturl (car opinions)))
