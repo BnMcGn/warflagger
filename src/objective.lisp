@@ -143,15 +143,29 @@
        ;; of hash tags as an example.
        (not (not-empty (and (assoc :clean-comment opinion) (assoc-cdr :clean-comment opinion))))))
 
-(defun process-scsc-node (iid opinion-store children)
+;;FIXME: add types/checking
+(defun process-hashtag (tag opinion)
+  (list 'hashtag tag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion)))
 
-  ;; what decisions?
-  ;; flag, owner, iid, :excerpt 
-  ;; what do we do with various directives?
-  ;; attach hashtags
-  ;; references?
-  ;;
+;;FIXME: add types/checking, including known directives check.
+(defun process-directive (dirc opinion)
+  (append dirc (list :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion))))
+
+(defun process-opinion (opinion)
+  (let* ((flag (assoc-cdr :flag opinion))
+         (flag (if (warflagger:recognized-flag-p flag)
+                   (symb (car flag) '- (second flag))
+                   'unknown-flag)))
+    (list flag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion))))
+
+(defun process-scsc-node (iid opinion-store children)
+  ;; FIXME: consider adding an excerpt wrapper where appropriate
+  ;; FIXME: references should be handled
   (let* ((opinion (access opinion-store iid))
-         (x ))
-    )
-  )
+         (hashcode (mapcar (lambda (hashtag) (process-hashtag hashtag opinion))
+                           (assoc-cdr :hashtags opinion)))
+         (dircode (mapcar (lambda (dirc) (process-directive dirc opinion))
+                          (assoc-cdr :directives opinion))))
+    (if (opinion-collapsible-p opinion)
+        (append hashcode dircode children)
+        (list (append (process-opinion opinion) hashcode dircode children)))))

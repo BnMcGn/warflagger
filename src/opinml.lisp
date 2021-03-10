@@ -46,6 +46,8 @@
 
 (deftype opinion-with-iid () `(satisfies opinion-with-iid-p))
 
+(deftype recognized-flag () `(satisfies recognized-flag-p))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Save and load
 ;;;;;;;;;;;;;;;;;;;;
@@ -111,6 +113,7 @@
 
 (defparameter *max-comment-length* 10000) ;; Too long. Could go much closer to twitter.
 (defparameter *max-excerpt-length* 500) ;; Also too long
+(defparameter *max-hashtag-length* 30)
 
 (defun check-url (url)
   (cond
@@ -122,6 +125,11 @@
   (if (< len (length itm))
       (error "Field too long")
       itm))
+
+(defun check-hashtag (hashtag)
+  (check-length hashtag *max-hashtag-length*)
+  ;;FIXME: Alphanumeric?
+  )
 
 (defun deserialize-opinion-from-stream (stream)
   ;;FIXME: UNSAFE! Can't use read this way!
@@ -328,16 +336,27 @@
       ;;FIXME: Should send warnings to user on fail.
       (tryit (apply (symbol-function sym) (cdr data))))))
 
-(defparameter *known-directives* '(vote-value page-text no-cascade))
+(defparameter *known-directives* '(vote-value target-text target-title no-cascade suggest-target-text
+                                   suggest-target-title))
 
+;;Note: these functions don't do anything to interpret the directives. They are just here as a parsing
+;; aid.
 (defun vote-value (value)
   (declare (type integer value))
   (when (< -2 value 2)
     (list 'vote-value value)))
 
-;;FIXME: do we need separate for commenting on text? Should this be supply-text?
-(defun page-text ()
-  (list 'page-text))
+(defun target-text ()
+  (list 'target-text))
+
+(defun target-title ()
+  (list 'target-title))
+
+(defun suggest-target-text ()
+  (list 'suggest-target-text))
+
+(defun suggest-target-title ()
+  (list 'suggest-target-title))
 
 (defun no-cascade ()
   (list 'no-cascade))

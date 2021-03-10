@@ -14,8 +14,6 @@
 
 (in-package :warflagger-core)
 
-;FIXME: This should be stored in a format readable by both lisp and python.
-
 (defparameter *flag-types-source*
 
 ;;; Negative:

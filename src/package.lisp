@@ -102,5 +102,6 @@
    #:opinion-p
    #:iid-p
    #:list-of-type
-   #:list-of-type-p))
+   #:list-of-type-p
+   #:recognized-flag-p))
 
