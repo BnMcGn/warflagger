@@ -141,14 +141,6 @@
        (make-score-script (cdr subtree) opinion-store)))
     optree)))
 
-(declaim (ftype (function (warflagger:extended-opinion) boolean) opinion-collapsible-p))
-
-(defun opinion-collapsible-p (opinion)
-  (and (eq :blank (last-car (assoc :flag opinion)))
-       ;;FIXME: Clean-comment might not be the correct test. Case of comment consisting only
-       ;; of hash tags as an example.
-       (not (not-empty (and (assoc :clean-comment opinion) (assoc-cdr :clean-comment opinion))))))
-
 ;;FIXME: add types/checking
 (defun process-hashtag (tag opinion)
   (list 'hashtag tag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion)))
@@ -172,9 +164,7 @@
                            (assoc-cdr :hashtags opinion)))
          (dircode (mapcar (lambda (dirc) (process-directive dirc opinion))
                           (assoc-cdr :directives opinion))))
-    (if (opinion-collapsible-p opinion)
-        (append hashcode dircode children)
-        (list (append (process-opinion opinion) hashcode dircode children)))))
+    (list (append (process-opinion opinion) hashcode dircode children))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Score script interpreter
@@ -232,7 +222,7 @@
 (defun title-script (tree)
   (remove-if-not #'title-comments-tree-p tree))
 
-(defun regular-script (tree)
+(defun general-script (tree)
   (remove-if (lambda (itm) (or (text-comments-tree-p itm) (title-comments-tree-p itm))) tree))
 
 
