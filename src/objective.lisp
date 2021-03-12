@@ -125,6 +125,9 @@
 ;; - direction stuff is objective, right?
 ;; - replies total/immediate might be subjective... or should we not? Count of hidden.
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Score script creation
+;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun make-score-script (optree opinion-store)
   ;;FIXME: Any kind of max depth safety?
@@ -172,3 +175,64 @@
     (if (opinion-collapsible-p opinion)
         (append hashcode dircode children)
         (list (append (process-opinion opinion) hashcode dircode children)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Score script interpreter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *safe-symbols* (append warflagger::*known-directives*
+                                     (mapcar (lambda (flag) (symb (car flag) '- (second flag)))
+                                             (warflagger:known-flags))
+                                     (list 'unknown-flag 'hashtag 'excerpt 'reference)))
+(defparameter *safe-keywords* '(:iid :author))
+
+(defpackage #:score-script
+  (:use #:cl #:gadgets #:alexandria))
+
+(defun scsc-safety-symbols (code &optional (package (find-package :score-script)))
+  (proto:tree-search-replace
+   code
+   :test #'symbolp
+   :valuefunc
+   (lambda (sym)
+     (if (keywordp sym)
+         (if (member sym *safe-keywords*) sym
+             (error "Unknown keyword in score script"))
+         (if (member sym *safe-symbols* :test #'string-equal)
+             (symbolize sym :package package)
+             (error "Unknown symbol in score script"))))))
+
+
+(in-package :score-script)
+
+
+(defun text-comments-tree-p (tree)
+  (when (member (car tree) '(target-text suggest-target-text))
+    (return-from text-comments-tree-p t))
+  (some (lambda (itm)
+          (and (listp itm)
+               (member (car itm) '(target-text suggest-target-text))
+               (equal (gadgets:fetch-keyword :iid itm :in-list nil)
+                      (gadgets:fetch-keyword :iid tree :in-list nil))))
+        tree))
+
+(defun title-comments-tree-p (tree)
+  (when (member (car tree) '(target-title suggest-target-title))
+    (return-from title-comments-tree-p t))
+  (some (lambda (itm)
+          (and (listp itm)
+               (member (car itm) '(target-title suggest-target-title))
+               (equal (gadgets:fetch-keyword :iid itm :in-list nil)
+                      (gadgets:fetch-keyword :iid tree :in-list nil))))
+        tree))
+
+(defun text-script (tree)
+  (remove-if-not #'text-comments-tree-p tree))
+
+(defun title-script (tree)
+  (remove-if-not #'title-comments-tree-p tree))
+
+(defun regular-script (tree)
+  (remove-if (lambda (itm) (or (text-comments-tree-p itm) (title-comments-tree-p itm))) tree))
+
+
