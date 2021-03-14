@@ -1,7 +1,17 @@
 (in-package :cl-user)
 
 (defpackage #:wf/ipfs
-  (:use #:cl #:gadgets #:alexandria #:access))
+  (:use #:cl #:gadgets #:alexandria #:access)
+  (:export
+   #:target-text
+   #:suggest-target-title
+   #:target-title
+   #:text-comments-tree-p
+   #:title-comments-tree-p
+   #:text-script
+   #:title-script
+   #:general-script
+   #:participants))
 
 (in-package :wf/ipfs)
 
@@ -177,12 +187,18 @@
 (defparameter *safe-keywords* '(:iid :author))
 
 (defpackage #:score-script
-  (:use #:cl #:gadgets #:alexandria))
+  (:use #:cl #:gadgets #:alexandria)
+  (:nicknames #:scsc)
+  (:export
+   #:target-text
+   #:suggest-target-text
+   #:target-title
+   #:suggest-target-title))
 
 (defun scsc-safety-symbols (code &optional (package (find-package :score-script)))
   (proto:tree-search-replace
    code
-   :test #'symbolp
+   :predicate #'symbolp
    :valuefunc
    (lambda (sym)
      (if (keywordp sym)
@@ -193,25 +209,39 @@
              (error "Unknown symbol in score script"))))))
 
 
-(in-package :score-script)
 
+;;FIXME: add a score-script type and some type checking. Important for safety.
+
+(defun prep-scsc-for-execution (code)
+  "Symbols must be safetied before running"
+  (proto:mapbranch
+   (lambda (node)
+     (if (member (car node) *safe-symbols*)
+         (multiple-value-bind (main children) (splitfilter #'listp node)
+           (append
+            main
+            `(:modifiers
+              (lambda ()
+                ,@children))))
+         node))
+   code))
 
 (defun text-comments-tree-p (tree)
-  (when (member (car tree) '(target-text suggest-target-text))
+  (when (member (car tree) '(scsc:target-text scsc:suggest-target-text))
     (return-from text-comments-tree-p t))
   (some (lambda (itm)
           (and (listp itm)
-               (member (car itm) '(target-text suggest-target-text))
+               (member (car itm) '(scsc:target-text scsc:suggest-target-text))
                (equal (gadgets:fetch-keyword :iid itm :in-list nil)
                       (gadgets:fetch-keyword :iid tree :in-list nil))))
         tree))
 
 (defun title-comments-tree-p (tree)
-  (when (member (car tree) '(target-title suggest-target-title))
+  (when (member (car tree) '(scsc:target-title scsc:suggest-target-title))
     (return-from title-comments-tree-p t))
   (some (lambda (itm)
           (and (listp itm)
-               (member (car itm) '(target-title suggest-target-title))
+               (member (car itm) '(scsc:target-title scsc:suggest-target-title))
                (equal (gadgets:fetch-keyword :iid itm :in-list nil)
                       (gadgets:fetch-keyword :iid tree :in-list nil))))
         tree))
@@ -224,5 +254,39 @@
 
 (defun general-script (tree)
   (remove-if (lambda (itm) (or (text-comments-tree-p itm) (title-comments-tree-p itm))) tree))
+
+(defun participants (tree)
+  (let ((curr (flatten tree)))
+    (alexandria:hash-table-keys
+    (hu:collecting-hash-table (:test #'equal :mode :keep)
+      (loop
+        do (setf curr (nth-value 1 (part-after-true (lambda (x) (eq x :author)) curr)))
+        while curr
+        do (hu:collect (car curr) t))))))
+
+(defun scsc-for-tree-address (treead root-scsc)
+  (proto:maptree
+   (lambda (branch)
+     (unless treead
+       (error "Empty tree address"))
+     (when (listp branch)
+       (let ((iid (fetch-keyword :iid branch :in-list nil)))
+        (cond
+          ((equal iid (car treead))
+           (if (length1 treead)
+               (return-from scsc-for-tree-address branch)
+               (progn
+                 (setf treead (cdr treead))
+                 (remove-if-not #'listp branch))))
+          ((null iid)
+           (remove-if-not #'listp branch))
+          (t ;;iid found but not matching
+           nil)))))
+   root-scsc)
+  nil)
+
+
+(in-package :score-script)
+
 
 
