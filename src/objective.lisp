@@ -1,5 +1,6 @@
 (in-package :cl-user)
 
+
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)
   (:export
@@ -218,11 +219,12 @@
    (lambda (node)
      (if (member (car node) *safe-symbols*)
          (multiple-value-bind (main children) (splitfilter #'listp node)
-           (append
-            main
-            `(:modifiers
-              (lambda ()
-                ,@children))))
+           (when children
+             (append
+              main
+              `(:modifiers
+                (lambda ()
+                  ,@children)))))
          node))
    code))
 
@@ -285,8 +287,145 @@
    root-scsc)
   nil)
 
+(defvar *tree-address*)
+(defvar *ballot-box*)
+(defvar *text-ballot-box*)
+(defvar *title-ballot-box*)
+(defvar *warstats*)
+(defvar *text-warstats*)
+(defvar *title-warstats*)
+(defvar *apply-to*)
+(defvar *cascade*)
+
+(defun cast-vote-at-target (axis author &optional (ballot-box *ballot-box*))
+  (hu:collecting-hash-table (:existing ballot-box :mode :append)
+    (hu:collect axis author)))
+
+(defun stick-other-flag-on-target (flag ballot-box))
+
+(defun apply-hashtag (hashtag ))
+
+(defun apply-to (aspect iid)
+  (unless (equal iid (lastcar *tree-address*))
+    (error "IID problem: can't apply-to"))
+  (if *apply-to*
+      (warn "Apply-to is already set. No action taken.")
+      (setf *apply-to* aspect)))
+
+(defun collect-warstats (key warstats)
+  )
+
+(defun execute-modifiers (modifiers tree-address)
+  (hu:collecting-hash-table (:mode :replace)
+    (let ((*ballot-box* (make-hash-table))
+          (*text-ballot-box* (make-hash-table))
+          (*title-ballot-box* (make-hash-table))
+          (*warstats* nil)
+          (*text-warstats* nil)
+          (*title-warstats* nil)
+          (*apply-to* nil)
+          (*cascade* t)
+          (*tree-address* (append *tree-address* (list iid))))
+      (funcall modifiers)
+      (hu:collect :ballot-box *ballot-box*)
+      (hu:collect :text-ballot-box *text-ballot-box*)
+      (hu:collect :title-ballot-box *title-ballot-box*)
+      (hu:collect :warstats *warstats*)
+      (hu:collect :text-warstats *text-warstats*)
+      (hu:collect :title-warstats *title-warstats*)
+      (hu:collect :apply-to *apply-to*)
+      (hu:collect :cascade *cascade*))))
+
+
 
 (in-package :score-script)
 
+;; Initial implementation of consensus scorer
+
+(defun negative-spam (&key iid author modifiers)
+  (hu:with-keys (ballot-box text-ballot-box title-ballot-box warstats text-warstats title-warstats
+                            apply-to cascade)
+      (if modifiers
+          (execute-modifiers modifiers (append *tree-address* (list iid)))
+          (make-hash-table))
+
+    )
+  
+    ;;Save this set of warstats
+    ;;Did or will directives need to modify things? How will we check?
+ 
+    (dolist (vot *ballot-box*) ;;somehow
+      (cast-vote-at-target &etc))
+    (stick-other-flag-on-target :flag-spam *ballot-box* + mine)
+    )
+  #|
+ What do we need to do?
+  - Find out what effect we will have:
+   - if there are any dislike or wrong, we have no effect
+   - Has author retracted?
+    - If so, what do we do with agreement? Under consensus, we drop it.
+    - How do we make Retraction do the job itself? Don't want special cases!
+  - Before calling modifiers, set self up as top of some stack of to-be-modified
+   - There are things that can happen in modifiers that will disable this opinion, preventing
+     other modifiers from effecting this or its target chain. How do we handle that?
+   - The nature of this opinion determines whether or not its modifiers can touch parent targets
+    - But what do they touch? Effect? Controversy? These are done through this, right? Count?
+      That happens anyways...
+   - Modifiers can be part of this opinion.
+   - Modifiers can adjust the target (text, title) of this opinion. What do we do with contradictory
+     modifiers?
+   - No opinion is going to get its target modified in an unpredictable way. Or can it?
+     - There are limits: so far only text/title
+   - Modifiers might want to add their authors as contributing to parent vote.
+  - What do we do if author is blacklisted?
+   - Don't implement yet.
+   - Don't cancel if non-blacklisted has added support.
 
 
+  - Do we register spam attribute even if it is zero value?
+  - Spam attribute is only applied to target. Dislike will flow up the tree.
+  - Add to count of all parents, if we are doing count.
+  - 
+    -
+|#
+
+  )
+
+(defun negative-inflammatory (&key iid author modifiers))
+(defun negative-disagree (&key iid author modifiers))
+(defun negative-dislike (&key iid author modifiers))
+(defun negative-language-warning (&key iid author modifiers))
+(defun negative-disturbing (&key iid author modifiers))
+(defun negative-logical-fallacy (&key iid author modifiers))
+(defun negative-needs-evidence (&key iid author modifiers))
+(defun negative-raise-question (&key iid author modifiers))
+(defun negative-out-of-bounds (&key iid author modifiers))
+(defun positive-funny (&key iid author modifiers))
+(defun positive-agree (&key iid author modifiers))
+(defun positive-like (&key iid author modifiers))
+(defun positive-interesting (&key iid author modifiers))
+(defun statements-evidence (&key iid author modifiers))
+(defun custodial-redundant (&key iid author modifiers))
+(defun custodial-out-of-date (&key iid author modifiers))
+(defun custodial-retraction (&key iid author modifiers))
+(defun custodial-correction (&key iid author modifiers))
+(defun custodial-incorrect-flag (&key iid author modifiers))
+(defun custodial-flag-abuse (&key iid author modifiers))
+(defun custodial-offtopic (&key iid author modifiers))
+(defun custodial-arcane (&key iid author modifiers))
+(defun custodial-same-thing (&key iid author modifiers))
+(defun custodial-blank (&key iid author modifiers))
+
+;;FIXME: something should be set in warstats for suggest. 
+(defun target-text (&key iid author)
+  (declare (ignore author))
+  (apply-to :text iid))
+(defun suggest-target-text (&key iid author)
+  (declare (ignore author))
+  (apply-to :text iid))
+(defun target-title (&key iid author)
+  (declare (ignore author))
+  (apply-to :title iid))
+(defun suggest-target-title (&key iid author)
+  (declare (ignore author))
+  (apply-to :title iid))
