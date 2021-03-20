@@ -39,5 +39,7 @@
                               (:file "excerpts")
                               (:file "ranking")
                               (:file "objective")
+                              (:file "ballot-box")
+                              (:file "author-stats")
                               (:file "summarizer")))))
 

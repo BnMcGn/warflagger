@@ -389,7 +389,7 @@
     -
 |#
 
-  )
+  
 
 (defun negative-inflammatory (&key iid author modifiers))
 (defun negative-disagree (&key iid author modifiers))
