@@ -21,9 +21,11 @@
     (setf (gethash :wrong res) nil)
     (setf (gethash :up res) nil)
     (setf (gethash :down res) nil)
+    (setf (gethash 'cache res) nil)
     res))
 
 (defun cast-vote! (balbox direction iid author &optional reference)
+  (setf (gethash 'cache res) nil)
   (push `(,iid ,author ,@(when reference (list reference)) (gethash direction balbox))))
 
 (defun merge-ballot-boxes (&rest boxes)
@@ -81,7 +83,7 @@
                  (hu:collect author t))))
     res))
 
-(defun ballot-box-totals (balbox)
+(defun %ballot-box-totals (balbox)
   "Remove-extra-votes should have been run on the input already."
   (let
       ((right
@@ -98,6 +100,13 @@
                sum (author-vote-value author))))
     (values (+ right up) (+ wrong down))))
 
+(defun ballot-box-totals (balbox)
+  (if-let ((totals (gethash 'cache balbox)))
+    (apply #'values totals)
+    (let ((totals (multiple-value-list (%ballot-box-totals (remove-extra-votes balbox)))))
+      (setf (gethash 'cache balbox) totals)
+      (apply #'values totals))))
+
 (defun score-vast-majority-p (pos neg)
-  (unless (>= 0 pos)
+  (unless (>= 1 pos)
     (>= (/ 1 10) (/ neg pos))))
