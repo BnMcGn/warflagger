@@ -17,22 +17,21 @@
 
 (defun make-ballot-box ()
   (let ((res (make-hash-table)))
-    (setf (gethash :right res) (make-hash-table :test #'equal))
-    (setf (gethash :wrong res) (make-hash-table :test #'equal))
-    (setf (gethash :up res) (make-hash-table :test #'equal))
-    (setf (gethash :down res) (make-hash-table :test #'equal))
+    (setf (gethash :right res) nil)
+    (setf (gethash :wrong res) nil)
+    (setf (gethash :up res) nil)
+    (setf (gethash :down res) nil)
     res))
 
-(defun cast-vote! (balbox direction author iid &optional reference)
-  (hu:collecting-hash-table (:existing (gethash direction balbox) :mode :append)
-    (hu:collect iid (if reference (list author reference) (list author)))))
+(defun cast-vote! (balbox direction iid author &optional reference)
+  (push `(,iid ,author ,@(when reference (list reference)) (gethash direction balbox))))
 
 (defun merge-ballot-boxes (&rest boxes)
   (let ((res (make-ballot-box)))
     (dolist (box boxes)
       (dolist (dir '(:right :wrong :up :down))
-        (do-hash-table (iid (author &optional reference) (gethash dir box))
-          (cast-vote! res dir author iid reference))))
+        (dolist (vote (gethash dir box))
+          (apply #'cast-vote res dir vote))))
     res))
 
 (defun remove-extra-votes (balbox)
@@ -40,50 +39,65 @@
  - An author can't have more than one positive and one negative vote, except maybe in the right/wrong
    category.
  - Right/wrong votes take precedence over up/down.
+ - Right/wrong votes without a reference are ignored (for now. Not sure about this one)
  - Right/wrong votes are created by an author providing references. Extra votes can be gained under the   following conditions:
    - Author has an average-reference-quality rating
  - If an author makes multiple references and we need to narrow down to one, we already don't know if we
-   can trust the author, so we just use a single vote as the value. This won't be done in this function."
+   can trust the author, so we just use a single vote as the value. This won't be done in this function.
+ - There can be multiple unique ref votes per iid."
   (let ((res (make-ballot-box))
-        (present (make-hash-table :test #'equal)))
+        (present (make-hash-table :test #'equal))
+        (refcheck (make-hash-table :test #'equal)))
     (hu:collecting-hash-table (:existing present :mode :replace)
-      (do-hash-table (iid (author &optional reference) (gethash :right balbox))
-        (if (author-reasonable-p author)
-            (cast-vote! res :right author iid reference)
-            (unless (gethash author present)
-              (cast-vote! res :right author iid reference)
-              (hu:collect author t))))
-      (do-hash-table (iid (author &optional reference) (gethash :up balbox))
-        (unless (gethash author present)
-          (cast-vote! res :up author iid reference)
-          (hu:collect author t))))
+      (loop for (iid author . reference) in (gethash :right balbox)
+            do (when reference
+                 (if (author-reasonable-p author)
+                     (unless (gethash (cons author (car reference)) refcheck)
+                       (cast-vote! res :right iid author reference)
+                       (hu:collect author t)
+                       (setf (gethash (cons author (car reference)) refcheck) t))
+                     (unless (gethash author present)
+                       (cast-vote! res :right iid author (car reference))
+                       (hu:collect author t)))))
+      (loop for (iid author . nil) in (gethash :up balbox)
+            do (unless (gethash author present)
+                 (cast-vote! res :up iid author)
+                 (hu:collect author t))))
     (setf present (make-hash-table :test #'equal))
     (hu:collecting-hash-table (:existing present :mode :replace)
-      (do-hash-table (iid (author &optional reference) (gethash :wrong balbox))
-        (if (author-reasonable-p author)
-            (cast-vote! res :wrong author iid reference)
-            (unless (gethash author present)
-              (cast-vote! res :wrong author iid reference)
-              (hu:collect author t))))
-      (do-hash-table (iid (author &optional reference) (gethash :down balbox))
-        (unless (gethash author present)
-          (cast-vote! res :down author iid reference)
-          (hu:collect author t))))
+      (loop for (iid author . reference) in (gethash :wrong balbox)
+            do (when reference
+                 (if (author-reasonable-p author)
+                     (unless (gethash (cons author (car reference)) refcheck)
+                       (cast-vote! res :wrong iid author reference)
+                       (hu:collect author t)
+                       (setf (gethash (cons author (car reference)) refcheck) t))
+                     (unless (gethash author present)
+                       (cast-vote! res :wrong iid author (car reference))
+                       (hu:collect author t)))))
+      (loop for (iid author . nil) in (gethash :down balbox)
+            do (unless (gethash author present)
+                 (cast-vote! res :down iid author)
+                 (hu:collect author t))))
     res))
 
-(defun ballot-box-scores (balbox)
+(defun ballot-box-totals (balbox)
   "Remove-extra-votes should have been run on the input already."
-  (let ((right
-          (apply #'+
-                 (cl-utilities:collecting
-                   (do-hash-table ))
-                 (maphash
-                  (lambda (iid vote)
-                    (uthor-reference-vote-value author ())))))))
-  (values
-   (+
-    (apply #'
-     (maphash )))
-   ))
+  (let
+      ((right
+         (loop for (nil author . reference) in (gethash :right balbox)
+               sum (author-reference-vote-value author (car reference))))
+       (up
+         (loop for (nil author . nil) in (gethash :up balbox)
+               sum (author-vote-value author)))
+       (wrong
+         (loop for (nil author . reference) in (gethash :wrong balbox)
+               sum (author-reference-vote-value author (car reference))))
+       (down
+         (loop for (nil author . nil) in (gethash :down balbox)
+               sum (author-vote-value author))))
+    (values (+ right up) (+ wrong down))))
 
-
+(defun score-vast-majority-p (pos neg)
+  (unless (>= 0 pos)
+    (>= (/ 1 10) (/ neg pos))))
