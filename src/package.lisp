@@ -104,5 +104,14 @@
    #:list-of-type
    #:list-of-type-p
    #:recognized-flag-p
-   #:known-flags))
+   #:known-flags
+   #:make-ballot-box
+   #:ballot-box-empty-p
+   #:apply-ballot-box-to-warstats
+   #:ballot-box-totals
+   #:score-vast-majority-p
+   #:score-controversy
+   #:cast-vote!
+   #:merge-ballot-boxes
+   #:merge-with-inverted-ballot-boxes))
 

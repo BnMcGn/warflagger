@@ -36,6 +36,19 @@
           (apply #'cast-vote res dir vote))))
     res))
 
+(defun merge-with-inverted-ballot-boxes (&rest boxes)
+  (let ((res (merge-ballot-boxes (car boxes))))
+    (dolist (box (cdr boxes))
+      (loop for dir in '(:right :wrong :up :down)
+            for swap in '(:wrong :right :down :up)
+            do (dolist (vote (gethash dir box))
+                 (apply #'cast-vote res swap vote))))
+    res))
+
+(defun ballot-box-empty-p (balbox)
+  (not (some (lambda (cat) (not-empty (gethash cat balbox)))
+             '(:right :up :wrong :down))))
+
 (defun remove-extra-votes (balbox)
   "Rules:
  - An author can't have more than one positive and one negative vote, except maybe in the right/wrong
@@ -98,7 +111,7 @@
        (down
          (loop for (nil author . nil) in (gethash :down balbox)
                sum (author-vote-value author))))
-    (values (+ right up) (+ wrong down))))
+    (values right up wrong down)))
 
 (defun ballot-box-totals (balbox)
   (if-let ((totals (gethash 'cache balbox)))
@@ -110,3 +123,21 @@
 (defun score-vast-majority-p (pos neg)
   (unless (>= 1 pos)
     (>= (/ 1 10) (/ neg pos))))
+
+(defun score-controversy (pos neg)
+  (let* ((total (+ pos neg))
+         (effect (max 0 (- pos neg)))
+         (diff (abs (- pos neg)))
+         (balance (- total diff)))
+    ;;FIXME: Should this have a multiplier? Should it be a ratio?
+    (values effect balance)))
+
+(defun apply-ballot-box-to-warstats (balbox warstats)
+  (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
+    (setf (gethash :x-right warstats) right)
+    (setf (gethash :x-up warstats) up)
+    (setf (gethash :x-wrong warstats) wrong)
+    (setf (gethash :x-down warstats) down)
+    (multiple-value-bind (effect controv) (score-controversy (+ right up) (+ wrong down))
+      (setf (gethash :x-effect warstats) effect)
+      (setf (gethash :x-controversy warstats) controv))))

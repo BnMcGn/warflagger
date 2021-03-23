@@ -287,23 +287,42 @@
    root-scsc)
   nil)
 
+(defparameter *warstats* nil)
+(defparameter *text-warstats* nil)
+(defparameter *title-warstats* nil)
+
 (defvar *tree-address*)
 (defvar *ballot-box*)
 (defvar *text-ballot-box*)
 (defvar *title-ballot-box*)
-(defvar *warstats*)
-(defvar *text-warstats*)
-(defvar *title-warstats*)
+(defvar *warstat*)
+(defvar *text-warstat*)
+(defvar *title-warstat*)
 (defvar *apply-to*)
 (defvar *cascade*)
+(defvar *other-flag*)
+(defvar *direction*)
 
-(defun cast-vote-at-target (axis author &optional (ballot-box *ballot-box*))
-  (hu:collecting-hash-table (:existing ballot-box :mode :append)
-    (hu:collect axis author)))
 
-(defun stick-other-flag-on-target (flag ballot-box))
+(defun stick-other-flag-on-target (flag ballot-box warstat)
+  (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals ballot-box)
+    (let ((pos (+ right up))
+          (neg (+ wrong down)))
+      (when (warflagger:score-vast-majority-p pos neg)
+        (setf (gethash flag warstat) (nth-value 0 (warflagger:score-controversy pos neg)))))))
 
-(defun apply-hashtag (hashtag ))
+(defun add-to-replies-count (warstats childcount)
+  (unless (key-in-hash? :replies-immediate warstats)
+    (setf (gethash :replies-immediate warstats) 0))
+  (unless (key-in-hash? :replies-total warstats)
+    (setf (gethash :replies-total warstats) 0))
+  (incf (gethash :replies-immediate warstats))
+  (incf (gethash :replies-total warstats) (1+ childcount)))
+
+(defun set-tree-freshness (warstat &rest timestamps)
+  (setf
+   (gethash :tree-freshness warstat)
+   (car (sort (remove-if #'null timestamps) #'<))))
 
 (defun apply-to (aspect iid)
   (unless (equal iid (lastcar *tree-address*))
@@ -312,31 +331,84 @@
       (warn "Apply-to is already set. No action taken.")
       (setf *apply-to* aspect)))
 
-(defun collect-warstats (key warstats)
-  )
+(defun applied-to (applyto)
+  (case applyto
+    (:text (values *text-warstat* *text-ballot-box*))
+    (:title (values *title-warstat* *title-ballot-box*))
+    (otherwise (values *warstat* *ballot-box*))))
 
-(defun execute-modifiers (modifiers tree-address)
+(defun collect-warstats (key warstats &optional type)
+  (let ((ws-store (case type
+                    (:text *text-warstats*)
+                    (:title *title-warstats*)
+                    (otherwise *warstats*))))
+    (setf (gethash key ws-store) warstats)))
+
+(defun execute-modifiers (modifiers tree-address other-flag direction)
   (hu:collecting-hash-table (:mode :replace)
-    (let ((*ballot-box* (make-hash-table))
-          (*text-ballot-box* (make-hash-table))
-          (*title-ballot-box* (make-hash-table))
-          (*warstats* nil)
-          (*text-warstats* nil)
-          (*title-warstats* nil)
+    (let ((*ballot-box* (warflagger:make-ballot-box))
+          (*text-ballot-box* (warflagger:make-ballot-box))
+          (*title-ballot-box* (warflagger:make-ballot-box))
+          (*warstat* (make-hash-table))
+          (*text-warstat* (make-hash-table))
+          (*title-warstat* (make-hash-table))
           (*apply-to* nil)
-          (*cascade* t)
-          (*tree-address* (append *tree-address* (list iid))))
+          (*other-flag* other-flag)
+          (*direction* direction)
+          (*tree-address* tree-address))
       (funcall modifiers)
       (hu:collect :ballot-box *ballot-box*)
       (hu:collect :text-ballot-box *text-ballot-box*)
       (hu:collect :title-ballot-box *title-ballot-box*)
-      (hu:collect :warstats *warstats*)
-      (hu:collect :text-warstats *text-warstats*)
-      (hu:collect :title-warstats *title-warstats*)
+      (hu:collect :warstat *warstat*)
+      (hu:collect :text-warstat *text-warstat*)
+      (hu:collect :title-warstat *title-warstat*)
       (hu:collect :apply-to *apply-to*)
-      (hu:collect :cascade *cascade*))))
+      (hu:collect :direction *direction*)
+      (hu:collect :other-flag *other-flag*))))
 
+(defun flag-core (other-flag direction iid author modifiers)
+  (hu:with-keys (:ballot-box :text-ballot-box :title-ballot-box :warstat :text-warstat :title-warstat
+                            :apply-to :direction :other-flag)
+      (if modifiers
+          (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction)
+          (make-hash-table))
 
+    ;;accumulate own warstats
+    (multiple-value-bind (ws bb) (applied-to apply-to)
+      (unless (warflagger:ballot-box-empty-p ballot-box)
+       (warflagger:apply-ballot-box-to-warstats ballot-box warstat)
+       (collect-warstats iid warstat))
+     ;;FIXME: do we deal with text warstats for nonroot targets?
+     (unless (warflagger:ballot-box-empty-p text-ballot-box)
+       (warflagger:apply-ballot-box-to-warstats text-ballot-box text-warstat)
+       (collect-warstats iid text-warstat :text))
+     (unless (warflagger:ballot-box-empty-p title-ballot-box)
+       (warflagger:apply-ballot-box-to-warstats title-ballot-box title-warstat)
+       (collect-warstats iid title-warstat :title))
+     ;;FIXME: Are there cases when an opinion and descendants should not be counted?
+     (add-to-replies-count ws
+                           (+ (gethash :replies-total warstat 0)
+                              (gethash :replies-total text-warstat 0)
+                              (gethash :replies-total title-warstat 0)))
+     (set-tree-freshness ws
+                         (assoc-cdr :timestamp (warflagger:opinion-by-id iid))
+                         (gethash :timestamp warstat) (gethash :timestamp text-warstat)
+                         (gethash :timestamp title-warstat))
+     ;;For now it is either direction-style vote or other-flag. Not both.
+     (cond
+       (other-flag
+        (warflagger:cast-vote! ballot-box :up iid author)
+        (stick-other-flag-on-target other-flag ballot-box ws)
+        nil)
+       ;;We don't cast own vote if it's not an other-flag. Return appropriate ballot box instead.
+       ((eq direction :pro)
+        (setf bb (warflagger:merge-ballot-boxes bb ballot-box))
+        bb)
+       ((eq direction :con)
+        (setf bb (warflagger:merge-with-inverted-ballot-boxes bb ballot-box))
+        bb)
+       (t nil)))))
 
 (in-package :score-script)
 
@@ -349,7 +421,10 @@
           (execute-modifiers modifiers (append *tree-address* (list iid)))
           (make-hash-table))
 
-    )
+    ;;How do we decide if the ballot box should be applied?
+    ;; - If cascade is false, no
+    ;; - Decision to count ballot box for other-flag stuff should be passed out because author
+    ;;   count may be desirable. )
   
     ;;Save this set of warstats
     ;;Did or will directives need to modify things? How will we check?
@@ -389,7 +464,7 @@
     -
 |#
 
-  
+
 
 (defun negative-inflammatory (&key iid author modifiers))
 (defun negative-disagree (&key iid author modifiers))
@@ -416,16 +491,20 @@
 (defun custodial-same-thing (&key iid author modifiers))
 (defun custodial-blank (&key iid author modifiers))
 
-;;FIXME: something should be set in warstats for suggest. 
+;;FIXME: something should be set in warstats for suggest.
 (defun target-text (&key iid author)
   (declare (ignore author))
-  (apply-to :text iid))
+  (if (not (length1 wf/ipfs::*tree-address*))
+      (warn "Can't target the text of a non-rooturl target")
+      (wfip::apply-to :text iid)))
 (defun suggest-target-text (&key iid author)
   (declare (ignore author))
-  (apply-to :text iid))
+  (if (not (length1 wf/ipfs::*tree-address*))
+      (warn "Can't target the text of a non-rooturl target")
+      (wfip::apply-to :text iid)))
 (defun target-title (&key iid author)
   (declare (ignore author))
-  (apply-to :title iid))
+  (wfip::apply-to :title iid))
 (defun suggest-target-title (&key iid author)
   (declare (ignore author))
-  (apply-to :title iid))
+  (wfip::apply-to :title iid))
