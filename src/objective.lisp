@@ -198,6 +198,20 @@
     (list (append (process-opinion opinion) hashcode dircode children))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Objective bundle
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun objective-data (opfilelist)
+  (let* ((opinion-store (extend-opinions (load-opinion-files opfilelist)))
+         (optree (opinion-tree-from-opinions (alexandria:hash-table-values opinion-store)))
+         (scsc (make-score-script optree opinion-store))
+         (rooturl (assoc-cdr :rooturl (car (alexandria:hash-table-values opinion-store)))))
+    (list :opinion-store opinion-store :opinion-tree optree :score-script scsc :rooturl rooturl)))
+
+(defun objective-data-for-dir (dirpath)
+  (objective-data (uiop:directory-files dirpath)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Score script interpreter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -228,8 +242,6 @@
          (if (member sym *safe-symbols* :test #'string-equal)
              (symbolize sym :package package)
              (error "Unknown symbol in score script"))))))
-
-
 
 ;;FIXME: add a score-script type and some type checking. Important for safety.
 
@@ -324,6 +336,31 @@
 (defvar *direction*)
 (defvar *target-author* nil)
 
+(defun execute-score-script (scsc rooturl opinion-store)
+  (let ((warflagger:*opinion-store* opinion-store)
+        (scsc (prep-scsc-for-execution (scsc-safety-symbols scsc)))
+        (*warstats* (make-hash-table :test #'equal))
+        (*text-warstats* (make-hash-table :test #'equal))
+        (*title-warstats* (make-hash-table :test #'equal))
+
+        (*ballot-box* (warflagger:make-ballot-box))
+        (*text-ballot-box* (warflagger:make-ballot-box))
+        (*title-ballot-box* (warflagger:make-ballot-box))
+        (*warstat* (make-hash-table))
+        (*text-warstat* (make-hash-table))
+        (*title-warstat* (make-hash-table))
+        (*tree-address* nil))
+    (eval scsc)
+    (unless (warflagger:ballot-box-empty-p *ballot-box*)
+      (warflagger:apply-ballot-box-to-warstats *ballot-box* *warstat*)
+      (collect-warstats rooturl *warstat*))
+    (unless (warflagger:ballot-box-empty-p *text-ballot-box*)
+      (warflagger:apply-ballot-box-to-warstats *text-ballot-box* *text-warstat*)
+      (collect-warstats rooturl *text-warstat* :text))
+    (unless (warflagger:ballot-box-empty-p *title-ballot-box*)
+      (warflagger:apply-ballot-box-to-warstats *title-ballot-box* *title-warstat*)
+      (collect-warstats rooturl *title-warstat* :title))
+    (values *warstats* *text-warstats* *title-warstats*)))
 
 (defun stick-other-flag-on-target (flag ballot-box warstat)
   (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals ballot-box)
