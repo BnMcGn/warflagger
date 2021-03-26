@@ -38,16 +38,17 @@
   (if (author-ignored-p author) 0 1))
 
 ;;FIXME: rethink
-;; - Ref votes should have more punch than regular. Old system did 2x on vote.
 ;; - We should incorporate the value of the reference if it is available. It isn't yet.
 ;; - Use average-reference-quality if not.
 ;; - Reference quality can't be used for unreasonable users. Use single regular vote for unknown auths.
 (defun author-reference-vote-value (author reference)
   (if (author-reasonable-p author)
-      (* *reference-vote-multiplier*
-         (if-let  ((val (reference-transferrable-value reference)))
-           val
-           (or (author-average-reference-quality author) (author-vote-value author))))
+      (if reference
+          (* *reference-vote-multiplier*
+             (if-let  ((val (reference-transferrable-value reference)))
+               val
+               (or (author-average-reference-quality author) (author-vote-value author))))
+          (author-vote-value author))
       (author-vote-value author)))
 
 ;;FIXME: Stub. Needs to move somewhere else. Needs to be thought out.

@@ -12,7 +12,10 @@
    #:text-script
    #:title-script
    #:general-script
-   #:participants))
+   #:participants
+   #:flag-core
+   #:opinion-references
+   #:opinion-can-apply-dircs-to-parent))
 
 (in-package :wf/ipfs)
 
@@ -81,6 +84,11 @@
             (warflagger::add-extras-to-opinion opinion (warflagger:get-target-text iid))))
     warflagger:*opinion-store*))
 
+(defun opinion-references (opinion)
+  (let ((main (assoc-cdr :reference opinion))
+        (commt (assoc-cdr :references opinion)))
+    (if main (list* main commt) commt)))
+
 (defun iid-equal (id1 id2)
   "Might be the bare id string, or might be an URL with the string on the end"
   (gadgets:sequences-end-same id1 id2))
@@ -111,8 +119,20 @@
      :format (lambda (x) (gadgets:assoc-cdr :iid x))
      :identity-func (alexandria:curry #'gadgets:assoc-cdr :iid))))
 
+(defun opinion-target-same-author-p (opinion)
+  (when-let* ((treead (assoc-cdr :tree-address opinion))
+              (ln (not (length1 treead)))
+              (parent (warflagger:opinion-by-id (nelt treead 1))))
+    (equal (assoc-cdr :author opinion) (assoc-cdr :author parent))
+    (and (not (length1 treead)))))
 
-
+;;FIXME: must be extended opinion. check type.
+(defun opinion-can-apply-dircs-to-parent (opinion)
+  (and (eq :blank (last-car (assoc :flag opinion)))
+       (if-let ((cmt (assoc :clean-comment opinion)))
+         (not (not-empty (cdr cmt)))
+         t)
+       (opinion-target-same-author-p opinion)))
 
 ;;;;;
 ;; What do we need to know about opinions/ rooturl?
@@ -302,6 +322,7 @@
 (defvar *cascade*)
 (defvar *other-flag*)
 (defvar *direction*)
+(defvar *target-author* nil)
 
 
 (defun stick-other-flag-on-target (flag ballot-box warstat)
@@ -318,6 +339,9 @@
     (setf (gethash :replies-total warstats) 0))
   (incf (gethash :replies-immediate warstats))
   (incf (gethash :replies-total warstats) (1+ childcount)))
+
+(defun set-direction (warstat direction)
+  (setf (gethash :direction warstat) (or direction :neutral)))
 
 (defun set-tree-freshness (warstat &rest timestamps)
   (setf
@@ -344,9 +368,10 @@
                     (otherwise *warstats*))))
     (setf (gethash key ws-store) warstats)))
 
-(defun execute-modifiers (modifiers tree-address other-flag direction)
+(defun execute-modifiers (modifiers tree-address other-flag direction author)
   (hu:collecting-hash-table (:mode :replace)
-    (let ((*ballot-box* (warflagger:make-ballot-box))
+    (let ((*target-author* author)
+          (*ballot-box* (warflagger:make-ballot-box))
           (*text-ballot-box* (warflagger:make-ballot-box))
           (*title-ballot-box* (warflagger:make-ballot-box))
           (*warstat* (make-hash-table))
@@ -369,127 +394,132 @@
 
 (defun flag-core (other-flag direction iid author modifiers)
   (hu:with-keys (:ballot-box :text-ballot-box :title-ballot-box :warstat :text-warstat :title-warstat
-                            :apply-to :direction :other-flag)
+                 :apply-to :direction :other-flag)
       (if modifiers
-          (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction)
+          (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction author)
           (make-hash-table))
-
     ;;accumulate own warstats
+    (set-direction warstat direction)
     (multiple-value-bind (ws bb) (applied-to apply-to)
       (unless (warflagger:ballot-box-empty-p ballot-box)
-       (warflagger:apply-ballot-box-to-warstats ballot-box warstat)
-       (collect-warstats iid warstat))
-     ;;FIXME: do we deal with text warstats for nonroot targets?
-     (unless (warflagger:ballot-box-empty-p text-ballot-box)
-       (warflagger:apply-ballot-box-to-warstats text-ballot-box text-warstat)
-       (collect-warstats iid text-warstat :text))
-     (unless (warflagger:ballot-box-empty-p title-ballot-box)
-       (warflagger:apply-ballot-box-to-warstats title-ballot-box title-warstat)
-       (collect-warstats iid title-warstat :title))
-     ;;FIXME: Are there cases when an opinion and descendants should not be counted?
-     (add-to-replies-count ws
-                           (+ (gethash :replies-total warstat 0)
-                              (gethash :replies-total text-warstat 0)
-                              (gethash :replies-total title-warstat 0)))
-     (set-tree-freshness ws
-                         (assoc-cdr :timestamp (warflagger:opinion-by-id iid))
-                         (gethash :timestamp warstat) (gethash :timestamp text-warstat)
-                         (gethash :timestamp title-warstat))
-     ;;For now it is either direction-style vote or other-flag. Not both.
-     (cond
-       (other-flag
+        (warflagger:apply-ballot-box-to-warstats ballot-box warstat)
+        (collect-warstats iid warstat))
+      ;;FIXME: do we deal with text warstats for nonroot targets?
+      (unless (warflagger:ballot-box-empty-p text-ballot-box)
+        (warflagger:apply-ballot-box-to-warstats text-ballot-box text-warstat)
+        (collect-warstats iid text-warstat :text))
+      (unless (warflagger:ballot-box-empty-p title-ballot-box)
+        (warflagger:apply-ballot-box-to-warstats title-ballot-box title-warstat)
+        (collect-warstats iid title-warstat :title))
+      ;;FIXME: Are there cases when an opinion and descendants should not be counted?
+      (add-to-replies-count ws
+                            (+ (gethash :replies-total warstat 0)
+                               (gethash :replies-total text-warstat 0)
+                               (gethash :replies-total title-warstat 0)))
+      (set-tree-freshness ws
+                          (assoc-cdr :timestamp (warflagger:opinion-by-id iid))
+                          (gethash :timestamp warstat) (gethash :timestamp text-warstat)
+                          (gethash :timestamp title-warstat))
+      (when other-flag
         (warflagger:cast-vote! ballot-box :up iid author)
-        (stick-other-flag-on-target other-flag ballot-box ws)
-        nil)
-       ;;We don't cast own vote if it's not an other-flag. Return appropriate ballot box instead.
-       ((eq direction :pro)
-        (setf bb (warflagger:merge-ballot-boxes bb ballot-box))
-        bb)
-       ((eq direction :con)
-        (setf bb (warflagger:merge-with-inverted-ballot-boxes bb ballot-box))
-        bb)
-       (t nil)))))
+        (stick-other-flag-on-target other-flag ballot-box ws))
+      (cond
+        ;;We don't cast own vote if it's not an other-flag. Return appropriate ballot box instead.
+        ((eq direction :pro)
+         (setf bb (warflagger:merge-ballot-boxes bb ballot-box))
+         bb)
+        ((eq direction :con)
+         (setf bb (warflagger:merge-with-inverted-ballot-boxes bb ballot-box))
+         bb)
+        (t nil)))))
 
 (in-package :score-script)
 
 ;; Initial implementation of consensus scorer
 
 (defun negative-spam (&key iid author modifiers)
-  (hu:with-keys (ballot-box text-ballot-box title-ballot-box warstats text-warstats title-warstats
-                            apply-to cascade)
-      (if modifiers
-          (execute-modifiers modifiers (append *tree-address* (list iid)))
-          (make-hash-table))
-
-    ;;How do we decide if the ballot box should be applied?
-    ;; - If cascade is false, no
-    ;; - Decision to count ballot box for other-flag stuff should be passed out because author
-    ;;   count may be desirable. )
-  
-    ;;Save this set of warstats
-    ;;Did or will directives need to modify things? How will we check?
- 
-    (dolist (vot *ballot-box*) ;;somehow
-      (cast-vote-at-target &etc))
-    (stick-other-flag-on-target :flag-spam *ballot-box* + mine)
-    )
-  #|
- What do we need to do?
-  - Find out what effect we will have:
-   - if there are any dislike or wrong, we have no effect
-   - Has author retracted?
-    - If so, what do we do with agreement? Under consensus, we drop it.
-    - How do we make Retraction do the job itself? Don't want special cases!
-  - Before calling modifiers, set self up as top of some stack of to-be-modified
-   - There are things that can happen in modifiers that will disable this opinion, preventing
-     other modifiers from effecting this or its target chain. How do we handle that?
-   - The nature of this opinion determines whether or not its modifiers can touch parent targets
-    - But what do they touch? Effect? Controversy? These are done through this, right? Count?
-      That happens anyways...
-   - Modifiers can be part of this opinion.
-   - Modifiers can adjust the target (text, title) of this opinion. What do we do with contradictory
-     modifiers?
-   - No opinion is going to get its target modified in an unpredictable way. Or can it?
-     - There are limits: so far only text/title
-   - Modifiers might want to add their authors as contributing to parent vote.
-  - What do we do if author is blacklisted?
-   - Don't implement yet.
-   - Don't cancel if non-blacklisted has added support.
-
-
-  - Do we register spam attribute even if it is zero value?
-  - Spam attribute is only applied to target. Dislike will flow up the tree.
-  - Add to count of all parents, if we are doing count.
-  - 
-    -
-|#
-
-
-
-(defun negative-inflammatory (&key iid author modifiers))
-(defun negative-disagree (&key iid author modifiers))
-(defun negative-dislike (&key iid author modifiers))
-(defun negative-language-warning (&key iid author modifiers))
-(defun negative-disturbing (&key iid author modifiers))
-(defun negative-logical-fallacy (&key iid author modifiers))
-(defun negative-needs-evidence (&key iid author modifiers))
-(defun negative-raise-question (&key iid author modifiers))
-(defun negative-out-of-bounds (&key iid author modifiers))
-(defun positive-funny (&key iid author modifiers))
-(defun positive-agree (&key iid author modifiers))
-(defun positive-like (&key iid author modifiers))
-(defun positive-interesting (&key iid author modifiers))
-(defun statements-evidence (&key iid author modifiers))
-(defun custodial-redundant (&key iid author modifiers))
-(defun custodial-out-of-date (&key iid author modifiers))
-(defun custodial-retraction (&key iid author modifiers))
-(defun custodial-correction (&key iid author modifiers))
-(defun custodial-incorrect-flag (&key iid author modifiers))
-(defun custodial-flag-abuse (&key iid author modifiers))
-(defun custodial-offtopic (&key iid author modifiers))
-(defun custodial-arcane (&key iid author modifiers))
-(defun custodial-same-thing (&key iid author modifiers))
-(defun custodial-blank (&key iid author modifiers))
+  (wf/ipfs:flag-core :spam nil iid author modifiers))
+(defun negative-inflammatory (&key iid author modifiers)
+  (wf/ipfs:flag-core :inflammatory nil iid author modifiers))
+(defun negative-disagree (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :con iid author modifiers)))
+    (warflagger:cast-vote! balbox :down author iid)))
+(defun negative-dislike (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :con iid author modifiers)))
+    (warflagger:cast-vote! balbox :down author iid)))
+(defun negative-language-warning (&key iid author modifiers)
+  (wf/ipfs:flag-core :language-warning nil iid author modifiers))
+(defun negative-disturbing (&key iid author modifiers)
+  (wf/ipfs:flag-core :disturbing nil iid author modifiers))
+(defun negative-logical-fallacy (&key iid author modifiers)
+  (wf/ipfs:flag-core :logical-fallacy nil iid author modifiers))
+(defun negative-needs-evidence (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :con iid author modifiers)))
+    (warflagger:cast-vote! balbox :wrong author iid)))
+(defun negative-raise-question (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :con iid author modifiers)))
+    (warflagger:cast-vote! balbox :wrong author iid)))
+(defun negative-out-of-bounds (&key iid author modifiers)
+  (wf/ipfs:flag-core :out-of-bounds nil iid author modifiers))
+(defun positive-funny (&key iid author modifiers)
+  (wf/ipfs:flag-core :funny nil iid author modifiers))
+(defun positive-agree (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :pro iid author modifiers)))
+    (warflagger:cast-vote! balbox :up author iid)))
+(defun positive-like (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :pro iid author modifiers)))
+    (warflagger:cast-vote! balbox :up author iid)))
+(defun positive-interesting (&key iid author modifiers)
+  (wf/ipfs:flag-core :interesting nil iid author modifiers))
+;;FIXME: this should go away
+(defun statements-evidence (&key iid author modifiers)
+  (let ((vv (assoc-cdr :vote-value (warflagger:opinion-by-id iid))))
+    (cond ((eql vv 1) (positive-evidence :iid iid :author author :modifiers modifiers))
+          ((eql vv -1) (negative-evidence :iid iid :author author :modifiers modifiers)))))
+(defun negative-evidence (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :con iid author modifiers)))
+    (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))
+      (warflagger:cast-vote! balbox :wrong author iid ref))))
+(defun positive-evidence (&key iid author modifiers)
+  (when-let ((balbox (wf/ipfs:flag-core nil :pro iid author modifiers)))
+    (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))
+      (warflagger:cast-vote! balbox :right author iid ref))))
+(defun custodial-redundant (&key iid author modifiers)
+  (wf/ipfs:flag-core :redundant nil iid author modifiers))
+(defun custodial-out-of-date (&key iid author modifiers)
+  (wf/ipfs:flag-core :out-of-date nil iid author modifiers))
+(defun custodial-retraction (&key iid author modifiers)
+  (if (equal author wf/ipfs::*target-author*)
+      (progn
+        (wf/ipfs:flag-core nil nil iid author modifiers)
+        (setf (gethash :retraction wf/ipfs::*warstat*) t))
+      (warn "Retraction applied to target not by author")))
+(defun custodial-correction (&key iid author modifiers)
+  (warn "Correction flag not implemented")
+  (wf/ipfs:flag-core nil nil iid author modifiers))
+(defun custodial-incorrect-flag (&key iid author modifiers)
+  (wf/ipfs:flag-core :incorrect-flag nil iid author modifiers))
+(defun custodial-flag-abuse (&key iid author modifiers)
+  (if (length1 (assoc-cdr :tree-address (warflagger:opinion-by-id iid)))
+      (warn "Flag-Abuse applied to root URL")
+      (progn
+        ;;FIXME: Dirty hack. Need to rethink system to make this less ugly
+        (wf/ipfs:flag-core :flag-abuse nil iid author modifiers)
+        (when (gethash :flag-abuse *warstat*)
+          (setf *direction* :neutral)
+          (setf *other-flag* nil)))))
+(defun custodial-offtopic (&key iid author modifiers)
+  (wf/ipfs:flag-core :offtopic nil iid author modifiers))
+(defun custodial-arcane (&key iid author modifiers)
+  (wf/ipfs:flag-core :arcane nil iid author modifiers))
+(defun custodial-same-thing (&key iid author modifiers)
+  (warn "Same-thing flag not implemented")
+  (wf/ipfs:flag-core nil nil iid author modifiers))
+(defun custodial-blank (&key iid author modifiers)
+  (if (wf/ipfs:opinion-can-apply-dircs-to-parent (warflagger:opinion-by-id iid))
+      ;;Will this work?
+      (and modifiers (funcall modifiers))
+      (wf/ipfs:flag-core nil nil iid author modifiers)))
 
 ;;FIXME: something should be set in warstats for suggest.
 (defun target-text (&key iid author)
@@ -504,7 +534,17 @@
       (wfip::apply-to :text iid)))
 (defun target-title (&key iid author)
   (declare (ignore author))
-  (wfip::apply-to :title iid))
+  (wf/ipfs::apply-to :title iid))
 (defun suggest-target-title (&key iid author)
   (declare (ignore author))
   (wfip::apply-to :title iid))
+
+(defun vote-value (value &key iid author)
+  (declare (ignore iid author))
+  (if (eql value 0)
+      (setf *direction* :neutral)
+      (warn "Vote-value: only support setting to 0")))
+
+(defun no-cascade (&key iid author)
+  ;;FIXME: this might not work...
+  (setf *direction* :neutral))
