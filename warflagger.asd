@@ -41,5 +41,6 @@
                               (:file "objective")
                               (:file "ballot-box")
                               (:file "author-stats")
+                              (:file "score-script")
                               (:file "summarizer")))))
 
