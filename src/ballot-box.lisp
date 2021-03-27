@@ -29,15 +29,23 @@
   (push `(,iid ,author ,@(when reference (list reference))) (gethash direction balbox)))
 
 (defun merge-ballot-boxes (&rest boxes)
-  (let ((res (make-ballot-box)))
-    (dolist (box boxes)
+  (apply #'merge-ballot-boxes! (make-ballot-box) boxes))
+
+(defun merge-ballot-boxes! (&rest boxes)
+  (let ((res (car boxes)))
+    (dolist (box (cdr boxes))
       (dolist (dir '(:right :wrong :up :down))
         (dolist (vote (gethash dir box))
           (apply #'cast-vote res dir vote))))
     res))
 
 (defun merge-with-inverted-ballot-boxes (&rest boxes)
-  (let ((res (merge-ballot-boxes (car boxes))))
+  (apply #'merge-with-inverted-ballot-boxes!
+         (merge-ballot-boxes! (make-ballot-box) (car boxes))
+         (cdr boxes)))
+
+(defun merge-with-inverted-ballot-boxes! (&rest boxes)
+  (let ((res (car boxes)))
     (dolist (box (cdr boxes))
       (loop for dir in '(:right :wrong :up :down)
             for swap in '(:wrong :right :down :up)

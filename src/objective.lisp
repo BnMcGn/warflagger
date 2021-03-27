@@ -464,10 +464,10 @@
       (cond
         ;;We don't cast own vote if it's not an other-flag. Return appropriate ballot box instead.
         ((eq direction :pro)
-         (setf bb (warflagger:merge-ballot-boxes bb ballot-box))
+         (warflagger:merge-ballot-boxes! bb ballot-box)
          bb)
         ((eq direction :con)
-         (setf bb (warflagger:merge-with-inverted-ballot-boxes bb ballot-box))
+         (warflagger:merge-with-inverted-ballot-boxes! bb ballot-box)
          bb)
         (t nil)))))
 

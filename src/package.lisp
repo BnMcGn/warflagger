@@ -113,5 +113,7 @@
    #:score-controversy
    #:cast-vote!
    #:merge-ballot-boxes
-   #:merge-with-inverted-ballot-boxes))
+   #:merge-with-inverted-ballot-boxes
+   #:merge-ballot-boxes!
+   #:merge-with-inverted-ballot-boxes!))
 
