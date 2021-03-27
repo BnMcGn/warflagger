@@ -249,14 +249,15 @@
   "Symbols must be safetied before running"
   (proto:mapbranch
    (lambda (node)
-     (if (member (car node) *safe-symbols*)
-         (multiple-value-bind (main children) (splitfilter #'listp node)
-           (when children
+     (if (and (symbolp (car node)) (member (car node) *safe-symbols* :test #'string-equal))
+         (multiple-value-bind (children main) (splitfilter #'listp node)
+           (if children
              (append
               main
               `(:modifiers
                 (lambda ()
-                  ,@children)))))
+                  ,@children)))
+             node))
          node))
    code))
 
@@ -350,7 +351,7 @@
         (*text-warstat* (make-hash-table))
         (*title-warstat* (make-hash-table))
         (*tree-address* nil))
-    (eval scsc)
+    (mapc #'eval scsc)
     (unless (warflagger:ballot-box-empty-p *ballot-box*)
       (warflagger:apply-ballot-box-to-warstats *ballot-box* *warstat*)
       (collect-warstats rooturl *warstat*))
@@ -418,7 +419,8 @@
           (*other-flag* other-flag)
           (*direction* direction)
           (*tree-address* tree-address))
-      (funcall modifiers)
+      (when (functionp modifiers)
+        (funcall modifiers))
       (hu:collect :ballot-box *ballot-box*)
       (hu:collect :text-ballot-box *text-ballot-box*)
       (hu:collect :title-ballot-box *title-ballot-box*)
@@ -432,9 +434,8 @@
 (defun flag-core (other-flag direction iid author modifiers)
   (hu:with-keys (:ballot-box :text-ballot-box :title-ballot-box :warstat :text-warstat :title-warstat
                  :apply-to :direction :other-flag)
-      (if modifiers
-          (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction author)
-          (make-hash-table))
+      (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction author)
+    (make-hash-table)
     ;;accumulate own warstats
     (set-direction warstat direction)
     (multiple-value-bind (ws bb) (applied-to apply-to)
@@ -542,9 +543,9 @@
       (progn
         ;;FIXME: Dirty hack. Need to rethink system to make this less ugly
         (wf/ipfs:flag-core :flag-abuse nil iid author modifiers)
-        (when (gethash :flag-abuse *warstat*)
-          (setf *direction* :neutral)
-          (setf *other-flag* nil)))))
+        (when (gethash :flag-abuse wf/ipfs::*warstat*)
+          (setf wf/ipfs::*direction* :neutral)
+          (setf wf/ipfs::*other-flag* nil)))))
 (defun custodial-offtopic (&key iid author modifiers)
   (wf/ipfs:flag-core :offtopic nil iid author modifiers))
 (defun custodial-arcane (&key iid author modifiers)
@@ -558,30 +559,39 @@
       (and modifiers (funcall modifiers))
       (wf/ipfs:flag-core nil nil iid author modifiers)))
 
+;;FIXME: add a general unknown-flag handler
+(defun statements-am-qualified (&key iid author modifiers)
+  (warn "Deprecated flag")
+  (wf/ipfs:flag-core nil nil iid author modifiers))
+(defun negative-already-answered (&key iid author modifiers)
+  (warn "Deprecated flag")
+  (wf/ipfs:flag-core nil nil iid author modifiers))
+
 ;;FIXME: something should be set in warstats for suggest.
 (defun target-text (&key iid author)
   (declare (ignore author))
   (if (not (length1 wf/ipfs::*tree-address*))
       (warn "Can't target the text of a non-rooturl target")
-      (wfip::apply-to :text iid)))
+      (wf/ipfs::apply-to :text iid)))
 (defun suggest-target-text (&key iid author)
   (declare (ignore author))
   (if (not (length1 wf/ipfs::*tree-address*))
       (warn "Can't target the text of a non-rooturl target")
-      (wfip::apply-to :text iid)))
+      (wf/ipfs::apply-to :text iid)))
 (defun target-title (&key iid author)
   (declare (ignore author))
   (wf/ipfs::apply-to :title iid))
 (defun suggest-target-title (&key iid author)
   (declare (ignore author))
-  (wfip::apply-to :title iid))
+  (wf/ipfs::apply-to :title iid))
 
 (defun vote-value (value &key iid author)
   (declare (ignore iid author))
   (if (eql value 0)
-      (setf *direction* :neutral)
+      (setf wf/ipfs::*direction* :neutral)
       (warn "Vote-value: only support setting to 0")))
 
 (defun no-cascade (&key iid author)
+  (declare (ignore iid author))
   ;;FIXME: this might not work...
-  (setf *direction* :neutral))
+  (setf wf/ipfs::*direction* :neutral))

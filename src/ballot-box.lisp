@@ -25,8 +25,8 @@
     res))
 
 (defun cast-vote! (balbox direction iid author &optional reference)
-  (setf (gethash 'cache res) nil)
-  (push `(,iid ,author ,@(when reference (list reference)) (gethash direction balbox))))
+  (setf (gethash 'cache balbox) nil)
+  (push `(,iid ,author ,@(when reference (list reference))) (gethash direction balbox)))
 
 (defun merge-ballot-boxes (&rest boxes)
   (let ((res (make-ballot-box)))
