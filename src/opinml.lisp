@@ -131,10 +131,18 @@
   ;;FIXME: Alphanumeric?
   )
 
+(defparameter *safe-opinion-symbols*
+  (append
+   '(:target :rooturl :flag :comment :author :votevalue :reference :datestamp)
+   (gadgets:ordered-unique (alexandria:flatten (warflagger:known-flags)))))
+
+(defun safe-symbol-p (namestr package)
+  (and (member namestr *safe-opinion-symbols* :test #'string-equal)
+       (eq package :keyword)))
+
 (defun deserialize-opinion-from-stream (stream)
-  ;;FIXME: UNSAFE! Can't use read this way!
   ;;FIXME: Add over all length limit
-  (let ((opinion (read stream)))
+  (let ((opinion (proto:limited-reader stream #'safe-symbol-p)))
     (mapc (lambda (key) (check-url (getf opinion key))) '(:target :rooturl :author))
     (when (getf opinion :reference)
       (check-url (getf opinion :reference)))
@@ -318,7 +326,6 @@
          ;;Nil if comment has nothing remaining but whitespace
          (unless (every (alexandria:rcurry #'member *whitespace-characters*) res)
            res)))
-      (:raw-comment comment)
       (:hashtags (ordered-unique (nreverse *found-hashtags*)))
       (:references (nreverse *found-references*))
       (:directives (ordered-unique (nreverse *found-directives*)))))))

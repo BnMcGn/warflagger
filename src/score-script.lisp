@@ -143,9 +143,9 @@
    :valuefunc
    (lambda (sym)
      (if (keywordp sym)
-         (if (member sym *safe-keywords*) sym
+         (if (member sym warflagger::*safe-keywords*) sym
              (error "Unknown keyword in score script"))
-         (if (member sym *safe-symbols* :test #'string-equal)
+         (if (member sym warflagger::*safe-symbols* :test #'string-equal)
              (symbolize sym :package package)
              (error "Unknown symbol in score script"))))))
 
@@ -155,7 +155,7 @@
   "Symbols must be safetied before running"
   (proto:mapbranch
    (lambda (node)
-     (if (and (symbolp (car node)) (member (car node) *safe-symbols* :test #'string-equal))
+     (if (and (symbolp (car node)) (member (car node) warflagger::*safe-symbols* :test #'string-equal))
          (multiple-value-bind (children main) (splitfilter #'listp node)
            (if children
              (append
@@ -338,11 +338,11 @@
           ((eql vv -1) (negative-evidence :iid iid :author author :modifiers modifiers)))))
 (defun negative-evidence (&key iid author modifiers)
   (when-let ((balbox (sss:flag-core nil :con iid author modifiers)))
-    (dolist (ref (sss:opinion-references (warflagger:opinion-by-id iid)))
+    (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))
       (warflagger:cast-vote! balbox :wrong author iid ref))))
 (defun positive-evidence (&key iid author modifiers)
   (when-let ((balbox (sss:flag-core nil :pro iid author modifiers)))
-    (dolist (ref (sss:opinion-references (warflagger:opinion-by-id iid)))
+    (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))
       (warflagger:cast-vote! balbox :right author iid ref))))
 (defun custodial-redundant (&key iid author modifiers)
   (sss:flag-core :redundant nil iid author modifiers))
@@ -376,7 +376,7 @@
   (warn "Same-thing flag not implemented")
   (sss:flag-core nil nil iid author modifiers))
 (defun custodial-blank (&key iid author modifiers)
-  (if (sss:opinion-can-apply-dircs-to-parent (warflagger:opinion-by-id iid))
+  (if (wf/ipfs:opinion-can-apply-dircs-to-parent (warflagger:opinion-by-id iid))
       ;;Will this work?
       (and modifiers (funcall modifiers))
       (sss:flag-core nil nil iid author modifiers)))
