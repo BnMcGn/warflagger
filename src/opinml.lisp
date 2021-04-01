@@ -328,8 +328,8 @@
   - refs found
   - directives found
   - indicate if only directives were found "
-  ;;FIXME: convert all line endings to #\Newline
-  (let* ((counter 0)
+  (let* ((counter (dos-to-unix comment))
+         (counter 0)
          (tracker (lambda (&optional (advance 0))
                     (prog1 (subseq comment counter)
                       (incf counter advance))))

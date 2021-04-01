@@ -119,5 +119,7 @@
    #:iid-tree-address
    #:iid-tree-address-p
    #:opinion-store
-   #:opinion-store-p))
+   #:opinion-store-p
+   #:iid-opinion-tree
+   #:score-script))
 
