@@ -48,6 +48,35 @@
 
 (deftype recognized-flag () `(satisfies recognized-flag-p))
 
+(defun opinion-store-p (item)
+  (and (hash-table-p item)
+       (every #'opinion-p (alexandria:hash-table-values item))))
+
+(deftype opinion-store () `(satisfies opinion-store-p))
+
+(defun iid-tree-address-p (item)
+  (list-of-type-p item 'iid))
+
+(deftype iid-tree-address () `(satisfies iid-tree-address-p))
+
+(defun iid-opinion-tree-p (item)
+  (and (listp item)
+       (every #'iid-p (flatten item))))
+
+(deftype iid-opinion-tree () `(satisfies iid-opinion-tree))
+
+(defun hashtag-p (item)
+  (and (stringp item)
+       (eql #\# (elt item 0))
+       (< (length item) *max-hashtag-length*)
+       ;;FIXME: Alphanumeric for now. Should consider unicode chars?
+       (every #'alphanumericp
+              (sequence->list (subseq item 1)))))
+
+(deftype hashtag () `(satisfies hashtag-p))
+
+(deftype uri () `(satisfies quri:uri-p))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Save and load
 ;;;;;;;;;;;;;;;;;;;;
@@ -127,9 +156,8 @@
       itm))
 
 (defun check-hashtag (hashtag)
-  (check-length hashtag *max-hashtag-length*)
-  ;;FIXME: Alphanumeric?
-  )
+  (unless (hashtag-p hashtag)
+    (error "Invalid hashtag")))
 
 (defparameter *safe-opinion-symbols*
   (append

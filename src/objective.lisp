@@ -93,7 +93,9 @@
   "Might be the bare id string, or might be an URL with the string on the end"
   (gadgets:sequences-end-same id1 id2))
 
-;;FIXME: add type checking
+(declaim (ftype
+          (function (warflagger:opinion &optional warflagger:opinion-store) warflagger:iid-tree-address)
+          tree-address))
 (defun tree-address (opinion &optional opinion-store)
   (or (access opinion :tree-address)
       (if (string-equal (access opinion :target) (access opinion :rooturl))
@@ -138,6 +140,7 @@
 ;; Score script creation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(declaim (ftype (function (iid-opinion-tree opinion-store) score-script) make-score-script))
 (defun make-score-script (optree opinion-store)
   ;;FIXME: Any kind of max depth safety?
   (apply

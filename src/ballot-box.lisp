@@ -8,6 +8,7 @@
 ;;;
 ;;;
 
+;;; Typedefs
 
 (defun ballot-box-p (item)
   (and (hash-table-p item)
@@ -15,6 +16,12 @@
 
 (deftype ballot-box () `(satisfies ballot-box-p))
 
+(defun vote-direction-p (item)
+  (member item '(:up :down :right :wrong)))
+
+(deftype vote-direction () `(satisfies vote-direction-p))
+
+(declaim (ftype (function () ballot-box) make-ballot-box))
 (defun make-ballot-box ()
   (let ((res (make-hash-table)))
     (setf (gethash :right res) nil)
@@ -24,9 +31,14 @@
     (setf (gethash 'cache res) nil)
     res))
 
+(declaim (ftype (function (ballot-box vote-direction iid uri &optional uri) t) cast-vote!))
 (defun cast-vote! (balbox direction iid author &optional reference)
   (setf (gethash 'cache balbox) nil)
   (push `(,iid ,author ,@(when reference (list reference))) (gethash direction balbox)))
+
+(declaim (ftype (function (&rest (list-of-type 'ballot-box)) ballot-box)
+                merge-ballot-boxes merge-ballot-boxes!
+                merge-with-inverted-ballot-boxes merge-with-inverted-ballot-boxes!))
 
 (defun merge-ballot-boxes (&rest boxes)
   (apply #'merge-ballot-boxes! (make-ballot-box) boxes))
@@ -53,10 +65,12 @@
                  (apply #'cast-vote res swap vote))))
     res))
 
+(declaim (ftype (function (ballot-box) boolean) ballot-box-empty-p))
 (defun ballot-box-empty-p (balbox)
   (not (some (lambda (cat) (not-empty (gethash cat balbox)))
              '(:right :up :wrong :down))))
 
+(declaim (ftype (function (ballot-box) ballot-box) remove-extra-votes))
 (defun remove-extra-votes (balbox)
   "Rules:
  - An author can't have more than one positive and one negative vote, except maybe in the right/wrong

@@ -115,5 +115,9 @@
    #:merge-ballot-boxes
    #:merge-with-inverted-ballot-boxes
    #:merge-ballot-boxes!
-   #:merge-with-inverted-ballot-boxes!))
+   #:merge-with-inverted-ballot-boxes!
+   #:iid-tree-address
+   #:iid-tree-address-p
+   #:opinion-store
+   #:opinion-store-p))
 
