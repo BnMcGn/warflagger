@@ -90,7 +90,7 @@
                          ,@body)
          (setf (readtable-case *readtable*) ,case)))))
 
-(defun serialize-opinion (opinion &key author datestamp)
+(defun serialize-opinion (opinion &key author created)
   "Create a basic version of an opinion that is suitable for saving to disk or IPFS. No ID is included because this is assumed to be a first save."
   (with-inverted-case
     (prin1-to-string
@@ -112,8 +112,8 @@
           (hu:collect :excerpt-offset excerpt-offset))
         (when-let ((reference (assoc-cdr :reference opinion)))
           (hu:collect :reference reference))
-        (hu:collect :datestamp
-          (js-compatible-utcstamp (or datestamp (assoc-cdr :datestamp opinion)))))))))
+        (hu:collect :created
+          (js-compatible-utcstamp (or created (cdr (assoc-or '(:created :datestamp) opinion))))))))))
 
 ;; Problems: datestamp. Might want to deal with :id or :url because maybe is a remote web opinion.
 ;; - how to serialize to string?
@@ -177,7 +177,10 @@
     (check-length (getf opinion :comment) *max-comment-length*)
     (when (getf opinion :excerpt)
       (check-length (getf opinion :excerpt) *max-excerpt-length*))
-    (setf (getf opinion :datestamp) (local-time:parse-timestring (getf opinion :datestamp)))
+    (setf (getf opinion :created) (local-time:parse-timestring (getf opinion :created)))
+    ;;FIXME: datestamp is deprecated
+    (push (getf opinion :created) opinion)
+    (push :datestamp opinion)
     (hu:plist->alist opinion)))
 
 (defun make-experimental-opinion-url (oiid)
