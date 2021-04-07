@@ -250,7 +250,9 @@ the page text can be found in the cache."
     (error "Text keyword is not valid without :extra set to T"))
   (let ((opinion (if-let  (res (and *opinion-store* (gethash oid *opinion-store*)))
                    res
-                   (opinion-from-db-row (get-assoc-by-pkey 'opinion oid)))))
+                   (opinion-from-db-row (if (stringp oid)
+                                            (get-assoc-by-col (colm 'opinion 'iid) oid)
+                                            (get-assoc-by-pkey 'opinion oid))))))
     ;;FIXME: will go away when db goes
     (when (integerp (assoc-cdr :rooturl opinion))
       (push (cons :rootid (assoc-cdr :rooturl opinion)) opinion)
@@ -294,7 +296,8 @@ the page text can be found in the cache."
   (if-let ((id (rooturl-p url)))
     (values (caar id) :rooturl)
     (when-let ((op (opinion-exists-p url)))
-      (values (assoc-cdr :id op) :opinion))))
+      (values (if (assoc :iid op) (assoc-cdr :iid op) (assoc-cdr :id op))
+              :opinion))))
 
 (defun get-target-id (opinid)
   (get-target-id-from-url (assoc-cdr :target (opinion-by-id opinid))))
@@ -307,7 +310,7 @@ the page text can be found in the cache."
   (multiple-value-bind (id type) (get-target-id-from-url url)
     (case type
       (:rooturl (make-rootid-url id))
-      (:opinion (make-opinion-url nil id))
+      (:opinion (make-opinion-url (opinion-by-id id)))
       (otherwise
        (if (stringp (is-location-opinml? url))
          url

@@ -216,6 +216,25 @@
                 :username (lisp (webhax-user:get-user-name))
                 :child opinion-page)))))
 
+  (setf (ningle:route *app* "/o/*")
+        (quick-page
+            ()
+          (bind-validated-input
+              ((iid :string))
+            (let* ((opin (opinion-by-id iid))
+                   (rooturl (assoc-cdr :rooturl opin)))
+              (mount-component (target-loader)
+                :url (lisp rooturl)
+                :rootid (lisp (assoc-cdr :rootid opin))
+                :title (lisp (grab-title rooturl))
+                :looks (lisp (when (authenticated?)
+                               (ps-gadgets:as-ps-data
+                                (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
+                :focus (lisp (list* 'list (tree-address id)))
+                :username (lisp (webhax-user:get-user-name))
+                :child opinion-page)))))
+
+
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
             ()
