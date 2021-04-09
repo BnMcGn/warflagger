@@ -56,7 +56,7 @@
     (setf opin1id (save-opinion-from-user opin1 userid))
     (ok (integerp opin1id))
     (let ((saved-opin (opinion-by-id opin1id)))
-      (ok saved-opin)
+      (ok (gadgets:not-empty (assoc-cdr :target saved-opin)))
 
       (setf ourl (assoc-cdr :url saved-opin))
 

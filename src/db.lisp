@@ -296,7 +296,7 @@ the page text can be found in the cache."
   (if-let ((id (rooturl-p url)))
     (values (caar id) :rooturl)
     (when-let ((op (opinion-exists-p url)))
-      (values (if (assoc :iid op) (assoc-cdr :iid op) (assoc-cdr :id op))
+      (values (if (and (assoc :iid op) (assoc-cdr :iid op)) (assoc-cdr :iid op) (assoc-cdr :id op))
               :opinion))))
 
 (defun get-target-id (opinid)
