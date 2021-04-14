@@ -228,19 +228,24 @@
     res))
 
 (defun set-opinion-target (id url)
-  (format t "SetTarget: ~a ~a~&" id url))
+  (format t "SetTarget: ~a ~a~&" id url)
+  (update-record 'opinion id (list (cons (colm 'target) url))))
 
 (defun set-opinion-reference (id url)
-  (format t "SetReference: ~a ~a~&" id url))
+  (format t "SetReference: ~a ~a~&" id url)
+  (update-record 'reference id (list (cons (colm 'reference) url))))
 
 (defun set-opinion-url (id url)
-  (format nil "SetTarget: ~a ~a~&" id url))
+  (format nil "SetTarget: ~a ~a~&" id url)
+  (update-record 'opinion id (list (cons (colm 'url) url))))
 
 (defun set-opinion-comment (id comment)
-  (format t "SetComment: ~a ~a~&" id comment))
+  (format t "SetComment: ~a ~a~&" id comment)
+  (update-record 'comment id (list (cons (colm 'comment) comment))))
 
-(defun set-opinion-iid (id url)
-  (format nil "SetTarget: ~a ~a~&" id url))
+(defun set-opinion-iid (id iid)
+  (format nil "SetTarget: ~a ~a~&" id iid)
+  (update-record 'opinion id (list (cons (colm 'iid) iid))))
 
 (defun proc-db-opinion (opinion)
   (let ((id (assoc-cdr :id opinion)))
@@ -253,7 +258,7 @@
       (push (cons :author (make-author-url (assoc-cdr :author-id opinion))) opinion))
     (when-let* ((reference (assoc-cdr :reference opinion))
                 (newref (and (old-opinion-url reference) (new-url-for-old reference))))
-      (set-opinion-reference id reference)
+      (set-opinion-reference id newref)
       (push (cons :reference newref) opinion))
     (when-let* ((comment (assoc-cdr :comment opinion))
                 (comment (replace-urls-in-comment comment)))

@@ -87,7 +87,7 @@
       (values
        (list (case rtype
                (:rooturl rid)
-               (:opinion (grab-one (liql rid 'opinion 'opinion.rooturl)))
+               (:opinion (assoc-cdr :rootid (opinion-by-id rid)))
                (otherwise (error "Unknown type")))
              :warstats)
        rid rtype))))
