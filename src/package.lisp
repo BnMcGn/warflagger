@@ -121,5 +121,9 @@
    #:opinion-store
    #:opinion-store-p
    #:iid-opinion-tree
-   #:score-script))
+   #:score-script
+   #:is-author-initialized
+   #:initialize-author
+   #:save-opinion
+   #:opinion-reference))
 

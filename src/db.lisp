@@ -100,6 +100,11 @@
     (generate-rooturl-warstats (get-rooturl-for-url target)))
   (gethash target *warstat-store*))
 
+(defun opinion-reference (opinion)
+  (when-let* ((ref (assoc :reference opinion))
+              (ref (and (listp ref) (cdr ref))))
+    (and (stringp ref) (not-empty ref) ref)))
+
 ;;;
 ;;; Rooturl utilities
 ;;;
@@ -468,7 +473,7 @@ the page text can be found in the cache."
               ;;FIXME: RootURL should be stored in targetted opin, passed in by client.
                 (cl-utilities:collect
                     (cons (colm :rooturl) (find/store-root-url target)))
-              (dolist (k '(:votevalue :target :datestamp :url))
+              (dolist (k '(:votevalue :target :datestamp :url :iid))
                 (when-let ((field (assoc k opin)))
                   (cl-utilities:collect (cons (colm (car field)) (sql-escape (cdr field))))))
               (when id

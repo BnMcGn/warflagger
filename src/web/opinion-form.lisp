@@ -94,7 +94,7 @@
 
 (defun after-save-opinion (opinion)
   (save-new-references (assoc-cdr :url opinion))
-  (write-all-rootid-warstats (get-rooturl-id (assoc-cdr :rooturl opinion)))
+  (write-all-rootid-warstats (assoc-cdr :rootid opinion))
   (write-grouped-data-file))
 
 ;; Depends on: webhax-widgets:ps-widgets
