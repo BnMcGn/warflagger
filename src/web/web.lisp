@@ -230,7 +230,7 @@
                 :looks (lisp (when (authenticated?)
                                (ps-gadgets:as-ps-data
                                 (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
-                :focus (lisp (list* 'list (tree-address id)))
+                :focus (lisp (list* 'list (tree-address (assoc-cdr :id opin))))
                 :username (lisp (webhax-user:get-user-name))
                 :child opinion-page)))))
 

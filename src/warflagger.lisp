@@ -155,3 +155,30 @@
    :where (sql-= (colm 'flag) (flag-to-db old)))
   (print "To complete the rename operation, run write-all-warstats. Remember to check the wiki at the source repository and other documentation."))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Opinion posting central
+;;
+;; - should this be in another file?
+;;   - needs access to all applicable backends
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun is-author-initialized (author)
+  (get-local-user-id author))
+
+(defun initialize-author (&rest atypes-and-values)
+  (apply #'insert-new-author atypes-and-values))
+
+(defun save-opinion (opinion-data local-author &key post)
+  (let* ((author-url (make-author-url local-author))
+         (opinion (hu:hash->alist opinion-data))
+         (datestamp (clsql:get-time))
+         (strop (serialize-opinion opinion-data :author author-url :created datestamp))
+         (iid (ipfs-data-hash strop))
+         (opinion (cons (cons :iid iid) opinion))
+         (opinion (cons (cons :datestamp datestamp) opinion))
+         (opinion (cons (cons :url (make-opinion-url opinion)) opinion))
+         (id (insert-opinion opinion (get-local-user-id local-author)))
+         (opinion (cons (cons :id id) opinion)))
+    (when (functionp post)
+      (funcall post opinion))))
+

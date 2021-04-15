@@ -83,25 +83,19 @@
          *key-web-input*
          *opinion-form-specs*)
       (when sig
-        (let ((aid (get-local-user-id (get-user-name))))
-          (unless aid
-            (setf aid (apply #'insert-new-author
-                             (create-author-spec-from-current-user))))
-          (setf (gethash :flag values)
-                (multiple-value-bind (cat flag) (split-sequence-on-subseq ": " (gethash :flag values))
-                  (list cat flag)))
-          ;;FIXME: db needs a constraint for this
-          (setf (gethash :datestamp values)
-                (clsql:get-time))
-          (let* ((newid (save-opinion-from-user (hu:hash->alist values) aid))
-                 (savedopin (opinion-by-id newid)))
-            ;;FIXME: Should be done in separate thread to reduce delay for user
-            ;;Generate references
-            (save-new-references (assoc-cdr :url savedopin))
-            (write-all-rootid-warstats (assoc-cdr :rootid savedopin))
-            (write-grouped-data-file))))
+        (unless (is-author-initialized (get-user-name))
+          (apply #'initialize-author (create-author-spec-from-current-user)))
+        (setf (gethash :flag values)
+              (multiple-value-bind (cat flag) (split-sequence-on-subseq ": " (gethash :flag values))
+                (list cat flag)))
+        (save-opinion values (get-user-name) :post #'after-save-opinion))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))
+
+(defun after-save-opinion (opinion)
+  (save-new-references (assoc-cdr :url opinion))
+  (write-all-rootid-warstats (get-rooturl-id (assoc-cdr :rooturl opinion)))
+  (write-grouped-data-file))
 
 ;; Depends on: webhax-widgets:ps-widgets
 (define-ps-lib opinion-components ()
