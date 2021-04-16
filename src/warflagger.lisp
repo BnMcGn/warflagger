@@ -168,7 +168,7 @@
 (defun initialize-author (&rest atypes-and-values)
   (apply #'insert-new-author atypes-and-values))
 
-(defun save-opinion (opinion-data local-author &key post authorid)
+(defun save-opinion (opinion local-author &key post authorid)
   (let* ((authorid (or authorid (get-local-user-id local-author)))
          (author-url (make-author-url authorid))
          (datestamp (clsql:get-time))
