@@ -171,7 +171,6 @@
 (defun save-opinion (opinion-data local-author &key post authorid)
   (let* ((authorid (or authorid (get-local-user-id local-author)))
          (author-url (make-author-url authorid))
-         (opinion (hu:hash->alist opinion-data))
          (datestamp (clsql:get-time))
          (strop (serialize-opinion opinion :author author-url :created datestamp))
          (iid (ipfs-data-hash strop))
