@@ -168,8 +168,9 @@
 (defun initialize-author (&rest atypes-and-values)
   (apply #'insert-new-author atypes-and-values))
 
-(defun save-opinion (opinion-data local-author &key post)
-  (let* ((author-url (make-author-url (get-local-user-id local-author)))
+(defun save-opinion (opinion-data local-author &key post authorid)
+  (let* ((authorid (or authorid (get-local-user-id local-author)))
+         (author-url (make-author-url authorid))
          (opinion (hu:hash->alist opinion-data))
          (datestamp (clsql:get-time))
          (strop (serialize-opinion opinion :author author-url :created datestamp))
@@ -177,8 +178,9 @@
          (opinion (cons (cons :iid iid) opinion))
          (opinion (cons (cons :datestamp datestamp) opinion))
          (opinion (cons (cons :url (make-opinion-url opinion)) opinion))
-         (id (insert-opinion opinion (get-local-user-id local-author)))
+         (id (insert-opinion opinion authorid))
          (opinion (opinion-by-id id)))
     (when (functionp post)
-      (funcall post opinion))))
+      (funcall post opinion))
+    opinion))
 

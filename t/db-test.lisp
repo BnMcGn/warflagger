@@ -53,9 +53,8 @@
       )
     ;;Create opinion with excerpt, reference, offset
     (diag "Create opinion:")
-    (setf opin1id (save-opinion-from-user opin1 userid))
-    (ok (integerp opin1id))
-    (let ((saved-opin (opinion-by-id opin1id)))
+    (let ((saved-opin (save-opinion opin1 nil :authorid userid)))
+      (setf opin1id (assoc-cdr :id saved-opin))
       (ok (gadgets:not-empty (assoc-cdr :target saved-opin)))
 
       (setf ourl (assoc-cdr :url saved-opin))
@@ -68,8 +67,9 @@
 
       (diag "Create child opinion:")
       ;;Create second opinion on first
-      (setf opin2id (save-opinion-from-user
-                     (cons (cons :target ourl) opin2) userid))
+      (setf opin2id (assoc-cdr :id
+                        (save-opinion
+                         (cons (cons :target ourl) opin2) nil :authorid userid)))
 
       (is (gethash :text (opinion-text-server ourl)) *testcomment*)
       (is (gethash :text (opinion-text-server
