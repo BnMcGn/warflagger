@@ -22,6 +22,39 @@
     (userfig:userfig-value-for loginid 'screen-name)))
 
 (defun account-bar ()
+  (let* ((info (warflagger-user-info-bundle))
+         (name (when (webhax-user:signed-up?)
+                 (get-apparent-display-name (get-user-name))))
+         (links
+           (if (webhax-user:signed-up?)
+               (lambda ()
+                 (html-out
+                   (:a :href (assoc-cdr :settings-url info) "Settings")
+                   (:a :href (assoc-cdr :logout-url info) "Sign out")))
+               (lambda ()
+                 (html-out
+                   (:a :onclick
+                       (login-link-js (assoc-cdr :login-url info))
+                       :href "#" "Sign Up")
+                   (:a :onclick
+                       (login-link-js (assoc-cdr :login-url info))
+                       :href "#" "Log In"))))))
+    (html-out
+      (:div
+       :class "container-fluid"
+       (:div
+        :class "row"
+        (:div :class "col-sm-2 wf-sidebar-width" " ")
+        (:div :class "col-sm-1" (%logo))
+        (:div
+         :class "col-auto"
+         (if name
+             (htm (:a :href "/user/" (str name)))
+             (str "Not Signed In")))
+        (:div :class "col-sm-1" (funcall links))
+        (:div :class "col-sm-2 wf-sidebar-width" " "))))))
+
+(defun account-bar ()
   (let ((info (warflagger-user-info-bundle)))
     (html-out
       (if (webhax-user:signed-up?)
