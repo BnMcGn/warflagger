@@ -34,30 +34,6 @@
   ;; 'radmin
    ))
 
-'(define-default-layout (warflagger-main :wrapper #'webhax:page-base)
-  (:prepend-parts
-   :@head (html-out (:meta :charset "utf-8"))
-   :@css-link "/static/css/style.css"
-   :@css-link "/static/css/target.css"
-   :@css-link "/static/css/react-tabs.css"
-   )
-  (html-out
-                                        ;;Header
-    (:div :id "header_wrapper"
-          (:div :id "account_bar"
-                :@account-info))
-                                        ;;Main content
-    (:div :id "left_side"
-          :@site-index :@side-content)
-    (:div :id "right_side"
-          :@site-search :@notifications
-          (:div :class "featurebox_side" :style "opacity: 0;" "_"))
-    (:div :id "content"
-          :@messages :@inner :@footnotes)
-                                        ;;Footer
-    (:div :id "footer" :@copyright)
-    (str (tracking-code))))
-
 (setf (cl-who:html-mode) :html5)
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
@@ -111,8 +87,6 @@
 ;;FIXME: react, react-dom should be loaded from the npm bundle.
 (define-default-parts warflagger-base
   :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"
-  ;;:@javascript-link "https://unpkg.com/react@16.12.0/umd/react.development.js"
-  ;;:@javascript-link "https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"
   :@javascript-link "/static/javascript/warflagger-bundle.js"
   :@javascript (ps:ps
                  (setf -react (require "react"))
@@ -120,10 +94,6 @@
                  (setf (ps:@ -react -d-o-m) (require "react-dom-factories"))
                  (setf -redux (require "redux"))
                  (setf -react-redux (require "react-redux")))
-  ;;:@javascript-link
-  ;;"https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.js"
-  ;;:@javascript-link
-  ;;"https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.js"
 
   :@account-info #'account-bar
   :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
