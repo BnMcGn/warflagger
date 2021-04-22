@@ -54,32 +54,6 @@
         (:div :class "col-sm-1" (funcall links))
         (:div :class "col-sm-2 wf-sidebar-width" " "))))))
 
-(defun account-bar ()
-  (let ((info (warflagger-user-info-bundle)))
-    (html-out
-      (if (webhax-user:signed-up?)
-          (htm
-           (:div
-            (%logo)
-            (:a :style "position:relative; left: 180px;"
-                ;;FIXME: Should be link at /user/ to :user-url
-                :href "/user/" ;(assoc-cdr :user-url info)
-                (str (get-apparent-display-name (get-user-name))))
-            (:div :style "float: right; margin-right: 30px;"
-                  (:a :href (assoc-cdr :settings-url info) "Settings")
-                  (:a :href (assoc-cdr :logout-url info) "Sign out"))))
-          (htm
-           (:div
-            (%logo)
-            (:span :style "position:relative; left: 180px;" "Not Signed In")
-            (:div :style "float: right; margin-right: 30px;"
-                  (:a :onclick
-                      (login-link-js (assoc-cdr :login-url info))
-                   :href "#" "Sign Up")
-                  (:a :onclick
-                      (login-link-js (assoc-cdr :login-url info))
-                      :href "#" "Log In"))))))))
-
 (defun user-home-page ()
   (check-signed-up)
   (let ((since (userfig:userfig-value 'signed-up)))
