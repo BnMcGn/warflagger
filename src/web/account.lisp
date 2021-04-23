@@ -13,8 +13,8 @@
 (defun %logo ()
   (html-out
     (:a :href wf/local-settings:*base-url*
-        (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"
-              :style "position: absolute; top: 2px;"))))
+        :style "padding-right: 1.5rem"
+        (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"))))
 
 (defun get-apparent-display-name (loginid)
   (if-let ((id (get-local-user-id loginid)))
@@ -30,28 +30,33 @@
                (lambda ()
                  (html-out
                    (:a :href (assoc-cdr :settings-url info) "Settings")
-                   (:a :href (assoc-cdr :logout-url info) "Sign out")))
+                   (:a :href (assoc-cdr :logout-url info) "Sign&nbsp;out")))
                (lambda ()
                  (html-out
                    (:a :onclick
                        (login-link-js (assoc-cdr :login-url info))
-                       :href "#" "Sign Up")
+                       :href "#" "Sign&nbsp;Up")
                    (:a :onclick
                        (login-link-js (assoc-cdr :login-url info))
-                       :href "#" "Log In"))))))
+                       :href "#" "Log&nbsp;In"))))))
     (html-out
       (:div
        :class "container-fluid"
        (:div
         :class "row"
         (:div :class "col-sm-2 wf-sidebar-width" " ")
-        (:div :class "col-sm-1" (%logo))
         (:div
-         :class "col-auto"
-         (if name
-             (htm (:a :href "/user/" (str name)))
-             (str "Not Signed In")))
-        (:div :class "col-sm-1" (funcall links))
+         :class "col"
+         (:div
+          :class "d-inline-flex flex-row align-items-center"
+          :style "position: relative; width: 100%; top: 2px;"
+          (%logo)
+          (:span
+           :class "flex-grow-1"
+           (if name
+               (htm (:a :href "/user/" (str name)))
+               (str "Not Signed In")))
+          (:span (funcall links))))
         (:div :class "col-sm-2 wf-sidebar-width" " "))))))
 
 (defun user-home-page ()

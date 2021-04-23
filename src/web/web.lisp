@@ -43,10 +43,9 @@
    :@css-link "https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
    :@css-link "/static/css/style.css"
    :@css-link "/static/css/target.css"
-   :@css-link "/static/css/react-tabs.css"
-   )
+   :@css-link "/static/css/react-tabs.css")
   (html-out
-    (:div :id "header_wrapper" :class "jumbotron-fluid"
+    (:div :id "header_wrapper"
           (:div :id "account_bar"
                 :@account-info))
     (:div
@@ -55,7 +54,7 @@
       :class "row"
       (:div :class "col-sm-2 wf-sidebar-width"
             :@site-index :@side-content)
-      (:div :class "col-auto"
+      (:div :class "col"
             :@messages :@inner :@footnotes)
       (:div :class "col-sm-2 wf-sidebar-width"
             :@site-search :@notifications
