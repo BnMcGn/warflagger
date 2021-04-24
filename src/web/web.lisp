@@ -52,11 +52,11 @@
      :class "container-fluid"
      (:div
       :class "row"
-      (:div :class "col-sm-2 wf-sidebar-width"
+      (:div :id "left_side" :class "col-sm-2 wf-sidebar-width"
             :@site-index :@side-content)
       (:div :class "col"
             :@messages :@inner :@footnotes)
-      (:div :class "col-sm-2 wf-sidebar-width"
+      (:div :id "right_side" :class "col-sm-2 wf-sidebar-width"
             :@site-search :@notifications
             (:div :class "featurebox_side" :style "opacity: 0;" "_"))))
     (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
