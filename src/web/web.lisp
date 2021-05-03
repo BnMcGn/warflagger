@@ -366,7 +366,7 @@
   (clack-server-manager
    *handler*
    (clack-pretend:pretend-builder
-       (:insert 0) ;clack.builder:builder
+       (:insert 0)
        (clack.middleware.clsql:<clack-middleware-clsql>
         :database-type :postgresql-socket3
         :connection-spec *test-db-connect-spec*)
@@ -392,7 +392,9 @@
                  :database-type wf/local-settings:*db-connect-type* :if-exists :old)
   (clack-server-manager
    *handler*
-   (lack:builder
+   (clack-pretend:pretend-builder
+       (:insert 0 :errors-only t
+        :logfile "/var/log/warflagger.requests")
     (:backtrace
      :output #p"/var/log/warflagger.err"
      :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
