@@ -11,6 +11,7 @@
                #:sql-stuff
                #:liql
                #:alexandria
+               #:bordeaux-threads
                #:cl-who
                #:cl-json
                #:anaphora

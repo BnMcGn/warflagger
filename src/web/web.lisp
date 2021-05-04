@@ -407,11 +407,11 @@
     (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
     *app*)
    :port 5005)
-  #+sbcl (sb-thread:join-thread
-          (find-if
-           (lambda (th)
-             (string= (sb-thread:thread-name th) "clack-handler-hunchentoot"))
-           (sb-thread:list-all-threads))))
+  (bordeaux-threads:join-thread
+   (find-if
+    (lambda (th)
+      (string= (bordeaux-threads:thread-name th) "clack-handler-hunchentoot"))
+    (bordeaux-threads:all-threads))))
 
 (when wf/local-settings:*auto-run*
   ;;FIXME: isn't working for production.
