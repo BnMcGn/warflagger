@@ -185,8 +185,14 @@
       )
     opinion))
 
-(let* ((lparallel:*kernel* (lparallel:make-kernel 1))
-       (channel (lparallel:make-channel)))
-  (defun launch-task (func param)
-    (lparallel:submit-task channel (lambda () (funcall func param)))))
+(defparameter *kernel* nil)
+(defparameter *channel* nil)
 
+;;FIXME: Single worker until we know that threads won't tread on each other's work
+(defun launch-task (func param)
+  (unless *kernel*
+    (setf *kernel* (lparallel:make-kernel 1)))
+  (let ((lparallel:*kernel* *kernel*))
+    (unless *channel*
+      (setf *channel* (lparallel:make-channel)))
+    (lparallel:submit-task *channel* (lambda () (funcall func param)))))
