@@ -180,6 +180,13 @@
          (id (insert-opinion opinion authorid))
          (opinion (opinion-by-id id)))
     (when (functionp post)
-      (funcall post opinion))
+      ;;(funcall post opinion)
+      (launch-task post opinion)
+      )
     opinion))
+
+(let* ((lparallel:*kernel* (lparallel:make-kernel 1))
+       (channel (lparallel:make-channel)))
+  (defun launch-task (func param)
+    (lparallel:submit-task channel (lambda () (funcall func param)))))
 

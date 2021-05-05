@@ -12,6 +12,7 @@
                #:liql
                #:alexandria
                #:bordeaux-threads
+               #:lparallel
                #:cl-who
                #:cl-json
                #:anaphora
