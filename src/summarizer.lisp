@@ -183,6 +183,12 @@
           '("Negative RaiseQuestion" "Negative NeedsEvidence")
           :test #'equal))
 
+#|
+(defun list-of-things-p (opinid)
+  (let* ((opinion (opinion-by-id opinid))
+         (replies ()))))
+|#
+
 (defun question-list-for-rooturl (rooturl warstats)
   (cl-utilities:collecting
     (let ((tree (opinion-tree-for-rooturl rooturl)))

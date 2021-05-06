@@ -61,14 +61,19 @@
 
 (defun user-home-page ()
   (check-signed-up)
-  (let ((since (userfig:userfig-value 'signed-up)))
+  (let ((since (userfig:userfig-value 'signed-up))
+        (name (get-apparent-display-name (get-user-name))))
+    ;;Don't use: wrong name
+    ;;(userfig:userfig-value 'screen-name)
     (html-out
       (:h3
-       (format *webhax-output* "User: ~a" (userfig:userfig-value 'screen-name)))
+       (format *webhax-output* "User: ~a" name))
       (:h4 (format
             *webhax-output* "Member since ~a ~a"
             (elt local-time:+month-names+ (local-time:timestamp-month since))
             (local-time:timestamp-year since)))
+      (when-let ((id (get-local-user-id (get-user-name))))
+        (htm (:div (:a :href (make-author-url id) "View public page"))))
       (:br)))
   (let ((*thing-sidebox-length* 20)
         (*thing-sidebox-width* 40)
