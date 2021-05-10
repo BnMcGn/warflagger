@@ -239,18 +239,22 @@
             ()
           (bind-validated-input
               ((iid :string))
-            (let* ((opin (opinion-by-id iid))
-                   (rooturl (assoc-cdr :rooturl opin)))
-              (mount-component (target-loader)
-                :url (lisp rooturl)
-                :rootid (lisp (assoc-cdr :rootid opin))
-                :title (lisp (grab-title rooturl))
-                :looks (lisp (when (authenticated?)
-                               (ps-gadgets:as-ps-data
-                                (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
-                :focus (lisp (list* 'list (tree-address (assoc-cdr :id opin))))
-                :username (lisp (webhax-user:get-user-name))
-                :child opinion-page)))))
+            (handler-case
+                (let* ((opin (opinion-by-id iid))
+                       (rooturl (assoc-cdr :rooturl opin)))
+                  (mount-component (target-loader)
+                    :url (lisp rooturl)
+                    :rootid (lisp (assoc-cdr :rootid opin))
+                    :title (lisp (grab-title rooturl))
+                    :looks (lisp (when (authenticated?)
+                                   (ps-gadgets:as-ps-data
+                                    (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
+                    :focus (lisp (list* 'list (tree-address (assoc-cdr :id opin))))
+                    :username (lisp (webhax-user:get-user-name))
+                    :child opinion-page))
+              (warflagger:not-found (c)
+                (declare (ignore c))
+                (webhax-core:web-fail-404))))))
 
 
   (setf (ningle:route *app* "/grouped/*")

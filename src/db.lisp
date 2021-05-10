@@ -6,7 +6,7 @@
 ;;; Tools for accessing stored opinions.
 ;;;
 ;;;
-
+(define-condition not-found (error) ())
 
 (defun for-rooturl-mixin (rurl)
   (list :from (list (tabl 'opinion) (tabl 'rooturl))
@@ -257,9 +257,11 @@ the page text can be found in the cache."
     (error "Text keyword is not valid without :extra set to T"))
   (let ((opinion (if-let  (res (and *opinion-store* (gethash oid *opinion-store*)))
                    res
-                   (opinion-from-db-row (if (stringp oid)
-                                            (get-assoc-by-col (colm 'opinion 'iid) oid)
-                                            (get-assoc-by-pkey 'opinion oid))))))
+                   (opinion-from-db-row
+                    (or (if (stringp oid)
+                            (get-assoc-by-col (colm 'opinion 'iid) oid)
+                            (get-assoc-by-pkey 'opinion oid))
+                        (error 'not-found))))))
     ;;FIXME: will go away when db goes
     (when (integerp (assoc-cdr :rooturl opinion))
       (push (cons :rootid (assoc-cdr :rooturl opinion)) opinion)

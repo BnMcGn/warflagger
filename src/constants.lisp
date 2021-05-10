@@ -218,7 +218,7 @@ throw the discussion tree out of whack."
         :blank "#fff"))
  
 (defparameter *direction-colors*
-  (list :negative "rgba(256,0,0,0.75)"
+  (list :negative "rgba(255,0,0,0.75)"
         :neutral "rgba(171,163,163,0.75)"
-        :positive "rgba(0,256,0,0.75)"
-        :contested "rgba(256,136,0,0.75)"))
+        :positive "rgba(0,255,0,0.75)"
+        :contested "rgba(255,136,0,0.75)"))
