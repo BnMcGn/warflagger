@@ -120,8 +120,14 @@
   (funcall
    (webhax-route:quick-page
        (:@title title)
-     (named-text :login-page)
      (princ (funcall body-func) *webhax-output*))))
+
+(defun clath:clath-login-page ()
+  (clath:clath-page-wrapper
+   "Login"
+   (lambda ()
+     (named-text :login-page)
+     (clath:login-links))))
 
 (defun favicon-links ()
   (html-out
@@ -146,7 +152,6 @@
 (wf/text-extract:initialize-indices)
 
 (setf (webhax-user::login-destination) "/user/")
-
 
 (proto:dependency-auto-watcher routes
   (setf (ningle:route *app* "/text-server/")

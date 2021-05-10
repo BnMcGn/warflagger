@@ -125,5 +125,6 @@
    #:is-author-initialized
    #:initialize-author
    #:save-opinion
-   #:opinion-reference))
+   #:opinion-reference
+   #:not-found))
 
