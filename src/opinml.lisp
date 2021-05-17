@@ -42,7 +42,7 @@
 (defun opinion-with-iid-p (opinion)
   (and (opinion-p opinion)
        (assoc :iid opinion)
-       (iid-p (assoc :iid opinion))))
+       (iid-p (assoc-cdr :iid opinion))))
 
 (deftype opinion-with-iid () `(satisfies opinion-with-iid-p))
 
@@ -93,27 +93,29 @@
 (defun serialize-opinion (opinion &key author created)
   "Create a basic version of an opinion that is suitable for saving to disk or IPFS. No ID is included because this is assumed to be a first save."
   (with-inverted-case
-    (prin1-to-string
-     (hu:hash->plist
-      ;;FIXME: keys should be ordered
-      (hu:collecting-hash-table (:mode :replace)
-        (hu:collect :target (assoc-cdr :target opinion))
-        (hu:collect :rooturl (assoc-cdr :rooturl opinion))
-        (hu:collect :flag (assoc-cdr :flag opinion))
-        (hu:collect :comment (assoc-cdr :comment opinion))
-        (hu:collect :author (or author (assoc-cdr :author opinion)))
-        (when-let ((comment (assoc-cdr :comment opinion)))
-          (hu:collect :comment comment))
-        (when-let ((votevalue (assoc-cdr :votevalue opinion)))
-          (hu:collect :votevalue votevalue))
-        (when-let ((excerpt (assoc-cdr :excerpt opinion)))
-          (hu:collect :excerpt excerpt))
-        (when-let ((excerpt-offset (assoc-cdr :excerpt-offset opinion)))
-          (hu:collect :excerpt-offset excerpt-offset))
-        (when-let ((reference (assoc-cdr :reference opinion)))
-          (hu:collect :reference reference))
-        (hu:collect :created
-          (js-compatible-utcstamp (or created (cdr (assoc-or '(:created :datestamp) opinion))))))))))
+    (strcat
+     ";;OpinML 0.0.1 :s-expression\n"
+     (prin1-to-string
+      (hu:hash->plist
+       ;;FIXME: keys should be ordered
+       (hu:collecting-hash-table (:mode :replace)
+         (hu:collect :target (assoc-cdr :target opinion))
+         (hu:collect :rooturl (assoc-cdr :rooturl opinion))
+         (hu:collect :flag (assoc-cdr :flag opinion))
+         (hu:collect :comment (assoc-cdr :comment opinion))
+         (hu:collect :author (or author (assoc-cdr :author opinion)))
+         (when-let ((comment (assoc-cdr :comment opinion)))
+           (hu:collect :comment comment))
+         (when-let ((votevalue (assoc-cdr :votevalue opinion)))
+           (hu:collect :votevalue votevalue))
+         (when-let ((excerpt (assoc-cdr :excerpt opinion)))
+           (hu:collect :excerpt excerpt))
+         (when-let ((excerpt-offset (assoc-cdr :excerpt-offset opinion)))
+           (hu:collect :excerpt-offset excerpt-offset))
+         (when-let ((reference (assoc-cdr :reference opinion)))
+           (hu:collect :reference reference))
+         (hu:collect :created
+           (js-compatible-utcstamp (or created (cdr (assoc-or '(:created :datestamp) opinion)))))))))))
 
 ;; Problems: datestamp. Might want to deal with :id or :url because maybe is a remote web opinion.
 ;; - how to serialize to string?
