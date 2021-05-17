@@ -90,8 +90,8 @@
                          ,@body)
          (setf (readtable-case *readtable*) ,case)))))
 
-(defun serialize-opinion (opinion &key author created)
-  "Create a basic version of an opinion that is suitable for saving to disk or IPFS. No ID is included because this is assumed to be a first save."
+(defun serialize-opinion (opinion &key author created extended)
+  "Create a version of an opinion that is suitable for saving to disk or IPFS in s-expression format. If EXTENDED is not set, no id is included because it is assumed to be a first save."
   (with-inverted-case
     (strcat
      ";;OpinML 0.0.1 :s-expression\n"
@@ -115,7 +115,26 @@
          (when-let ((reference (assoc-cdr :reference opinion)))
            (hu:collect :reference reference))
          (hu:collect :created
-           (js-compatible-utcstamp (or created (cdr (assoc-or '(:created :datestamp) opinion)))))))))))
+           (js-compatible-utcstamp (or created (cdr (assoc-or '(:created :datestamp) opinion)))))
+         (when extended
+           (hu:collect :tree-address (assoc-cdr :tree-address opinion))
+           (hu:collect :iid (assoc-cdr :iid opinion))
+           (when-let ((text-position (assoc-cdr :text-position opinion)))
+             (hu:collect :text-position text-position))
+           (when-let ((leading (assoc-cdr :leading opinion)))
+             (hu:collect :leading leading))
+           (when-let ((trailing (assoc-cdr :trailing opinion)))
+             (hu:collect :trailing trailing))
+           (when-let ((hashtags (assoc-cdr :hashtags opinion)))
+             (hu:collect :hashtags hashtags))
+           (when-let ((clean-comment (assoc-cdr :clean-comment opinion)))
+             (hu:collect :clean-comment clean-comment))
+           (when-let ((references (assoc-cdr :references opinion)))
+             (hu:collect :references references))
+           (when-let ((directives (assoc-cdr :directives opinion)))
+             (hu:collect :directives directives)))))))))
+
+:hashtags :clean-comment :references :directives
 
 ;; Problems: datestamp. Might want to deal with :id or :url because maybe is a remote web opinion.
 ;; - how to serialize to string?
