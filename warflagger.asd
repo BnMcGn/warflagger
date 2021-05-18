@@ -44,5 +44,6 @@
                               (:file "ballot-box")
                               (:file "author-stats")
                               (:file "score-script")
+                              (:file "ipfs")
                               (:file "summarizer")))))
 

@@ -15,7 +15,8 @@
    #:participants
    #:flag-core
    #:opinion-references
-   #:opinion-can-apply-dircs-to-parent))
+   #:opinion-can-apply-dircs-to-parent
+   #:objective-data-for-opinions))
 
 (in-package :wf/ipfs)
 
@@ -46,6 +47,17 @@
           (push (cons :url (warflagger::make-experimental-opinion-url iid)) opinion))
         (cl-utilities:collect iid)
         (cl-utilities:collect opinion)))))
+
+(defun prep-opinions-for-extension (opinions)
+  "Equivalent of load-opinion-files where opinions are already in memory."
+  (cl-utilities:collecting
+    (dolist (op opinions)
+      (let* ((iid (assoc :iid op))
+             (iid (if iid
+                      (cdr iid)
+                      (error "Iid not found"))))
+        (cl-utilities:collect iid)
+        (cl-hash-util:collect op)))))
 
 ;;FIXME: Rethink me. This is temporary for testing opinml import.
 ;; - for one, we want a better check for when an url is an iid opinion.
@@ -182,12 +194,15 @@
 ;; Objective bundle
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun objective-data (opfilelist)
-  (let* ((opinion-store (extend-opinions (load-opinion-files opfilelist)))
+(defun objective-data (op-plist)
+  (let* ((opinion-store (extend-opinions op-plist))
          (optree (opinion-tree-from-opinions (alexandria:hash-table-values opinion-store)))
          (scsc (make-score-script optree opinion-store))
          (rooturl (assoc-cdr :rooturl (car (alexandria:hash-table-values opinion-store)))))
     (list :opinion-store opinion-store :opinion-tree optree :score-script scsc :rooturl rooturl)))
 
 (defun objective-data-for-dir (dirpath)
-  (objective-data (uiop:directory-files dirpath)))
+  (objective-data (load-opinion-files (uiop:directory-files dirpath))))
+
+(defun objective-data-for-opinions (opinions)
+  (objective-data (prep-opinions-for-extension opinions)))

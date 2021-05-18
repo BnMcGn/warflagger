@@ -126,5 +126,7 @@
    #:initialize-author
    #:save-opinion
    #:opinion-reference
-   #:not-found))
+   #:not-found
+   #:execute-score-script
+   #:serialize-opinion))
 
