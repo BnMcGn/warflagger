@@ -16,7 +16,8 @@
    #:flag-core
    #:opinion-references
    #:opinion-can-apply-dircs-to-parent
-   #:objective-data-for-opinions))
+   #:objective-data-for-opinions
+   #:ipfs-write-rooturl-data))
 
 (in-package :wf/ipfs)
 
@@ -57,7 +58,7 @@
                       (cdr iid)
                       (error "Iid not found"))))
         (cl-utilities:collect iid)
-        (cl-hash-util:collect op)))))
+        (cl-utilities:collect op)))))
 
 ;;FIXME: Rethink me. This is temporary for testing opinml import.
 ;; - for one, we want a better check for when an url is an iid opinion.
@@ -152,7 +153,8 @@
 ;; Score script creation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(declaim (ftype (function (iid-opinion-tree opinion-store) score-script) make-score-script))
+(declaim (ftype (function (warflagger:iid-opinion-tree warflagger:opinion-store)
+                          warflagger:score-script) make-score-script))
 (defun make-score-script (optree opinion-store)
   ;;FIXME: Any kind of max depth safety?
   (apply
@@ -174,7 +176,8 @@
   (append dirc (list :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion))))
 
 (defun process-opinion (opinion)
-  (let* ((flag (assoc-cdr :flag opinion))
+  (let* ((*package* (find-package 'warflagger))
+         (flag (assoc-cdr :flag opinion))
          (flag (if (warflagger:recognized-flag-p flag)
                    (symb (car flag) '- (second flag))
                    'unknown-flag)))

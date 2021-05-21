@@ -48,7 +48,7 @@
     (dolist (box (cdr boxes))
       (dolist (dir '(:right :wrong :up :down))
         (dolist (vote (gethash dir box))
-          (apply #'cast-vote res dir vote))))
+          (apply #'cast-vote! res dir vote))))
     res))
 
 (defun merge-with-inverted-ballot-boxes (&rest boxes)
@@ -62,7 +62,7 @@
       (loop for dir in '(:right :wrong :up :down)
             for swap in '(:wrong :right :down :up)
             do (dolist (vote (gethash dir box))
-                 (apply #'cast-vote res swap vote))))
+                 (apply #'cast-vote! res swap vote))))
     res))
 
 (declaim (ftype (function (ballot-box) boolean) ballot-box-empty-p))

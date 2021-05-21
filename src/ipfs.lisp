@@ -41,18 +41,27 @@
 
 (defun save-warstat-sets (location key warstats text title)
   (ipfs:with-files-write (s (strcat location "warstats.data") :create t)
-    (princ (hu:hash->plist (gethash key warstats)) s))
+    (when-let ((data (gethash key warstats)))
+      (princ (hu:hash->plist data) s)))
   ;;FIXME: text and title will be wanting some additions
   (ipfs:with-files-write (s (strcat location "text.data") :create t)
-    (princ (hu:hash->plist (gethash key text)) s))
+    (when-let ((data (gethash key text)))
+      (princ (hu:hash->plist data) s)))
   (ipfs:with-files-write (s (strcat location "title.data") :create t)
-    (princ (hu:hash->plist (gethash key title)) s)))
+    (when-let ((data (gethash key title)))
+      (princ (hu:hash->plist data) s))))
+
+(defun add-author-to-opinion (opinion)
+  (if (assoc-cdr :author opinion)
+      opinion
+      (cons (cons :author (warflagger:make-author-url (assoc-cdr :author-id opinion))) opinion)))
 
 (defun ipfs-write-rooturl-data (rooturl)
   (initialize-warstat-dirs)
   ;;FIXME: We will need an index opinions->rooturl for ipfs. This relies on DB.
   (let* ((opinions (warflagger:opinion-ids-for-rooturl rooturl))
          (opinions (mapcar #'warflagger:opinion-by-id opinions))
+         (opinions (mapcar #'add-author-to-opinion opinions))
          (rootpath (strcat "/rooturls/" (quri:url-encode rooturl) "/")))
     (hu:with-keys (:opinion-store :opinion-tree :score-script :rooturl)
         (hu:plist->hash (wf/ipfs:objective-data-for-opinions opinions))

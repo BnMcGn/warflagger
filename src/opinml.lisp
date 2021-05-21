@@ -63,7 +63,7 @@
   (and (listp item)
        (every #'iid-p (flatten item))))
 
-(deftype iid-opinion-tree () `(satisfies iid-opinion-tree))
+(deftype iid-opinion-tree () `(satisfies iid-opinion-tree-p))
 
 (defun hashtag-p (item)
   (and (stringp item)
@@ -75,7 +75,15 @@
 
 (deftype hashtag () `(satisfies hashtag-p))
 
-(deftype uri () `(satisfies quri:uri-p))
+(defun url-p (item)
+  (handler-case
+      (progn (quri:parse-uri item)
+             item)
+    (error (e)
+      (declare (ignore e))
+      nil)))
+
+(deftype uri () `(satisfies url-p))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Save and load
