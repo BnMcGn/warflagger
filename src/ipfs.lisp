@@ -79,11 +79,9 @@
           (save-extended-opinion opinion)
           (save-warstat-sets (strcat "/opinions/" iid "/") iid warstats text title))))))
 
-;; Bit of a problem: objective-data wants a list of opinml files. We don't have that.
-;; How do we get started without?
-
-;; Returns: plist: :opinion-store :opinion-tree :score-script :rooturl
-
-(warflagger:execute-score-script )
-
-;; Returns: values: warstats textwarstats titlewarstats
+(defun update-ipns ()
+  (let* ((stat (ipfs:files-stat "/"))
+         (roothash (assoc-cdr "Hash" stat :test #'equal))
+         ;;FIXME: IPNS is dog slow. Can we do without it?
+         (namestat (ipfs:name-publish (strcat "/ipfs/" roothash))))
+    (assoc-cdr "Name" namestat)))

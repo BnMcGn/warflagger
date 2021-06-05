@@ -102,7 +102,7 @@
   "Create a version of an opinion that is suitable for saving to disk or IPFS in s-expression format. If EXTENDED is not set, no id is included because it is assumed to be a first save."
   (with-inverted-case
     (strcat
-     ";;OpinML 0.0.1 :s-expression\n"
+     (format nil ";;OpinML 0.0.1 :s-expression~%")
      (prin1-to-string
       (hu:hash->plist
        ;;FIXME: keys should be ordered
