@@ -210,6 +210,17 @@
                 :username (lisp (webhax-user:get-user-name))
                 )))))
 
+  ;;FIXME: temporary
+  (setf (ningle:route *app* "/target2/*")
+        (quick-page
+            ()
+          (bind-validated-input
+              ((id :integer))
+            (let ((url (get-rooturl-by-id id)))
+              (mount-component (target-iloader)
+                :rooturl (lisp url))))))
+
+
   (setf (ningle:route *app* "/new-target/")
         (quick-page
             ()

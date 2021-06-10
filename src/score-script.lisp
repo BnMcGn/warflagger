@@ -120,6 +120,27 @@
    root-scsc)
   nil)
 
+(in-package :score-script-support)
+
+(defparameter *warstats* nil)
+(defparameter *text-warstats* nil)
+(defparameter *title-warstats* nil)
+
+(defvar *tree-address*)
+(defvar *ballot-box*)
+(defvar *text-ballot-box*)
+(defvar *title-ballot-box*)
+(defvar *warstat*)
+(defvar *text-warstat*)
+(defvar *title-warstat*)
+(defvar *apply-to*)
+(defvar *cascade*)
+(defvar *other-flag*)
+(defvar *direction*)
+(defvar *target-author* nil)
+
+(in-package :warflagger)
+
 (defun execute-score-script (scsc rooturl opinion-store)
   (declare (type score-script scsc))
   (let ((warflagger:*opinion-store* opinion-store)
@@ -179,23 +200,6 @@
              node))
          node))
    code))
-
-(defparameter *warstats* nil)
-(defparameter *text-warstats* nil)
-(defparameter *title-warstats* nil)
-
-(defvar *tree-address*)
-(defvar *ballot-box*)
-(defvar *text-ballot-box*)
-(defvar *title-ballot-box*)
-(defvar *warstat*)
-(defvar *text-warstat*)
-(defvar *title-warstat*)
-(defvar *apply-to*)
-(defvar *cascade*)
-(defvar *other-flag*)
-(defvar *direction*)
-(defvar *target-author* nil)
 
 
 (defun stick-other-flag-on-target (flag ballot-box warstat)
