@@ -33,7 +33,7 @@
 
 (defun opinion-tree-for-rooturl (rurl)
   ;;FIXME: fails to check for loops and dead trees.
-  (proto:tree-by-feature
+  (proto:tree-by-parent
    (merge-query
     (opinion-ids-for-rooturl rurl)
     (select (colm 'opinion 'target)
@@ -47,7 +47,7 @@
 (defun opinion-tree-for-target (turl)
   (if (rooturl-p turl)
       (opinion-tree-for-rooturl turl)
-      (proto:tree-by-feature
+      (proto:tree-by-parent
        (merge-query
         (opinion-ids-for-rooturl (get-rooturl-for-url turl))
         (select (colm 'opinion 'target)

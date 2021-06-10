@@ -124,7 +124,7 @@
         (opinions (sort (copy-list opinions) #'string<
                         :key (lambda (x)
                                (warflagger::js-compatible-utcstamp (assoc-cdr :datestamp x))))))
-    (proto:tree-by-feature
+    (proto:tree-by-parent
      opinions
      (lambda (x) (let ((treead (tree-address x)))
                    (if (eq 1 (length treead))
