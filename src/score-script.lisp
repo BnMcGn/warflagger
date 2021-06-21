@@ -201,6 +201,18 @@
          node))
    code))
 
+(defun initialize-warstats ()
+  (hu:hash
+   (:replies-immediate 0)
+   (:replies-total 0)
+   (:tree-freshness nil)
+   (:x-right 0)
+   (:x-wrong 0)
+   (:x-up 0)
+   (:x-down 0)
+   ;; FIXME: Should effect and controversy be prefixed with x?
+   (:x-effect 0)
+   (:x-controversy 0)))
 
 (defun stick-other-flag-on-target (flag ballot-box warstat)
   (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals ballot-box)
@@ -220,6 +232,7 @@
 (defun set-direction (warstat direction)
   (setf (gethash :direction warstat) (or direction :neutral)))
 
+;;FIXME: doesn't seem to function. Tree freshness should never be nil
 (defun set-tree-freshness (warstat &rest timestamps)
   (setf
    (gethash :tree-freshness warstat)
@@ -251,7 +264,7 @@
           (*ballot-box* (warflagger:make-ballot-box))
           (*text-ballot-box* (warflagger:make-ballot-box))
           (*title-ballot-box* (warflagger:make-ballot-box))
-          (*warstat* (make-hash-table))
+          (*warstat* (initialize-warstats))
           (*text-warstat* (make-hash-table))
           (*title-warstat* (make-hash-table))
           (*apply-to* nil)
@@ -279,15 +292,15 @@
     (set-direction warstat direction)
     (multiple-value-bind (ws bb) (applied-to apply-to)
       (unless (warflagger:ballot-box-empty-p ballot-box)
-        (warflagger:apply-ballot-box-to-warstats ballot-box warstat)
-        (collect-warstats iid warstat))
+        (warflagger:apply-ballot-box-to-warstats ballot-box warstat))
+      (collect-warstats iid warstat)
       ;;FIXME: do we deal with text warstats for nonroot targets?
       (unless (warflagger:ballot-box-empty-p text-ballot-box)
-        (warflagger:apply-ballot-box-to-warstats text-ballot-box text-warstat)
-        (collect-warstats iid text-warstat :text))
+        (warflagger:apply-ballot-box-to-warstats text-ballot-box text-warstat))
+      (collect-warstats iid text-warstat :text)
       (unless (warflagger:ballot-box-empty-p title-ballot-box)
-        (warflagger:apply-ballot-box-to-warstats title-ballot-box title-warstat)
-        (collect-warstats iid title-warstat :title))
+        (warflagger:apply-ballot-box-to-warstats title-ballot-box title-warstat))
+      (collect-warstats iid title-warstat :title)
       ;;FIXME: Are there cases when an opinion and descendants should not be counted?
       (add-to-replies-count ws
                             (+ (gethash :replies-total warstat 0)
