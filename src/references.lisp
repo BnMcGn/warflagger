@@ -213,7 +213,7 @@
 ;;FIXME: For now, we are not attaching incoming refs to the discussion.
 ;;FIXME: This is not tail recursive. Could hit some limits.
 ;;FIXME: Possibly we want to include every reference to a rootURL in the discussion,
-;; but for simplicity we are just taking the first occurence.
+;; but for simplicity we are just taking the first occurrence.
 (defun discussion-tree-for-root (discroot discroots)
   "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the reference opinion ids in the discussion. Discroots are ids to be excluded. When the search touches one of these, it stops. Second value is a list of rootURL ids in the discussion. Third value is a list of exclusions that got touched during the search."
   (let ((found (make-hash-table :test #'equal))

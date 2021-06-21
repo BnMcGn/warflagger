@@ -128,5 +128,7 @@
    #:opinion-reference
    #:not-found
    #:execute-score-script
-   #:serialize-opinion))
+   #:serialize-opinion
+   #:uri-domain
+   #:reference-opinion-p))
 

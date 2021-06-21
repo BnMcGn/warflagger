@@ -85,6 +85,13 @@
 
 (deftype uri () `(satisfies url-p))
 
+(defun reference-opinion-p (opinion)
+  (and (opinion-p opinion)
+       (or (when-let ((ref (assoc :reference opinion)))
+             (cdr ref))
+           (when-let ((refs (assoc :references opinion)))
+             (cdr refs)))))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Save and load
 ;;;;;;;;;;;;;;;;;;;;
@@ -141,8 +148,6 @@
              (hu:collect :references references))
            (when-let ((directives (assoc-cdr :directives opinion)))
              (hu:collect :directives directives)))))))))
-
-:hashtags :clean-comment :references :directives
 
 ;; Problems: datestamp. Might want to deal with :id or :url because maybe is a remote web opinion.
 ;; - how to serialize to string?

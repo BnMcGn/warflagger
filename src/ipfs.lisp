@@ -42,14 +42,14 @@
 (defun save-warstat-sets (location key warstats text title)
   (ipfs:with-files-write (s (strcat location "warstats.data") :create t)
     (when-let ((data (gethash key warstats)))
-      (princ (hu:hash->plist data) s)))
+      (print (hu:hash->plist data) s)))
   ;;FIXME: text and title will be wanting some additions
   (ipfs:with-files-write (s (strcat location "text.data") :create t)
     (when-let ((data (gethash key text)))
-      (princ (hu:hash->plist data) s)))
+      (print (hu:hash->plist data) s)))
   (ipfs:with-files-write (s (strcat location "title.data") :create t)
     (when-let ((data (gethash key title)))
-      (princ (hu:hash->plist data) s))))
+      (print (hu:hash->plist data) s))))
 
 (defun add-author-to-opinion (opinion)
   (if (assoc-cdr :author opinion)
@@ -62,6 +62,8 @@
   (let* ((opinions (warflagger:opinion-ids-for-rooturl rooturl))
          (opinions (mapcar #'warflagger:opinion-by-id opinions))
          (opinions (mapcar #'add-author-to-opinion opinions))
+         (references (remove-if-not #'warflagger:reference-opinion-p opinions))
+         (references (mapcar (lambda (x) (assoc-cdr :iid x)) references))
          (rootpath (strcat "/rooturls/" (quri:url-encode rooturl) "/")))
     (hu:with-keys (:opinion-store :opinion-tree :score-script :rooturl)
         (hu:plist->hash (wf/ipfs:objective-data-for-opinions opinions))
@@ -73,7 +75,10 @@
           (print opinion-tree s))
         (ipfs:with-files-write (s (strcat rootpath "score-script.data") :create t)
           (print score-script s))
+        (ipfs:with-files-write (s (strcat rootpath "references.data") :create t)
+          (print (list :references references) s))
         (save-warstat-sets rootpath rooturl warstats text title)
+        ;;FIXME: Handle incoming references
         ;;Opinion stuff
         (gadgets:do-hash-table (iid opinion opinion-store)
           (save-extended-opinion opinion)

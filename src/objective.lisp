@@ -72,6 +72,17 @@
         (gethash :text (warflagger:text-server-dispatcher (assoc-cdr :target op)))
         (warflagger::opinion-text (last-car (butlast treead))))))
 
+(defun opinion-reference-attributes (opinion)
+  (let ((ref (assoc-cdr :reference opinion)))
+    (when (stringp ref)
+      (let ((opinml (is-location-opinml? ref)))
+        (if opinml
+            (let* ((iid (warflagger:get-target-id-from-url (if (stringp opinml) opinml ref)))
+                   (refd-opin (warflagger:opinion-by-id iid)))
+              (list (cons :refd-opinion iid)
+                    (cons :reference-domain (warflagger:uri-domain (assoc-cdr :rooturl refd-opin)))))
+            (list (cons :reference-domain (warflagger:uri-domain ref))))))))
+
 (defun %extend-opinions (plist)
   (mapcan-by-2
    (lambda (k opinion)
@@ -81,7 +92,11 @@
                           ;;FIXME: parsing error report?
                          (append (warflagger::parse-comment-field (assoc-cdr :comment opinion))
                                  opinion)
-                          opinion)))
+                         opinion)))
+        ;;Additions for references placed here, outside of the *opinion-store* binding
+        ;;FIXME: Currently using DB to look up outside reference opinions
+        (when (assoc :reference opinion)
+          (setf opinion (append opinion (opinion-reference-attributes opinion))))
         opinion)))
    plist))
 

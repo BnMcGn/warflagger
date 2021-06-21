@@ -150,6 +150,9 @@
            :refd-opinion-leading (getf econtext :leading)
            :refd-opinion-trailing (getf econtext :trailing)))))
 
+(defun uri-domain (uri)
+  (nth-value 2 (quri:parse-uri uri)))
+
 (defun outgoing-reference-data (id)
   (let* ((refopin (opinion-by-id id))
          (refurl (assoc-cdr :reference refopin))
@@ -158,7 +161,7 @@
     (assert (stringp refroot))
     `(:reference
       ,refurl
-      :reference-domain ,(nth-value 2 (quri:parse-uri refroot))
+      :reference-domain ,(uri-domain refroot)
       :warflagger-link ,(make-wf-url-for-url refurl)
       :tree-address ,(tree-address id)
       :refbot ,(system-generated-p id)
