@@ -218,7 +218,8 @@
               ((id :integer))
             (let ((url (get-rooturl-by-id id)))
               (mount-component (target-iloader)
-                :rooturl (lisp url))))))
+                :rooturl (lisp url)
+                :child target-root)))))
 
 
   (setf (ningle:route *app* "/new-target/")

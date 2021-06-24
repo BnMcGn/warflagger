@@ -130,5 +130,6 @@
    #:execute-score-script
    #:serialize-opinion
    #:uri-domain
-   #:reference-opinion-p))
+   #:reference-opinion-p
+   #:js-compatible-utcstamp))
 

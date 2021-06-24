@@ -39,15 +39,27 @@
      (ipfs:with-files-write (s (strcat dir "opinion.data") :create t)
        (princ (warflagger:serialize-opinion opinion :extended t) s)))))
 
+(defun serialize-warstat (warstat)
+  (warflagger:with-inverted-case
+    (prin1-to-string
+     (cl-utilities:collecting
+       (gadgets:do-window ((k v) warstat :size 2 :step 2)
+         (cond ((eq :tree-freshness k)
+                (cl-utilities:collect k)
+                (cl-utilities:collect (warflagger:js-compatible-utcstamp v)))
+               (t
+                (cl-utilities:collect k)
+                (cl-utilities:collect v))))))))
+
 (defun save-warstat-sets (location key warstats text title)
-  (ipfs:with-files-write (s (strcat location "warstats.data") :create t)
+  (ipfs:with-files-write (s (strcat location "warstats.data") :create t :truncate t)
     (when-let ((data (gethash key warstats)))
-      (print (hu:hash->plist data) s)))
+      (princ (serialize-warstat (hu:hash->plist data)) s)))
   ;;FIXME: text and title will be wanting some additions
-  (ipfs:with-files-write (s (strcat location "text.data") :create t)
+  (ipfs:with-files-write (s (strcat location "text.data") :create t :truncate t)
     (when-let ((data (gethash key text)))
       (print (hu:hash->plist data) s)))
-  (ipfs:with-files-write (s (strcat location "title.data") :create t)
+  (ipfs:with-files-write (s (strcat location "title.data") :create t :truncate t)
     (when-let ((data (gethash key title)))
       (print (hu:hash->plist data) s))))
 
@@ -71,11 +83,11 @@
           (warflagger:execute-score-script score-script rooturl opinion-store)
         ;;Rooturl stuff
         (ipfs-ensure-directory-exists rootpath)
-        (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t)
+        (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t :truncate t)
           (print opinion-tree s))
-        (ipfs:with-files-write (s (strcat rootpath "score-script.data") :create t)
+        (ipfs:with-files-write (s (strcat rootpath "score-script.data") :create t :truncate t)
           (print score-script s))
-        (ipfs:with-files-write (s (strcat rootpath "references.data") :create t)
+        (ipfs:with-files-write (s (strcat rootpath "references.data") :create t :truncate t)
           (print (list :references references) s))
         (save-warstat-sets rootpath rooturl warstats text title)
         ;;FIXME: Handle incoming references

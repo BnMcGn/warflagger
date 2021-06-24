@@ -236,7 +236,8 @@
 (defun set-tree-freshness (warstat &rest timestamps)
   (setf
    (gethash :tree-freshness warstat)
-   (car (sort (remove-if #'null timestamps) #'<))))
+   (car (or (sort (remove-if #'null timestamps) #'string< :key #'warflagger:js-compatible-utcstamp)
+            (error "No timestamp found in tree")))))
 
 (defun apply-to (aspect iid)
   (unless (equal iid (lastcar *tree-address*))
@@ -287,9 +288,9 @@
   (hu:with-keys (:ballot-box :text-ballot-box :title-ballot-box :warstat :text-warstat :title-warstat
                  :apply-to :direction :other-flag)
       (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction author)
-    (make-hash-table)
     ;;accumulate own warstats
     (set-direction warstat direction)
+    ;; ws and bb belong to the target, not the current item.
     (multiple-value-bind (ws bb) (applied-to apply-to)
       (unless (warflagger:ballot-box-empty-p ballot-box)
         (warflagger:apply-ballot-box-to-warstats ballot-box warstat))
@@ -306,10 +307,10 @@
                             (+ (gethash :replies-total warstat 0)
                                (gethash :replies-total text-warstat 0)
                                (gethash :replies-total title-warstat 0)))
-      (set-tree-freshness ws
-                          (assoc-cdr :timestamp (warflagger:opinion-by-id iid))
-                          (gethash :timestamp warstat) (gethash :timestamp text-warstat)
-                          (gethash :timestamp title-warstat))
+      (set-tree-freshness warstat
+                          (assoc-cdr :datestamp (warflagger:opinion-by-id iid))
+                          (gethash :tree-freshness warstat) (gethash :tree-freshness text-warstat)
+                          (gethash :tree-freshness title-warstat))
       (when other-flag
         (warflagger:cast-vote! ballot-box :up iid author)
         (stick-other-flag-on-target other-flag ballot-box ws))
