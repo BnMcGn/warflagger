@@ -160,5 +160,5 @@
     (setf (gethash :x-wrong warstats) wrong)
     (setf (gethash :x-down warstats) down)
     (multiple-value-bind (effect controv) (score-controversy (+ right up) (+ wrong down))
-      (setf (gethash :x-effect warstats) effect)
-      (setf (gethash :x-controversy warstats) controv))))
+      (setf (gethash :effect warstats) effect)
+      (setf (gethash :controversy warstats) controv))))

@@ -157,6 +157,7 @@
         (scss:*title-warstat* (make-hash-table))
         (scss:*tree-address* nil))
     (mapc #'eval scsc)
+    ;;FIXME: Should be writing blank warstat even if empty?
     (unless (warflagger:ballot-box-empty-p scss:*ballot-box*)
       (warflagger:apply-ballot-box-to-warstats scss:*ballot-box* scss:*warstat*)
       (scss:collect-warstats rooturl scss:*warstat*))
@@ -210,9 +211,8 @@
    (:x-wrong 0)
    (:x-up 0)
    (:x-down 0)
-   ;; FIXME: Should effect and controversy be prefixed with x?
-   (:x-effect 0)
-   (:x-controversy 0)))
+   (:effect 0)
+   (:controversy 0)))
 
 (defun stick-other-flag-on-target (flag ballot-box warstat)
   (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals ballot-box)
@@ -307,8 +307,10 @@
                             (+ (gethash :replies-total warstat 0)
                                (gethash :replies-total text-warstat 0)
                                (gethash :replies-total title-warstat 0)))
-      (set-tree-freshness warstat
-                          (assoc-cdr :datestamp (warflagger:opinion-by-id iid))
+      (unless (gethash :tree-freshness warstat)
+        (set-tree-freshness warstat (assoc-cdr :datestamp (warflagger:opinion-by-id iid))))
+      (set-tree-freshness ws
+                          (gethash :tree-freshness ws)
                           (gethash :tree-freshness warstat) (gethash :tree-freshness text-warstat)
                           (gethash :tree-freshness title-warstat))
       (when other-flag
