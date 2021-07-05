@@ -90,7 +90,7 @@
             do (if (author-reasonable-p author)
                    ;;FIXME: null reference shouldn't count if there are other refs
                    (unless (gethash (cons author (car reference)) refcheck)
-                     (cast-vote! res :right iid author reference)
+                     (cast-vote! res :right iid author (car reference))
                      (hu:collect author t)
                      (setf (gethash (cons author (car reference)) refcheck) t))
                    (unless (gethash author present)
@@ -105,7 +105,7 @@
       (loop for (iid author . reference) in (gethash :wrong balbox)
             do (if (author-reasonable-p author)
                    (unless (gethash (cons author (car reference)) refcheck)
-                     (cast-vote! res :wrong iid author reference)
+                     (cast-vote! res :wrong iid author (car reference))
                      (hu:collect author t)
                      (setf (gethash (cons author (car reference)) refcheck) t))
                    (unless (gethash author present)

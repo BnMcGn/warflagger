@@ -368,7 +368,10 @@
 (defun statements-evidence (&key iid author modifiers)
   (let ((vv (assoc-cdr :vote-value (warflagger:opinion-by-id iid))))
     (cond ((eql vv 1) (positive-evidence :iid iid :author author :modifiers modifiers))
-          ((eql vv -1) (negative-evidence :iid iid :author author :modifiers modifiers)))))
+          ((eql vv -1) (negative-evidence :iid iid :author author :modifiers modifiers))
+          ;;FIXME: why null? should be zero?
+          ((null vv) (positive-evidence :iid iid :author author :modifiers modifiers))
+          (t (warn "Unhandled statements-evidence flag")))))
 (defun negative-evidence (&key iid author modifiers)
   (when-let ((balbox (scss:flag-core nil :con iid author modifiers)))
     (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))

@@ -53,8 +53,9 @@
 
 (defun save-warstat-sets (location key warstats text title)
   (ipfs:with-files-write (s (strcat location "warstats.data") :create t :truncate t)
-    (when-let ((data (gethash key warstats)))
-      (princ (serialize-warstat (hu:hash->plist data)) s)))
+    (if-let ((data (gethash key warstats)))
+      (princ (serialize-warstat (hu:hash->plist data)) s)
+      (warn "Missing warstats!")))
   ;;FIXME: text and title will be wanting some additions
   (ipfs:with-files-write (s (strcat location "text.data") :create t :truncate t)
     (when-let ((data (gethash key text)))

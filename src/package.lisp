@@ -131,5 +131,6 @@
    #:serialize-opinion
    #:uri-domain
    #:reference-opinion-p
-   #:js-compatible-utcstamp))
+   #:js-compatible-utcstamp
+   #:with-inverted-case))
 

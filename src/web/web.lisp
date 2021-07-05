@@ -215,10 +215,13 @@
         (quick-page
             ()
           (bind-validated-input
-              ((id :integer))
+              ((id :integer)
+               &key
+               (tmode :integer))
             (let ((url (get-rooturl-by-id id)))
               (mount-component (target-iloader)
                 :rooturl (lisp url)
+                :tmode (lisp tmode)
                 :child target-root)))))
 
 
