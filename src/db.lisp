@@ -348,7 +348,7 @@ the page text can be found in the cache."
    (nth-value 1 (get-assoc-by-col (colm 'author 'id) aid))))
 
 ;;FIXME: Perhaps in the case of WF user, we shouldn't be looking here for the screen
-;; name. That breaks a few assumtions. We don't have userfig here.
+;; name. That breaks a few assumptions. We don't have userfig here.
 (defun author-representation-from-row (data)
   (when-let ((res (assoc-or '(:screen-name :display-name :homepage :email) data)))
     (values (cdr res) (car res))))

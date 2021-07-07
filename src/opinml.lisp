@@ -136,6 +136,8 @@
            (hu:collect :iid (assoc-cdr :iid opinion))
            (when-let ((text-position (assoc-cdr :text-position opinion)))
              (hu:collect :text-position text-position))
+           (when-let ((authorname (assoc-cdr :authorname opinion)))
+             (hu:collect :authorname authorname))
            (when-let ((leading (assoc-cdr :leading opinion)))
              (hu:collect :leading leading))
            (when-let ((trailing (assoc-cdr :trailing opinion)))

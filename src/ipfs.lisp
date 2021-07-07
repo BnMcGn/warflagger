@@ -56,7 +56,7 @@
     (if-let ((data (gethash key warstats)))
       (princ (serialize-warstat (hu:hash->plist data)) s)
       (warn "Missing warstats!")))
-  ;;FIXME: text and title will be wanting some additions
+  ;;FIXME: text and title will be wanting some addition
   (ipfs:with-files-write (s (strcat location "text.data") :create t :truncate t)
     (when-let ((data (gethash key text)))
       (print (hu:hash->plist data) s)))
@@ -67,7 +67,11 @@
 (defun add-author-to-opinion (opinion)
   (if (assoc-cdr :author opinion)
       opinion
-      (cons (cons :author (warflagger:make-author-url (assoc-cdr :author-id opinion))) opinion)))
+      (list* (cons :author (warflagger:make-author-url (assoc-cdr :author-id opinion)))
+             ;;FIXME: Should be independent of db
+             (cons :authorname (warflagger:get-author-representation
+                                (warflagger:find-author-id (assoc-cdr :author-id opinion))))
+             opinion)))
 
 (defun ipfs-write-rooturl-data (rooturl)
   (initialize-warstat-dirs)
@@ -94,7 +98,8 @@
         ;;FIXME: Handle incoming references
         ;;Opinion stuff
         (gadgets:do-hash-table (iid opinion opinion-store)
-          (save-extended-opinion opinion)
+          ;;FIXME: optimize the writings!
+          (save-extended-opinion opinion :overwrite t)
           (save-warstat-sets (strcat "/opinions/" iid "/") iid warstats text title))))))
 
 ;;FIXME: This is ignorant. We are going to clear out everything. Probably wrong, but let's find out
