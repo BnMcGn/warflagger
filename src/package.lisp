@@ -132,5 +132,7 @@
    #:uri-domain
    #:reference-opinion-p
    #:js-compatible-utcstamp
-   #:with-inverted-case))
+   #:with-inverted-case
+   #:*side-opinions*
+   #:copy-ballot-box))
 

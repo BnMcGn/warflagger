@@ -31,6 +31,14 @@
     (setf (gethash 'cache res) nil)
     res))
 
+(declaim (ftype (function (ballot-box) ballot-box) copy-ballot-box))
+(defun copy-ballot-box (old)
+  "Make a shallow copy of a ballot box"
+  (let ((new (make-ballot-box)))
+    (dolist (k '(:up :down :right :wrong))
+      (setf (gethash k new) (gethash k old)))
+    new))
+
 (declaim (ftype (function (ballot-box vote-direction iid uri &optional uri) t) cast-vote!))
 (defun cast-vote! (balbox direction iid author &optional reference)
   (setf (gethash 'cache balbox) nil)

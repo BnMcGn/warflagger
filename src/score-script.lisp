@@ -38,7 +38,10 @@
    #:applied-to
    #:collect-warstats
    #:flag-core
-   #:*ballot-box*))
+   #:*ballot-box*
+   #:*side-opinions*
+   #:add-alternative
+   #:add-side-opinion))
 
 (defpackage #:score-script
   (:use #:cl #:gadgets #:alexandria)
@@ -139,6 +142,8 @@
 (defvar *direction*)
 (defvar *target-author* nil)
 
+(defvar *side-opinions*)
+
 (in-package :warflagger)
 
 (defun execute-score-script (scsc rooturl opinion-store)
@@ -155,6 +160,7 @@
         (scss:*warstat* (make-hash-table))
         (scss:*text-warstat* (make-hash-table))
         (scss:*title-warstat* (make-hash-table))
+        (scss:*side-opinions* (make-hash-table))
         (scss:*tree-address* nil))
     (mapc #'eval scsc)
     ;;FIXME: Should be writing blank warstat even if empty?
@@ -167,7 +173,7 @@
     (unless (warflagger:ballot-box-empty-p scss:*title-ballot-box*)
       (warflagger:apply-ballot-box-to-warstats scss:*title-ballot-box* scss:*title-warstat*)
       (scss:collect-warstats rooturl scss:*title-warstat* :title))
-    (values scss:*warstats* scss:*text-warstats* scss:*title-warstats*)))
+    (values scss:*warstats* scss:*text-warstats* scss:*title-warstats* scss:*side-opinions*)))
 
 (in-package :score-script-support)
 
@@ -239,6 +245,14 @@
    (car (or (sort (remove-if #'null timestamps) #'string< :key #'warflagger:js-compatible-utcstamp)
             (error "No timestamp found in tree")))))
 
+(defun add-alternative (iid)
+  (hu:collecting-hash-table (:mode :append :existing *side-opinions*)
+    (hu:collect (assoc-cdr :target (warflagger:opinion-by-id iid)) iid)))
+
+(defun add-side-opinion (iid)
+  (hu:collecting-hash-table (:mode :append :existing *side-opinions*)
+    (hu:collect (assoc-cdr :target (warflagger:opinion-by-id iid)) iid)))
+
 (defun apply-to (aspect iid)
   (unless (equal iid (lastcar *tree-address*))
     (error "IID problem: can't apply-to"))
@@ -284,6 +298,8 @@
       (hu:collect :direction *direction*)
       (hu:collect :other-flag *other-flag*))))
 
+;;FIXME: flag-core is a little dense. Individual flags and directives should have a clearer
+;; api. Consider rewriting with dispatch functions instead of dynamics.
 (defun flag-core (other-flag direction iid author modifiers)
   (hu:with-keys (:ballot-box :text-ballot-box :title-ballot-box :warstat :text-warstat :title-warstat
                  :apply-to :direction :other-flag)
@@ -318,6 +334,7 @@
         (stick-other-flag-on-target other-flag ballot-box ws))
       (cond
         ;;We don't cast own vote if it's not an other-flag. Return appropriate ballot box instead.
+        ;;FIXME: how does our vote get in that ballot box?
         ((eq direction :pro)
          (warflagger:merge-ballot-boxes! bb ballot-box)
          bb)
@@ -426,21 +443,28 @@
   (scss:flag-core nil nil iid author modifiers))
 
 ;;FIXME: something should be set in warstats for suggest.
+;;FIXME: only one of these should be used at a time. Add a check. Or prime position?
 (defun target-text (&key iid author)
   (declare (ignore author))
   (if (not (length1 scss:*tree-address*))
       (warn "Can't target the text of a non-rooturl target")
-      (scss:apply-to :text iid)))
+      (progn
+        (scss:add-side-opinion iid)
+        (scss:apply-to :text iid))))
 (defun suggest-target-text (&key iid author)
   (declare (ignore author))
   (if (not (length1 scss:*tree-address*))
       (warn "Can't target the text of a non-rooturl target")
-      (scss:apply-to :text iid)))
+      (progn
+        (scss:add-alternative iid)
+        (scss:apply-to :text iid))))
 (defun target-title (&key iid author)
   (declare (ignore author))
+  (scss:add-side-opinion iid)
   (scss:apply-to :title iid))
 (defun suggest-target-title (&key iid author)
   (declare (ignore author))
+  (scss:add-alternative iid)
   (scss:apply-to :title iid))
 
 (defun vote-value (value &key iid author)
