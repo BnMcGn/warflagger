@@ -18,30 +18,7 @@
    #:prep-scsc-for-execution
    #:*warstats*
    #:*text-warstats*
-   #:*title-warstats*
-   #:*tree-address*
-   #:*text-ballot-box*
-   #:*title-ballot-box*
-   #:*warstat*
-   #:*text-warstat*
-   #:*title-warstat*
-   #:*apply-to*
-   #:*cascade*
-   #:*other-flag*
-   #:*direction*
-   #:*target-author*
-   #:stick-other-flag-on-target
-   #:add-to-replies-count
-   #:set-direction
-   #:set-tree-freshness
-   #:apply-to
-   #:applied-to
-   #:collect-warstats
-   #:flag-core
-   #:*ballot-box*
-   #:*side-opinions*
-   #:add-alternative
-   #:add-side-opinion))
+   #:*title-warstats*))
 
 (defpackage #:score-script
   (:use #:cl #:gadgets #:alexandria)
@@ -125,24 +102,8 @@
 
 (in-package :score-script-support)
 
-(defparameter *warstats* nil)
-(defparameter *text-warstats* nil)
-(defparameter *title-warstats* nil)
-
-(defvar *tree-address*)
-(defvar *ballot-box*)
-(defvar *text-ballot-box*)
-(defvar *title-ballot-box*)
-(defvar *warstat*)
-(defvar *text-warstat*)
-(defvar *title-warstat*)
-(defvar *apply-to*)
-(defvar *cascade*)
-(defvar *other-flag*)
-(defvar *direction*)
-(defvar *target-author* nil)
-
-(defvar *side-opinions*)
+(defvar *dispatch*)
+(defparameter *score-data* nil)
 
 (in-package :warflagger)
 
@@ -175,7 +136,112 @@
       (scss:collect-warstats rooturl scss:*title-warstat* :title))
     (values scss:*warstats* scss:*text-warstats* scss:*title-warstats* scss:*side-opinions*)))
 
-(in-package :score-script-support)
+(defun execute-score-script (scsc rooturl opinion-store)
+  (declare (type score-script scsc))
+  (let* ((warflagger:*opinion-store* opinion-store)
+         (*score-data* (make-hash-table))
+         ;; tree-address?
+         (*dispatch* (scsc-dispatch rooturl nil nil)))
+    (mapc #'eval (prep-scsc-for-execution (scsc-safety-symbols scsc)))
+    *score-data*))
+
+(defun scsc-dispatch (key parent-dispatch info)
+  "key is iid or rooturl"
+  (let ((ballot-box (warflagger:make-ballot-box))
+        (text-ballot-box (warflagger:make-ballot-box))
+        (title-ballot-box (warflagger:make-ballot-box))
+        (tree-freshness nil)
+        (apply-to nil)
+        (replies-immediate 0)
+        (replies-total 0)
+        (other-flag nil)
+        (post-other-flag t)
+        (other-flags (make-hash-table))
+        (direction nil)
+        (alternatives nil)
+        (delayed-procedures nil)
+        (enabled t))
+    (labels ((which-bb (applied-to)
+               (case applied-to
+                 (:text text-ballot-box)
+                 (:title title-ballot-box)
+                 (otherwise ballot-box))))
+      (lambda (cmd param &rest params)
+        (case cmd
+          (:direction
+           (setf direction (or param :neutral)))
+          (:info
+           (case param
+             (:parent parent-dispatch)
+             (:enabled enabled)
+             (:direction direction)
+             (:ballot-box ballot-box)
+             (:other-flag other-flag)
+             (otherwise (getf info param))))
+          (:apply-to
+           (setf apply-to param))
+          (:tree-freshness
+           (if tree-freshness
+               (when (string< (warflagger:js-compatible-utcstamp tree-freshness)
+                              (warflagger:js-compatible-utcstamp param))
+                 (setf tree-freshness param))
+               (setf tree-freshness param)))
+          (:replies
+           (incf replies-immediate)
+           (incf replies-total (1+ param)))
+          (:merge-ballots
+           (warflagger:merge-ballot-boxes! (which-bb (getf params :applied-to)) param))
+          (:merge-ballots-inverted
+           (warflagger:merge-with-inverted-ballot-boxes! (which-bb (getf params :applied-to)) param))
+          (:merge-other-flag-ballots
+           (if-let ((bb (gethash param other-flags)))
+             (warflagger:merge-ballot-boxes! bb (getf params :ballot-box))
+             (setf (gethash param other-flags)
+                   (warflagger:copy-ballot-box (getf params :ballot-box)))))
+          (:cast-own-vote
+           (warflagger:cast-vote! (which-bb (getf params :applied-to)) param
+                                  (getf params :iid) (getf params :author) (getf params :reference)))
+          (:cast-own-other-vote
+           (let ((bb (gethash param other-flags)))
+             (warflagger:cast-vote! bb :up (getf params :iid) (getf params :author))))
+          (:cast-vote
+           (funcall parent-dispatch :cast-own-vote param :iid (getf info :iid)
+                    :author (getf info :author) :reference (getf params :reference)
+                    :applied-to apply-to))
+          (:other-flag
+           (setf other-flag param))
+          (:post-other-flag
+           (setf post-other-flag param))
+          (:add-alternative
+           (push param alternatives))
+          (:add-delayed-procedure
+           (push param delayed-procedures))
+          (:disable
+           (setf enabled nil))
+          (:save
+           (let ((data (hu:hash
+                        (:ballot-box ballot-box) (:text-ballot-box text-ballot-box)
+                        (:title-ballot-box title-ballot-box) (:tree-freshness tree-freshness)
+                        (:direction direction) (:replies-total replies-total)
+                        (:replies-immediate replies-immediate) (:other-flags other-flags)
+                        (:alternatives alternatives))))
+             (setf (gethash key score-script-support::*score-data*) data)))
+          (:post
+           (mapcan #'funcall delayed-procedures)
+           (funcall parent-dispatch :replies replies-total)
+           (funcall parent-dispatch :tree-freshness tree-freshness)
+           (cond
+             ((null enabled) nil)
+             ((and other-flag (not post-other-flag)) nil)
+             (other-flag
+              (funcall parent-dispatch :merge-other-flag-ballots other-flag :ballob-box ballot-box)
+              ;; Auto-vote for other flag
+              (funcall parent-dispatch :cast-own-other-vote
+                       other-flag :up :iid (getf info :iid) :author (getf info :author)))
+             ((eq direction :pro)
+              (funcall parent-dispatch :merge-ballots ballot-box :applied-to apply-to))
+             ((eq direction :con)
+              (funcall parent-dispatch :merge-ballots-inverted ballot-box :applied-to apply-to)))))))))
 
 (defun scsc-safety-symbols (code &optional (package (find-package :score-script)))
   (proto:tree-search-replace
@@ -220,167 +286,226 @@
    (:effect 0)
    (:controversy 0)))
 
-(defun stick-other-flag-on-target (flag ballot-box warstat)
-  (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals ballot-box)
-    (let ((pos (+ right up))
-          (neg (+ wrong down)))
-      (when (warflagger:score-vast-majority-p pos neg)
-        (setf (gethash flag warstat) (nth-value 0 (warflagger:score-controversy pos neg)))))))
+(in-package :score-script-support)
+;; Score-script-support is for tools that will be visible from within flags and directives
 
-(defun add-to-replies-count (warstats childcount)
-  (unless (key-in-hash? :replies-immediate warstats)
-    (setf (gethash :replies-immediate warstats) 0))
-  (unless (key-in-hash? :replies-total warstats)
-    (setf (gethash :replies-total warstats) 0))
-  (incf (gethash :replies-immediate warstats))
-  (incf (gethash :replies-total warstats) (1+ childcount)))
+(defun set-direction (direction)
+  (unless (member direction '(:pro :con))
+    (error "Not a valid direction"))
+  (funcall *dispatch* :direction direction))
 
-(defun set-direction (warstat direction)
-  (setf (gethash :direction warstat) (or direction :neutral)))
+(defun set-apply-to (type)
+  (funcall *dispatch* :apply-to type))
 
-;;FIXME: doesn't seem to function. Tree freshness should never be nil
-(defun set-tree-freshness (warstat &rest timestamps)
-  (setf
-   (gethash :tree-freshness warstat)
-   (car (or (sort (remove-if #'null timestamps) #'string< :key #'warflagger:js-compatible-utcstamp)
-            (error "No timestamp found in tree")))))
+(defun set-other-flag (flag)
+  (funcall *dispatch* :other-flag flag))
+
+(defun dont-flag ()
+  (funcall *dispatch* :post-other-flag nil))
+
+(defun set-tree-freshness (dt)
+  (funcall *dispatch* :tree-freshness dt))
+
+(defun disable ()
+  (funcall *dispatch* :disable))
+
+(defun disable-parent ()
+  (when-let ((parent (funcall *dispatch* :info :parent)))
+    (and (functionp parent)
+         (funcall parent :disable))))
+
+(defun reply-to-self-p ()
+  (when-let ((parent (funcall *dispatch* :info :parent)))
+    (and (functionp parent)
+         (equal (funcall *dispatch* :info :author)
+                (funcall parent :info :author)))))
+
+(defun parent-is-root-p ()
+  (length1 (assoc-cdr :tree-address (get-opinion))))
+
+(defun blank-flag-p ()
+  (eq :blank (funcall *dispatch* :info :other-flag)))
+
+(defun vote-down ()
+  (funcall *dispatch* :cast-vote :down))
+(defun vote-up ()
+  (funcall *dispatch* :cast-vote :up))
+(defun vote-right (&optional ref)
+  (funcall *dispatch* :cast-vote :right :reference ref))
+(defun vote-wrong (&optional ref)
+  (funcall *dispatch* :cast-vote :wrong :reference ref))
 
 (defun add-alternative (iid)
-  (hu:collecting-hash-table (:mode :append :existing *side-opinions*)
-    (hu:collect (assoc-cdr :target (warflagger:opinion-by-id iid)) iid)))
+  (funcall *dispatch* :add-alternative iid))
 
-(defun add-side-opinion (iid)
-  (hu:collecting-hash-table (:mode :append :existing *side-opinions*)
-    (hu:collect (assoc-cdr :target (warflagger:opinion-by-id iid)) iid)))
+(defun get-opinion ()
+  (funcall *dispatch* :info :opinion))
 
-(defun apply-to (aspect iid)
-  (unless (equal iid (lastcar *tree-address*))
-    (error "IID problem: can't apply-to"))
-  (if *apply-to*
-      (warn "Apply-to is already set. No action taken.")
-      (setf *apply-to* aspect)))
+(defun get-opinion-created ()
+  (assoc-cdr :datestamp (get-opinion)))
 
-(defun applied-to (applyto)
-  (case applyto
-    (:text (values *text-warstat* *text-ballot-box*))
-    (:title (values *title-warstat* *title-ballot-box*))
-    (otherwise (values *warstat* *ballot-box*))))
+(defun get-ballot-box ()
+  (funcall *dispatch* :info :ballot-box))
 
-(defun collect-warstats (key warstats &optional type)
-  (let ((ws-store (case type
-                    (:text *text-warstats*)
-                    (:title *title-warstats*)
-                    (otherwise *warstats*))))
-    (setf (gethash key ws-store) warstats)))
+(defun enabledp ()
+  (and (funcall *dispatch* :info :enabled)
+       (not (eq :neutral (funcall *dispatch* :info :direction)))))
 
-(defun execute-modifiers (modifiers tree-address other-flag direction author)
-  (hu:collecting-hash-table (:mode :replace)
-    (let ((*target-author* author)
-          (*ballot-box* (warflagger:make-ballot-box))
-          (*text-ballot-box* (warflagger:make-ballot-box))
-          (*title-ballot-box* (warflagger:make-ballot-box))
-          (*warstat* (initialize-warstats))
-          (*text-warstat* (make-hash-table))
-          (*title-warstat* (make-hash-table))
-          (*apply-to* nil)
-          (*other-flag* other-flag)
-          (*direction* direction)
-          (*tree-address* tree-address))
-      (when (functionp modifiers)
-        (funcall modifiers))
-      (hu:collect :ballot-box *ballot-box*)
-      (hu:collect :text-ballot-box *text-ballot-box*)
-      (hu:collect :title-ballot-box *title-ballot-box*)
-      (hu:collect :warstat *warstat*)
-      (hu:collect :text-warstat *text-warstat*)
-      (hu:collect :title-warstat *title-warstat*)
-      (hu:collect :apply-to *apply-to*)
-      (hu:collect :direction *direction*)
-      (hu:collect :other-flag *other-flag*))))
+;;FIXME: can't be run before post-flag, because of missing own vote
+;;FIXME: likewise, can't be used for non other-flag for similar reasons.
+;; could possibly just work with a copy of the ballot-box. might solve all of the problems
+;;FIXME: At moment, this is the only subjective thing in score-script. Do we like that?
+(defun approvedp ()
+  "Essentially a vast-majority check on the current resource."
+  (and (enabledp)
+       (let ((balbox (get-ballot-box)))
+         (if (warflagger:ballot-box-empty-p balbox)
+             t
+             (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals (get-ballot-box))
+               (let ((pos (+ right up))
+                     (neg (+ wrong down)))
+                 (warflagger:score-vast-majority-p pos neg)))))))
 
-;;FIXME: flag-core is a little dense. Individual flags and directives should have a clearer
-;; api. Consider rewriting with dispatch functions instead of dynamics.
-(defun flag-core (other-flag direction iid author modifiers)
-  (hu:with-keys (:ballot-box :text-ballot-box :title-ballot-box :warstat :text-warstat :title-warstat
-                 :apply-to :direction :other-flag)
-      (execute-modifiers modifiers (append *tree-address* (list iid)) other-flag direction author)
-    ;;accumulate own warstats
-    (set-direction warstat direction)
-    ;; ws and bb belong to the target, not the current item.
-    (multiple-value-bind (ws bb) (applied-to apply-to)
-      (unless (warflagger:ballot-box-empty-p ballot-box)
-        (warflagger:apply-ballot-box-to-warstats ballot-box warstat))
-      (collect-warstats iid warstat)
-      ;;FIXME: do we deal with text warstats for nonroot targets?
-      (unless (warflagger:ballot-box-empty-p text-ballot-box)
-        (warflagger:apply-ballot-box-to-warstats text-ballot-box text-warstat))
-      (collect-warstats iid text-warstat :text)
-      (unless (warflagger:ballot-box-empty-p title-ballot-box)
-        (warflagger:apply-ballot-box-to-warstats title-ballot-box title-warstat))
-      (collect-warstats iid title-warstat :title)
-      ;;FIXME: Are there cases when an opinion and descendants should not be counted?
-      (add-to-replies-count ws
-                            (+ (gethash :replies-total warstat 0)
-                               (gethash :replies-total text-warstat 0)
-                               (gethash :replies-total title-warstat 0)))
-      (unless (gethash :tree-freshness warstat)
-        (set-tree-freshness warstat (assoc-cdr :datestamp (warflagger:opinion-by-id iid))))
-      (set-tree-freshness ws
-                          (gethash :tree-freshness ws)
-                          (gethash :tree-freshness warstat) (gethash :tree-freshness text-warstat)
-                          (gethash :tree-freshness title-warstat))
-      (when other-flag
-        (warflagger:cast-vote! ballot-box :up iid author)
-        (stick-other-flag-on-target other-flag ballot-box ws))
-      (cond
-        ;;We don't cast own vote if it's not an other-flag. Return appropriate ballot box instead.
-        ;;FIXME: how does our vote get in that ballot box?
-        ((eq direction :pro)
-         (warflagger:merge-ballot-boxes! bb ballot-box)
-         bb)
-        ((eq direction :con)
-         (warflagger:merge-with-inverted-ballot-boxes! bb ballot-box)
-         bb)
-        (t nil)))))
+(defun run-modifiers ()
+  (let ((mods (funcall *dispatch* :info :modifiers)))
+    (when (functionp mods)
+      (funcall mods))))
 
-(in-package :score-script)
+(defmacro on-post (&body body)
+  `(funcall *dispatch* :add-delayed-procedure
+            (lambda ()
+              ,@body)))
 
-;; Initial implementation of consensus scorer
+(defun save-flag ()
+  (funcall *dispatch* :save nil))
 
-(defun negative-spam (&key iid author modifiers)
-  (scss:flag-core :spam nil iid author modifiers))
-(defun negative-inflammatory (&key iid author modifiers)
-  (scss:flag-core :inflammatory nil iid author modifiers))
-(defun negative-disagree (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :con iid author modifiers)))
-    (warflagger:cast-vote! balbox :down iid author)))
-(defun negative-dislike (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :con iid author modifiers)))
-    (warflagger:cast-vote! balbox :down iid author)))
-(defun negative-language-warning (&key iid author modifiers)
-  (scss:flag-core :language-warning nil iid author modifiers))
-(defun negative-disturbing (&key iid author modifiers)
-  (scss:flag-core :disturbing nil iid author modifiers))
-(defun negative-logical-fallacy (&key iid author modifiers)
-  (scss:flag-core :logical-fallacy nil iid author modifiers))
-(defun negative-needs-evidence (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :con iid author modifiers)))
-    (warflagger:cast-vote! balbox :wrong iid author)))
-(defun negative-raise-question (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :con iid author modifiers)))
-    (warflagger:cast-vote! balbox :wrong iid author)))
-(defun negative-out-of-bounds (&key iid author modifiers)
-  (scss:flag-core :out-of-bounds nil iid author modifiers))
-(defun positive-funny (&key iid author modifiers)
-  (scss:flag-core :funny nil iid author modifiers))
-(defun positive-agree (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :pro iid author modifiers)))
-    (warflagger:cast-vote! balbox :up iid author)))
-(defun positive-like (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :pro iid author modifiers)))
-    (warflagger:cast-vote! balbox :up iid author)))
-(defun positive-interesting (&key iid author modifiers)
-  (scss:flag-core :interesting nil iid author modifiers))
+(defun post-flag ()
+  (funcall *dispatch* :post nil))
+
+(defun post-error (err)
+  (disable)
+  ;;FIXME: implement error storage
+  (warn err))
+
+(eval-always
+  (defmacro defflag (name &body body)
+    (let ((opinion (gensym "opinion")))
+      `(defun ,name (&key iid author modifiers)
+         (let* ((,opinion (warflagger:opinion-by-id iid))
+                (*dispatch* (scsc-dispatch iid *dispatch*
+                                           (list :iid iid :author author :opinion ,opinion))))
+           ,@body)))))
+
+
+
+(defflag scsc::negative-spam
+  (set-other-flag :spam)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-inflammatory
+  (set-other-flag :inflammatory)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-disagree
+  (set-direction :con)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (vote-down)))
+
+(defflag scsc::negative-dislike
+  (set-direction :con)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (vote-down)))
+
+(defflag scsc::negative-language-warning
+  (set-other-flag :language-warning)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-disturbing
+  (set-other-flag :disturbing)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-logical-fallacy
+  (set-other-flag :logical-fallacy)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-needs-evidence
+  (set-direction :con)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (vote-wrong)))
+
+(defflag scsc::negative-raise-question
+  (set-other-flag :inflammatory)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-out-of-bounds
+  (set-other-flag :out-of-bounds)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::positive-funny
+  (set-other-flag :funny)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::positive-agree
+  (set-direction :pro)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (vote-up)))
+
+(defflag scsc::positive-like
+  (set-direction :pro)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (vote-up)))
+
+(defflag scsc::positive-interesting
+  (set-other-flag :interesting)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
 ;;FIXME: this should go away
 (defun statements-evidence (&key iid author modifiers)
   (let ((vv (assoc-cdr :vote-value (warflagger:opinion-by-id iid))))
@@ -389,91 +514,122 @@
           ;;FIXME: why null? should be zero?
           ((null vv) (positive-evidence :iid iid :author author :modifiers modifiers))
           (t (warn "Unhandled statements-evidence flag")))))
-(defun negative-evidence (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :con iid author modifiers)))
-    (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))
-      (warflagger:cast-vote! balbox :wrong iid author ref))))
-(defun positive-evidence (&key iid author modifiers)
-  (when-let ((balbox (scss:flag-core nil :pro iid author modifiers)))
-    (dolist (ref (wf/ipfs:opinion-references (warflagger:opinion-by-id iid)))
-      (warflagger:cast-vote! balbox :right iid author ref))))
-(defun custodial-redundant (&key iid author modifiers)
-  (scss:flag-core :redundant nil iid author modifiers))
-(defun custodial-out-of-date (&key iid author modifiers)
-  (scss:flag-core :out-of-date nil iid author modifiers))
-(defun custodial-retraction (&key iid author modifiers)
-  (if (equal author scss:*target-author*)
-      (progn
-        (scss:flag-core nil nil iid author modifiers)
-        (setf (gethash :retraction scss:*warstat*) t))
-      (warn "Retraction applied to target not by author")))
-(defun custodial-correction (&key iid author modifiers)
-  (warn "Correction flag not implemented")
-  (scss:flag-core nil nil iid author modifiers))
-(defun custodial-incorrect-flag (&key iid author modifiers)
-  (scss:flag-core :incorrect-flag nil iid author modifiers))
-(defun custodial-flag-abuse (&key iid author modifiers)
-  (if (length1 (assoc-cdr :tree-address (warflagger:opinion-by-id iid)))
-      (warn "Flag-Abuse applied to root URL")
-      (progn
-        ;;FIXME: Dirty hack. Need to rethink system to make this less ugly
-        (scss:flag-core :flag-abuse nil iid author modifiers)
-        (when (gethash :flag-abuse scss:*warstat*)
-          (setf scss:*direction* :neutral)
-          (setf scss:*other-flag* nil)))))
-(defun custodial-offtopic (&key iid author modifiers)
-  (scss:flag-core :offtopic nil iid author modifiers))
-(defun custodial-arcane (&key iid author modifiers)
-  (scss:flag-core :arcane nil iid author modifiers))
-(defun custodial-same-thing (&key iid author modifiers)
-  (warn "Same-thing flag not implemented")
-  (scss:flag-core nil nil iid author modifiers))
-(defun custodial-blank (&key iid author modifiers)
-  (if (wf/ipfs:opinion-can-apply-dircs-to-parent (warflagger:opinion-by-id iid))
-      ;;Will this work?
-      (and modifiers (funcall modifiers))
-      (scss:flag-core nil nil iid author modifiers)))
 
-;;FIXME: add a general unknown-flag handler
-(defun statements-am-qualified (&key iid author modifiers)
-  (warn "Deprecated flag")
-  (scss:flag-core nil nil iid author modifiers))
-(defun negative-already-answered (&key iid author modifiers)
-  (warn "Deprecated flag")
-  (scss:flag-core nil nil iid author modifiers))
+(defflag scsc::negative-evidence
+  (set-direction :con)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
+      (vote-right ref))))
 
-;;FIXME: something should be set in warstats for suggest.
+(defflag scsc::positive-evidence
+  (set-direction :pro)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (enabledp)
+    (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
+      (vote-wrong ref))))
+
+(defflag scsc::custodial-redundant
+  (set-other-flag :redundant)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::custodial-out-of-date
+  (set-other-flag :out-of-date)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::custodial-flag-abuse
+  (set-other-flag :flag-abuse)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (when (parent-is-root-p)
+      (post-error "Target is not an opinion"))
+  (post-flag)
+  (when (approvedp)
+    (disable-parent)))
+
+(defflag scsc::custodial-offtopic
+  (set-other-flag :offtopic)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::custodial-arcane
+  (set-other-flag :arcane)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::custodial-blank
+  (set-other-flag :blank)
+  (dont-flag)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::statements-am-qualified
+  (set-tree-freshness (get-opinion-created))
+  (post-error "Deprecated flag")
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
+(defflag scsc::negative-already-answered
+  (set-tree-freshness (get-opinion-created))
+  (post-error "Deprecated flag")
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
 ;;FIXME: only one of these should be used at a time. Add a check. Or prime position?
-(defun target-text (&key iid author)
+(defun scsc::target-text (&key iid author)
   (declare (ignore author))
-  (if (not (length1 scss:*tree-address*))
-      (warn "Can't target the text of a non-rooturl target")
-      (progn
-        (scss:add-side-opinion iid)
-        (scss:apply-to :text iid))))
-(defun suggest-target-text (&key iid author)
+  (set-apply-to :text))
+(defun scsc::suggest-target-text (&key iid author)
   (declare (ignore author))
-  (if (not (length1 scss:*tree-address*))
-      (warn "Can't target the text of a non-rooturl target")
-      (progn
-        (scss:add-alternative iid)
-        (scss:apply-to :text iid))))
-(defun target-title (&key iid author)
+  (cond
+    ((not (parent-is-root-p))
+     (post-error "Can't suggest text for non-root target"))
+    ((not (blank-flag-p))
+     (post-error "Text suggestions must be made with Custodial:Blank flag type"))
+    (t
+     (on-post
+       (when (enabledp)
+         (add-alternative iid))))))
+(defun scsc::target-title (&key iid author)
   (declare (ignore author))
-  (scss:add-side-opinion iid)
-  (scss:apply-to :title iid))
-(defun suggest-target-title (&key iid author)
+  (set-apply-to :title))
+(defun scsc::suggest-target-title (&key iid author)
   (declare (ignore author))
-  (scss:add-alternative iid)
-  (scss:apply-to :title iid))
+  (if (not (blank-flag-p))
+      (post-error "Title suggestions must be made with Custodial:Blank flag type")
+      (on-post
+        (when (enabledp)
+          (add-alternative iid)))))
 
-(defun vote-value (value &key iid author)
+(defun scsc::vote-value (value &key iid author)
   (declare (ignore iid author))
   (if (eql value 0)
-      (setf scss:*direction* :neutral)
-      (warn "Vote-value: only support setting to 0")))
+      (set-direction :neutral)
+      (post-error "#(vote-value): can only set to 0")))
 
-(defun no-cascade (&key iid author)
+(defun scsc::no-cascade (&key iid author)
   (declare (ignore iid author))
-  ;;FIXME: this might not work...
-  (setf scss:*direction* :neutral))
+  (set-direction :neutral))
+
+
