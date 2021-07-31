@@ -18,7 +18,9 @@
    #:prep-scsc-for-execution
    #:*warstats*
    #:*text-warstats*
-   #:*title-warstats*))
+   #:*title-warstats*
+   #:*dispatch*
+   #:*score-data*))
 
 (defpackage #:score-script
   (:use #:cl #:gadgets #:alexandria)
@@ -109,41 +111,12 @@
 
 (defun execute-score-script (scsc rooturl opinion-store)
   (declare (type score-script scsc))
-  (let ((warflagger:*opinion-store* opinion-store)
-        (scsc (scss:prep-scsc-for-execution (scss:scsc-safety-symbols scsc)))
-        (scss:*warstats* (make-hash-table :test #'equal))
-        (scss:*text-warstats* (make-hash-table :test #'equal))
-        (scss:*title-warstats* (make-hash-table :test #'equal))
-
-        (scss:*ballot-box* (warflagger:make-ballot-box))
-        (scss:*text-ballot-box* (warflagger:make-ballot-box))
-        (scss:*title-ballot-box* (warflagger:make-ballot-box))
-        (scss:*warstat* (make-hash-table))
-        (scss:*text-warstat* (make-hash-table))
-        (scss:*title-warstat* (make-hash-table))
-        (scss:*side-opinions* (make-hash-table))
-        (scss:*tree-address* nil))
-    (mapc #'eval scsc)
-    ;;FIXME: Should be writing blank warstat even if empty?
-    (unless (warflagger:ballot-box-empty-p scss:*ballot-box*)
-      (warflagger:apply-ballot-box-to-warstats scss:*ballot-box* scss:*warstat*)
-      (scss:collect-warstats rooturl scss:*warstat*))
-    (unless (warflagger:ballot-box-empty-p scss:*text-ballot-box*)
-      (warflagger:apply-ballot-box-to-warstats scss:*text-ballot-box* scss:*text-warstat*)
-      (scss:collect-warstats rooturl scss:*text-warstat* :text))
-    (unless (warflagger:ballot-box-empty-p scss:*title-ballot-box*)
-      (warflagger:apply-ballot-box-to-warstats scss:*title-ballot-box* scss:*title-warstat*)
-      (scss:collect-warstats rooturl scss:*title-warstat* :title))
-    (values scss:*warstats* scss:*text-warstats* scss:*title-warstats* scss:*side-opinions*)))
-
-(defun execute-score-script (scsc rooturl opinion-store)
-  (declare (type score-script scsc))
   (let* ((warflagger:*opinion-store* opinion-store)
-         (*score-data* (make-hash-table))
+         (scss:*score-data* (make-hash-table))
          ;; tree-address?
-         (*dispatch* (scsc-dispatch rooturl nil nil)))
-    (mapc #'eval (prep-scsc-for-execution (scsc-safety-symbols scsc)))
-    *score-data*))
+         (scss:*dispatch* (scsc-dispatch rooturl nil nil)))
+    (mapc #'eval (scss:prep-scsc-for-execution (scss:scsc-safety-symbols scsc)))
+    scss:*score-data*))
 
 (defun scsc-dispatch (key parent-dispatch info)
   "key is iid or rooturl"
@@ -274,18 +247,6 @@
          node))
    code))
 
-(defun initialize-warstats ()
-  (hu:hash
-   (:replies-immediate 0)
-   (:replies-total 0)
-   (:tree-freshness nil)
-   (:x-right 0)
-   (:x-wrong 0)
-   (:x-up 0)
-   (:x-down 0)
-   (:effect 0)
-   (:controversy 0)))
-
 (in-package :score-script-support)
 ;; Score-script-support is for tools that will be visible from within flags and directives
 
@@ -392,10 +353,10 @@
     (let ((opinion (gensym "opinion")))
       `(defun ,name (&key iid author modifiers)
          (let* ((,opinion (warflagger:opinion-by-id iid))
-                (*dispatch* (scsc-dispatch iid *dispatch*
-                                           (list :iid iid :author author :opinion ,opinion))))
+                (*dispatch* (warflagger::scsc-dispatch iid *dispatch*
+                                           (list :iid iid :author author :opinion ,opinion
+                                                 :modifiers modifiers))))
            ,@body)))))
-
 
 
 (defflag scsc::negative-spam
@@ -509,10 +470,10 @@
 ;;FIXME: this should go away
 (defun statements-evidence (&key iid author modifiers)
   (let ((vv (assoc-cdr :vote-value (warflagger:opinion-by-id iid))))
-    (cond ((eql vv 1) (positive-evidence :iid iid :author author :modifiers modifiers))
-          ((eql vv -1) (negative-evidence :iid iid :author author :modifiers modifiers))
+    (cond ((eql vv 1) (scsc::positive-evidence :iid iid :author author :modifiers modifiers))
+          ((eql vv -1) (scsc::negative-evidence :iid iid :author author :modifiers modifiers))
           ;;FIXME: why null? should be zero?
-          ((null vv) (positive-evidence :iid iid :author author :modifiers modifiers))
+          ((null vv) (scsc::positive-evidence :iid iid :author author :modifiers modifiers))
           (t (warn "Unhandled statements-evidence flag")))))
 
 (defflag scsc::negative-evidence
@@ -598,7 +559,7 @@
 
 ;;FIXME: only one of these should be used at a time. Add a check. Or prime position?
 (defun scsc::target-text (&key iid author)
-  (declare (ignore author))
+  (declare (ignore author iid))
   (set-apply-to :text))
 (defun scsc::suggest-target-text (&key iid author)
   (declare (ignore author))
@@ -612,7 +573,7 @@
        (when (enabledp)
          (add-alternative iid))))))
 (defun scsc::target-title (&key iid author)
-  (declare (ignore author))
+  (declare (ignore author iid))
   (set-apply-to :title))
 (defun scsc::suggest-target-title (&key iid author)
   (declare (ignore author))
