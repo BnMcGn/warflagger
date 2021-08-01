@@ -134,5 +134,9 @@
    #:js-compatible-utcstamp
    #:with-inverted-case
    #:*side-opinions*
-   #:copy-ballot-box))
+   #:copy-ballot-box
+   #:compare-ballot-boxes
+   #:rank-ballot-boxes
+   #:excerpt-segment-points
+   #:flavor-from-warstats))
 

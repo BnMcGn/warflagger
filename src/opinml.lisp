@@ -476,8 +476,6 @@
       (:references (nreverse *found-references*))
       (:directives (ordered-unique (nreverse *found-directives*)))))))
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Directives
 ;;;;;;;;;;;;;;;;;;;;;;;;;;

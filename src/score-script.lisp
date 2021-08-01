@@ -207,7 +207,7 @@
              ((null enabled) nil)
              ((and other-flag (not post-other-flag)) nil)
              (other-flag
-              (funcall parent-dispatch :merge-other-flag-ballots other-flag :ballob-box ballot-box)
+              (funcall parent-dispatch :merge-other-flag-ballots other-flag :ballot-box ballot-box)
               ;; Auto-vote for other flag
               (funcall parent-dispatch :cast-own-other-vote
                        other-flag :up :iid (getf info :iid) :author (getf info :author)))
