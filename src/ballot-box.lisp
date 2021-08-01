@@ -154,12 +154,11 @@
     (>= (/ 1 10) (/ neg pos))))
 
 (defun score-controversy (pos neg)
-  (let* ((total (+ pos neg))
-         (effect (max 0 (- pos neg)))
-         (diff (abs (- pos neg)))
-         (balance (- total diff)))
+  (let* ((score (- pos neg))
+         (effect (max 0 score))
+         (balance (min pos neg)))
     ;;FIXME: Should this have a multiplier? Should it be a ratio?
-    (values effect balance)))
+    (values effect balance score)))
 
 (defun apply-ballot-box-to-warstats (balbox warstats)
   (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
@@ -170,3 +169,17 @@
     (multiple-value-bind (effect controv) (score-controversy (+ right up) (+ wrong down))
       (setf (gethash :effect warstats) effect)
       (setf (gethash :controversy warstats) controv))))
+
+;; Comparison is a bit tricky!
+;; - Need to be careful that users can't sneak in extra votes
+;; - What about comparing a box that is high on both axes to one that is low on both?
+;; - Can we use merge-with-inverted to do a good comparison? Might solve the sneak vote problem.
+(defun compare-ballot-boxes (bbox1 bbox2)
+  (multiple-value-bind (right up wrong down)
+      (ballot-box-totals (merge-with-inverted-ballot-boxes bbox1 bbox2))
+    (nth-value 2 (score-controversy (+ right up) (+ wrong down)))))
+
+(defun rank-ballot-boxes (boxes &key (keys (range (length boxes))))
+  "Order the ballot boxes by rank."
+  (mapcar #'car
+          (sort (pairlis keys boxes) #'compare-ballot-boxes :key #'cdr)))
