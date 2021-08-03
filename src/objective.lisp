@@ -75,7 +75,7 @@
 (defun opinion-reference-attributes (opinion)
   (let ((ref (assoc-cdr :reference opinion)))
     (when (stringp ref)
-      (let ((opinml (is-location-opinml? ref)))
+      (let ((opinml (warflagger::is-location-opinml? ref)))
         (if opinml
             (let* ((iid (warflagger:get-target-id-from-url (if (stringp opinml) opinml ref)))
                    (refd-opin (warflagger:opinion-by-id iid)))

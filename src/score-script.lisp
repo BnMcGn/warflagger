@@ -115,7 +115,8 @@
          (scss:*score-data* (make-hash-table))
          ;; tree-address?
          (scss:*dispatch* (scsc-dispatch rooturl nil nil)))
-    (mapc #'eval (scss:prep-scsc-for-execution (scss:scsc-safety-symbols scsc)))
+    (mapc #'eval (prep-scsc-for-execution (scsc-safety-symbols scsc)))
+    (funcall scss:*dispatch* :save nil)
     scss:*score-data*))
 
 (defun scsc-dispatch (key parent-dispatch info)
@@ -210,7 +211,7 @@
               (funcall parent-dispatch :merge-other-flag-ballots other-flag :ballot-box ballot-box)
               ;; Auto-vote for other flag
               (funcall parent-dispatch :cast-own-other-vote
-                       other-flag :up :iid (getf info :iid) :author (getf info :author)))
+                       other-flag :iid (getf info :iid) :author (getf info :author)))
              ((eq direction :pro)
               (funcall parent-dispatch :merge-ballots ballot-box :applied-to apply-to))
              ((eq direction :con)
@@ -268,7 +269,7 @@
   (funcall *dispatch* :tree-freshness dt))
 
 (defun disable ()
-  (funcall *dispatch* :disable))
+  (funcall *dispatch* :disable nil))
 
 (defun disable-parent ()
   (when-let ((parent (funcall *dispatch* :info :parent)))
@@ -468,7 +469,7 @@
   (post-flag))
 
 ;;FIXME: this should go away
-(defun statements-evidence (&key iid author modifiers)
+(defun scsc::statements-evidence (&key iid author modifiers)
   (let ((vv (assoc-cdr :vote-value (warflagger:opinion-by-id iid))))
     (cond ((eql vv 1) (scsc::positive-evidence :iid iid :author author :modifiers modifiers))
           ((eql vv -1) (scsc::negative-evidence :iid iid :author author :modifiers modifiers))
