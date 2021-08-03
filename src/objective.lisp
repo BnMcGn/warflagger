@@ -149,6 +149,19 @@
      :format (lambda (x) (gadgets:assoc-cdr :iid x))
      :identity-func (alexandria:curry #'gadgets:assoc-cdr :iid))))
 
+(defun subtree-for-address (optree treead)
+  "Returns the portion of the opinion tree below the supplied tree address, eg. all replies to it."
+  (labels ((proc (ot ta)
+             (if ta
+                 (dolist (branch ot nil)
+                   (when (equal (car branch) (car ta))
+                     (return-from proc (proc (cdr branch) (cdr ta)))))
+                 ot)))
+    (proc optree treead)))
+
+(defun has-excerpt-p (opinion)
+  (assoc :excerpt opinion))
+
 (defun opinion-target-same-author-p (opinion)
   (when-let* ((treead (assoc-cdr :tree-address opinion))
               (ln (not (length1 treead)))
@@ -163,6 +176,20 @@
          (not (not-empty (cdr cmt)))
          t)
        (opinion-target-same-author-p opinion)))
+
+(defun opinion-has-dirc (opinion dirc)
+  (let ((dircs (getf opinion :directives)))
+    (first-match (lambda (x) (eq (car x) dirc)) dircs)))
+
+(defun opinion-applies-to-text (opinion)
+  ;;FIXME: We aren't handling the Correction flag yet
+  (some (curry #'opinion-has-dirc) '(:target-text :suggest-target-text)))
+
+(defun opinion-applies-to-title (opinion)
+  (some (curry #'opinion-has-dirc) '(:target-title :suggest-target-title)))
+
+(defun opinion-suggests-t/t (opinion)
+  (let ((dircs))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Score script creation
@@ -224,3 +251,137 @@
 
 (defun objective-data-for-opinions (opinions)
   (objective-data (prep-opinions-for-extension opinions)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Score script result tools
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(in-package :warflagger)
+
+(defun initialize-warstats ()
+  (hu:hash
+   (:replies-immediate 0)
+   (:replies-total 0)
+   (:tree-freshness nil)
+   (:x-right 0)
+   (:x-wrong 0)
+   (:x-up 0)
+   (:x-down 0)
+   (:effect 0)
+   (:controversy 0)))
+
+(defun warstats-from-scsc-results (result &optional bbox)
+  "The optional bbox is to allow this function to prepare warstats from an alternate ballot box, such as for text or title."
+  (hu:with-keys (:ballot-box :tree-freshness :direction :replies-total :replies-immediate
+                             :other-flags) result
+    (let ((warstat (initialize-warstats))
+          (ballot-box (or bbox ballot-box)))
+      (warflagger:apply-ballot-box-to-warstats ballot-box warstat)
+      (setf (gethash :tree-freshness warstat) tree-freshness)
+      (incf (gethash :replies-immediate warstat) replies-immediate)
+      (incf (gethash :replies-total warstat) replies-total)
+      (setf (gethash :direction warstat) direction)
+      (gadgets:do-hash-table (flag balbox other-flags)
+        (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
+          (let ((pos (+ right up))
+                (neg (+ wrong down)))
+            (when (score-vast-majority-p pos neg)
+              (setf flag warstat) (nth-value 0 (score-controversy pos neg))))))
+      warstat)))
+
+(defun text-warstats-from-scsc-results (result)
+  (warstats-from-scsc-results result (gethash :text-ballot-box result)))
+
+(defun title-warstats-from-scsc-results (result)
+  (warstats-from-scsc-results result (gethash :title-ballot-box result)))
+
+(defun add-root-text-info (stor url)
+  (hu:with-keys (:text :status :message) (wf/text-extract:text-server url)
+    (hu:collecting-hash-table (:existing stor :mode :replace)
+     (hu:collect :initial-text (and (not-empty text) text))
+     (hu:collect :initial-status status)
+     (hu:collect :initial-message (and (not-empty message) message)))))
+
+;;FIXME: Handle texts attached by reference
+;;FIXME: Should some other text cleaning be done?
+(defun prep-alternate-text (iid)
+  (gethash :clean-comment (warflagger:opinion-by-id iid)))
+
+(defun text-info-from-scsc-results (results rooturl)
+  (let* ((rootres (gethash rooturl results))
+         (alts (gethash :alternatives rootres))
+         (alts (remove-if-not (lambda (x) (wf/ipfs::opinion-applies-to-text (opinion-by-id x)))
+                              alts))
+         (key (if alts
+                  (car
+                   (rank-ballot-boxes
+                    (cons (gethash :text-ballot-box rootres)
+                          (mapcar (lambda (x) (gethash :ballot-box (gethash x results))) alts))
+                    :keys (cons rooturl alts)))
+                  rooturl))
+         (result (gethash key results))
+         (warstats (text-warstats-from-scsc-results result)))
+    (add-root-text-info warstats rooturl)
+    (when (not-empty alts)
+      (setf (gethash :competitors warstats) (cons rooturl alts)))
+    ;;FIXME: Should be a way to indicate how secure an item is against its competitors
+    ;; probably should be added to ballot-box.lisp
+    (if (equal rooturl key)
+        (progn
+          (setf (gethash :text warstats) (gethash :initial-text warstats))
+          (setf (gethash :text-source warstats) :initial))
+        (progn
+          (setf (gethash :text warstats) (prep-alternate-text key))
+          (setf (gethash :text-source warstats) key)))
+    warstats))
+
+(defun add-root-title-info (stor url)
+  (hu:with-keys (:title :status :message) (wf/text-extract:text-server url)
+    (hu:collecting-hash-table (:existing stor :mode :replace)
+      (hu:collect :initial-text (and (not-empty title) title))
+      (hu:collect :initial-status status)
+      (hu:collect :initial-message (and (not-empty message) message)))))
+
+(defun title-info-from-scsc-results (results opinion-tree &key rooturl iid)
+  (let* ((starting-key (or iid rooturl))
+         (starting-res (gethash starting-key results))
+         (alts (gethash :alternatives starting-res))
+         (alts (remove-if-not (lambda (x) (wf/ipfs::opinion-applies-to-title (opinion-by-id x)))
+                              alts))
+         (key (if alts
+                  (car
+                   (rank-ballot-boxes
+                    (cons (gethash :title-ballot-box starting-res)
+                          (mapcar (lambda (x) (gethash :ballot-box (gethash x results))) alts))
+                    :keys (cons starting-key alts)))
+                  starting-key))
+         (result (gethash key results))
+         (warstats (title-warstats-from-scsc-results result))
+         (optree (if (not iid)
+                     opinion-tree
+                     (wf/ipfs::subtree-for-address opinion-tree
+                                                   (assoc-cdr :tree-address (opinion-by-id iid)))))
+         (replies (remove-if-not #'wf/ipfs::has-excerpt-p
+                                 (mapcar #'opinion-by-id (mapcar #'car optree))))
+         (replies (if (equal key starting-key)
+                      replies (remove-if-not #'wf/ipfs::opinion-applies-to-title replies)))
+         (title nil))
+    (when (not iid)
+      (add-root-title-info warstats rooturl))
+    (if (equal key starting-key)
+        (progn
+          (setf title (gethash :initial-title warstats))
+          (setf (gethash :title-source warstats) :initial))
+        (progn
+          (setf title (prep-alternate-text key))
+          (setf (gethash :title-source warstats) key)))
+    (setf (gethash :title warstats) title)
+    (when (not-empty title)
+      (multiple-value-bind (segpoints segopins) (excerpt-segment-points replies (length title))
+        (when segpoints
+          (setf (gethash :title-segments warstats) segpoints)
+          (setf (gethash :title-flavors warstats)
+                (mapcar (lambda (x) (apply #'flavor-from-warstats x)) segopins)))))))
+
+

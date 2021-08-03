@@ -159,19 +159,19 @@
         (cond
           ((significant (gethash :controversy warstats) (gethash :effect warstats))
            (incf controv (gethash :controversy warstats)))
-          ((eql "pro" (gethash :direction warstats))
+          ((eql :pro (gethash :direction warstats))
            (incf positive (gethash :effect warstats)))
-          ((eql "con" (gethash :direction warstats))
+          ((eql :con (gethash :direction warstats))
            (incf negative (gethash :effect warstats)))))
       (let ((top (max controv positive negative)))
         (cond
-          ((> 0.5 top) "neutral")
-          ((significant controv top) "contested")
+          ((> 0.5 top) :neutral)
+          ((significant controv top) :contested)
           ((eql top positive)
            (if (significant negative positive)
-               "contested"
-               "positive"))
+               :contested
+               :positive))
           ((eql top negative)
            (if (significant positive negative)
-               "contested"
-               "negative")))))))
+               :contested
+               :negative)))))))

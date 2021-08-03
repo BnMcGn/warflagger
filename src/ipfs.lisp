@@ -51,19 +51,6 @@
                 (cl-utilities:collect k)
                 (cl-utilities:collect v))))))))
 
-(defun save-warstat-sets (location key warstats text title)
-  (ipfs:with-files-write (s (strcat location "warstats.data") :create t :truncate t)
-    (if-let ((data (gethash key warstats)))
-      (princ (serialize-warstat (hu:hash->plist data)) s)
-      (warn "Missing warstats!")))
-  ;;FIXME: text and title will be wanting some addition
-  (ipfs:with-files-write (s (strcat location "text.data") :create t :truncate t)
-    (when-let ((data (gethash key text)))
-      (print (hu:hash->plist data) s)))
-  (ipfs:with-files-write (s (strcat location "title.data") :create t :truncate t)
-    (when-let ((data (gethash key title)))
-      (print (hu:hash->plist data) s))))
-
 (defun add-author-to-opinion (opinion)
   (if (assoc-cdr :author opinion)
       opinion
@@ -84,8 +71,7 @@
          (rootpath (strcat "/rooturls/" (quri:url-encode rooturl) "/")))
     (hu:with-keys (:opinion-store :opinion-tree :score-script :rooturl)
         (hu:plist->hash (wf/ipfs:objective-data-for-opinions opinions))
-      (multiple-value-bind (warstats text title)
-          (warflagger:execute-score-script score-script rooturl opinion-store)
+      (let ((results (warflagger:execute-score-script score-script rooturl opinion-store)))
         ;;Rooturl stuff
         (ipfs-ensure-directory-exists rootpath)
         (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t :truncate t)
@@ -94,13 +80,26 @@
           (print score-script s))
         (ipfs:with-files-write (s (strcat rootpath "references.data") :create t :truncate t)
           (print (list :references references) s))
-        (save-warstat-sets rootpath rooturl warstats text title)
+        (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
+          (print (serialize-warstat
+                  (hu:hash->plist
+                   (warflagger::warstats-from-scsc-results (gethash rooturl results)))) s))
+        (ipfs:with-files-write (s (strcat rootpath "text.data") :create t :truncate t)
+          (print (warflagger::text-info-from-scsc-results results rooturl) s))
+        (ipfs:with-files-write (s (strcat rootpath "title.data") :create t :truncate t)
+          (print (warflagger::title-info-from-scsc-results results opinion-tree :rooturl rooturl) s))
         ;;FIXME: Handle incoming references
         ;;Opinion stuff
         (gadgets:do-hash-table (iid opinion opinion-store)
           ;;FIXME: optimize the writings!
           (save-extended-opinion opinion :overwrite t)
-          (save-warstat-sets (strcat "/opinions/" iid "/") iid warstats text title))))))
+          (let ((oppath (strcat "/opinions/" iid "/")))
+            (ipfs:with-files-write (s (strcat oppath "warstats.data") :create t :truncate t)
+              (print (serialize-warstat
+                      (hu:hash->plist
+                       (warflagger::warstats-from-scsc-results (gethash iid results)))) s))
+            (ipfs:with-files-write (s (strcat oppath "title.data") :create t :truncate t)
+              (print (warflagger::title-info-from-scsc-results results opinion-tree :iid iid) s))))))))
 
 ;;FIXME: This is ignorant. We are going to clear out everything. Probably wrong, but let's find out
 (defun reset-pins ()
