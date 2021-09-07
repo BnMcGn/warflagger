@@ -25,6 +25,7 @@
                #:reacl
                #:lack-middleware-mount
                #:clath
+               #:claxy
                #:userfig)
   :serial t
   :components ((:module 

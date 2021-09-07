@@ -120,9 +120,11 @@
 
 (defun excerpt-segment-points (opset end)
   "Find all the indices where excerpts start or stop. End is the length of the text. Assumes extended opinions that have text-position set. Second value is a matched list of lists of iids that target the identified segments."
+  (print "in excerpt-segment-points")
   (let* ((stor (hu:collecting-hash-table (:mode :append)
                  (dolist (opin opset)
                    (let ((tpos (assoc-cdr :text-position opin)))
+                     (print tpos)
                      (hu:collect (car tpos) nil)
                      (hu:collect (+ (car tpos) (second tpos)) (assoc-cdr :iid opin))))
                  (hu:collect 0 nil)

@@ -178,15 +178,16 @@
        (opinion-target-same-author-p opinion)))
 
 (defun opinion-has-dirc (opinion dirc)
-  (let ((dircs (getf opinion :directives)))
-    (first-match (lambda (x) (eq (car x) dirc)) dircs)))
+  (let ((dircs (assoc :directives opinion)))
+    (when dircs
+      (first-match (lambda (x) (eq (car x) dirc)) (cdr dircs)))))
 
 (defun opinion-applies-to-text (opinion)
   ;;FIXME: We aren't handling the Correction flag yet
   (some (curry #'opinion-has-dirc) '(:target-text :suggest-target-text)))
 
 (defun opinion-applies-to-title (opinion)
-  (some (curry #'opinion-has-dirc) '(:target-title :suggest-target-title)))
+  (some (curry #'opinion-has-dirc opinion) '(:target-title :suggest-target-title)))
 
 (defun opinion-suggests-t/t (opinion)
   (let ((dircs))))
@@ -334,12 +335,13 @@
         (progn
           (setf (gethash :text warstats) (prep-alternate-text key))
           (setf (gethash :text-source warstats) key)))
+    (remhash :initial-text warstats)
     warstats))
 
 (defun add-root-title-info (stor url)
   (hu:with-keys (:title :status :message) (wf/text-extract:text-server url)
     (hu:collecting-hash-table (:existing stor :mode :replace)
-      (hu:collect :initial-text (and (not-empty title) title))
+      (hu:collect :initial-title (and (not-empty title) title))
       (hu:collect :initial-status status)
       (hu:collect :initial-message (and (not-empty message) message)))))
 
@@ -365,7 +367,7 @@
          (replies (remove-if-not #'wf/ipfs::has-excerpt-p
                                  (mapcar #'opinion-by-id (mapcar #'car optree))))
          (replies (if (equal key starting-key)
-                      replies (remove-if-not #'wf/ipfs::opinion-applies-to-title replies)))
+                      (remove-if-not #'wf/ipfs::opinion-applies-to-title replies) replies))
          (title nil))
     (when (not iid)
       (add-root-title-info warstats rooturl))
@@ -377,11 +379,13 @@
           (setf title (prep-alternate-text key))
           (setf (gethash :title-source warstats) key)))
     (setf (gethash :title warstats) title)
-    (when (not-empty title)
+    (remhash :initial-title warstats)
+    (when (and replies (not-empty title))
       (multiple-value-bind (segpoints segopins) (excerpt-segment-points replies (length title))
         (when segpoints
           (setf (gethash :title-segments warstats) segpoints)
           (setf (gethash :title-flavors warstats)
-                (mapcar (lambda (x) (apply #'flavor-from-warstats x)) segopins)))))))
+                (mapcar (lambda (x) (apply #'flavor-from-warstats x)) segopins)))))
+    warstats))
 
 

@@ -160,6 +160,7 @@
                               (warflagger:js-compatible-utcstamp param))
                  (setf tree-freshness param))
                (setf tree-freshness param)))
+          ;;FIXME: t/t replies should be distinguished!
           (:replies
            (incf replies-immediate)
            (incf replies-total (1+ param)))
