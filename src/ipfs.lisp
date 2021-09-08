@@ -77,15 +77,20 @@
                             (iid opin opinion-store)
                           (when (warflagger:reference-opinion-p opin)
                             (cl-utilities:collect iid)))))
-          (rootpath (strcat "/rooturls/" (quri:url-encode rooturl) "/")))
+          ;;Because IPFS daemon unescapes the escaped url in the path. Since we are doing a one-
+          ;; way transform of the rooturl for id purposes only, this shouldn't harm.
+          (rootpath (strcat "/rooturls/" (substitute #\* #\% (quri:url-encode rooturl)) "/")))
       ;;Rooturl stuff
       (ipfs-ensure-directory-exists rootpath)
       (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t :truncate t)
         (print opinion-tree s))
       (ipfs:with-files-write (s (strcat rootpath "score-script.data") :create t :truncate t)
-        (print score-script s))
+        (let ((*package* (find-package :warflagger)))
+          (warflagger:with-inverted-case
+            (print score-script s))))
       (ipfs:with-files-write (s (strcat rootpath "references.data") :create t :truncate t)
-        (print (list :references references) s))
+        (warflagger:with-inverted-case
+          (print (list :references references) s)))
       (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
         (princ (serialize-warstat
                 (hu:hash->plist
@@ -106,11 +111,11 @@
         (save-extended-opinion opinion :overwrite t)
         (let ((oppath (strcat "/opinions/" iid "/")))
           (ipfs:with-files-write (s (strcat oppath "warstats.data") :create t :truncate t)
-            (print (serialize-warstat
+            (princ (serialize-warstat
                     (hu:hash->plist
                      (warflagger::warstats-from-scsc-results (gethash iid results)))) s))
           (ipfs:with-files-write (s (strcat oppath "title.data") :create t :truncate t)
-            (print (serialize-warstat
+            (princ (serialize-warstat
                     (alexandria:hash-table-plist
                      (warflagger::title-info-from-scsc-results results opinion-tree :iid iid)))
                    s)))))))

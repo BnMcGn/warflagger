@@ -131,7 +131,7 @@
         (other-flag nil)
         (post-other-flag t)
         (other-flags (make-hash-table))
-        (direction nil)
+        (direction :neutral)
         (alternatives nil)
         (delayed-procedures nil)
         (enabled t))
