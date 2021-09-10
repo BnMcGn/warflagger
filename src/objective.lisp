@@ -56,7 +56,7 @@
       (let* ((iid (assoc :iid op))
              (iid (if iid
                       (cdr iid)
-                      (error "Iid not found"))))
+                      (error "IID not found"))))
         (cl-utilities:collect iid)
         (cl-utilities:collect op)))))
 
@@ -278,7 +278,7 @@
                              :other-flags) result
     (let ((warstat (initialize-warstats))
           (ballot-box (or bbox ballot-box)))
-      (warflagger:apply-ballot-box-to-warstats ballot-box warstat)
+      (warflagger:apply-ballot-box-to-warstats! ballot-box warstat)
       (setf (gethash :tree-freshness warstat) tree-freshness)
       (incf (gethash :replies-immediate warstat) replies-immediate)
       (incf (gethash :replies-total warstat) replies-total)

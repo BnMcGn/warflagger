@@ -160,7 +160,7 @@
     ;;FIXME: Should this have a multiplier? Should it be a ratio?
     (values effect balance score)))
 
-(defun apply-ballot-box-to-warstats (balbox warstats)
+(defun apply-ballot-box-to-warstats! (balbox warstats)
   (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
     (setf (gethash :x-right warstats) right)
     (setf (gethash :x-up warstats) up)
