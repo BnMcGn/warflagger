@@ -389,24 +389,25 @@
 (defun run-test-server ()
   (clack-server-manager
    *handler*
-   (clack-pretend:pretend-builder
-       (:insert 0)
-       (clack.middleware.clsql:<clack-middleware-clsql>
-        :database-type :postgresql-socket3
-        :connection-spec *test-db-connect-spec*)
-       (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
-       (clack.middleware.static:<clack-middleware-static>
-        :path "/static/"
-        :root #p"~/quicklisp/local-projects/wf-static/")
-       :session
-       (claxy:middleware (list (list "/ipfs/" "http://localhost:8080/ipfs/")
-                               (list "/ipns/" "http://localhost:8080/ipns/")))
-       (claxy:middleware (list (list "/x/" "https://warflagger.net/")))
-       (clath:component
-        "https://logintest.warflagger.com:5000/")
-       (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-       ;;(snooze:make-clack-middleware)
-       *app*)
+   (terminate-thread-on-broken-pipe
+     (clack-pretend:pretend-builder
+        (:insert 0)
+        (clack.middleware.clsql:<clack-middleware-clsql>
+         :database-type :postgresql-socket3
+         :connection-spec *test-db-connect-spec*)
+        (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
+        (clack.middleware.static:<clack-middleware-static>
+         :path "/static/"
+         :root #p"~/quicklisp/local-projects/wf-static/")
+        :session
+        (claxy:middleware (list (list "/ipfs/" "http://localhost:8080/ipfs/")
+                                (list "/ipns/" "http://localhost:8080/ipns/")))
+        (claxy:middleware (list (list "/x/" "https://warflagger.net/")))
+        (clath:component
+         "https://logintest.warflagger.com:5000/")
+        (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+        ;;(snooze:make-clack-middleware)
+        *app*))
    :port 5000
    :ssl t
    :ssl-key-file wf/local-settings:*ssl-key-file*
@@ -417,23 +418,24 @@
   ;; Because we aren't running the block below on live server
   (clsql:connect wf/local-settings:*db-connect-spec*
                  :database-type wf/local-settings:*db-connect-type* :if-exists :old)
-  (clack-server-manager
-   *handler*
-   (clack-pretend:pretend-builder
-       (:insert 0 :errors-only t
-        :logfile "/var/log/warflagger.requests")
-    (:backtrace
-     :output #p"/var/log/warflagger.err"
-     :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
-    (clack.middleware.clsql:<clack-middleware-clsql>
-     :database-type :postgresql-socket3
-     :connection-spec *db-connect-spec*)
-    :session
-    (clath:component
-     *base-url*)
-    (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-    *app*)
-   :port 5005)
+  (terminate-thread-on-broken-pipe
+    (clack-server-manager
+    *handler*
+    (clack-pretend:pretend-builder
+        (:insert 0 :errors-only t
+         :logfile "/var/log/warflagger.requests")
+        (:backtrace
+         :output #p"/var/log/warflagger.err"
+         :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
+        (clack.middleware.clsql:<clack-middleware-clsql>
+         :database-type :postgresql-socket3
+         :connection-spec *db-connect-spec*)
+        :session
+        (clath:component
+         *base-url*)
+        (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
+        *app*)
+    :port 5005))
   (bordeaux-threads:join-thread
    (find-if
     (lambda (th)

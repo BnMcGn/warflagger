@@ -107,7 +107,7 @@
    #:known-flags
    #:make-ballot-box
    #:ballot-box-empty-p
-   #:apply-ballot-box-to-warstats
+   #:apply-ballot-box-to-warstats!
    #:ballot-box-totals
    #:score-vast-majority-p
    #:score-controversy

@@ -30,4 +30,5 @@
   (:shadowing-import-from #:anaphora #:it)
   (:export
    #:write-grouped-data-file
-   #:dump-static-grouped-suggestions))
+   #:dump-static-grouped-suggestions
+   #:terminate-thread-on-broken-pipe))

@@ -59,3 +59,16 @@ Analytics\"></a></div></noscript>
   (when wf/local-settings:*test-user-name*
     (when-let ((user (get-user-by-screenname wf/local-settings:*test-user-name*)))
       (userfig:remove-user user))))
+
+(defmacro terminate-thread-on-broken-pipe (&body body)
+  "The live server eventually clogs with hunchentoot-worker threads. These seem to be wedged by
+sb-int:broken-pipe conditions. This macro should fix the problem when wrapped around the startup code."
+  ;;Because we might not be on sbcl
+  (if-let ((sym (and (find-package 'sb-int)
+                     (find-symbol "BROKEN-PIPE" (find-package 'sb-int)))))
+    `(handler-case
+         (progn ,@body)
+       ;;Terminate the thread
+       (,sym () (invoke-restart abort)))
+    `(progn ,@body)))
+
