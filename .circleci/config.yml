@@ -3,7 +3,7 @@ version: 2
 jobs:
   sbcl:
     docker:
-      - image: bnmcgn/warflagger-test:0.0.2
+      - image: bnmcgn/warflagger-test:0.0.3
         environment:
         - POSTGRES_USER=circleci
         - POSTGRES_PASSWORD=password

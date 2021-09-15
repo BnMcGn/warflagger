@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
-FROM circleci/python:3.6.9-stretch
 FROM circleci/postgres:9.6.18
 # RUN apk add --no-cache python g++ make
 WORKDIR /container
 # RUN echo "export PATH=$HOME/.roswell/bin:$PATH" >> $BASH_ENV
 RUN apt update
+RUN apt install -y python3 python3-pip || true
 RUN apt install -y postgresql-client || true
 RUN apt install libpq-dev
 RUN apt install -y curl || true
