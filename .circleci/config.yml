@@ -2,12 +2,8 @@ version: 2
 
 jobs:
   sbcl:
-    #machine:
-    #  image: ubuntu-1604:201903-01
     docker:
-      #- image: circleci/buildpack-deps:stretch-curl
-      - image: circleci/python:3.6.9-stretch
-      - image: circleci/postgres:9.6.18
+      - image: bnmcgn/warflagger-test:0.0.1
         environment:
         - POSTGRES_USER=circleci
         - POSTGRES_PASSWORD=password
@@ -24,7 +20,6 @@ jobs:
             echo "export PATH=$HOME/.roswell/bin:$PATH" >> $BASH_ENV
 
       - run: echo $LISP
-      - run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | bash
 
       - run:
           command: |
@@ -55,8 +50,6 @@ jobs:
             pip install --user readability-lxml
 
       - run: sudo apt update
-      - run: sudo apt install -y postgresql-client || true
-      - run: sudo apt install libpq-dev
 
       - run:
           name: Waiting for Postgres to be ready
