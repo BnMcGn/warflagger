@@ -3,7 +3,7 @@ version: 2
 jobs:
   sbcl:
     docker:
-      - image: bnmcgn/warflagger-test:0.0.3
+      - image: bnmcgn/warflagger-test:0.0.4
         environment:
         - POSTGRES_USER=circleci
         - POSTGRES_PASSWORD=password
@@ -44,8 +44,8 @@ jobs:
 
       - run:
           command: |
-            pip3 install --user https://github.com/clips/pattern/wiki/media/pattern-2.7.zip
-            pip3 install --user beautifulsoup4
+            pip3 install --user pattern
+           pip3 install --user beautifulsoup4
             pip3 install --user PyPDF2
             pip3 install --user readability-lxml
 
