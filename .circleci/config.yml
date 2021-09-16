@@ -44,10 +44,10 @@ jobs:
 
       - run:
           command: |
-            pip install --user pattern
-            pip install --user beautifulsoup4
-            pip install --user PyPDF2
-            pip install --user readability-lxml
+            pip3 install --user pattern
+            pip3 install --user beautifulsoup4
+            pip3 install --user PyPDF2
+            pip3 install --user readability-lxml
 
       - run: sudo apt update
 
