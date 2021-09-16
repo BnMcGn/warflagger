@@ -44,7 +44,6 @@ jobs:
 
       - run:
           command: |
-#            pip3 install --user pattern
             pip3 install --user https://github.com/clips/pattern/wiki/media/pattern-2.7.zip
             pip3 install --user beautifulsoup4
             pip3 install --user PyPDF2
