@@ -42,14 +42,19 @@ jobs:
 
             cp src/local-settings-template.lisp src/local-settings.lisp
 
+
       - run:
           command: |
-            pip3 install --user pattern
-            pip3 install --user beautifulsoup4
-            pip3 install --user PyPDF2
-            pip3 install --user readability-lxml
+            sudo apt update
+            sudo apt install python3-pip
 
-      - run: sudo apt update
+
+      - run:
+          command: |
+            pip install --user pattern
+            pip install --user beautifulsoup4
+            pip install --user PyPDF2
+            pip install --user readability-lxml
 
       - run:
           name: Waiting for Postgres to be ready

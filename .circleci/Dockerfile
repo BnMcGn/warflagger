@@ -4,7 +4,8 @@ FROM cimg/postgres:9.6.22
 WORKDIR /container
 # RUN echo "export PATH=$HOME/.roswell/bin:$PATH" >> $BASH_ENV
 RUN apt update
-RUN apt install -y python3 python3-pip || true
+RUN apt install -y python3 || true
+RUN apt install -y python-pip || true
 RUN apt install -y postgresql-client || true
 RUN apt install libpq-dev
 RUN apt install -y curl || true
