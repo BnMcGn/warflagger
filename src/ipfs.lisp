@@ -155,3 +155,6 @@
                        (let ((hash (ignore-errors (assoc-cdr "Hash" item :test #'equal))))
                          (cl-utilities:collect (proc hash)))))))))
       (proc hash))))
+
+(clerk:job "update ipns" every 12.hours (update-ipns))
+(clerk:start)
