@@ -41,6 +41,7 @@ jobs:
             git clone https://github.com/bnmcgn/reacl.git quicklisp/local-projects/reacl
             git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
             git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
+            git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
 
             cp src/local-settings-template.lisp src/local-settings.lisp
 
