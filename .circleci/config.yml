@@ -3,7 +3,9 @@ version: 2
 jobs:
   sbcl:
     docker:
-      - image: bnmcgn/warflagger-test:0.0.4
+      - image: bnmcgn/warflagger-test:0.0.6
+      - image: ipfs/go-ipfs:v0.10.0-rc1
+      - image: cimg/postgres:9.6.22
         environment:
         - POSTGRES_USER=circleci
         - POSTGRES_PASSWORD=password
@@ -14,10 +16,10 @@ jobs:
     steps:
       - checkout
       # This is the only way CircleCI allows setting environmental variables accross steps
-      - run:
-          name: Setup Environment Variables
-          command: |
-            echo "export PATH=$HOME/.roswell/bin:$PATH" >> $BASH_ENV
+      #- run:
+          #name: Setup Environment Variables
+          #command: |
+          #  echo "export PATH=$HOME/.roswell/bin:$PATH" >> $BASH_ENV
 
       - run: echo $LISP
 
@@ -42,15 +44,6 @@ jobs:
 
             cp src/local-settings-template.lisp src/local-settings.lisp
 
-
-      - run:
-          command: |
-            sudo apt update
-            sudo apt install python3-pip
-            sudo apt install -y postgresql-client || true
-            sudo apt install libpq-dev
-
-
       - run:
           command: |
             pip install --user pattern
@@ -69,6 +62,8 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
 
+      - run: sbcl --script /tmp/quicklisp.lisp
+
       - run:
           command: |
             psql -h 127.0.0.1 -d 'test_opinions' -c "create user ben with password 'test_password';"
@@ -77,12 +72,17 @@ jobs:
             psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
             psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
 
-      - run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
-      - run: ros install ci-utils
-      - run: ros install prove # for run-prove
+      #- run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
+      #- run: ros install ci-utils
+      #- run: ros install prove # for run-prove
 
-      - run: run-prove test-warflagger.asd
- 
+      - run:
+          command: |
+            sbcl --no-sysinit --disable-debugger --end-top-level-options \
+            --eval "(progn
+                     (if (ql:quickload 'test-warflagger)
+                         (uiop:quit)
+                         (uiop:quit 1)))"
 
 workflows:
   version: 2

@@ -1,22 +1,28 @@
 # syntax=docker/dockerfile:1
-FROM cimg/postgres:9.6.22
-# RUN apk add --no-cache python g++ make
+FROM cimg/python:3.8.12
+#FROM cimg/postgres:9.6.22
+
 WORKDIR /container
 # RUN echo "export PATH=$HOME/.roswell/bin:$PATH" >> $BASH_ENV
-RUN apt update
-RUN apt install -y python3 || true
-RUN apt install -y python-pip || true
-RUN apt install -y postgresql-client || true
-RUN apt install libpq-dev
-RUN apt install -y curl || true
+USER root
+RUN apt update && \
+    apt install -y postgresql-client || true && \
+    apt install libpq-dev
 
-#RUN apt install -y git tar gzip ssh ca-certificates || true
+# Install dependencies from Debian repositories
+RUN apt update && apt install -y make wget bzip2 && apt-get clean
 
-RUN curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | bash
-RUN curl https://dist.ipfs.io/go-ipfs/v0.9.1/go-ipfs_v0.9.1_linux-amd64.tar.gz > go-ipfs.tar.gz
-RUN tar xzvf go-ipfs.tar.gz
-RUN go-ipfs/install.sh
+# Install SBCL from the tarball binaries.
+RUN wget http://prdownloads.sourceforge.net/sbcl/sbcl-2.1.8-x86-64-linux-binary.tar.bz2 -O /tmp/sbcl.tar.bz2 && \
+    mkdir /tmp/sbcl && \
+    tar jxvf /tmp/sbcl.tar.bz2 --strip-components=1 -C /tmp/sbcl/ && \
+    cd /tmp/sbcl && \
+    sh install.sh && \
+    cd /tmp && \
+    rm -rf /tmp/sbcl/ && \
+    rm /tmp/sbcl.tar.bz2 && \
+    curl -O https://beta.quicklisp.org/quicklisp.lisp -o /tmp/quicklisp.lisp
 
+USER circleci
 COPY . .
-# RUN yarn install --production
 # CMD ["node", "src/index.js"]
