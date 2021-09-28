@@ -24,7 +24,9 @@
                #:simple-rgb
                #:lquery
                #:cl-ipfs-api2
-               #:access)
+               #:access
+               #:clerk
+               #:3bmd)
   :serial t
   :components ((:module 
 		 :src
