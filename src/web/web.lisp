@@ -453,4 +453,6 @@
    ;;FIXME: we don't have write permission on production, so update through git instead.
    ;; This isn't quite the best way to do things.
    (write-warflagger-js-resources))
+  (unless-production
+   (clerk:start))
   (if-production (run-production-server) (run-test-server)))

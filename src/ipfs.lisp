@@ -157,4 +157,3 @@
       (proc hash))))
 
 (clerk:job "update ipns" every 12.hours (update-ipns))
-(clerk:start)

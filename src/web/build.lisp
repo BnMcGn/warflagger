@@ -9,7 +9,8 @@
 
 (defun main ()
   (swank:create-server :port 4004 :dont-close t)
-  (wf/web::run-production-server))
+  (wf/web::run-production-server)
+  (clerk:start))
 
 (sb-ext:save-lisp-and-die
  "wf-server.new" :toplevel #'main :executable t)
