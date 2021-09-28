@@ -158,14 +158,12 @@
 (defun ipfs-data-hash (data)
   (declare (type string data))
   (assoc-cdr
-      :*hash
-      (cl-json:decode-json-from-string
-       (nth-value
-        1
-        (uiop:with-temporary-file (:pathname p :direction :output :stream s)
-          (write data :stream s)
-          (close s)
-          (ipfs:add p :pin nil :only-hash t :cid-version 1))))))
+      "Hash"
+      (uiop:with-temporary-file (:pathname p :direction :output :stream s)
+        (write data :stream s)
+        (close s)
+        (ipfs:add p :pin nil :only-hash t :cid-version 1))
+      :test #'equal))
 
 (defun save-opinion-to-folder (opinion folder)
   (let* ((author (unless (assoc-cdr :author opinion)
