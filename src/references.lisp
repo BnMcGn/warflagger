@@ -113,6 +113,34 @@
   (mapcar (lambda (x) (cons (%absolutify url (car x)) (cdr x)))
           (%extract-links-from-target url)))
 
+(defun %join-text-nodes (tn)
+  (apply #'concatenate 'string (remove-if-not #'stringp tn)))
+
+(defun extract-links-from-markdown (file-or-string)
+  (let* ((res (3bmd-grammar:parse-doc (if (pathnamep file-or-string)
+                                          (read-file-into-string file-or-string)
+                                          file-or-string)))
+         (refs (make-hash-table :test #'equal))
+         (links (cl-utilities:collecting
+                  (proto:dotree (itm res)
+                    (when (listp itm)
+                      (case (car itm)
+                        (:explicit-link
+                         (cl-utilities:collect
+                             (lambda ()
+                               (list (gadgets:fetch-keyword :source itm)
+                                     (%join-text-nodes (gadgets:fetch-keyword :label itm))))))
+                        (:reference-link
+                         (cl-utilities:collect
+                             (lambda ()
+                               (list (gethash (gadgets:fetch-keyword :definition itm) refs)
+                                     (%join-text-nodes (gadgets:fetch-keyword :label itm))))))
+                        (:reference
+                         (setf
+                          (gethash (car (gadgets:fetch-keyword :label itm)) refs)
+                          (gadgets:fetch-keyword :source itm)))))))))
+    (mapcar #'funcall links)))
+
 (defun reference-redundant-p (ref1 ref2)
   "Ref1 is the existing reference. Ref2 is the addition being considered. Will treat as redundant either if the excerpt (second itm) matches or if ref2 doesn't have an excerpt."
   (and (equal (car ref1) (car ref2))
