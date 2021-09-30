@@ -180,9 +180,7 @@
          (id (insert-opinion opinion authorid))
          (opinion (opinion-by-id id)))
     (when (functionp post)
-      ;;(funcall post opinion)
-      (launch-task post opinion)
-      )
+      (launch-task post opinion))
     opinion))
 
 (defparameter *kernel* nil)

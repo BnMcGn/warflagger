@@ -135,6 +135,20 @@
      (mapcar #'car stor)
      (mapcar (lambda (x) (remove-if #'null (cdr x))) stor))))
 
+(defun clean-string-for-excerpt (str)
+  (coerce
+   (cl-utilities:collecting
+     (let ((last-was-white nil))
+       (dotimes (i (length str))
+         (if (member (elt str i) *whitespace-characters*)
+             (unless last-was-white
+               (setf last-was-white t)
+               (cl-utilities:collect #\ ))
+             (progn
+               (setf last-was-white nil)
+               (cl-utilities:collect (elt str i)))))))
+   'string))
+
 ;;Borrowed from flaglib
 ;; Placed here because it is somewhat related to excerpts. Might not be right spot.
 

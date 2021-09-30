@@ -450,14 +450,14 @@ the page text can be found in the cache."
      :where (sql-and (sql-= (colm 'type) "wf_user")
                      (sql-= (colm 'id) userid)))))
 
-
+;;FIXME: Obsolete. Can probably remove.
 (defun save-opinion-from-user (opinion authorid
                                &key (opinurl #'make-opinion-url))
   "Opinions need to be set up with some stuff."
   (unless (listp opinion)
     (error "Opinion needs to be an alist"))
   (let* ((id (next-val "opinion_id_seq"))
-         (url (funcall opinurl authorid id)))
+         (url (funcall opinurl id)))
     (insert-opinion
      (cons (cons :url url) opinion)
      authorid
