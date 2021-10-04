@@ -162,6 +162,16 @@
 ;;   - needs access to all applicable backends
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;FIXME: Vote-value will probably go away, at least as an opinion form field.
+(defun default-votevalue (flag-pair)
+  (destructuring-bind (cat flag) flag-pair
+    (if (equal flag "Evidence")
+        (cond
+          ((equal cat "Positive") 1)
+          ((equal cat "Negative") -1)
+          (t (error "Invalid evidence flag category")))
+        (getf *default-vote* flag))))
+
 (defun is-author-initialized (author)
   (get-local-user-id author))
 
@@ -172,6 +182,9 @@
   (let* ((authorid (or authorid (get-local-user-id local-author)))
          (author-url (make-author-url authorid))
          (datestamp (clsql:get-time))
+         (votevalue (or (assoc-cdr :votevalue opinion)
+                         (default-votevalue (assoc-cdr :flag opinion))))
+         (opinion (cons (cons :votevalue votevalue) opinion))
          (strop (serialize-opinion opinion :author author-url :created datestamp))
          (iid (ipfs-data-hash strop))
          (opinion (cons (cons :iid iid) opinion))

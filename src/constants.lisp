@@ -47,8 +47,7 @@ problem in your comment."
      :needs-evidence
      "Any time that a vague claim has been made, such as \"Studies indicate...\".
 This is your way of saying \"Put up or shut up\" to an opponent. It is a way
-to challenge unquestioned assumptions. Note that the VoteValue field of this
-flag can be used to change it's level of hostility. Using a negative value indicates that an opponent's point will not be allowed to stand without further evidence. It says, \"There's no way that I am going to believe you until I have seen your sources and gone over them with a fine tooth comb\". Placing a zero in this field, on the other hand, indicates a polite request for more information."
+to challenge unquestioned assumptions."
 
      :evidence
      "You are presenting evidence that rebuts an item or provides an answer to a NeedsEvidence flag."
@@ -56,11 +55,7 @@ flag can be used to change it's level of hostility. Using a negative value indic
      :raise-question
      "When you feel that a point has not been covered. For example, when a reporter
 has failed to explore the background and associations of a source. When an
-angle that would derail an argument has been avoided. With the VoteValue set to
-neutral (0) this flag can indicate simple curiousity; this can be the voice of
-the child asking \"Why?\" or a launch into \"I wonder if...\" type of speculation.
-Applied to research articles it is a way to denote areas of possible future
-exploration."
+angle that would derail an argument has been avoided."
 
      :out-of-bounds
      "Meant to restrain some of the worst of online forum behavior. Specifically, when you see someone post immediately damaging information, this is a request for its prompt removal. For example, when someone has posted another person's home address, or is using the forum to directly organize a physical attack. This flag is for serious situations only. If you don't understand it, don't use it.")
@@ -78,7 +73,7 @@ exploration."
      "Even more generic approval: Use this for things that are a matter of taste more than a matter of fact or opinion."
 
      :interesting
-     "Use this when you wish to indicate that something is worth noting, even if you aren't ready to agree with it. Interesting flags used with a negative vote value will still raise the profile of a target. It can be used to point out negative examples."
+     "Use this when you wish to indicate that something is worth noting, even if you aren't ready to agree with it."
 
      :evidence
      "You are presenting evidence that supports an item.")
@@ -102,7 +97,7 @@ the purpose of this flag. It is meant for innocuous changes. Subversive use may
 result in the censure of the community!"
 
      :incorrect-flag
-     "Use this when someone has misused a flag or votevalue, and has evidently done
+     "Use this when someone has misused a flag, and has evidently done
 so out of ignorance. This warns reader systems to ignore comments that might
 throw the discussion tree out of whack."
 
