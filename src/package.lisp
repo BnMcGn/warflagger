@@ -138,5 +138,6 @@
    #:compare-ballot-boxes
    #:rank-ballot-boxes
    #:excerpt-segment-points
-   #:flavor-from-warstats))
+   #:flavor-from-warstats
+   #:clean-string-for-excerpt))
 
