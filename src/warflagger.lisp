@@ -170,7 +170,7 @@
           ((equal cat :positive) 1)
           ((equal cat :negative) -1)
           (t (error "Invalid evidence flag category")))
-        (getf *default-vote* flag))))
+        (getf *default-vote* flag 0))))
 
 (defun is-author-initialized (author)
   (get-local-user-id author))
