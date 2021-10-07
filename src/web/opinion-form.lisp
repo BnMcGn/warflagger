@@ -81,9 +81,9 @@
       (when sig
         (unless (is-author-initialized (get-user-name))
           (apply #'initialize-author (create-author-spec-from-current-user)))
-        (setf (gethash :flag values)
-              (multiple-value-bind (cat flag) (split-sequence-on-subseq ": " (gethash :flag values))
-                (list cat flag)))
+        (gadgets:hashval! (val :flag values)
+          (warflagger::flag-to-lisp
+           (apply #'gadgets:strcat (split-sequence:split-sequence #\: val))))
         (save-opinion (hu:hash->alist values) (get-user-name) :post #'after-save-opinion))
       (list 200 '(:content-type "text/json")
             (list (webhax-validate:batch-response-json values sig))))))

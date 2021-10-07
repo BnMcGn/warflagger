@@ -165,10 +165,10 @@
 ;;FIXME: Vote-value will probably go away, at least as an opinion form field.
 (defun default-votevalue (flag-pair)
   (destructuring-bind (cat flag) flag-pair
-    (if (equal flag "Evidence")
+    (if (equal flag :evidence)
         (cond
-          ((equal cat "Positive") 1)
-          ((equal cat "Negative") -1)
+          ((equal cat :positive) 1)
+          ((equal cat :negative) -1)
           (t (error "Invalid evidence flag category")))
         (getf *default-vote* flag))))
 
