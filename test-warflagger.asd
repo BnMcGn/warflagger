@@ -7,7 +7,7 @@
   :depends-on (#:warflagger
                #:alexandria
                #:gadgets
-               #:prove
+               #:fiveam
                #:liql
                #:wf-web
                #:ci-utils) 
@@ -19,7 +19,9 @@
                                      (:file "db-test")
 				     (:file "services-test")
                                      (:file "form-validator-test")
-                                     (:file "tests")))))
+                                     (:file "tests"))))
+  :perform (test-op (o s)
+            (uiop:symbol-call :fiveam :run! 'test-warflagger:test-warflagger)))
 
 
 

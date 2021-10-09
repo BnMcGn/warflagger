@@ -47,5 +47,6 @@
                               (:file "author-stats")
                               (:file "score-script")
                               (:file "ipfs")
-                              (:file "summarizer")))))
+                              (:file "summarizer"))))
+  :in-order-to ((test-op (test-op "test-warflagger"))))
 
