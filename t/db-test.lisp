@@ -92,6 +92,6 @@
 (test delete-opinions "Delete opinions"
   (delete-opinion *opin1id*)
   (delete-opinion *opin2id*)
-  (is-error (opinion-by-id *opin1id*) 'simple-error)
-  (is-error (opinion-by-id *opin2id*) 'simple-error))
+  (signals simple-error (opinion-by-id *opin1id*))
+  (signals simple-error (opinion-by-id *opin2id*)))
 

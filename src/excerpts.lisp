@@ -41,7 +41,7 @@
 (defparameter *excerpt-pre-context* 50)
 (defparameter *excerpt-post-context* 50)
 
-(defun excerpt-context (text start length &key (pre *excerpt-pre-context*)
+(defun excerpt-context-old (text start length &key (pre *excerpt-pre-context*)
                                             (post *excerpt-post-context*))
   (list
    (subseq text (if (< start pre) 0 (- start pre)) start)

@@ -6,6 +6,9 @@
 
 (in-suite wf-tests)
 
+(defmacro is-values (expr vals)
+  `(is (equal (values-list ,expr) ,vals)))
+
 (defun test-warflagger ()
   (let* ((tmpdir (homedir-relative-pathname "tmp/"))
          (*cache-path* (merge-pathnames "cache/" tmpdir))

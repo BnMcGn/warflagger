@@ -22,7 +22,7 @@
 (test basic-input
   (multiple-value-bind (vals sig)
       (webhax-validate:validate-batch *test-input* wf/web::*opinion-form-specs*)
-    (is sig)
+    (is (identity sig))
     (is (integerp (gethash :votevalue vals))))
   (multiple-value-bind (vals sig)
       (webhax-validate:validate-batch
@@ -30,7 +30,7 @@
               (cons :excerpt-offset "1.5") *test-input*)
        wf/web::*opinion-form-specs*)
     (is (null sig))
-    (is 3 (length (hash-table-keys vals)))
+    (is (eql 3 (length (hash-table-keys vals))))
     (is (key-in-hash? :votevalue vals))
     (is (key-in-hash? :excerpt-offset vals))
     (is (key-in-hash? :target vals))

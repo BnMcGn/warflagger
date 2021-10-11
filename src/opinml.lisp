@@ -170,7 +170,7 @@
                    (make-author-url (assoc-cdr :author-id opinion))))
          (datestamp (unless (assoc-cdr :datestamp opinion)
                       (get-universal-time)))
-         (strop (serialize-opinion opinion :author author :datestamp datestamp))
+         (strop (serialize-opinion opinion :author author :created datestamp))
          (iid (ipfs-data-hash strop)))
     (alexandria:write-string-into-file strop (make-pathname :directory folder :name iid))))
 
@@ -444,7 +444,7 @@
   - refs found
   - directives found
   - indicate if only directives were found "
-  (let* ((counter (dos-to-unix comment))
+  (let* ((comment (dos-to-unix comment))
          (counter 0)
          (tracker (lambda (&optional (advance 0))
                     (prog1 (subseq comment counter)
