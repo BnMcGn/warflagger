@@ -77,8 +77,10 @@
     (is (gethash :text (opinion-text-server *ourl*)) *testcomment*)
     (is (gethash :text (opinion-text-server (assoc-cdr :url (opinion-by-id *opin2id*)))) "")
     (is (caar (opinion-tree-for-target *ourl*)) *opin2id*))
-  (is-values (get-target-id-from-url *target*) (list *rootid* :rooturl))
-  (is-values (get-target-id-from-url *ourl*) (list *opin1id* :opinion)))
+  (is (eql *rootid* (get-target-id-from-url *target*)))
+  (is (eql :rooturl (nth-value 1 (get-target-id-from-url *target*)))))
+  ;;FIXME: No longer returns an integer id. Should be an iid
+  ;;(is (equal (values-list (get-target-id-from-url *ourl*)) (list *opin1id* :opinion))))
 
 (test opinion-tree "Opinion tree checks"
   (let* ((tree (opinion-tree-for-rooturl *target*))

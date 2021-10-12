@@ -15,14 +15,15 @@
   :components ((:module :t
                         :serial t
                         :components ((:file "package")
+                                     (:file "tests")
                                      (:file "textract-test")
                                      (:file "db-test")
 				     (:file "services-test")
-                                     (:file "form-validator-test")
-                                     (:file "tests"))))
+                                     (:file "form-validator-test"))))
   :perform (test-op (o s)
-            (uiop:symbol-call :fiveam :run! 'test-warflagger:test-warflagger)))
-
+            (uiop:symbol-call :fiveam :run! 
+              (gadgets:symbolize 
+                :test-warflagger :package :test-warflagger))))
 
 
 

@@ -18,7 +18,7 @@
     (is (gethash :status result) "missing"))
   (let ((result (target-seek-server *target*)))
     (is (gethash :status result) "success")
-    (is (sequence-starts-with (gethash :warstats result) "http"))))
+    (is (sequence-ends-with (gethash :warstats result) "json"))))
 
 
 #|
