@@ -81,8 +81,9 @@ jobs:
           command: |
             sbcl --no-sysinit --disable-debugger --end-top-level-options \
             --eval "(progn
-                     (if (ql:quickload 'test-warflagger)
-                         (uiop:quit)
+                     (ql:quickload 'test-warflagger)
+                     (if (print (test-warflagger:test-warflagger))
+                         (uiop:quit 0)
                          (uiop:quit 1)))"
 
 workflows:

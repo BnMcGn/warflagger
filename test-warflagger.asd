@@ -22,8 +22,7 @@
                                      (:file "form-validator-test"))))
   :perform (test-op (o s)
             (uiop:symbol-call :fiveam :run! 
-              (gadgets:symbolize 
-                :test-warflagger :package :test-warflagger))))
+              (intern "TEST-WARFLAGGER" (find-package :test-warflagger)))))
 
 
 
