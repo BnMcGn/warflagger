@@ -63,7 +63,6 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
 
-      - run: sbcl --script /tmp/quicklisp.lisp
 
       - run:
           command: |
@@ -73,18 +72,19 @@ jobs:
             psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
             psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
 
+      - run: sbcl --disable-debugger --script src/ci-loader.lisp
+
       #- run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
       #- run: ros install ci-utils
       #- run: ros install prove # for run-prove
-
-      - run:
-          command: |
-            sbcl --no-sysinit --disable-debugger --end-top-level-options \
-            --eval "(progn
-                     (ql:quickload 'test-warflagger)
-                     (if (print (test-warflagger:test-warflagger))
-                         (uiop:quit 0)
-                         (uiop:quit 1)))"
+      #- run:
+      #    command: |
+      #      sbcl --no-sysinit --disable-debugger --end-top-level-options \
+      #      --eval "(progn
+      #               (ql:quickload 'test-warflagger)
+      #               (if (print (test-warflagger:test-warflagger))
+      #                   (uiop:quit 0)
+      #                   (uiop:quit 1)))"
 
 workflows:
   version: 2
