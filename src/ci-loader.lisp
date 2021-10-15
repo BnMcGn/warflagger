@@ -1,5 +1,4 @@
-(load "/tmp/quicklisp.lisp")
-(quicklisp-quickstart:install)
+(load "~/quicklisp/setup.lisp")
 
 (ql:register-local-projects)
 

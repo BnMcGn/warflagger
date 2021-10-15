@@ -52,6 +52,7 @@ jobs:
 
       - run:
           command: |
+            cd ~
             git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
             git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
             git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
@@ -69,7 +70,7 @@ jobs:
             git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
             git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
-
+            sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (quicklisp-quickstart:install))"
             cp src/local-settings-template.lisp src/local-settings.lisp
             cd ~/project
             sbcl --disable-debugger --script src/ci-loader.lisp
