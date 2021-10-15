@@ -71,6 +71,7 @@ jobs:
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
 
             cp src/local-settings-template.lisp src/local-settings.lisp
+            cp project/quicklisp/local-projects quicklisp/
             sbcl --disable-debugger --script src/ci-loader.lisp
 
       #- run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
