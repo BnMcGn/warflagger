@@ -25,28 +25,6 @@ jobs:
 
       - run:
           command: |
-            git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
-            git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
-            git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
-            git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
-            git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
-            git clone https://github.com/bnmcgn/proto.git quicklisp/local-projects/proto
-            git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
-            git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
-            git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
-            git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
-            git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
-            git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
-            git clone https://github.com/bnmcgn/ps-lib-tool.git quicklisp/local-projects/ps-lib-tool
-            git clone https://github.com/bnmcgn/reacl.git quicklisp/local-projects/reacl
-            git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
-            git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
-            git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
-
-            cp src/local-settings-template.lisp src/local-settings.lisp
-
-      - run:
-          command: |
             pip install --user pattern
             pip install --user beautifulsoup4
             pip install --user PyPDF2
@@ -72,7 +50,28 @@ jobs:
             psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
             psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
 
-      - run: sbcl --disable-debugger --script src/ci-loader.lisp
+      - run:
+          command: |
+            git clone https://github.com/bnmcgn/cl-react quicklisp/local-projects/cl-react
+            git clone https://github.com/bnmcgn/clack-pretend.git quicklisp/local-projects/clack-pretend
+            git clone https://github.com/bnmcgn/clath.git quicklisp/local-projects/clath
+            git clone https://github.com/bnmcgn/cljwt.git quicklisp/local-projects/cljwt
+            git clone https://github.com/bnmcgn/gadgets.git quicklisp/local-projects/gadgets
+            git clone https://github.com/bnmcgn/proto.git quicklisp/local-projects/proto
+            git clone https://github.com/bnmcgn/ps-gadgets.git quicklisp/local-projects/ps-gadgets
+            git clone https://github.com/bnmcgn/sql-stuff.git quicklisp/local-projects/sql-stuff
+            git clone https://github.com/bnmcgn/thing-lister.git quicklisp/local-projects/thing-lister
+            git clone https://github.com/bnmcgn/userfig.git quicklisp/local-projects/userfig
+            git clone https://github.com/bnmcgn/webhax.git quicklisp/local-projects/webhax
+            git clone https://github.com/bnmcgn/liql.git quicklisp/local-projects/liql
+            git clone https://github.com/bnmcgn/ps-lib-tool.git quicklisp/local-projects/ps-lib-tool
+            git clone https://github.com/bnmcgn/reacl.git quicklisp/local-projects/reacl
+            git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
+            git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
+            git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
+
+            cp src/local-settings-template.lisp src/local-settings.lisp
+            sbcl --disable-debugger --script src/ci-loader.lisp
 
       #- run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
       #- run: ros install ci-utils
