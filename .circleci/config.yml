@@ -70,7 +70,7 @@ jobs:
             git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
             git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
-            sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (in-package :quicklisp-quickstart) (install))"
+            sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (uiop:symbol-call :quicklisp-quickstart :install))"
             cp src/local-settings-template.lisp src/local-settings.lisp
             cd ~/project
             sbcl --disable-debugger --script src/ci-loader.lisp
