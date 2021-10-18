@@ -302,6 +302,13 @@
       (error "File not found"))
     (uiop:copy-file filename dest)))
 
+(defun supply-title (text &key url number)
+  (unless (or url number)
+    (error "Need a target :url or :number"))
+  (let* ((url (if url url (car (gethash number *bynum*))))
+         (dest (title-loc url)))
+    (write-string-into-file text dest :if-exists :overwrite :if-does-not-exist :create)))
+
 (defun failures-by-number ()
   (sort (mapcar (alexandria:rcurry #'gethash *byurl*)
                 (remove-if (lambda (x)
