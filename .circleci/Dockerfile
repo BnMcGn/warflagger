@@ -21,7 +21,8 @@ RUN wget http://prdownloads.sourceforge.net/sbcl/sbcl-2.1.8-x86-64-linux-binary.
     cd /tmp && \
     rm -rf /tmp/sbcl/ && \
     rm /tmp/sbcl.tar.bz2 && \
-    curl -O https://beta.quicklisp.org/quicklisp.lisp -o /tmp/quicklisp.lisp
+    curl -O https://beta.quicklisp.org/quicklisp.lisp -o /tmp/quicklisp.lisp && \
+    echo "(require \"asdf\")" > /etc/sbclrc
 
 USER circleci
 COPY . .

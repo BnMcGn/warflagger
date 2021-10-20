@@ -3,7 +3,7 @@ version: 2
 jobs:
   sbcl:
     docker:
-      - image: bnmcgn/warflagger-test:0.0.6
+      - image: bnmcgn/warflagger-test:0.0.7
       - image: ipfs/go-ipfs:v0.10.0-rc1
       - image: cimg/postgres:9.6.22
         environment:
