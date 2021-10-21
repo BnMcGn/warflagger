@@ -71,8 +71,8 @@ jobs:
             git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
             sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (uiop:symbol-call :quicklisp-quickstart :install))"
-            cp src/local-settings-template.lisp src/local-settings.lisp
             cd ~/project
+            cp src/local-settings-template.lisp src/local-settings.lisp
             sbcl --disable-debugger --script src/ci-loader.lisp
 
       #- run: ros install warflagger # Because quicklisp on SBCL on CircleCI doesn't install smoothly 
