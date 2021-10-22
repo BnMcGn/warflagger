@@ -392,11 +392,9 @@
    (terminate-thread-on-broken-pipe
      (clack-pretend:pretend-builder
         (:insert 0)
-        (clack.middleware.clsql:<clack-middleware-clsql>
-         :database-type :postgresql-socket3
-         :connection-spec *test-db-connect-spec*)
+        (clsql-middleware :postgresql-socket3 *test-db-connect-spec*)
         (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
-        (clack.middleware.static:<clack-middleware-static>
+        (:static
          :path "/static/"
          :root #p"~/quicklisp/local-projects/wf-static/")
         :session
@@ -427,9 +425,7 @@
         (:backtrace
          :output #p"/var/log/warflagger.err"
          :result-on-error `(500 (:content-type "text/plain") ("Internal Server Error")))
-        (clack.middleware.clsql:<clack-middleware-clsql>
-         :database-type :postgresql-socket3
-         :connection-spec *db-connect-spec*)
+        (clsql-middleware :postgresql-socket3 *db-connect-spec*)
         :session
         (clath:component
          *base-url*)

@@ -72,3 +72,11 @@ sb-int:broken-pipe conditions. This macro should fix the problem when wrapped ar
        (,sym () (invoke-restart abort)))
     `(progn ,@body)))
 
+(defun clsql-middleware (dbtype connspec)
+  (lambda (app)
+    (lambda (env)
+      (let* ((conn (clsql:connect connspec :database-type dbtype :if-exists :new :make-default nil))
+             (clsql:*default-database* conn))
+        (unwind-protect
+             (funcall app env)
+          (clsql:disconnect :database conn))))))

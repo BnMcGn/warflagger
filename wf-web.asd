@@ -6,7 +6,6 @@
   :license "Apache License, version 2.0"
   :depends-on (#:webhax
                #:clack
-               #:clack-middleware-clsql
                #:ningle
                #:clack-pretend
                #:gadgets
