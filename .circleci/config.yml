@@ -72,7 +72,7 @@ jobs:
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
             git clone https://github.com/bnmcgn/warflagger.git quicklisp/local-projects/warflagger
             sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (uiop:symbol-call :quicklisp-quickstart :install))"
-            cd ~/project
+            cd ~/quicklisp/local-projects/warflagger/
             cp src/local-settings-template.lisp src/local-settings.lisp
             sbcl --disable-debugger --script src/ci-loader.lisp
 
