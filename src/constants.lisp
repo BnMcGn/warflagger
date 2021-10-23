@@ -149,7 +149,7 @@ throw the discussion tree out of whack."
 
 (defparameter *default-vote*
   (list :spam -1 :inflammatory -1 :disagree -1 :dislike -1 :language-warning -1 :disturbing -1
-        :already-answered -1 :logical-fallacy -1 :needs-evidence -1 :raise-question 0
+        :already-answered -1 :logical-fallacy -1 :needs-evidence -1 :raise-question -1
         :out-of-bounds -1 :funny 1 :agree 1 :like 1 :interesting 1 :eye-witness 0
         :am-qualified 0 :second-hand 0 :anecdotal 0 :evidence 0 :disclosure -1 :redundant -1
         :out-of-date -1 :retraction -1 :correction -1 :incorrect-flag -1 :flag-abuse -1
