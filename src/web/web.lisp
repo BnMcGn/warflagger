@@ -86,6 +86,7 @@
 ;;FIXME: react, react-dom should be loaded from the npm bundle.
 (define-default-parts warflagger-base
   :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"
+  :@javascript-link "/static/javascript/local.js"
   :@javascript-link "/static/javascript/warflagger-bundle.js"
   :@javascript (ps:ps
                  (setf -react (require "react"))

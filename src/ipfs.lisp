@@ -134,7 +134,7 @@
          (roothash (assoc-cdr "Hash" stat :test #'equal))
          ;;FIXME: IPNS is dog slow. Can we do without it?
          (namestat (ipfs:name-publish (strcat "/ipfs/" roothash))))
-    (assoc-cdr "Name" namestat)))
+    (assoc-cdr "Name" namestat :test #'equal)))
 
 (defun files-directories (&optional (root "/"))
   "Get a tree of the directories in the files repository. Each directory is represented by its hash."
