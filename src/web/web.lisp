@@ -226,6 +226,7 @@
                 :child target-root)))))
 
 
+  ;;FIXME: redirect if url found
   (setf (ningle:route *app* "/new-target/")
         (quick-page
             ()

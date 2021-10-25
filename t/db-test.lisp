@@ -92,8 +92,8 @@
   (is (null (rooturl-p *ourl*))))
 
 (test delete-opinions "Delete opinions"
-  (delete-opinion *opin1id*)
+  ;(delete-opinion *opin1id*)
   (delete-opinion *opin2id*)
-  (signals simple-error (opinion-by-id *opin1id*))
+  ;(signals simple-error (opinion-by-id *opin1id*))
   (signals simple-error (opinion-by-id *opin2id*)))
 
