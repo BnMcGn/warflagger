@@ -278,6 +278,27 @@
                 (declare (ignore c))
                 (webhax-core:web-fail-404))))))
 
+  (setf (ningle:route *app* "/o2/*")
+        (quick-page
+            ()
+          (bind-validated-input
+              ((iid :string))
+            (handler-case
+                (let* ((opin (opinion-by-id iid))
+                       (rooturl (assoc-cdr :rooturl opin)))
+                  (mount-component (target-iloader)
+                    ;;:url (lisp rooturl)
+                    :rooturl (lisp rooturl)
+                    :title (lisp (grab-title rooturl))
+                    :looks (lisp (when (authenticated?)
+                                   (ps-gadgets:as-ps-data
+                                    (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
+                    :focus (lisp (list* 'list (wf/ipfs::tree-address opin)))
+                    :username (lisp (webhax-user:get-user-name))
+                    :child opinion-page))
+              (warflagger:not-found (c)
+                (declare (ignore c))
+                (webhax-core:web-fail-404))))))
 
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
