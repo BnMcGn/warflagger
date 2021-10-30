@@ -207,3 +207,14 @@
     (unless *channel*
       (setf *channel* (lparallel:make-channel)))
     (lparallel:submit-task *channel* (lambda () (funcall func param)))))
+
+
+;;FIXME: Move this to admin package
+
+(defun all-worker-threads ()
+  (remove-if-not
+   (lambda (x)
+     (search "hunchentoot-worker-" (bt:thread-name x)))
+   (bt:all-threads)))
+
+
