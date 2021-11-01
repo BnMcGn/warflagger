@@ -130,7 +130,10 @@
           (list (access opinion :iid))
           (let ((tiid (warflagger::get-ipfs-hash-from-url (access opinion :target))))
             (if (warflagger:iid-p tiid)
-                (append (tree-address (access opinion-store tiid) opinion-store)
+                (append (tree-address (if opinion-store
+                                          (access opinion-store tiid)
+                                          (warflagger:opinion-by-id tiid))
+                                      opinion-store)
                         (list (access opinion :iid)))
                 (error "Target must be root or iid"))))))
 
