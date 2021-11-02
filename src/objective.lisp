@@ -17,7 +17,8 @@
    #:opinion-references
    #:opinion-can-apply-dircs-to-parent
    #:objective-data-for-opinions
-   #:ipfs-write-rooturl-data))
+   #:ipfs-write-rooturl-data
+   #:unknown-flag))
 
 (in-package :wf/ipfs)
 
@@ -226,7 +227,7 @@
          (flag (assoc-cdr :flag opinion))
          (flag (if (warflagger:recognized-flag-p flag)
                    (symb (car flag) '- (second flag))
-                   'unknown-flag)))
+                   'warflagger:unknown-flag)))
     (list flag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion))))
 
 (defun process-scsc-node (iid opinion-store children)

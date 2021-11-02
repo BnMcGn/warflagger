@@ -563,6 +563,16 @@
   (save-flag)
   (post-flag))
 
+(defflag scsc::unknown-flag
+  ;;FIXME: not sure the next two lines are the best approach. Review.
+  (set-other-flag :unknown)
+  (dont-flag)
+  (set-tree-freshness (get-opinion-created))
+  (post-error "Unknown flag")
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
 ;;FIXME: only one of these should be used at a time. Add a check. Or prime position?
 (defun scsc::target-text (&key iid author)
   (declare (ignore author iid))

@@ -139,5 +139,6 @@
    #:rank-ballot-boxes
    #:excerpt-segment-points
    #:flavor-from-warstats
-   #:clean-string-for-excerpt))
+   #:clean-string-for-excerpt
+   #:unknown-flag))
 

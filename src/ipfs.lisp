@@ -120,6 +120,11 @@
                      (warflagger::title-info-from-scsc-results results opinion-tree :iid iid)))
                    s)))))))
 
+(defun ipfs-write-all-rooturl-data ()
+  (dolist (rurl (warflagger:all-rooturls))
+    (ipfs-write-rooturl-data rurl))
+  (update-ipns))
+
 ;;FIXME: This is ignorant. We are going to clear out everything. Probably wrong, but let's find out
 (defun reset-pins ()
   (dolist (pin (ipfs:pin-ls :type "recursive"))
