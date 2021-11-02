@@ -44,6 +44,27 @@
            (opins< (gethash :id c))
            (headlines< url) (warstats< url)))))))
 
+;;Will replace gather-grouped-data-requirements
+(defun gather-grouped-id-requirements (components)
+  (cl-utilities:with-collectors (opins< roots<)
+    (dolist (c components)
+      (case (gethash :rowtype c)
+        (:rooturl
+         (roots< (gethash :url c))
+         (when (gethash :refparent c)
+           (opins< (assoc-cdr :iid (opinion-by-id (gethash :refid c))))))
+        (:reference
+         (opins< (assoc-cdr :iid (opinion-by-id (gethash :refopinid c))))
+         (if (gethash :refd-opinion-id c)
+             (let* ((ropin (opinion-by-id (gethash :refd-opinion-id c)))
+                    (rrooturl (assoc-cdr :rooturl ropin)))
+               (mapcar #'opins< (wf/ipfs::tree-address ropin))
+               (roots< rrooturl))
+             ;;FIXME: how do I know reference will be in title/warstats?
+             (roots< (gethash :reference c))))
+        (:question
+         (opins< (assoc-cdr :iid (opinion-by-id (gethash :id c)))))))))
+
 (defun format-group-component-data (opinid depth)
   (if (question-opinion-p opinid)
       (format-group-question-data opinid depth)
@@ -169,6 +190,10 @@
   (mount-component (grouped-main)
     :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
 
+(defun grouped-page2 ()
+  (mount-component (grouped-main2)
+    :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
+
 (defun prep-data-for-grouped-json (rootlist)
   (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
          (discrootids (mapcar #'get-rooturl-id discroots))
@@ -176,22 +201,26 @@
          (groups (grouped-data discrootids)))
     (multiple-value-bind (opinions warstats headlines)
         (gather-grouped-data-requirements (flatten groups))
-      (list
-       :groups groups
-       :keywords
-       (hu:alist->hash (pairlis discroots keywords))
-       :opinion-store
-       (hu:collecting-hash-table (:mode :replace)
-         (dolist (opid opinions)
-           (hu:collect opid (opinion-by-id opid :extra t))))
-       :warstats-store
-       (hu:collecting-hash-table (:mode :replace)
-         (dolist (target warstats)
-           (hu:collect target (hu:plist->hash (warstats-for-target target)))))
-       :headlines
-       (hu:collecting-hash-table (:mode :replace)
-         (dolist (target headlines)
-           (hu:collect target (get-headline-for-url target))))))))
+      (multiple-value-bind (opinion-iids rooturls)
+          (gather-grouped-id-requirements (flatten groups))
+        (list
+         :groups groups
+         :keywords
+         (hu:alist->hash (pairlis discroots keywords))
+         :opinion-store
+         (hu:collecting-hash-table (:mode :replace)
+           (dolist (opid opinions)
+             (hu:collect opid (opinion-by-id opid :extra t))))
+         :warstats-store
+         (hu:collecting-hash-table (:mode :replace)
+           (dolist (target warstats)
+             (hu:collect target (hu:plist->hash (warstats-for-target target)))))
+         :headlines
+         (hu:collecting-hash-table (:mode :replace)
+           (dolist (target headlines)
+             (hu:collect target (get-headline-for-url target))))
+         :opinions opinion-iids
+         :rooturls rooturls)))))
 
 (defun write-grouped-data-file ()
   (with-open-file (s (merge-pathnames "grouped.json" wf/local-settings:*warstats-path*)
