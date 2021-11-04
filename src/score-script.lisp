@@ -132,6 +132,7 @@
         (post-other-flag t)
         (other-flags (make-hash-table))
         (direction :neutral)
+        (direction-on-root :neutral)
         (alternatives nil)
         (delayed-procedures nil)
         (enabled t))
@@ -147,12 +148,19 @@
       (lambda (cmd param &rest params)
         (case cmd
           (:direction
-           (setf direction (or param :neutral)))
+           (let ((newdir (or param :neutral)))
+             (setf direction newdir)
+             (setf direction-on-root (if (length1 (assoc-cdr :tree-address (getf info :opinion)))
+                                         newdir
+                                         (opinion-chain-direction
+                                          (funcall parent-dispatch :info :direction-on-root)
+                                          newdir)))))
           (:info
            (case param
              (:parent parent-dispatch)
              (:enabled enabled)
              (:direction direction)
+             (:direction-on-root direction-on-root)
              (:ballot-box ballot-box)
              (:other-flag other-flag)
              (otherwise (getf info param))))
@@ -201,7 +209,8 @@
            (let ((data (hu:hash
                         (:ballot-box ballot-box) (:text-ballot-box text-ballot-box)
                         (:title-ballot-box title-ballot-box) (:tree-freshness tree-freshness)
-                        (:direction direction) (:replies-total replies-total)
+                        (:direction direction) (:direction-on-root direction-on-root)
+                        (:replies-total replies-total)
                         (:replies-immediate replies-immediate) (:other-flags other-flags)
                         (:alternatives alternatives))))
              (setf (gethash key score-script-support::*score-data*) data)))
