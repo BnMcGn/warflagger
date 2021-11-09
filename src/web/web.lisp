@@ -324,6 +324,12 @@
             (:div :class "featurebox"
                   (named-text :introduction)))))
 
+  (setf (ningle:route *app* "/user-manual/")
+        (quick-page ()
+          (html-out
+            (:div :class "featurebox"
+                  (named-text :user-manual)))))
+
   (setf (ningle:route *app* "/bookmarklet/")
         (quick-page ()
           (html-out
