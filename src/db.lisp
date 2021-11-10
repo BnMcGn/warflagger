@@ -130,6 +130,9 @@
 (defun all-rooturls ()
   (get-column (tabl 'rooturl) (colm 'rooturl)))
 
+(defun all-proper-references ()
+  (get-column (tabl 'reference) (colm 'reference)))
+
 (defun get-rooturl-for-url (url)
   "Tries to find the url at the root of a tree of comments. The primary value will always be a guess at the url. The second value tells whether get-rooturl is sure of its result. Get-rooturl does not do network lookups. The rooturl must exist in the database as a rooturl."
   (declare (type string url))
