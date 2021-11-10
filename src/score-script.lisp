@@ -112,7 +112,7 @@
 (defun execute-score-script (scsc rooturl opinion-store)
   (declare (type score-script scsc))
   (let* ((warflagger:*opinion-store* opinion-store)
-         (scss:*score-data* (make-hash-table))
+         (scss:*score-data* (make-hash-table :test 'equal))
          ;; tree-address?
          (scss:*dispatch* (scsc-dispatch rooturl nil nil)))
     (mapc #'eval (prep-scsc-for-execution (scsc-safety-symbols scsc)))

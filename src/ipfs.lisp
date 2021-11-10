@@ -46,7 +46,8 @@
        (gadgets:do-window ((k v) warstat :size 2 :step 2)
          (cond ((eq :tree-freshness k)
                 (cl-utilities:collect k)
-                (cl-utilities:collect (warflagger:js-compatible-utcstamp v)))
+                ;;Warstat for empty tree has nil tree freshness
+                (cl-utilities:collect (if v (warflagger:js-compatible-utcstamp v) nil)))
                (t
                 (cl-utilities:collect k)
                 (cl-utilities:collect v))))))))
@@ -67,12 +68,19 @@
                    ;;FIXME: We will need an index opinions->rooturl for ipfs. This relies on DB.
                    (warflagger:opinion-ids-for-rooturl rooturl)))))
 
+(defun ipfs-make-rooturl-data (rooturl)
+  (let ((res (objective-data-for-rooturl rooturl)))
+    (list* :results ;;could use a better name
+           (warflagger:execute-score-script (getf res :score-script)
+                                            (or (getf res :rooturl) rooturl)
+                                            (getf res :opinion-store))
+           res)))
+
 (defun ipfs-write-rooturl-data (rooturl)
   (initialize-warstat-dirs)
-  (hu:with-keys (:opinion-store :opinion-tree :score-script :rooturl)
-      (hu:plist->hash (objective-data-for-rooturl rooturl))
-    (let ((results (warflagger:execute-score-script score-script rooturl opinion-store))
-          (references (cl-utilities:collecting
+  (hu:with-keys (:opinion-store :opinion-tree :score-script :results)
+      (hu:plist->hash (ipfs-make-rooturl-data rooturl))
+    (let ((references (cl-utilities:collecting
                         (do-hash-table
                             (iid opin opinion-store)
                           (when (warflagger:reference-opinion-p opin)
@@ -120,8 +128,11 @@
                      (warflagger::title-info-from-scsc-results results opinion-tree :iid iid)))
                    s)))))))
 
+(defun ipfs-rooturl-exists-p (rooturl)
+  (ipfs-directory-exists-p (strcat "/rooturls/" (substitute #\* #\% (quri:url-encode rooturl)))))
+
 (defun ipfs-write-all-rooturl-data ()
-  (dolist (rurl (warflagger:all-rooturls))
+  (dolist (rurl (append (warflagger:all-rooturls) (warflagger:all-proper-references)))
     (ipfs-write-rooturl-data rurl))
   (update-ipns))
 

@@ -138,6 +138,7 @@
   (list*
    :refd-opinion-warstats (request-warstats-for-url (assoc-cdr :url opinion))
    :refd-opinion-id (assoc-cdr :id opinion)
+   :refd-opinion-iid (assoc-cdr :iid opinion)
    (when-let* ((excerpt (assoc-cdr :excerpt opinion))
                (text (get-target-text (assoc-cdr :id opinion)))
                (textpos (multiple-value-list
@@ -166,6 +167,7 @@
       :tree-address ,(tree-address id)
       :refbot ,(system-generated-p id)
       :refopinid ,id
+      :refopiniid ,(assoc-cdr :iid refopin)
       :refopinurl ,(assoc-cdr :url refopin)
       :warstats ,(request-warstats-for-url refroot)
       :warstats-src-url ;;FIXME: do we use this? kind of ugly.

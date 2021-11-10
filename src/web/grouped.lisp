@@ -75,6 +75,7 @@
     (hu:plist->hash
      (list
       :id opinid
+      :iid (assoc-cdr :iid opinion)
       :rowtype :question
       :display-depth depth
       :rootid (assoc-cdr :rooturl opinion)
@@ -94,6 +95,7 @@
           :rowtype :rooturl
           :refparent parent-rootid
           :refid refid
+          :refiid (assoc-cdr :iid refopin)
           :title (grab-title refurl)
           :looks (when (authenticated?)
                    (get-looks (get-user-name) rootid))
@@ -207,6 +209,7 @@
          :groups groups
          :keywords
          (hu:alist->hash (pairlis discroots keywords))
+         ;;FIXME: dual system. drop the stores.
          :opinion-store
          (hu:collecting-hash-table (:mode :replace)
            (dolist (opid opinions)
