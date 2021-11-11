@@ -26,7 +26,8 @@
                #:cl-ipfs-api2
                #:access
                #:clerk
-               #:3bmd)
+               #:3bmd
+               #:cl-csv)
   :serial t
   :components ((:module 
 		 :src
@@ -47,6 +48,7 @@
                               (:file "author-stats")
                               (:file "score-script")
                               (:file "ipfs")
-                              (:file "summarizer"))))
+                              (:file "summarizer")
+                              (:file "admin")))
   :in-order-to ((test-op (test-op "test-warflagger"))))
 
