@@ -127,8 +127,10 @@
 
 (eval-always
   (defun recognized-flag-p (flag)
-    (when-let ((i (first-match-index (curry #'eq (car flag)) *flag-category-keys*)))
-      (getf (nth i *flag-types-source*) (second flag)))))
+    (if-let ((i (first-match-index (curry #'eq (car flag)) *flag-category-keys*)))
+      (getf (nth i *flag-types-source*) (second flag))
+      (when (and (eq (car flag) :statements) (eq (second flag) :evidence))
+        flag))))
 
 (defun known-flags ()
   (cl-utilities:collecting
@@ -208,13 +210,5 @@
       (setf *channel* (lparallel:make-channel)))
     (lparallel:submit-task *channel* (lambda () (funcall func param)))))
 
-
-;;FIXME: Move this to admin package
-
-(defun all-worker-threads ()
-  (remove-if-not
-   (lambda (x)
-     (search "hunchentoot-worker-" (bt:thread-name x)))
-   (bt:all-threads)))
 
 

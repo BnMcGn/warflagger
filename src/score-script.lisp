@@ -7,7 +7,8 @@
 (defparameter *safe-symbols* (append warflagger::*known-directives*
                                      (mapcar (lambda (flag) (symb (car flag) '- (second flag)))
                                              (warflagger:known-flags))
-                                     (list 'unknown-flag 'hashtag 'excerpt 'reference)))
+                                     (list 'unknown-flag 'hashtag 'excerpt 'reference
+                                           'statements-evidence)))
 (defparameter *safe-keywords* '(:iid :author))
 
 (defpackage #:score-script-support
@@ -437,11 +438,13 @@
     (vote-wrong)))
 
 (defflag scsc::negative-raise-question
-  (set-other-flag :inflammatory)
+  (set-direction :con)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
-  (post-flag))
+  (post-flag)
+  (when (enabledp)
+    (vote-wrong)))
 
 (defflag scsc::negative-out-of-bounds
   (set-other-flag :out-of-bounds)
