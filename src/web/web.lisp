@@ -305,11 +305,6 @@
             ()
           (grouped-page)))
 
-  (setf (ningle:route *app* "/grouped2/*")
-        (quick-page
-            ()
-          (grouped-page2)))
-
   (setf (ningle:route *app* "/faq/")
         (quick-page ()
           (html-out
