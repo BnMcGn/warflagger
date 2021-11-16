@@ -186,35 +186,14 @@
          :content-type "application/json"))
 
   ;;FIXME: Target page needs to handle URLs that don't have a rootid yet.
+
   (setf (ningle:route *app* "/target/*")
         (quick-page
-            (
-             :@side-content
+            (:@side-content
              (lambda ()
                (bind-validated-input
                    ((id :integer))
                  (target-participants-sidebar id))))
-          (bind-validated-input
-              ((id :integer)
-               &key
-               (tmode :integer))
-            (let ((url (get-rooturl-by-id id)))
-              (mount-component (target-loader)
-                :url (lisp url)
-                :rootid (lisp id)
-                :title (lisp (grab-title url))
-                :looks (lisp (when (authenticated?)
-                               (ps-gadgets:as-ps-data
-                                (get-looks (get-user-name) id))))
-                :focus '()
-                :tmode (lisp tmode)
-                :username (lisp (webhax-user:get-user-name))
-                )))))
-
-  ;;FIXME: temporary
-  (setf (ningle:route *app* "/target2/*")
-        (quick-page
-            ()
           (bind-validated-input
               ((id :integer)
                &key
@@ -237,7 +216,6 @@
               :url (lisp url)
               :username (lisp (webhax-user:get-user-name))))))
 
-  ;;FIXME: Think about taking over the /opinion/ URL for this
   (setf (ningle:route *app* "/opinion-page/*")
         (quick-page
             ()
@@ -257,28 +235,6 @@
                 :child opinion-page)))))
 
   (setf (ningle:route *app* "/o/*")
-        (quick-page
-            ()
-          (bind-validated-input
-              ((iid :string))
-            (handler-case
-                (let* ((opin (opinion-by-id iid))
-                       (rooturl (assoc-cdr :rooturl opin)))
-                  (mount-component (target-loader)
-                    :url (lisp rooturl)
-                    :rootid (lisp (assoc-cdr :rootid opin))
-                    :title (lisp (grab-title rooturl))
-                    :looks (lisp (when (authenticated?)
-                                   (ps-gadgets:as-ps-data
-                                    (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
-                    :focus (lisp (list* 'list (tree-address (assoc-cdr :id opin))))
-                    :username (lisp (webhax-user:get-user-name))
-                    :child opinion-page))
-              (warflagger:not-found (c)
-                (declare (ignore c))
-                (webhax-core:web-fail-404))))))
-
-  (setf (ningle:route *app* "/o2/*")
         (quick-page
             ()
           (bind-validated-input
