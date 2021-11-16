@@ -252,3 +252,27 @@
            #'display-opinion-line
            (format nil "/author-replies/~a" id)
            (or index 0)))))
+
+
+;; React thing tools
+
+(defun tag-id-with-type (id type)
+  (collecting-hash-table (:test #'eq :mode :append)
+    (hu:collect :type type)
+    (hu:collect :id id)))
+
+(defun tag-as-author (func)
+  (lambda (itms)
+    (mapcar (alexandria:rcurry :author) itms)))
+
+(defun tag-as-opinion (func)
+  (lambda (itms)
+    (mapcar (alexandria:rcurry :opinion) itms)))
+
+(defun tag-as-rooturl (func)
+  (lambda (itms)
+    (mapcar (alexandria:rcurry :rooturl) itms)))
+
+(defun mount-react-thing (items)
+  (mount-component (thing-loader)
+    :things (lisp items)))
