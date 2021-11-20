@@ -27,7 +27,8 @@
                #:access
                #:clerk
                #:3bmd
-               #:cl-csv)
+               #:cl-csv
+               #:plump-sexp)
   :serial t
   :components ((:module 
 		 :src
@@ -49,6 +50,7 @@
                               (:file "score-script")
                               (:file "ipfs")
                               (:file "summarizer")
-                              (:file "admin")))
+                              (:file "admin")
+                              (:file "slicer"))))
   :in-order-to ((test-op (test-op "test-warflagger"))))
 
