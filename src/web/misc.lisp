@@ -69,7 +69,7 @@ sb-int:broken-pipe conditions. This macro should fix the problem when wrapped ar
     `(handler-case
          (progn ,@body)
        ;;Terminate the thread
-       (,sym () (invoke-restart abort)))
+       (,sym () (invoke-restart 'cl-user::abort)))
     `(progn ,@body)))
 
 (defun clsql-middleware (dbtype connspec)
