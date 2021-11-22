@@ -251,6 +251,8 @@
                                     (get-looks (get-user-name) (assoc-cdr :rootid opin)))))
                     :focus (lisp (list* 'list (wf/ipfs::tree-address opin)))
                     :username (lisp (webhax-user:get-user-name))
+                    ;;FIXME: Needed for link to root. Should eventually use url rather than id.
+                    :rootid (lisp (assoc-cdr :rootid opin))
                     :child opinion-page))
               (warflagger:not-found (c)
                 (declare (ignore c))

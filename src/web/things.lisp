@@ -95,10 +95,10 @@
             (&key
              (index :integer))
           (let ((thing-lister:*thing-summary-width* 40))
-            (thing-lister:display-things-with-pagers
-             #'recent-opinions
+            (thing-lister:display-thing-block-with-pagers
+             (tag-as-opinion #'recent-opinions)
              nil
-             #'display-opinion-line
+             #'mount-react-thing
              "/opinions-recent/"
              (or index 0))))))
 
@@ -127,10 +127,10 @@
             ((id :integer)
              &key
              (index :integer))
-          (display-things-with-pagers
-           #'target-participants
+          (display-thing-block-with-pagers
+           (tag-as-author #'target-participants)
            (list id)
-           #'display-author-line
+           #'mount-react-thing
            (format nil "/target-participants/~a" id)
            (or index 0)))))
 
@@ -163,10 +163,10 @@
             ((id :integer)
              &key
              (index :integer))
-          (display-things-with-pagers
-           #'author-opinions
+          (display-thing-block-with-pagers
+           (tag-as-opinion #'author-opinions)
            (list id)
-           #'display-opinion-line
+           #'mount-react-thing
            (format nil "/author-opinions/~a" id)
            (or index 0)))))
 
@@ -193,10 +193,10 @@
             ((id :integer)
              &key
              (index :integer))
-          (display-things-with-pagers
-           #'author-discussions
+          (display-thing-block-with-pagers
+           (tag-as-rooturl #'author-discussions)
            (list id)
-           #'display-target-line
+           #'mount-react-thing
            (format nil "/author-discussions/~a" id)
            (or index 0)))))
 
@@ -246,33 +246,58 @@
             ((id :integer)
              &key
              (index :integer))
-          (display-things-with-pagers
-           #'author-replies
+          (display-thing-block-with-pagers
+           (tag-as-opinion #'author-replies)
            (list id)
-           #'display-opinion-line
+           #'mount-react-thing
            (format nil "/author-replies/~a" id)
            (or index 0)))))
 
 
 ;; React thing tools
 
-(defun tag-id-with-type (id type)
-  (collecting-hash-table (:test #'eq :mode :append)
-    (hu:collect :type type)
-    (hu:collect :id id)))
-
 (defun tag-as-author (func)
-  (lambda (itms)
-    (mapcar (alexandria:rcurry :author) itms)))
+  (lambda (&rest params)
+    (let ((res (apply func params)))
+      (if (listp res)
+          (mapcar
+           (lambda (itm)
+             (hu:hash
+              (:type :author)
+              (:key itm)
+              ;;FIXME: what if remote?
+              (:id (author-representation-from-row (get-author-data itm)))))
+           res)
+          res))))
 
 (defun tag-as-opinion (func)
-  (lambda (itms)
-    (mapcar (alexandria:rcurry :opinion) itms)))
+  (lambda (&rest params)
+    (let ((res (apply func params)))
+      (if (listp res)
+          (mapcar
+           (lambda (itm)
+             (hu:hash
+              (:type :opinion)
+              (:key itm)
+              (:id (assoc-cdr :iid (opinion-by-id itm)))))
+           res)
+          res))))
 
 (defun tag-as-rooturl (func)
-  (lambda (itms)
-    (mapcar (alexandria:rcurry :rooturl) itms)))
+  (lambda (&rest params)
+    (let ((res (apply func params)))
+      (if (listp res)
+          (mapcar
+           (lambda (itm)
+             (hu:hash
+              (:type :rooturl)
+              (:key itm)
+              (:id (get-rooturl-by-id itm))))
+           res)
+          res))))
 
 (defun mount-react-thing (items)
   (mount-component (thing-loader)
-    :things (lisp items)))
+    :things (lisp
+             (list* 'list
+                    (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))))
