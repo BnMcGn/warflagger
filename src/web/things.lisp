@@ -114,10 +114,10 @@
       (thing-slice (flaggers-for-rooturl (get-rooturl-by-id targid)))))
 
 (defun target-participants-sidebar (id)
-  (display-things-sidebar
-   #'target-participants
+  (display-thing-block-in-sidebar
+   (tag-as-author #'target-participants)
    (list id)
-   #'display-author-line
+   #'mount-react-thing
    (format nil "/target-participants/~a" id)
    :label "Target: Participants"))
 
@@ -150,10 +150,10 @@
           (list :order-by (list (list (colm 'datestamp) :desc))))))))
 
 (defun author-opinions-sidebar (id)
-  (display-things-sidebar
-   #'author-opinions
+  (display-thing-block-in-sidebar
+   (tag-as-opinion #'author-opinions)
    (list id)
-   #'display-opinion-line
+   #'mount-react-thing
    (format nil "/author-opinions/~a" id)
    :label "Author: Opinions"))
 
@@ -180,10 +180,10 @@
        (thing-slice rslt))))
 
 (defun author-discussions-sidebar (id)
-  (display-things-sidebar
-   #'author-discussions
+  (display-thing-block-in-sidebar
+   (tag-as-rooturl #'author-discussions)
    (list id)
-   #'display-target-line
+   #'mount-react-thing
    (format nil "/author-discussions/~a" id)
    :label "Author: Discussions"))
 
@@ -236,9 +236,11 @@
                           (clsql:sql-= (colm :author) authid)))))))
     (if getcount
         (get-count query)
-        (merge-query
-         query
-         (list :order-by (list (list (colm 'datestamp) :desc)))))))
+        (mapcar
+         #'car
+         (merge-query
+          query
+          (list :order-by (list (list (colm 'datestamp) :desc))))))))
 
 (setf (ningle:route *app* "/author-replies/*")
       (quick-page ()
@@ -296,8 +298,11 @@
            res)
           res))))
 
+;;FIXME: counter doesn't seem like a healthy idea...
+(defparameter *mr-counter* 0)
+
 (defun mount-react-thing (items)
-  (mount-component (thing-loader)
+  (mount-component (thing-loader :mount-id (format nil "react-thing-~a" (incf *mr-counter*)))
     :things (lisp
              (list* 'list
                     (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))))

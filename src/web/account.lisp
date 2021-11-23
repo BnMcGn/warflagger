@@ -90,17 +90,17 @@
      nil
      :label "Recently Viewed:"
      :class "featurebox")
-    (thing-lister:display-things-sidebar
-     #'author-opinions
+    (thing-lister:display-thing-block-in-sidebar
+     (tag-as-opinion #'author-opinions)
      (list (get-local-user-id (get-user-name)))
-     #'display-opinion-line
+     #'mount-react-thing
      (format nil "/author-opinions/~a" uid)
      :label "Your Opinions:"
      :class "featurebox")
-    (thing-lister:display-things-sidebar
-     #'author-replies
+    (thing-lister:display-thing-block-in-sidebar
+     (tag-as-opinion #'author-replies)
      (list (get-local-user-id (get-user-name)))
-     #'display-opinion-line
+     #'mount-react-thing
      (format nil "/author-replies/~a" uid)
      :label "Replies to your Posts:"
      :class "featurebox")))
