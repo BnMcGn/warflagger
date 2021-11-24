@@ -89,8 +89,12 @@
             (list (webhax-validate:batch-response-json values sig))))))
 
 (defun after-save-opinion (opinion)
+  ;;FIXME: this is not working
   (save-new-references (assoc-cdr :url opinion))
+  ;;FIXME: pre-ipfs stuff that should go away
   (write-all-rootid-warstats (assoc-cdr :rootid opinion))
+  (wf/ipfs:ipfs-write-rooturl-data (assoc-cdr :rooturl opinion))
+  (wf/ipfs::update-ipns)
   (write-grouped-data-file))
 
 ;; Depends on: webhax-widgets:ps-widgets
