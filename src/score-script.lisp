@@ -324,9 +324,11 @@
 (defun get-ballot-box ()
   (funcall *dispatch* :info :ballot-box))
 
+(defun directional-p ()
+  (eq :neutral (funcall *dispatch* :info :direction)))
+
 (defun enabledp ()
-  (and (funcall *dispatch* :info :enabled)
-       (not (eq :neutral (funcall *dispatch* :info :direction)))))
+  (funcall *dispatch* :info :enabled))
 
 ;;FIXME: can't be run before post-flag, because of missing own vote
 ;;FIXME: likewise, can't be used for non other-flag for similar reasons.
@@ -334,14 +336,13 @@
 ;;FIXME: At moment, this is the only subjective thing in score-script. Do we like that?
 (defun approvedp ()
   "Essentially a vast-majority check on the current resource."
-  (and (enabledp)
-       (let ((balbox (get-ballot-box)))
-         (if (warflagger:ballot-box-empty-p balbox)
-             t
-             (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals (get-ballot-box))
-               (let ((pos (+ right up))
-                     (neg (+ wrong down)))
-                 (warflagger:score-vast-majority-p pos neg)))))))
+  (let ((balbox (get-ballot-box)))
+    (if (warflagger:ballot-box-empty-p balbox)
+        t
+        (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals (get-ballot-box))
+          (let ((pos (+ right up))
+                (neg (+ wrong down)))
+            (warflagger:score-vast-majority-p pos neg))))))
 
 (defun run-modifiers ()
   (let ((mods (funcall *dispatch* :info :modifiers)))
@@ -395,7 +396,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (vote-down)))
 
 (defflag scsc::negative-dislike
@@ -404,7 +405,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (vote-down)))
 
 (defflag scsc::negative-language-warning
@@ -434,7 +435,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (vote-wrong)))
 
 (defflag scsc::negative-raise-question
@@ -443,7 +444,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (vote-wrong)))
 
 (defflag scsc::negative-out-of-bounds
@@ -466,7 +467,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (vote-up)))
 
 (defflag scsc::positive-like
@@ -475,7 +476,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (vote-up)))
 
 (defflag scsc::positive-interesting
@@ -500,7 +501,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
       (vote-right ref))))
 
@@ -510,7 +511,7 @@
   (run-modifiers)
   (save-flag)
   (post-flag)
-  (when (enabledp)
+  (when (and (enabledp) (directional-p))
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
       (vote-wrong ref))))
 
@@ -536,7 +537,7 @@
   (when (parent-is-root-p)
       (post-error "Target is not an opinion"))
   (post-flag)
-  (when (approvedp)
+  (when (and (enabledp) (approvedp))
     (disable-parent)))
 
 (defflag scsc::custodial-offtopic
