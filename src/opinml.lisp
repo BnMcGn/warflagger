@@ -384,13 +384,16 @@
          (correct-start (member *last-char* '(#\Newline nil)))
          (correct-end (and correct-start ind
                            (or (eq (length curr) (1+ ind))
-                               (eq #\Newline (elt curr ind)))))
+                               (eq #\Newline (elt curr (1+ ind))))))
          (directive (and ind correct-start correct-end
                          (parse-directive
                           (string-trim *whitespace-characters* (subseq curr 0 (1+ ind)))))))
     (if directive
         (progn
-          (funcall input (1+ ind))
+          (funcall input (+ ind
+                            ;;consume to end of directive if end of string, else consume
+                            ;;one more to remove trailing newline
+                            (if (eq (length curr) (1+ ind)) 1 2)))
           (push directive *found-directives*)
           "")
         (progn
