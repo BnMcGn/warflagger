@@ -141,5 +141,6 @@
    #:flavor-from-warstats
    #:clean-string-for-excerpt
    #:unknown-flag
-   #:all-proper-references))
+   #:all-proper-references
+   #:*id-return-type*))
 

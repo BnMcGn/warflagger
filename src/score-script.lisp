@@ -313,7 +313,9 @@
   (funcall *dispatch* :cast-vote :wrong :reference ref))
 
 (defun add-alternative (iid)
-  (funcall *dispatch* :add-alternative iid))
+  (if-let ((parent (funcall *dispatch* :info :parent)))
+    (funcall parent :add-alternative iid)
+    (error "Shouldn't be called on root level")))
 
 (defun get-opinion ()
   (funcall *dispatch* :info :opinion))

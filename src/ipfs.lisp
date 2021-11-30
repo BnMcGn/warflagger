@@ -80,7 +80,8 @@
   (initialize-warstat-dirs)
   (hu:with-keys (:opinion-store :opinion-tree :score-script :results)
       (hu:plist->hash (ipfs-make-rooturl-data rooturl))
-    (let ((references (cl-utilities:collecting
+    (let ((warflagger:*opinion-store* opinion-store)
+          (references (cl-utilities:collecting
                         (do-hash-table
                             (iid opin opinion-store)
                           (when (warflagger:reference-opinion-p opin)
@@ -110,8 +111,7 @@
       (ipfs:with-files-write (s (strcat rootpath "title.data") :create t :truncate t)
         (princ (serialize-warstat
                 (alexandria:hash-table-plist
-                 (warflagger::title-info-from-scsc-results
-                  results opinion-tree :rooturl rooturl))) s))
+                 (warflagger::title-info-from-scsc-results results :rooturl rooturl))) s))
       ;;FIXME: Handle incoming references
       ;;Opinion stuff
       (gadgets:do-hash-table (iid opinion opinion-store)
@@ -125,7 +125,7 @@
           (ipfs:with-files-write (s (strcat oppath "title.data") :create t :truncate t)
             (princ (serialize-warstat
                     (alexandria:hash-table-plist
-                     (warflagger::title-info-from-scsc-results results opinion-tree :iid iid)))
+                     (warflagger::title-info-from-scsc-results results :iid iid)))
                    s)))))))
 
 (defun ipfs-rooturl-exists-p (rooturl)

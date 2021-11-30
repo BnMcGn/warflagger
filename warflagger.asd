@@ -28,7 +28,8 @@
                #:clerk
                #:3bmd
                #:cl-csv
-               #:plump-sexp)
+               #:plump-sexp
+               #:dexador)
   :serial t
   :components ((:module 
 		 :src

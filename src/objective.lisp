@@ -188,7 +188,7 @@
 
 (defun opinion-applies-to-text (opinion)
   ;;FIXME: We aren't handling the Correction flag yet
-  (some (curry #'opinion-has-dirc) '(:target-text :suggest-target-text)))
+  (some (curry #'opinion-has-dirc opinion) '(:target-text :suggest-target-text)))
 
 (defun opinion-applies-to-title (opinion)
   (some (curry #'opinion-has-dirc opinion) '(:target-title :suggest-target-title)))
@@ -218,9 +218,12 @@
 (defun process-hashtag (tag opinion)
   (list 'hashtag tag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion)))
 
-;;FIXME: add types/checking, including known directives check.
+;;FIXME: add types/checking
 (defun process-directive (dirc opinion)
-  (append dirc (list :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion))))
+  (if-let ((dircsym (first-match (curry #'string-equal (car dirc)) warflagger::*known-directives*)))
+    (append (cons dircsym (cdr dirc))
+            (list :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion)))
+    (error "Unknown directive")))
 
 (defun process-opinion (opinion)
   (let* ((*package* (find-package 'warflagger))
@@ -312,7 +315,7 @@
 ;;FIXME: Handle texts attached by reference
 ;;FIXME: Should some other text cleaning be done?
 (defun prep-alternate-text (iid)
-  (gethash :clean-comment (warflagger:opinion-by-id iid)))
+  (assoc-cdr :clean-comment (warflagger:opinion-by-id iid)))
 
 (defun text-info-from-scsc-results (results rooturl)
   (let* ((rootres (gethash rooturl results))
@@ -350,7 +353,7 @@
       (hu:collect :initial-status status)
       (hu:collect :initial-message (and (not-empty message) message)))))
 
-(defun title-info-from-scsc-results (results opinion-tree &key rooturl iid)
+(defun title-info-from-scsc-results (results &key rooturl iid)
   (let* ((starting-key (or iid rooturl))
          (starting-res (gethash starting-key results))
          (alts (gethash :alternatives starting-res))
@@ -365,12 +368,8 @@
                   starting-key))
          (result (gethash key results))
          (warstats (title-warstats-from-scsc-results result))
-         (optree (if (not iid)
-                     opinion-tree
-                     (wf/ipfs::subtree-for-address opinion-tree
-                                                   (assoc-cdr :tree-address (opinion-by-id iid)))))
-         (replies (remove-if-not #'wf/ipfs::has-excerpt-p
-                                 (mapcar #'opinion-by-id (mapcar #'car optree))))
+         (replies (let ((*id-return-type* :iid))
+                    (mapcar #'opinion-by-id (target-replies (get-target-url key)))))
          (replies (if (equal key starting-key)
                       (remove-if-not #'wf/ipfs::opinion-applies-to-title replies) replies))
          (title nil))

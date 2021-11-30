@@ -486,6 +486,7 @@
   (let ((data (safe-read:safe-read (make-string-input-stream (string-trim '(#\#) dstring)))))
     (when-let ((sym (first-match (curry #'string-equal (car data)) *known-directives*)))
       ;;FIXME: Should send warnings to user on fail.
+      ;;Fails should only be because of incorrect parameters.
       (tryit (apply (symbol-function sym) (cdr data))))))
 
 (defparameter *known-directives* '(vote-value target-text target-title no-cascade suggest-target-text
@@ -499,16 +500,16 @@
     (list 'vote-value value)))
 
 (defun target-text ()
-  (list 'target-text))
+  (list :target-text))
 
 (defun target-title ()
-  (list 'target-title))
+  (list :target-title))
 
 (defun suggest-target-text ()
-  (list 'suggest-target-text))
+  (list :suggest-target-text))
 
 (defun suggest-target-title ()
-  (list 'suggest-target-title))
+  (list :suggest-target-title))
 
 (defun no-cascade ()
-  (list 'no-cascade))
+  (list :no-cascade))
