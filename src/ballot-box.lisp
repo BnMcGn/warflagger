@@ -78,7 +78,7 @@
   (not (some (lambda (cat) (not-empty (gethash cat balbox)))
              '(:right :up :wrong :down))))
 
-(declaim (ftype (function (ballot-box) ballot-box) remove-extra-votes))
+(declaim (ftype (function (ballot-box) ballot-box) remove-extra-votes print-ballot-box))
 (defun remove-extra-votes (balbox)
   "Rules:
  - An author can't have more than one positive and one negative vote, except maybe in the right/wrong
@@ -149,6 +149,16 @@
       (setf (gethash 'cache balbox) totals)
       (apply #'values totals))))
 
+(defun print-ballot-box (bb)
+  (hu:with-keys
+      (:right :up :wrong :down) bb
+    (format t ":right ~a~%" right)
+    (format t ":up ~a~%" up)
+    (format t ":wrong ~a~%" wrong)
+    (format t ":down ~a~%" down)
+    (format t "~{~a~^ ~}~%" (multiple-value-list (ballot-box-totals bb))))
+  bb)
+
 (defun score-vast-majority-p (pos neg)
   (unless (>= 1 pos)
     (>= (/ 1 10) (/ neg pos))))
@@ -181,5 +191,6 @@
 
 (defun rank-ballot-boxes (boxes &key (keys (range (length boxes))))
   "Order the ballot boxes by rank."
-  (mapcar #'car
-          (sort (pairlis keys boxes) #'compare-ballot-boxes :key #'cdr)))
+  (nreverse
+   (mapcar #'car
+           (sort (pairlis keys boxes) #'compare-ballot-boxes :key #'cdr))))
