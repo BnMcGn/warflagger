@@ -14,12 +14,17 @@
         (sql-and (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))
                  (sql-= (colm 'rooturl 'rooturl) (sql-escape rurl)))))
 
+;;Other options: :iid, maybe :url
+;;Used for things that return an opinion id. Sometimes we would rather have iids or something else.
+(defvar *id-return-type* :id)
+
 (def-query opinion-ids-for-rooturl (rurl)
   (mapcar
    #'car
    (query-marker
     (merge-query
-     (select (colm 'opinion 'id))
+     (select (cond ((eq *id-return-type* :id) (colm 'opinion 'id))
+                   ((eq *id-return-type* :iid) (colm 'opinion 'iid))))
      (for-rooturl-mixin rurl)))))
 
 (def-query reference-opinion-ids-for-rooturl (rurl)
@@ -303,6 +308,11 @@ the page text can be found in the cache."
        (list :text ""
              :status "failure"
              :message "Opinion not found"))))
+
+(defun get-target-url (identifier)
+  (if (iid-p identifier)
+      (assoc-cdr :url (opinion-by-id identifier))
+      identifier))
 
 (defun get-target-id-from-url (url)
   (if-let ((id (rooturl-p url)))
