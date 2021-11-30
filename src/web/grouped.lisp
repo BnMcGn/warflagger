@@ -97,6 +97,7 @@
           :refid refid
           :refiid (assoc-cdr :iid refopin)
           :title (grab-title refurl)
+          :title-key refurl
           :looks (when (authenticated?)
                    (get-looks (get-user-name) rootid))
           :rootid rootid)
@@ -123,6 +124,7 @@
           :url url
           :rootid discrootid
           :title (grab-title url)
+          :title-key url
           :looks (when (authenticated?)
                    (get-looks (get-user-name) discrootid))))))
     (proto:dotree (opid tree :proc-leaf t :proc-branch nil)
@@ -190,10 +192,6 @@
 
 (defun grouped-page ()
   (mount-component (grouped-main)
-    :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
-
-(defun grouped-page2 ()
-  (mount-component (grouped-main2)
     :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
 
 (defun prep-data-for-grouped-json (rootlist)
