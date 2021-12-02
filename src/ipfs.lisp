@@ -36,7 +36,7 @@
      (when (and (not overwrite) (ipfs-file-exists-p file))
        (return))
      (ipfs-ensure-directory-exists dir)
-     (ipfs:with-files-write (s (strcat dir "opinion.data") :create t)
+     (ipfs:with-files-write (s (strcat dir "opinion.data") :create t :truncate t)
        (princ (warflagger:serialize-opinion opinion :extended t) s)))))
 
 (defun serialize-warstat (warstat)
