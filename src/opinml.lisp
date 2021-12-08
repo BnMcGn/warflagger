@@ -193,6 +193,7 @@
   (unless (hashtag-p hashtag)
     (error "Invalid hashtag")))
 
+;;FIXME: :datestamp -> :created ? Is this not used?
 (defparameter *safe-opinion-symbols*
   (append
    '(:target :rooturl :flag :comment :author :votevalue :reference :datestamp)
@@ -219,131 +220,6 @@
 
 (defun make-experimental-opinion-url (oiid)
   (strcat *base-url* "o/" oiid))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;FIXME: This is temporary code, until converted from db storage
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun proc-opinion (opinion newtarget)
-  (when newtarget
-    (push (cons :target newtarget) opinion))
-  (unless (assoc-cdr :author opinion)
-    (push (cons :author (make-author-url (assoc-cdr :author-id opinion))) opinion))
-  (let ((iid (ipfs-data-hash (serialize-opinion opinion))))
-    (push (cons :url (make-experimental-opinion-url iid)) opinion)
-    (push (cons :iid iid) opinion)
-    (values iid opinion)))
-
-(defparameter *id-iid* (make-hash-table))
-
-(defun old-opinion-url (url)
-  (or (search "opinion-page" url)
-      (search "things/thing/opinion" url)))
-
-(defun new-url-for-old (opinurl)
-  (unless (old-opinion-url opinurl)
-    (error "Not an opinion url!"))
-  (make-experimental-opinion-url
-   (gethash (parse-integer (last-car (split-sequence:split-sequence #\/ opinurl))) *id-iid*)))
-
-(defun replace-urls-in-comment (text)
-  (let ((res nil))
-    (dolist (url (find-urls text))
-      (when (old-opinion-url url)
-        (let* ((curr (or res text))
-               (indx (search url curr))
-               (new (new-url-for-old url)))
-          (unless indx (error "Something broken: didn't find found url!"))
-          (setf res (concatenate
-                     'string
-                     (subseq curr 0 indx)
-                     new
-                     (subseq curr (+ indx (length url))))))))
-    res))
-
-(defun set-opinion-target (id url)
-  (format t "SetTarget: ~a ~a~&" id url)
-  (update-record 'opinion id (list (cons (colm 'target) url))))
-
-(defun set-opinion-reference (id url)
-  (format t "SetReference: ~a ~a~&" id url)
-  (update-record 'reference id (list (cons (colm 'reference) url))))
-
-(defun set-opinion-url (id url)
-  (format nil "SetTarget: ~a ~a~&" id url)
-  (update-record 'opinion id (list (cons (colm 'url) url))))
-
-(defun set-opinion-comment (id comment)
-  (format t "SetComment: ~a ~a~&" id comment)
-  (update-record 'comment id (list (cons (colm 'comment) comment))))
-
-(defun set-opinion-iid (id iid)
-  (format nil "SetTarget: ~a ~a~&" id iid)
-  (update-record 'opinion id (list (cons (colm 'iid) iid))))
-
-(defun proc-db-opinion (opinion)
-  (let ((id (assoc-cdr :id opinion)))
-    (unless (equal (assoc-cdr :target opinion) (assoc-cdr :rooturl opinion))
-      (when (old-opinion-url (assoc-cdr :target opinion))
-        (let ((newtarg (new-url-for-old (assoc-cdr :target opinion))))
-         (push (cons :target newtarg) opinion)
-         (set-opinion-target id newtarg))))
-    (unless (assoc-cdr :author opinion)
-      (push (cons :author (make-author-url (assoc-cdr :author-id opinion))) opinion))
-    (when-let* ((reference (assoc-cdr :reference opinion))
-                (newref (and (old-opinion-url reference) (new-url-for-old reference))))
-      (set-opinion-reference id newref)
-      (push (cons :reference newref) opinion))
-    (when-let* ((comment (assoc-cdr :comment opinion))
-                (comment (replace-urls-in-comment comment)))
-      (push (cons :comment comment) opinion)
-      (set-opinion-comment id comment))
-    (let ((iid (ipfs-data-hash (serialize-opinion opinion))))
-      (set-opinion-url id (make-experimental-opinion-url iid))
-      (set-opinion-iid id iid)
-      (setf (gethash id *id-iid*) iid))))
-
-(defun proc-opinions-in-db ()
-  (let ((*id-iid* (make-hash-table)))
-    (dolist (opid (get-column 'opinion 'id :order-by 'id))
-      (proc-db-opinion (opinion-by-id opid)))))
-
-(defun convert-opinions-to-iids (opinions)
-  ;; need way to make target urls. Don't know if make-opinion-url is used anywhere
-  (let ((oldnew (make-hash-table :test 'equal))
-        (work opinions)
-        (stor nil)
-        (stop 0)
-        (remaining nil))
-    (loop
-      do (progn
-           (incf stop)
-           (when remaining
-             (format t "~a ~a" (length work) (length remaining))
-             (setf work remaining) (setf remaining nil))
-           (dolist (op work)
-             (cond
-               ((equal (assoc-cdr :target op) (assoc-cdr :rooturl op))
-                (multiple-value-bind (iid opinion) (proc-opinion op nil)
-                  (setf (gethash (assoc-cdr :url op) oldnew) (make-experimental-opinion-url iid))
-                  (push opinion stor)))
-                ((gethash (assoc-cdr :target op) oldnew)
-                 (multiple-value-bind (iid opinion)
-                     (proc-opinion op (gethash (assoc-cdr :target op) oldnew))
-                   (setf (gethash (assoc-cdr :url op) oldnew) (make-experimental-opinion-url iid))
-                   (push opinion stor)))
-                ((not (gethash (assoc-cdr :target op) oldnew))
-                 (push op remaining)))))
-        until (> stop 1000)
-      while remaining)
-    (values (nreverse stor) oldnew)))
-
-(defun iid-opinions-for-rooturl (rooturl)
-  (convert-opinions-to-iids (mapcar #'opinion-by-id (opinion-ids-for-rooturl rooturl))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; end temporary
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defparameter *ipfs-hash-pattern* (ppcre:create-scanner "baf[a-z0-9]{56}"))
 (defun get-ipfs-hash-from-url (string)
