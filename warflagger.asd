@@ -31,27 +31,27 @@
                #:plump-sexp
                #:dexador)
   :serial t
-  :components ((:module 
-		 :src
-		 :serial t
-		 :components ((:file "local-settings")
-                              (:file "text-extract/textract"
-                                     :depends-on ("local-settings"))
-                              (:file "package")
-                              (:file "warflagger")
-                              (:file "db")
-                              (:file "bulk-enter")
-                              (:file "references")
-                              (:file "excerpts")
-                              (:file "ranking")
-                              (:file "opinml")
-                              (:file "objective")
-                              (:file "ballot-box")
-                              (:file "author-stats")
-                              (:file "score-script")
-                              (:file "ipfs")
-                              (:file "summarizer")
-                              (:file "admin")
-                              (:file "slicer"))))
+  :components ((:module
+                :src
+                :serial t
+                :components ((:file "local-settings")
+                             (:file "text-extract/textract"
+                              :depends-on ("local-settings"))
+                             (:file "package")
+                             (:file "warflagger")
+                             (:file "db")
+                             (:file "bulk-enter")
+                             (:file "references")
+                             (:file "excerpts")
+                             (:file "ranking")
+                             (:file "opinml")
+                             (:file "objective")
+                             (:file "ballot-box")
+                             (:file "author-stats")
+                             (:file "score-script")
+                             (:file "ipfs")
+                             (:file "summarizer")
+                             (:file "admin")
+                             (:file "slicer"))))
   :in-order-to ((test-op (test-op "test-warflagger"))))
 

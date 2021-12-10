@@ -66,11 +66,11 @@
   (post (prep-opinion :flag (list :custodial :blank) comment)))
 
 ;;FIXME: always fetches original text, not updates. Also, should we do :clean-comment?
-(defun target-text (&optional target *target*)
+(defun target-text (&optional (target *target*))
   "Target is specified by url or iid, generally in the *target* var."
   (if (warflagger:iid-p target)
       (or (and *local-opinion-store*
-               (gethash target *local-opinion-store*))
+               (assoc-cdr :comment (gethash target *local-opinion-store*)))
           (error "IID target not found"))
       (gethash :text (warflagger:text-server-dispatcher target))))
 

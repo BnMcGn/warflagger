@@ -11,6 +11,8 @@
     (let* ((*cache-path* (merge-pathnames "cache/" tmpdir))
            (*warstats-path* (merge-pathnames "warstats/" tmpdir))
            (*static-path* "quicklisp/local-projects/wf-static/")
+           (wf/text-extract::*bynum* nil)
+           (wf/text-extract:*byurl* nil)
            ;;FIXME: Need better general way to handle db credentials.
            (*test-db-connect-spec*
              #+ci '("localhost" "test_opinions" "ben" "test_password")

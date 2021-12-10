@@ -232,7 +232,11 @@
     (when res
       (cdr res))))
 
-;;; Comment parser stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Comment parser
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (defun handle-hash (input)
   (let ((curr (funcall input)))
     (if (sequence-starts-with curr "#(")
