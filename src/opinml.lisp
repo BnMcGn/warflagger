@@ -172,7 +172,8 @@
                       (get-universal-time)))
          (strop (serialize-opinion opinion :author author :created datestamp))
          (iid (ipfs-data-hash strop)))
-    (alexandria:write-string-into-file strop (make-pathname :directory folder :name iid))))
+    (alexandria:write-string-into-file strop (merge-pathnames folder iid))
+    iid))
 
 (defparameter *max-comment-length* 10000) ;; Too long. Could go much closer to twitter.
 (defparameter *max-excerpt-length* 500) ;; Also too long

@@ -27,17 +27,24 @@
 (defparameter *posting-method* nil)
 (defparameter *posting-directory* nil)
 (defparameter *opinion-queue* nil)
-(defparameter *local-opinion-store* nil)
+(defparameter *alternate-base-url* nil)
 
+(defun save-to-opinion-store (key opinion)
+  (unless warflagger:*opinion-store*
+    (setf warflagger:*opinion-store* (make-hash-table :test #'equal)))
+  (setf (gethash key warflagger:*opinion-store*)
+        ;;FIXME: extend opinion?
+        opinion))
 
 (defun post (opinion) (%post opinion *posting-method*))
 (defgeneric %post (opinion posting-method))
 (defmethod %post (opinion (posting-method (eql :directory)))
   (if *posting-directory*
-      (warflagger::save-opinion-to-folder opinion *posting-directory*)
+      (save-to-opinion-store
+       (warflagger::save-opinion-to-folder opinion *posting-directory*)
+       opinion)
       (error "Can't post to directory with *posting-directory* unset")))
 ;;FIXME:: add a non-post, save in memory
-
 
 ;;Opinion makers
 
@@ -60,10 +67,15 @@
        (if target (cons :target target) (error "No target available")))
      (unless have-author
        (if author (cons :author author) (error "No author available")))
+     (cons :url
+           (let ((wf/local-settings:*base-url* (or *alternate-base-url* wf/local-settings:*base-url*)))
+             (warflagger:make-opinion-url opinion)))
+     (cons :rooturl
+           (warflagger:get-rooturl-by-id (warflagger:find/store-root-url target)))
      opinion)))
 
 (defun comment (comment)
-  (post (prep-opinion :flag (list :custodial :blank) comment)))
+  (post (prep-opinion :flag (list :custodial :blank) :comment comment)))
 
 ;;FIXME: always fetches original text, not updates. Also, should we do :clean-comment?
 (defun target-text (&optional (target *target*))
