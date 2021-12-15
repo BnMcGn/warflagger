@@ -117,7 +117,6 @@
          (hu:collect :target (assoc-cdr :target opinion))
          (hu:collect :rooturl (assoc-cdr :rooturl opinion))
          (hu:collect :flag (assoc-cdr :flag opinion))
-         (hu:collect :comment (assoc-cdr :comment opinion))
          (hu:collect :author (or author (assoc-cdr :author opinion)))
          (when-let ((comment (assoc-cdr :comment opinion)))
            (hu:collect :comment comment))
@@ -194,15 +193,19 @@
   (unless (hashtag-p hashtag)
     (error "Invalid hashtag")))
 
-;;FIXME: :datestamp -> :created ? Is this not used?
 (defparameter *safe-opinion-symbols*
   (append
-   '(:target :rooturl :flag :comment :author :votevalue :reference :datestamp)
+   '(:target :rooturl :flag :comment :author :votevalue :reference :excerpt :excerpt-offset
+     :created)
    (gadgets:ordered-unique (alexandria:flatten (warflagger:known-flags)))))
 
 (defun safe-symbol-p (namestr package)
-  (and (member namestr *safe-opinion-symbols* :test #'string-equal)
-       (eq package :keyword)))
+  (cond
+    ((eq package :keyword)
+     (member namestr *safe-opinion-symbols* :test #'string-equal))
+    ;;Allow NIL
+    ((eq package :current)
+     (string-equal namestr nil))))
 
 (defun deserialize-opinion-from-stream (stream)
   ;;FIXME: Add over all length limit
