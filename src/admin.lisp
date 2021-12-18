@@ -77,6 +77,12 @@
 (defun comment (comment)
   (post (prep-opinion :flag (list :custodial :blank) :comment comment)))
 
+(defun suggest-text (text)
+  (comment (format nil "#(suggest-target-text)~%~a" text)))
+
+(defun suggest-title (text)
+  (comment (format nil "#(suggest-target-title)~%~a" text)))
+
 ;;FIXME: always fetches original text, not updates. Also, should we do :clean-comment?
 (defun target-text (&optional (target *target*))
   "Target is specified by url or iid, generally in the *target* var."
