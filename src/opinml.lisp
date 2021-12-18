@@ -197,6 +197,7 @@
   (append
    '(:target :rooturl :flag :comment :author :votevalue :reference :excerpt :excerpt-offset
      :created)
+   '(hashtag)
    (gadgets:ordered-unique (alexandria:flatten (warflagger:known-flags)))))
 
 (defun safe-symbol-p (namestr package)

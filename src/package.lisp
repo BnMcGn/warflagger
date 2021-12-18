@@ -142,5 +142,6 @@
    #:clean-string-for-excerpt
    #:unknown-flag
    #:all-proper-references
-   #:*id-return-type*))
+   #:*id-return-type*
+   #:hashtag))
 

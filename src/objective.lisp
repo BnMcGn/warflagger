@@ -42,13 +42,17 @@
   (cl-utilities:collecting
     (dolist (fn opfilelist)
       (let ((iid (pathname-name fn))
-            (opinion (with-open-file (s fn)
-                       (warflagger:deserialize-opinion-from-stream s))))
-        (push (cons :iid iid) opinion)
-        (unless (assoc :url opinion)
-          (push (cons :url (warflagger::make-experimental-opinion-url iid)) opinion))
-        (cl-utilities:collect iid)
-        (cl-utilities:collect opinion)))))
+            (opinion
+              (with-open-file (s fn)
+                (restart-case
+                    (warflagger:deserialize-opinion-from-stream s)
+                  (skip-opinion () nil)))))
+        (when opinion
+          (push (cons :iid iid) opinion)
+          (unless (assoc :url opinion)
+            (push (cons :url (warflagger::make-experimental-opinion-url iid)) opinion))
+          (cl-utilities:collect iid)
+          (cl-utilities:collect opinion))))))
 
 (defun prep-opinions-for-extension (opinions)
   "Equivalent of load-opinion-files where opinions are already in memory."
@@ -216,7 +220,7 @@
 
 ;;FIXME: add types/checking
 (defun process-hashtag (tag opinion)
-  (list 'hashtag tag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion)))
+  (list 'warflagger:hashtag tag :iid (assoc-cdr :iid opinion) :author (assoc-cdr :author opinion)))
 
 ;;FIXME: add types/checking
 (defun process-directive (dirc opinion)
