@@ -110,7 +110,7 @@
 
 (in-package :warflagger)
 
-(defun execute-score-script (scsc rooturl opinion-store)
+(defun %execute-score-script (scsc rooturl opinion-store)
   (declare (type score-script scsc))
   (let* ((warflagger:*opinion-store* opinion-store)
          (scss:*score-data* (make-hash-table :test 'equal))
@@ -119,6 +119,12 @@
     (mapc #'eval (prep-scsc-for-execution (scsc-safety-symbols scsc)))
     (funcall scss:*dispatch* :save nil)
     scss:*score-data*))
+
+(defun execute-score-script (info-bundle &key score-script rooturl opinion-store)
+  (let ((score-script (or score-script (getf info-bundle :score-script)))
+        (rooturl (or rooturl (getf info-bundle :rooturl)))
+        (opinion-store (or opinion-store (getf info-bundle :opinion-store))))
+    (%execute-score-script score-script rooturl opinion-store)))
 
 (defun scsc-dispatch (key parent-dispatch info)
   "key is iid or rooturl"
@@ -267,7 +273,7 @@
 ;; Score-script-support is for tools that will be visible from within flags and directives
 
 (defun set-direction (direction)
-  (unless (member direction '(:pro :con))
+  (unless (member direction '(:pro :con :neutral))
     (error "Not a valid direction"))
   (funcall *dispatch* :direction direction))
 
@@ -616,12 +622,20 @@
 
 (defun scsc::vote-value (value &key iid author)
   (declare (ignore iid author))
+  ;;FIXME: should we be able to apply to same author parent?
   (if (eql value 0)
-      (set-direction :neutral)
+      ;;FIXME: Should disable?
+      (progn (set-direction :neutral) (disable))
       (post-error "#(vote-value): can only set to 0")))
 
 (defun scsc::no-cascade (&key iid author)
   (declare (ignore iid author))
   (set-direction :neutral))
+
+(defun scsc::hashtag (tag &key iid author)
+  (declare (ignore tag iid author))
+  ;;FIXME: consider setting hashtag on parent when blank-flag-p
+  ;; Some hashtags may get own functions, but this will need to be added in scsc maker.
+  )
 
 
