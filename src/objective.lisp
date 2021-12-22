@@ -18,7 +18,8 @@
    #:opinion-can-apply-dircs-to-parent
    #:objective-data-for-opinions
    #:ipfs-write-rooturl-data
-   #:unknown-flag))
+   #:unknown-flag
+   #:opinion-can-apply-hashtag-to-parent))
 
 (in-package :wf/ipfs)
 
@@ -158,7 +159,7 @@
      :identity-func (alexandria:curry #'gadgets:assoc-cdr :iid))))
 
 (defun subtree-for-address (optree treead)
-  "Returns the portion of the opinion tree below the supplied tree address, eg. all replies to it."
+  "Returns the portion of the opinion tree below the supplied tree address, ie. all replies to it."
   (labels ((proc (ot ta)
              (if ta
                  (dolist (branch ot nil)
@@ -184,6 +185,13 @@
          (not (not-empty (cdr cmt)))
          t)
        (opinion-target-same-author-p opinion)))
+
+(defun opinion-can-apply-hashtag-to-parent (opinion)
+  (let ((hashtags (assoc-cdr :hashtags opinion)))
+    (and (eq :blank (last-car (assoc :flag opinion)))
+         (length1 hashtags)
+         (eq (length (car hashtags))
+             (length (string-strip (assoc-cdr :comment opinion)))))))
 
 (defun opinion-has-dirc (opinion dirc)
   (let ((dircs (assoc :directives opinion)))

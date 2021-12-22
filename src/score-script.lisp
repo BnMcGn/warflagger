@@ -138,10 +138,12 @@
         (other-flag nil)
         (post-other-flag t)
         (other-flags (make-hash-table))
+        (hashtags (make-hash-table :test 'equal))
         (direction :neutral)
         (direction-on-root :neutral)
         (alternatives nil)
-        (delayed-procedures nil)
+        (on-post-procedures nil)
+        (on-save-procedures nil)
         (enabled t))
     (labels ((which-bb (applied-to)
                (case applied-to
@@ -206,23 +208,32 @@
            (setf other-flag param))
           (:post-other-flag
            (setf post-other-flag param))
+          (:apply-hashtag
+           (if-let ((bb (gethash (car params) hashtags)))
+             (merge-ballot-boxes! bb (second params))
+             (setf (gethash (car params) hashtags)
+                   (copy-ballot-box (second params)))))
           (:add-alternative
            (push param alternatives))
-          (:add-delayed-procedure
-           (push param delayed-procedures))
+          (:add-on-post-procedure
+           (push param on-post-procedures))
+          (:add-on-save-procedure
+           (push param on-save-procedures))
           (:disable
            (setf enabled nil))
           (:save
+           (mapcan #'funcall on-save-procedures)
            (let ((data (hu:hash
                         (:ballot-box ballot-box) (:text-ballot-box text-ballot-box)
                         (:title-ballot-box title-ballot-box) (:tree-freshness tree-freshness)
                         (:direction direction) (:direction-on-root direction-on-root)
                         (:replies-total replies-total)
                         (:replies-immediate replies-immediate) (:other-flags other-flags)
+                        (:hashtags hashtags)
                         (:alternatives alternatives))))
              (setf (gethash key score-script-support::*score-data*) data)))
           (:post
-           (mapcan #'funcall delayed-procedures)
+           (mapcan #'funcall on-post-procedures)
            (funcall parent-dispatch :replies replies-total)
            (funcall parent-dispatch :tree-freshness tree-freshness)
            (cond
@@ -318,6 +329,9 @@
 (defun vote-wrong (&optional ref)
   (funcall *dispatch* :cast-vote :wrong :reference ref))
 
+(defun apply-hashtag (tag)
+  (funcall (funcall *dispatch* :info :parent) :apply-hashtag tag))
+
 (defun add-alternative (iid)
   (if-let ((parent (funcall *dispatch* :info :parent)))
     (funcall parent :add-alternative iid)
@@ -333,7 +347,7 @@
   (funcall *dispatch* :info :ballot-box))
 
 (defun directional-p ()
-  (eq :neutral (funcall *dispatch* :info :direction)))
+  (not (eq :neutral (funcall *dispatch* :info :direction))))
 
 (defun enabledp ()
   (funcall *dispatch* :info :enabled))
@@ -358,7 +372,12 @@
       (funcall mods))))
 
 (defmacro on-post (&body body)
-  `(funcall *dispatch* :add-delayed-procedure
+  `(funcall *dispatch* :add-on-post-procedure
+            (lambda ()
+              ,@body)))
+
+(defmacro on-save (&body body)
+  `(funcall *dispatch* :add-on-save-procedure
             (lambda ()
               ,@body)))
 
@@ -634,8 +653,8 @@
 
 (defun scsc::hashtag (tag &key iid author)
   (declare (ignore tag iid author))
-  ;;FIXME: consider setting hashtag on parent when blank-flag-p
   ;; Some hashtags may get own functions, but this will need to be added in scsc maker.
-  )
+  (on-save
+    (apply-hashtag tag)))
 
 
