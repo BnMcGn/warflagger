@@ -18,6 +18,7 @@
                                      (:file "tests")
                                      (:file "textract-test")
                                      (:file "db-test")
+                                     (:file "opinml-test")
 				     (:file "services-test")
                                      (:file "form-validator-test"))))
   :perform (test-op (o s)

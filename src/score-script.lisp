@@ -209,10 +209,10 @@
           (:post-other-flag
            (setf post-other-flag param))
           (:apply-hashtag
-           (if-let ((bb (gethash (car params) hashtags)))
-             (merge-ballot-boxes! bb (second params))
-             (setf (gethash (car params) hashtags)
-                   (copy-ballot-box (second params)))))
+           (if-let ((bb (gethash param hashtags)))
+             (merge-ballot-boxes! bb (car params))
+             (setf (gethash param hashtags)
+                   (copy-ballot-box (car params)))))
           (:add-alternative
            (push param alternatives))
           (:add-on-post-procedure
@@ -330,7 +330,8 @@
   (funcall *dispatch* :cast-vote :wrong :reference ref))
 
 (defun apply-hashtag (tag)
-  (funcall (funcall *dispatch* :info :parent) :apply-hashtag tag))
+  (funcall (funcall *dispatch* :info :parent)
+           :apply-hashtag tag (funcall *dispatch* :info :ballot-box)))
 
 (defun add-alternative (iid)
   (if-let ((parent (funcall *dispatch* :info :parent)))
