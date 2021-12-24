@@ -19,7 +19,8 @@
    #:objective-data-for-opinions
    #:ipfs-write-rooturl-data
    #:unknown-flag
-   #:opinion-can-apply-hashtag-to-parent))
+   #:opinion-can-apply-hashtag-to-parent
+   #:skip-opinion))
 
 (in-package :wf/ipfs)
 
@@ -54,6 +55,10 @@
             (push (cons :url (warflagger::make-experimental-opinion-url iid)) opinion))
           (cl-utilities:collect iid)
           (cl-utilities:collect opinion))))))
+
+(defun skip-opinion (c)
+  (declare (ignore c))
+  (when-let ((restart (find-restart 'skip-opinion))) (invoke-restart restart)))
 
 (defun prep-opinions-for-extension (opinions)
   "Equivalent of load-opinion-files where opinions are already in memory."
