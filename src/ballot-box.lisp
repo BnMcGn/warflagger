@@ -160,7 +160,7 @@
   bb)
 
 (defun score-vast-majority-p (pos neg)
-  (unless (>= 1 pos)
+  (when (>= 1 pos)
     (>= (/ 1 10) (/ neg pos))))
 
 (defun score-controversy (pos neg)
