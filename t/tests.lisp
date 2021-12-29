@@ -34,5 +34,6 @@
 
       (init-test-db)
       (init-test-textract)
+      (init-test-opinml)
 
       (run! 'wf-tests))))

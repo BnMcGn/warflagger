@@ -13,6 +13,13 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 (defparameter *opinion-tree* nil)
 (defparameter *score-script* nil)
 (defparameter *subjective* nil)
+(defparameter *rooturl-text* nil)
+
+(def-suite test-opinml
+  :description "WF tests for reading opinml"
+  :in wf-tests)
+
+(in-suite test-opinml)
 
 (defun init-test-opinml ()
   (let* ((opin-path (asdf:system-relative-pathname 'warflagger "t/opinions/"))
@@ -23,5 +30,51 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (setf *opinion-store* (getf data :opinion-store))
     (setf *opinion-tree* (getf data :opinion-tree))
     (setf *score-script* (getf data :score-script))
+    (setf *rooturl-text* (wf/text-extract:grab-text *target*))
     (setf *subjective* more-data)))
+
+(test opinion-with-excerpt "Excerpt opinion"
+ (let* ((iid "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+        (opinion (gethash iid *opinion-store*))
+        (text-position (assoc-cdr :text-position opinion)))
+   (is (string-equal
+        (subseq *rooturl-text* (car text-position) (+ (car text-position) (second text-position)))
+        (assoc-cdr :excerpt opinion)))))
+
+(test score-script-results "Score script results for target"
+  (let* ((rootres (gethash *target* *subjective*))
+         (warstats (warflagger::warstats-from-scsc-results rootres))
+         (title-info (warflagger::title-info-from-scsc-results *subjective* :rooturl *target*))
+         (text-info (warflagger::text-info-from-scsc-results *subjective* *target*)))
+    (is (member "bafkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
+                (gethash :alternatives rootres)))
+    (is (member "bafkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
+                (gethash :alternatives rootres)))
+    (is (member "#Test" (alexandria:hash-table-keys (gethash :hashtags rootres))))
+    (is (typep (gethash :tree-freshness rootres) 'local-time:timestamp))
+    (is (< 0 (nth-value 1 (warflagger:ballot-box-totals (gethash :ballot-box rootres)))))
+    (is (< 0 (nth-value 3 (warflagger:ballot-box-totals (gethash :title-ballot-box rootres)))))
+    (is (member "#Test" (gethash :hashtags warstats)))
+    (is (equal "Saample Web Pge" (gethash :title title-info)))
+    (is (equal "bafkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
+               (gethash :title-source title-info)))
+    (is (equal "This is the secret real text of the page" (gethash :text text-info)))
+    (is (equal "bafkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
+               (gethash :text-source text-info)))))
+
+(test opinion-with-bad-excerpt "Excerpt not found"
+  (let* ((iid "bafkreihv55u2tcj2m7dcxlr4twcqhhkafix56mrlfermuwz4tizsw7x7zy")
+         (opinion (gethash iid *opinion-store*)))
+    (is (assoc-cdr :text-position opinion))
+    (is (not (car (assoc-cdr :text-position opinion))))
+    (is (not (second (assoc-cdr :text-position opinion))))))
+;;FIXME: Not implemented: excerpt that points at different version of text
+;;FIXME: Slight errors in excerpt, such as whitespace variations, should be handled.
+
+;;FIXME: loading of nonexistent flag is not currently implemented
+;(test opinion-nonexistent-flag "Unrecognized flag"
+;  (let* ((iid "bafkreicwk5rilkvzvkvq4pjhfqksehtekggksl6u5wavvo3tdswrpsmnmu"))))
+
+;;TODO: test all of the different flags
+;;TODO: test different forms of adversity in votes
 
