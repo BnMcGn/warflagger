@@ -47,14 +47,14 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
          (title-info (warflagger::title-info-from-scsc-results *subjective* :rooturl *target*))
          (text-info (warflagger::text-info-from-scsc-results *subjective* *target*)))
     (is (member "bafkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
-                (gethash :alternatives rootres)))
+                (gethash :alternatives rootres) :test #'equal))
     (is (member "bafkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
-                (gethash :alternatives rootres)))
-    (is (member "#Test" (alexandria:hash-table-keys (gethash :hashtags rootres))))
+                (gethash :alternatives rootres) :test #'equal))
+    (is (member "#Test" (alexandria:hash-table-keys (gethash :hashtags rootres)) :test #'equal))
     (is (typep (gethash :tree-freshness rootres) 'local-time:timestamp))
     (is (< 0 (nth-value 1 (warflagger:ballot-box-totals (gethash :ballot-box rootres)))))
     (is (< 0 (nth-value 3 (warflagger:ballot-box-totals (gethash :title-ballot-box rootres)))))
-    (is (member "#Test" (gethash :hashtags warstats)))
+    (is (member "#Test" (gethash :hashtags warstats) :test #'equal))
     (is (equal "Saample Web Pge" (gethash :title title-info)))
     (is (equal "bafkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
                (gethash :title-source title-info)))
