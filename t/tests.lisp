@@ -32,8 +32,8 @@
                    (invoke-restart restart))))))
         (clsql:connect *test-db-connect-spec* :database-type *db-connect-type*))
 
-      (init-test-db)
       (init-test-textract)
+      (init-test-db)
       (init-test-opinml)
 
       (run! 'wf-tests))))
