@@ -71,8 +71,8 @@
 (defun ipfs-make-rooturl-data (rooturl)
   (let ((res (objective-data-for-rooturl rooturl)))
     (list* :results ;;could use a better name
-           (warflagger:execute-score-script res :rooturl (or (getf res :rooturl) rooturl)))
-           res))
+           (warflagger:execute-score-script res :rooturl (or (getf res :rooturl) rooturl))
+           res)))
 
 (defun ipfs-write-rooturl-data (rooturl)
   (initialize-warstat-dirs)
