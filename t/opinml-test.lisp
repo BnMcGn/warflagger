@@ -27,7 +27,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (update-page *testurl*)
     (sleep 0.50)
     (let ((id (gethash *testurl* *byurl*)))
-      (setf (gethash id *bynum*) *target*)
+      (setf (gethash id *bynum*) (list *target*))
       (setf (gethash *target* *byurl*) id)
       (remhash *testurl* *byurl*)))
 
