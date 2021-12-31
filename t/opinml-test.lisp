@@ -31,7 +31,16 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (setf *opinion-tree* (getf data :opinion-tree))
     (setf *score-script* (getf data :score-script))
     (setf *rooturl-text* (wf/text-extract:grab-text *target*))
-    (setf *subjective* more-data)))
+    (setf *subjective* more-data)
+
+    ;;Rob the content from the file, then hijack the url.
+    (unless (gethash *target* *byurl*)
+      (update-page *testurl*)
+      (sleep 0.50)
+      (let ((id (gethash *testurl* *byurl*)))
+        (setf (gethash id *bynum*) *target*)
+        (setf (gethash *target* *byurl*) id)
+        (remhash *testurl* *byurl*)))))
 
 (test opinion-with-excerpt "Excerpt opinion"
  (let* ((iid "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
