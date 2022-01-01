@@ -87,3 +87,6 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 ;;TODO: test all of the different flags
 ;;TODO: test different forms of adversity in votes
 
+;;TODO: test square brackets that are not a markdown link
+
+;;TODO: test multiple references in comment body

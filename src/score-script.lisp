@@ -557,6 +557,14 @@
   (save-flag)
   (post-flag))
 
+(defflag scsc::custodial-correction
+  ;;FIXME: What do we actually do with this? Need to specify...
+  (set-other-flag :correction)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag))
+
 (defflag scsc::custodial-flag-abuse
   (set-other-flag :flag-abuse)
   (set-tree-freshness (get-opinion-created))
