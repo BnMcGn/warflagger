@@ -1,4 +1,6 @@
-(in-package :cl-user)
+(in-package :cl-user
+            (:export
+             #:has-found-excerpt-p))
 
 
 (defpackage #:wf/ipfs
@@ -175,6 +177,12 @@
 
 (defun has-excerpt-p (opinion)
   (assoc :excerpt opinion))
+
+(defun has-found-excerpt-p (opinion)
+  (and (has-excerpt-p opinion)
+       (when-let ((dat (assoc-cdr :text-position opinion)))
+         (and (integerp (car dat))
+              (integerp (second dat))))))
 
 (defun opinion-target-same-author-p (opinion)
   (when-let* ((treead (assoc-cdr :tree-address opinion))
@@ -398,6 +406,7 @@
                     (mapcar #'opinion-by-id (target-replies (get-target-url key)))))
          (replies (if (equal key starting-key)
                       (remove-if-not #'wf/ipfs::opinion-applies-to-title replies) replies))
+         (replies (remove-if-not #'wf/ipfs:has-found-excerpt-p replies))
          (title nil))
     (when (not iid)
       (add-root-title-info warstats rooturl))
