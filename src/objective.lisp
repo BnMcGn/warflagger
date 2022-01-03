@@ -22,7 +22,8 @@
    #:ipfs-write-rooturl-data
    #:unknown-flag
    #:opinion-can-apply-hashtag-to-parent
-   #:skip-opinion))
+   #:skip-opinion
+   #:has-found-excerpt-p))
 
 (in-package :wf/ipfs)
 
