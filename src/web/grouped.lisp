@@ -191,8 +191,7 @@
           (cl-utilities:collect (format-group-data discroot (getf groups discroot))))))))
 
 (defun grouped-page ()
-  (mount-component (grouped-main)
-    :data (lisp (ps-gadgets:as-ps-data (list* 'list (grouped-data))))))
+  (mount-component (grouped-main)))
 
 (defun prep-data-for-grouped-json (rootlist)
   (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
