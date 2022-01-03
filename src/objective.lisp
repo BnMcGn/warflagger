@@ -126,8 +126,9 @@
     warflagger:*opinion-store*))
 
 (defun opinion-references (opinion)
+  "Note: Strips the link text out of :references"
   (let ((main (assoc-cdr :reference opinion))
-        (commt (assoc-cdr :references opinion)))
+        (commt (mapcar #'second (assoc-cdr :references opinion))))
     (if main (list* main commt) commt)))
 
 (defun iid-equal (id1 id2)
