@@ -60,17 +60,30 @@ Analytics\"></a></div></noscript>
     (when-let ((user (get-user-by-screenname wf/local-settings:*test-user-name*)))
       (userfig:remove-user user))))
 
-(defmacro terminate-thread-on-broken-pipe (&body body)
-  "The live server eventually clogs with hunchentoot-worker threads. These seem to be wedged by
+(eval-always
+  (defmacro terminate-thread-on-broken-pipe (&body body)
+   "The live server eventually clogs with hunchentoot-worker threads. These seem to be wedged by
 sb-int:broken-pipe conditions. This macro should fix the problem when wrapped around the startup code."
-  ;;Because we might not be on sbcl
-  (if-let ((sym (and (find-package 'sb-int)
-                     (find-symbol "BROKEN-PIPE" (find-package 'sb-int)))))
-    `(handler-case
-         (progn ,@body)
-       ;;Terminate the thread
-       (,sym () (invoke-restart 'cl-user::abort)))
-    `(progn ,@body)))
+   ;;Because we might not be on sbcl
+   (if-let ((sym (and (find-package 'sb-int)
+                      (find-symbol "BROKEN-PIPE" (find-package 'sb-int)))))
+     `(handler-case
+          (progn ,@body)
+        ;;Terminate the thread
+        (,sym () (invoke-restart 'cl-user::abort)))
+     `(progn ,@body))))
+
+(defun handle-response-shim (res)
+  (terminate-thread-on-broken-pipe
+    (%handle-response-copy res)))
+
+;;FIXME: We are getting hung threads because of broken-pipe conditions on the server
+;; This should allow us to terminate them gracefully, for now. But it would be better to
+;; find out why clack is not catching these errors by default.
+(unless (fboundp '%handle-response-copy)
+  (def-as-func %handle-response-copy #'clack.handler.hunchentoot::handle-response)
+  (def-as-func clack.handler.hunchentoot::handle-response #'handle-response-shim))
+
 
 (defun clsql-middleware (dbtype connspec)
   (lambda (app)
