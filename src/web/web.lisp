@@ -438,4 +438,5 @@
    (write-warflagger-js-resources))
   (unless-production
    (clerk:start))
-  (if-production (run-production-server) (run-test-server)))
+  (if-production (run-production-server) (run-test-server))
+  (shim-handle-response))

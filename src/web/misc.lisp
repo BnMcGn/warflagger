@@ -80,10 +80,12 @@ sb-int:broken-pipe conditions. This macro should fix the problem when wrapped ar
 ;;FIXME: We are getting hung threads because of broken-pipe conditions on the server
 ;; This should allow us to terminate them gracefully, for now. But it would be better to
 ;; find out why clack is not catching these errors by default.
-(unless (fboundp '%handle-response-copy)
-  (def-as-func %handle-response-copy #'clack.handler.hunchentoot::handle-response)
-  (def-as-func clack.handler.hunchentoot::handle-response #'handle-response-shim))
-
+(defun shim-handle-response ()
+    (unless (fboundp '%handle-response-copy)
+      (def-as-func %handle-response-copy
+          (symbol-function (symbolize 'handle-response :package 'clack.handler.hunchentoot)))
+      (def-as-func (symbolize 'handle-response :package 'clack.handler.hunchentoot)
+        #'handle-response-shim)))
 
 (defun clsql-middleware (dbtype connspec)
   (lambda (app)

@@ -1,6 +1,4 @@
-(in-package :cl-user
-            (:export
-             #:has-found-excerpt-p))
+(in-package :cl-user)
 
 
 (defpackage #:wf/ipfs
