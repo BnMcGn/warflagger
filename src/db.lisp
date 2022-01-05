@@ -463,6 +463,85 @@ the page text can be found in the cache."
      :where (sql-and (sql-= (colm 'type) "wf_user")
                      (sql-= (colm 'id) userid)))))
 
+(def-query author-rooturls (authid)
+  (mapcar #'car
+          (query-marker
+           (select (colm 'rooturl 'rooturl)
+                   :from (list (tabl 'rooturl) (tabl 'opinion))
+                   :where (sql-and (sql-= (colm 'opinion 'rooturl) (colm 'rooturl 'id))
+                                   (sql-= (colm 'opinion 'author) authid))
+                   :distinct t))))
+
+;;NOTE: Won't find references from comments
+(def-query author-references (authid)
+  (mapcar #'car
+          (query-marker
+           (select (colm 'reference 'reference)
+                   :from (list (tabl 'reference) (tabl 'opinion))
+                   :where (sql-and (sql-= (colm 'reference 'opinion) (colm 'opinion 'id))
+                                   (sql-= (colm 'opinion 'author) authid))
+                   :distinct t))))
+
+;;A list of replies to a given author
+(def-query author-replies (authid)
+  (mapcar #'car
+          (query-marker
+           (clsql:select
+            (case *id-return-type*
+              (:id (colm :id))
+              (:iid (colm :iid))
+              (otherwise (error "not implemented")))
+            :from (tabl :opinion)
+            :where
+            (clsql:sql-and
+             (clsql:sql-in
+              (colm :target)
+              (clsql:sql-query
+               (colm :opinion :url)
+               :from (tabl :opinion)
+               :where (clsql:sql-= (colm :author) authid)))
+             (clsql:sql-not
+              (clsql:sql-= (colm :author) authid)))))))
+
+(def-query author-opinions (authid)
+  (mapcar #'car
+          (query-marker
+           (select
+            (case *id-return-type*
+              (:id (colm :id))
+              (:iid (colm :iid))
+              (otherwise (error "not implemented")))
+            :from (tabl :opinion)
+            :where (sql-= (colm :author) authid)))))
+
+
+;;FIXME: broken
+(def-query author-reply-references (authid)
+  (mapcar
+   #'car
+   (query-marker
+    (select (colm 'reference 'reference)
+            :from (list (tabl 'reference) (tabl 'opinion))
+            :where (in-subquery (colm 'opinion 'id) (author-replies authid))))))
+
+(defun author-urls (author)
+  "A (comprehensive, eventually) list of urls that the author has interacted with."
+  (let ((*id-return-type* :iid)
+        (authid (find-author-id author)))
+    (list
+     :rooturls (author-rooturls authid)
+     ;;FIXME: Want inline references as well. Need IPFS read for that, probably
+     :references (author-references authid)
+     :replies
+     (cl-utilities:collecting
+       (dolist (opid (author-replies authid))
+         (when-let ((ref (assoc-cdr :reference (opinion-by-id opid))))
+           (cl-utilities:collect ref)))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Opinion insert and delete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;FIXME: Obsolete. Can probably remove.
 (defun save-opinion-from-user (opinion authorid
                                &key (opinurl #'make-opinion-url))

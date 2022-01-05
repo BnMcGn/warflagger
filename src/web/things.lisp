@@ -219,28 +219,14 @@
           query
           (order-by-mixin 'firstlook))))))
 
-(defun author-replies (authid &key getcount)
-  (let ((query
-          (unexecuted
-            (clsql:select
-             (colm :id) :from (tabl :opinion)
-                        :where
-                        (clsql:sql-and
-                         (clsql:sql-in
-                          (colm :target)
-                          (clsql:sql-query
-                           (colm :opinion :url)
-                           :from (tabl :opinion)
-                           :where (clsql:sql-= (colm :author) authid)))
-                         (clsql:sql-not
-                          (clsql:sql-= (colm :author) authid)))))))
-    (if getcount
-        (get-count query)
-        (mapcar
-         #'car
-         (merge-query
-          query
-          (list :order-by (list (list (colm 'datestamp) :desc))))))))
+(defun %author-replies (authid &key getcount)
+  (if getcount
+      (get-count (author-replies authid))
+      (mapcar
+       #'car
+       (merge-query
+        (author-replies authid)
+        (list :order-by (list (list (colm 'datestamp) :desc)))))))
 
 (setf (ningle:route *app* "/author-replies/*")
       (quick-page ()
@@ -249,7 +235,7 @@
              &key
              (index :integer))
           (display-thing-block-with-pagers
-           (tag-as-opinion #'author-replies)
+           (tag-as-opinion #'%author-replies)
            (list id)
            #'mount-react-thing
            (format nil "/author-replies/~a" id)
