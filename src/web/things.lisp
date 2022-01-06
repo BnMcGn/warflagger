@@ -221,7 +221,7 @@
 
 (defun %author-replies (authid &key getcount)
   (if getcount
-      (get-count (author-replies authid))
+      (get-count (unexecuted (author-replies authid)))
       (mapcar
        #'car
        (merge-query

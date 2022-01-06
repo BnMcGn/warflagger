@@ -98,7 +98,7 @@
      :label "Your Opinions:"
      :class "featurebox")
     (thing-lister:display-thing-block-in-sidebar
-     (tag-as-opinion #'author-replies)
+     (tag-as-opinion #'%author-replies)
      (list (get-local-user-id (get-user-name)))
      #'mount-react-thing
      (format nil "/author-replies/~a" uid)
