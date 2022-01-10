@@ -177,7 +177,7 @@
            (when-let* ((user (get-user-name))
                        (aid (get-local-user-id user))
                        (author (get-author-representation aid)))
-             (json:encode-json (author-urls author) *webhax-output*)))
+             (json:encode-json-plist (author-urls author) *webhax-output*)))
          :content-type "application/json"))
 
   (setf (ningle:route *app* "/opinion-post/" :method :POST)
