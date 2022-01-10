@@ -118,6 +118,8 @@
          (hu:collect :rooturl (assoc-cdr :rooturl opinion))
          (hu:collect :flag (assoc-cdr :flag opinion))
          (hu:collect :author (or author (assoc-cdr :author opinion)))
+         (when-let ((url (assoc-cdr :url opinion)))
+           (hu:collect :url url))
          (when-let ((comment (assoc-cdr :comment opinion)))
            (hu:collect :comment comment))
          (when-let ((votevalue (assoc-cdr :votevalue opinion)))
