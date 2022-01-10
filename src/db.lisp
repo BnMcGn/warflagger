@@ -379,6 +379,7 @@ the page text can be found in the cache."
   (author-identification-from-row (get-author-data aid)))
 
 (defun get-local-user-id (wf-user)
+  "Maybe should be called get-id-from-local-user"
   (let ((res (select (colm 'author 'id) :from (tabl 'author)
                      :where
                      (sql-and

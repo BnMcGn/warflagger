@@ -167,6 +167,19 @@
         (quick-page ()
           (opinion-form-page)))
 
+  (setf (ningle:route *app* "/make-opinion/")
+        (quick-page ()
+          (make-opinion-page)))
+
+  (setf (ningle:route *app* "/author-url-data/")
+        (input-function-wrapper
+         (lambda ()
+           (when-let* ((user (get-user-name))
+                       (aid (get-local-user-id user))
+                       (author (get-author-representation aid)))
+             (json:encode-json (author-urls author) *webhax-output*)))
+         :content-type "application/json"))
+
   (setf (ningle:route *app* "/opinion-post/" :method :POST)
         (lambda (x)
           (declare (ignore x))
@@ -387,7 +400,6 @@
         :session
         (claxy:middleware (list (list "/ipfs/" "http://localhost:8080/ipfs/")
                                 (list "/ipns/" "http://localhost:8080/ipns/")))
-        (claxy:middleware (list (list "/x/" "https://warflagger.net/")))
         (clath:component
          "https://logintest.warflagger.com:5000/")
         (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)

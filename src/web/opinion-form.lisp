@@ -316,3 +316,21 @@
 
     ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; New opinion form
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun make-opinion-page ()
+  (check-signed-up)
+  (bind-validated-input
+      (&key
+       (target :url)
+       (excerpt :string)
+       (offset :unsigned-integer)
+       (target-text :boolean)
+       (target-title :boolean)
+       (suggest-target-text :boolean)
+       (suggest-target-title :boolean))
+    (mount-component (make-opinion)
+      )))
+
