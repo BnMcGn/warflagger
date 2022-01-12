@@ -143,5 +143,10 @@
    #:unknown-flag
    #:all-proper-references
    #:*id-return-type*
-   #:hashtag))
+   #:hashtag
+   #:author-rooturls
+   #:author-replies
+   #:author-references
+   #:author-opinions
+   #:author-urls))
 
