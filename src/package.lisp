@@ -148,5 +148,6 @@
    #:author-replies
    #:author-references
    #:author-opinions
-   #:author-urls))
+   #:author-urls
+   #:is-location-opinml?))
 

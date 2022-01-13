@@ -142,4 +142,11 @@
                    (elt local-time:+month-names+
                         (local-time:timestamp-month since))
                    (local-time:timestamp-year since)))))
-          (:h4 (format *webhax-output* "Opinions Posted: ~a" num)))))))
+          (:h4 (format *webhax-output* "Opinions Posted: ~a" num)))
+        (thing-lister:display-thing-block-in-sidebar
+         #'%author-references
+         (list authid)
+         #'mount-react-thing
+         (format nil "/author-references/~a" authid)
+         :label "Author: References Made"
+         :class "featurebox")))))

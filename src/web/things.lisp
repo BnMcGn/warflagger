@@ -241,6 +241,36 @@
            (format nil "/author-replies/~a" id)
            (or index 0)))))
 
+(defun %author-references (authid &key getcount)
+  (if getcount
+      (get-count (unexecuted (author-references authid)))
+      (cl-utilities:collecting
+        (dolist (url (author-references authid))
+          (cl-utilities:collect
+              (if-let ((opurl (is-location-opinml? url)))
+                (let ((opinion (opinion-exists-p opurl)))
+                  (hu:hash
+                   (:type :opinion)
+                   (:key (assoc-cdr :id opinion))
+                   (:id (assoc-cdr :iid opinion))))
+                (hu:hash
+                 (:type :rooturl)
+                 (:key (tryit (get-rooturl-id url)))
+                 (:id url))))))))
+
+(setf (ningle:route *app* "/author-references/*")
+      (quick-page ()
+        (bind-validated-input
+            ((id :integer)
+             &key
+             (index :integer))
+          (display-thing-block-with-pagers
+           #'%author-references
+           (list id)
+           #'mount-react-thing
+           (format nil "/author-references/~a" id)
+           (or index 0)))))
+
 
 ;; React thing tools
 
