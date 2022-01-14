@@ -95,6 +95,7 @@
      (list (get-local-user-id (get-user-name)))
      #'mount-react-thing
      (format nil "/author-opinions/~a" uid)
+     :trim thing-lister:*thing-summary-width*
      :label "Your Opinions:"
      :class "featurebox")
     (thing-lister:display-thing-block-in-sidebar
@@ -102,6 +103,7 @@
      (list (get-local-user-id (get-user-name)))
      #'mount-react-thing
      (format nil "/author-replies/~a" uid)
+     :trim thing-lister:*thing-summary-width*
      :label "Replies to your Posts:"
      :class "featurebox")))
 
@@ -148,5 +150,6 @@
          (list authid)
          #'mount-react-thing
          (format nil "/author-references/~a" authid)
+         :trim thing-lister:*thing-summary-width*
          :label "Author: References Made"
          :class "featurebox")))))

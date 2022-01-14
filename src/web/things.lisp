@@ -151,7 +151,7 @@
 
 (defun author-opinions-sidebar (id)
   (display-thing-block-in-sidebar
-   (tag-as-opinion #'author-opinions)
+   (tag-as-opinion #'author-opinions '(:hide-author t))
    (list id)
    #'mount-react-thing
    (format nil "/author-opinions/~a" id)
@@ -241,6 +241,7 @@
            (format nil "/author-replies/~a" id)
            (or index 0)))))
 
+;;FIXME: should really be including reference opinion...
 (defun %author-references (authid &key getcount)
   (if getcount
       (get-count (unexecuted (author-references authid)))
@@ -288,16 +289,17 @@
            res)
           res))))
 
-(defun tag-as-opinion (func)
+(defun tag-as-opinion (func &optional options)
   (lambda (&rest params)
     (let ((res (apply func params)))
       (if (listp res)
           (mapcar
            (lambda (itm)
-             (hu:hash
-              (:type :opinion)
-              (:key itm)
-              (:id (assoc-cdr :iid (opinion-by-id itm)))))
+             (hu:plist->hash
+              (list* :type :opinion
+                     :key itm
+                     :id (assoc-cdr :iid (opinion-by-id itm))
+                     options)))
            res)
           res))))
 
@@ -321,4 +323,5 @@
   (mount-component (thing-loader :mount-id (format nil "react-thing-~a" (incf *mr-counter*)))
     :things (lisp
              (list* 'list
-                    (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))))
+                    (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))
+    :trim (lisp *thing-summary-width*)))
