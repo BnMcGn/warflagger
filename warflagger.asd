@@ -29,7 +29,8 @@
                #:3bmd
                #:cl-csv
                #:plump-sexp
-               #:dexador)
+               #:dexador
+               #:osicat)
   :serial t
   :components ((:module
                 :src

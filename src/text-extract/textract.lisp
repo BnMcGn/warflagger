@@ -29,7 +29,8 @@
    #:grab-failed-message
    #:grab-messages
    #:supply-text
-   #:supply-page))
+   #:supply-page
+   #:pending-since))
 
 (in-package :wf/text-extract)
 
@@ -244,6 +245,12 @@
   (and (is-cached url)
        (probe-file (concatenate 'string (cache-loc url) "processing.lock"))))
 
+(defun pending-since (url)
+  (let ((lockname (concatenate 'string (cache-loc url) "processing.lock")))
+    (when (probe-file lockname)
+      (when-let ((date (tryit (osicat-posix:stat-mtime (osicat-posix:stat lockname)))))
+        (local-time:universal-to-timestamp date)))))
+
 (defun old-page-available (url)
   (and (is-cached url) (probe-file (page-loc url))))
 
@@ -281,6 +288,7 @@
          (cl-hash-util:collect :text (get-old))
          (cl-hash-util:collect :title (grab-title url :alternate "" :update nil))
          (cl-hash-util:collect :status "wait")
+         (cl-hash-util:collect :since (pending-since url))
          (cl-hash-util:collect :message "Loading page text..."))))))
 
 ;;Tools for manually fixing missing pages and texts.
