@@ -34,6 +34,16 @@
        (grouped-page)
     ))
 
+(defmacro cljs-page ((&rest parts-and-templates) &body body)
+  `(webhax-core:input-function-wrapper
+    (lambda ()
+      (webhax-metaplate:display-page
+       webhax-metaplate:*metaplate-default-layout*
+       cljs-base
+       ,@parts-and-templates
+       ,@(when body `(:@inner
+                      (lambda ()
+                        ,@body)))))))
 
 (defun tracking-code ()
  "<!-- Start of StatCounter Code for Default Guide -->
@@ -52,7 +62,10 @@ href=\"http://statcounter.com/\" target=\"_blank\"><img
 class=\"statcounter\"
 src=\"//c.statcounter.com/11547060/0/13ae87ef/1/\" alt=\"Web
 Analytics\"></a></div></noscript>
-<!-- End of StatCounter Code for Default Guide -->")
+<!-- End of StatCounter Code for Default Guide -->"
+  ;;broken anyways
+""
+  )
 
 ;;Not the greatest thing to have on the live server, but we want to have the sign up code tested.
 (defun cleanup-test-user ()

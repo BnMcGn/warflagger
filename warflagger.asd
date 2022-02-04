@@ -39,7 +39,6 @@
                              (:file "text-extract/textract"
                               :depends-on ("local-settings"))
                              (:file "package")
-                             (:file "warflagger")
                              (:file "db")
                              (:file "bulk-enter")
                              (:file "references")
@@ -51,6 +50,7 @@
                              (:file "author-stats")
                              (:file "score-script")
                              (:file "ipfs")
+                             (:file "warflagger")
                              (:file "summarizer")
                              (:file "admin")
                              (:file "slicer"))))

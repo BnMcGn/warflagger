@@ -149,5 +149,6 @@
    #:author-references
    #:author-opinions
    #:author-urls
-   #:is-location-opinml?))
+   #:is-location-opinml?
+   #:deserialize-warstat))
 

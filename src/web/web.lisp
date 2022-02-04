@@ -117,6 +117,24 @@
        (:div (:a :href "/faq/" "FAQ"))
        (:div (:a :href "http://warblog.warflagger.net/" "WarBlog"))))))
 
+(define-parts cljs-base
+  :@javascript-link  "/static/cljs-out/dev-main.js"
+  :@account-info #'account-bar
+  :@head #'favicon-links
+  :@site-index
+  (lambda ()
+    (html-out
+      (:div
+       :class "featurebox_side"
+       (:h3 "Index")
+       (:div (:a :href "/" "Home"))
+       (:div (:a :href "/introduction/" "Introduction"))
+       (:div (:a :href "/opinions-recent/" "Recent Opinions"))
+       (:div (:a :href "/grouped/" "Current Discussions"))
+       (:div (:a :href "/opinion/" "Write an Opinion"))
+       (:div (:a :href "/faq/" "FAQ"))
+       (:div (:a :href "http://warblog.warflagger.net/" "WarBlog"))))))
+
 (defun clath:clath-page-wrapper (title body-func)
   (funcall
    (webhax-route:quick-page
@@ -167,10 +185,15 @@
         (quick-page ()
           (opinion-form-page)))
 
+  #|
   (setf (ningle:route *app* "/make-opinion/")
         (quick-page ()
           (make-opinion-page)))
-
+|#
+  (setf (ningle:route *app* "/make-opinion/")
+        (cljs-page ()
+          (make-opinion-page)))
+  
   (setf (ningle:route *app* "/author-url-data/")
         (input-function-wrapper
          (lambda ()

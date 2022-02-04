@@ -320,6 +320,8 @@
 ;; New opinion form
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#|
+This is for non-cljs
 (defun make-opinion-page ()
   (check-signed-up)
   (bind-validated-input
@@ -333,4 +335,20 @@
        (suggest-target-title :boolean))
     (mount-component (make-opinion)
       )))
+|#
 
+(defun make-opinion-page ()
+  (check-signed-up)
+  (bind-validated-input
+      (&key
+       (target :url)
+       (excerpt :string)
+       (offset :unsigned-integer)
+       (target-text :boolean)
+       (target-title :boolean)
+       (suggest-target-text :boolean)
+       (suggest-target-title :boolean))
+    ;;FIXME: how will we launch cljs app?
+    ;;(mount-component (make-opinion))
+
+    ))

@@ -9,4 +9,5 @@
   :components ((:module 
 		 :src
 		 :serial t
-		 :components ((:file "constants"))))) 
+		 :components ((:file "constants")
+                              (:file "core"))))) 
