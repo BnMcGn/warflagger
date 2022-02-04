@@ -86,7 +86,7 @@
                             (cl-utilities:collect iid)))))
           ;;Because IPFS daemon unescapes the escaped url in the path. Since we are doing a one-
           ;; way transform of the rooturl for id purposes only, this shouldn't harm.
-          (rootpath (strcat "/rooturls/" (substitute #\* #\% (quri:url-encode rooturl)) "/")))
+          (rootpath (ipfs-rooturl-path rooturl "")))
       ;;Rooturl stuff
       (ipfs-ensure-directory-exists rootpath)
       (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t :truncate t)
@@ -126,8 +126,13 @@
                      (warflagger::title-info-from-scsc-results results :iid iid)))
                    s)))))))
 
+(defun ipfs-rooturl-path (rooturl &optional more)
+  (strcat "/rooturls/" (substitute #\* #\% (quri:url-encode rooturl))
+          (when more "/")
+          more))
+
 (defun ipfs-rooturl-exists-p (rooturl)
-  (ipfs-directory-exists-p (strcat "/rooturls/" (substitute #\* #\% (quri:url-encode rooturl)))))
+  (ipfs-directory-exists-p (ipfs-rooturl-path rooturl)))
 
 (defun ipfs-write-all-rooturl-data ()
   (dolist (rurl (append (warflagger:all-rooturls) (warflagger:all-proper-references)))
@@ -171,3 +176,23 @@
       (proc hash))))
 
 (clerk:job "update ipns" every 12.hours (update-ipns))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; IPFS read
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun ipfs-warstats (item)
+  (if (warflagger:iid-p item)
+      (ipfs-warstats-for-opinion item)
+      (ipfs-warstats-for-rooturl item)))
+
+(defun ipfs-warstats-for-rooturl (rooturl)
+  "Load warstats for a rooturl from IPFS"
+  (when (ipfs-rooturl-exists-p rooturl)
+    (warflagger:deserialize-warstat (ipfs:files-read (ipfs-rooturl-path rooturl "warstats.data")))))
+
+(defun ipfs-warstats-for-opinion (iid)
+  nil)
+
+

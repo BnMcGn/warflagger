@@ -400,3 +400,39 @@
 
 (defun no-cascade ()
   (list :no-cascade))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Warstat reader
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defparameter *safe-warstat-symbols*
+  '(:replies-total :replies-immediate :tree-freshness :effect :controversy :direction :direction-on-root
+    :x-right :x-wrong :x-up :x-down :neutral :pro :con))
+
+(defun safe-warstat-symbol-p (namestr package)
+  (cond
+    ((eq package :keyword)
+     (member namestr *safe-warstat-symbols* :test #'string-equal))
+    ;;Allow NIL
+    ((eq package :current)
+     (string-equal namestr nil))))
+
+(defun deserialize-warstat (data)
+  (let* ((data (if (stringp data) (make-string-input-stream data) data))
+         (warstat (hu:plist->hash (proto:limited-reader data #'safe-warstat-symbol-p))))
+    (unless (member (gethash :direction warstat) '(:neutral :pro :con))
+      (error "Bad direction field"))
+    (unless (member (gethash :direction-on-root warstat) '(:neutral :pro :con))
+      (error "Bad direction-on-root field"))
+    (setf (gethash :tree-freshness warstat)
+          (local-time:parse-timestring (gethash :tree-freshness warstat)))
+    (check-type (gethash :replies-total warstat) integer)
+    (check-type (gethash :replies-immediate warstat) integer)
+    (check-type (gethash :effect warstat) integer)
+    (check-type (gethash :controversy warstat) integer)
+    (check-type (gethash :x-right warstat) integer)
+    (check-type (gethash :x-wrong warstat) integer)
+    (check-type (gethash :x-up warstat) integer)
+    (check-type (gethash :x-down warstat) integer)
+    warstat))

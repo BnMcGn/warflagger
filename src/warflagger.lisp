@@ -41,7 +41,10 @@
 (defun text-server-dispatcher (url)
   (let ((otest (is-location-opinml? url)))
     (cond
-      ((not otest) (wf/text-extract:text-server url))
+      ((not otest)
+       (let ((res (wf/text-extract:text-server url)))
+         (setf (gethash :available res) (wf/ipfs::ipfs-rooturl-exists-p url))
+         res))
       ((eq otest t) (warflagger:opinion-text-server url))
       ((stringp otest)
        (let ((res (opinion-text-server otest)))
@@ -131,13 +134,6 @@
       (getf (nth i *flag-types-source*) (second flag))
       (when (and (eq (car flag) :statements) (eq (second flag) :evidence))
         flag))))
-
-(defun known-flags ()
-  (cl-utilities:collecting
-    (loop for cat in *flag-category-keys*
-          for flags in *flag-types-source*
-          do (gadgets:do-window (pair flags :size 2 :step 2)
-               (cl-utilities:collect (list cat (car pair)))))))
 
 (defmacro check-recognized-flag (flag)
   (unless (recognized-flag-p flag)
