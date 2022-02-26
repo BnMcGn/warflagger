@@ -348,7 +348,4 @@ This is for non-cljs
        (target-title :boolean)
        (suggest-target-text :boolean)
        (suggest-target-title :boolean))
-    ;;FIXME: how will we launch cljs app?
-    ;;(mount-component (make-opinion))
-
-    ))
+    (mount-cljs-component ((@ flaglib2 core mount_make_opinion)))))

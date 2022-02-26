@@ -39,7 +39,7 @@
     (lambda ()
       (webhax-metaplate:display-page
        webhax-metaplate:*metaplate-default-layout*
-       cljs-base
+       #'cljs-base
        ,@parts-and-templates
        ,@(when body `(:@inner
                       (lambda ()

@@ -10,7 +10,8 @@
    #:*vote-ranges*
    #:*default-vote*
    #:*flag-colors*
-   #:*direction-colors*))
+   #:*direction-colors*
+   #:known-flags))
 
 (in-package :warflagger-core)
 

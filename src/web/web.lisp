@@ -118,7 +118,8 @@
        (:div (:a :href "http://warblog.warflagger.net/" "WarBlog"))))))
 
 (define-parts cljs-base
-  :@javascript-link  "/static/cljs-out/dev-main.js"
+  :@javascript-link "/static/javascript/local.js"
+  :@javascript-link "/static/cljs-out/dev-main.js"
   :@account-info #'account-bar
   :@head #'favicon-links
   :@site-index

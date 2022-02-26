@@ -6,7 +6,7 @@
 
 (defparameter *safe-symbols* (append warflagger::*known-directives*
                                      (mapcar (lambda (flag) (symb (car flag) '- (second flag)))
-                                             (warflagger:known-flags))
+                                             (warflagger-core:known-flags))
                                      (list 'unknown-flag 'hashtag 'excerpt 'reference
                                            'statements-evidence)))
 (defparameter *safe-keywords* '(:iid :author))
