@@ -19,11 +19,10 @@ Click **Post** to finish.
 
 ## More documentation
 
-For more tips on getting started, you will want to read these pages from the [WarFlagger Wiki](https://github.com/BnMcGn/warflagger/wiki/):
+For a guide general to etiquette and posting, see the [User Manual](https://warflagger.net/user-manual/)
 
-- [Checking the News](https://github.com/BnMcGn/warflagger/wiki/Checking-the-News)
-- [Guidelines For Moderating](https://github.com/BnMcGn/warflagger/wiki/Guidelines-for-Moderating)
+There is more discussion on the [WarFlagger Wiki](https://github.com/BnMcGn/warflagger/wiki/):
 
-There is also a [FAQ](http://warflagger.net/faq/)
+A list of frequently asked questions can be found [here](http://warflagger.net/faq/).
 
 

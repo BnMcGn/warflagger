@@ -5,33 +5,26 @@
 
 ### Etiquette
 
-1.  How to be a useful flagger
+####  How to be a useful flagger
 
-    Thank you for volunteering to help improve conversation on the internet. This manual is a guide to 
-    etiquette for users of the WarFlagger site.
-    
-    [desire to] round up all of the people who are Wrong on the internet and reeducate them.
-    
-    handle the various situations that [weaken] conversation on the internet
-    This document serves as a user's manual and etiquette guide for particants in the WarFlagger forum.
-    Welcome to the WarFlagger User's Manual. The goal of this manual is to turn you into a useful
-    flagger. It serves as an etiquette guide. It tells you what to do about the various problems
-    that emerge in an internet discussion.
+Welcome to the WarFlagger User's Manual. The goal of this manual is to turn you into a useful
+flagger. It serves as an etiquette guide. It tells you what to do about the various problems
+that emerge in an internet discussion.
 
-2.  You don't need to read this manual
+####  You don't need to read this manual
 
-    Just so you know, you don't need to use any of the features named in this manual to participate
-    in a WarFlagger discussion. You'll do fine if you simply stick to upvotes, downvotes and comments.
+Just so you know, you don't need to use any of the features named in this manual to participate
+in a WarFlagger discussion. You'll do fine if you simply stick to upvotes, downvotes and comments.
 
 
 ### Goals
 
-1.  Extracting useful facts from savage ideological debates
+####  Extracting useful facts from savage ideological debates
 
-    WarFlagger is meant to deal with hard discussions. What is a good discussion about a hard topic?
-    One where the participants are polite, statements are backed up with facts, and every point of 
-    view gets an even chance to present itself. WarFlagger is meant to foster all of that. Then it will
-    extract the useful parts from the discussion, displaying them without clutter.
+WarFlagger is meant to deal with hard discussions. What is a good discussion about a hard topic?
+One where the participants are polite, statements are backed up with facts, and every point of 
+view gets an even chance to present itself. WarFlagger is meant to foster all of that. Then it will
+extract the useful parts from the discussion, displaying them without clutter.
 
 
 ## Digging down, Debunking, Data
@@ -51,57 +44,46 @@ Attempts to shut down a good question before it has been answered will be noted!
 Tools to deal with bad faith questions can be found in the Clutter section below.
 
 
-### Question Everyone Else too
-
-1.  Verifying media interviews
-
-
 ### Getting to the bottom
 
-1.  Drilling down
+####  Drilling down
 
-    When you request evidence for an opponent's point with the NeedsEvidence flag, your opponent will
-    probably respond with an Evidence flag. This should contain a reference (ie. link) to an article
-    that supports your opponent's point. From here it can go three ways:
+When you request evidence for an opponent's point with the NeedsEvidence flag, your opponent will
+probably respond with an Evidence flag. This should contain a reference (ie. link) to an article
+that supports your opponent's point. From here it can go three ways:
     
-    You may concede the point, leaving the evidence to stand. You might even thank your opponent by upvoting
-    the item. 
+You may concede the point, leaving the evidence to stand. You might even thank your opponent by upvoting
+the item. 
     
-    You may contest the quality of the referred article, especially if it has not already been vetted on 
-    WarFlagger. Flag errors in the article and indicate places where further evidence is needed. If the
-    article itself makes reference to further resources, you might want to chase these down in turn and 
-    comment on them.
+You may contest the quality of the referred article, especially if it has not already been vetted on 
+WarFlagger. Flag errors in the article and indicate places where further evidence is needed. If the
+article itself makes reference to further resources, you might want to chase these down in turn and 
+comment on them.
     
-    You might notice that the article is good, but that your opponent has misapplied it to the situation. In 
-    this case you don't want to flag the linked article, which has done nothing wrong. Instead apply your 
-    flag - probably a Disagree - to your opponent's Evidence flag. Explain the lack of fit in the comment 
-    portion of your opinion. 
+You might notice that the article is good, but that your opponent has misapplied it to the situation. In 
+this case you don't want to flag the linked article, which has done nothing wrong. Instead apply your 
+flag - probably a Disagree - to your opponent's Evidence flag. Explain the lack of fit in the comment 
+portion of your opinion. 
 
-2.  Lists of things
+####  Lists of things
 
-    When you post a NeedsEvidence, consider framing the question in such a way that responders are encouraged
-    to create a list of answers: "Times when executive orders were used by US presidents", "List of the
-    arguments that the mood landings were a hoax", "Examples of religious terrorism in the 20th century".
+When you post a NeedsEvidence, consider framing the question in such a way that responders are encouraged
+to create a list of answers: "Times when executive orders were used by US presidents", "List of the
+arguments that the mood landings were a hoax", "Examples of religious terrorism in the 20th century".
     
-    Each example should be attached as a reference in its own Evidence flag. That way each item can be
-    critiqued individually. Viewers will be able to see the state of each piece of evidence: if it is solid, 
-    if it has been debunked, or if it has generated an ongoing debate.
+Each example should be attached as a reference in its own Evidence flag. That way each item can be
+critiqued individually. Viewers will be able to see the state of each piece of evidence: if it is solid, 
+if it has been debunked, or if it has generated an ongoing debate.
     
-    The list of items can then be brought into other discussions when needed.
+The list of items can then be brought into other discussions when needed.
 
-3.  Anecdotal, Ancient history, Inconclusive
+####  Anecdotal, Ancient history, Inconclusive
 
-    We can't conclusively answer every question. Ancient historical facts, for example, often only have
-    anecdotal evidence to support them. Sometimes the evidence is inconclusive, and the question can't be
-    settled. 
+We can't always get to the bottom. Sometimes we only have anecdotal evidence. When discussing
+ancient history, we often only have one account of an event. Sometimes a debate can't be resolved.
     
-    What we can do in this case, is to collect all of the available evidence, label the caveats, and leave
-    the end reader to make an informed final decision.
-    We can't always get to the bottom. Sometimes we only have anecdotal evidence. When discussing
-    ancient history, we often only have one account of an event. Sometimes a debate can't be resolved.
-    
-    That's OK. We can present the evidence that we have, present the caveats to that evidence, and agree
-    to an informed disagreement. 
+That's OK. We can present the evidence that we have, present the caveats to that evidence, and agree
+to an informed disagreement. 
 
 
 ## Censorship
@@ -118,56 +100,55 @@ It is best to discredit fake news with a negative Evidence flag. Point to an exi
 some part of the news article has been debunked. Use the excerpt feature to zoom in on the false claim.
 Almost as good: start a fact hunt using the NeedsEvidence flag.
 
-1.  Misleading headlines
+####  Misleading headlines
 
-    Poorly written headlines can be flagged, debated, edited
-    How many times have you clicked on an article, only to find that the content didn't match the headline?
-    Now you can fix it. Object to a headline, or suggest a more accurate, informative alternative with the 
-    title tool.
+How many times have you clicked on an article, only to find that the content didn't match the headline?
+Now you can fix it. Object to a headline, or suggest a more accurate, informative alternative with the 
+title tool.
 
 
 ### Mean
 
-1.  Inflammatory
+####  Inflammatory
 
-    Use of the Inflammatory flag is obvious. It is meant for cases of name calling, insults and general 
-    rudeness.
+Use of the Inflammatory flag is obvious. It is meant for cases of name calling, insults and general 
+rudeness.
     
-    Before you use it, consider a few things: 
+Before you use it, consider a few things: 
     
-    Questions of truth should usually be handled with Evidence/NeedsEvidence flags. If your opponent is 
-    making allegations, you might be best to challenge those allegations.
+Questions of truth should usually be handled with Evidence/NeedsEvidence flags. If your opponent is 
+making allegations, you might be best to challenge those allegations.
     
-    Not every thing that makes you uncomfortable should be considered Inflammatory. There is a line between
-    the blunt truth and a label that is meant to demean. We don't want to interfere with plain statements.
+Not every thing that makes you uncomfortable should be considered Inflammatory. There is a line between
+the blunt truth and a label that is meant to demean. We don't want to interfere with plain statements.
     
-    There is a special flag under consideration for uncomfortableness: TriggerWarning. Sometimes people are
-    not ready to look into the dark corners. You can use this flag to warn away the fragile.
+There is a special flag under consideration for uncomfortableness: TriggerWarning. Sometimes people are
+not ready to look into the dark corners. You can use this flag to warn away the fragile.
 
-2.  Out of bounds
+####  Out of bounds
 
-    The OutOfBounds flag is meant for things that need emergency cleanup:
+The OutOfBounds flag is meant for things that need emergency cleanup:
     
-    -   Immediate threats of violence
-    -   Incitement to violence
-    -   Doxxing (posting the private personal details of another person, often for the sake of harrassment)
+-   Immediate threats of violence
+-   Incitement to violence
+-   Doxxing (posting the private personal details of another person, often for the sake of harrassment)
     
-    Don't cry wolf. This flag is like that red "Pull in case of fire" thing that was mounted in your school
-    hallway. Unnecessary use may lead to requests for detailed explanations of meaning in the principal's 
-    office.
+Don't cry wolf. This flag is like that red "Pull in case of fire" thing that was mounted in your school
+hallway. Unnecessary use may lead to requests for detailed explanations of meaning in the principal's 
+office.
 
 
 ### Filthy
 
-1.  NSFW
+####  NSFW
 
-    You may use the Disturbing flag to label things that are obscene, violent or otherwise Not Safe For Work.
-    The milder LanguageWarning flag is also available for those who wish to filter out four letter words and 
-    such.
+You may use the Disturbing flag to label things that are obscene, violent or otherwise Not Safe For Work.
+The milder LanguageWarning flag is also available for those who wish to filter out four letter words and 
+such.
     
-    These flags are user sensitive. Some people will flag with a high tolerance for the offensive. Others
-    will be very picky. As a reader, you will be able to choose to ignore some and take caution from others.
-    You might, for example, set your software up to be more sensitive when children are using it.
+These flags are user sensitive. Some people will flag with a high tolerance for the offensive. Others
+will be very picky. As a reader, you will be able to choose to ignore some and take caution from others.
+You might, for example, set your software up to be more sensitive when children are using it.
 
 
 ### Illegal
@@ -197,16 +178,16 @@ This allows citizens of good conscience in your country to obediently not look a
 There seems to be a compelling urge to attack the messenger when the message is unpalatable. You can
 call this out with the LogicalFallacy flag.
 
-1.  Paid shill
+####  Paid shill
 
-    Are your fellow forum participants in the pay of some shadowy dark entity? Aha! That would explain why
-    they keep scoring against you. Unfortunately, accusing them of it constitutes an Ad Hominem attack, 
-    especially when such an accusation is made without evidence. Facts are facts, no matter who paid
-    for them.
+Are your fellow forum participants in the pay of some shadowy dark entity? Aha! That would explain why
+they keep scoring against you. Unfortunately, accusing them of it constitutes an Ad Hominem attack, 
+especially when such an accusation is made without evidence. Facts are facts, no matter who paid
+for them.
     
-    On the other hand, it may be of interest to know who is funding what. If you have evidence of shadow
-    funding, you are welcome to post it. You might consider self-flagging your post as Offtopic to indicate
-    that it should not influence the discussion of the actual fact in question.
+On the other hand, it may be of interest to know who is funding what. If you have evidence of shadow
+funding, you are welcome to post it. You might consider self-flagging your post as Offtopic to indicate
+that it should not influence the discussion of the actual fact in question.
 
 
 ### Censorship
@@ -292,32 +273,4 @@ be entirely able to route around it. You must be able to see that the moderation
 the most important voices.
 
 Trust no information source that fails this test.
-
-
-## Glossary
-
-
-### Opinion
-
--   every post on WF. basic unit of action. Commenting, voting, flagging, editing
-
-
-### Target
-
-
-### Flag
-
-
-### Reference
-
-
-### Excerpt
-
--   narrow down
-
-
-### Hashtag
-
-
-### Directive
 

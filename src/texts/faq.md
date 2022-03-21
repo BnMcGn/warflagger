@@ -6,6 +6,8 @@
 
 WarFlagger is your chance to correct the internet. It allows you to comment on any site on the internet without censorship from the owners.
 
+A [User Manual](https://warflagger.net/user-manual/) is available with etiquette hints and usage guidelines.
+
 ### How does it work?
 
 WarFlagger is based on OpinML, an open standard file format. It allows you to own your own content, pass it around to others and host it, all without the permission of WarFlagger's owners. 
