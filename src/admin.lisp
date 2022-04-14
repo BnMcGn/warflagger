@@ -16,6 +16,12 @@
      (search "hunchentoot-worker-" (bt:thread-name x)))
    (bt:all-threads)))
 
+(defun all-ipns-threads ()
+  (remove-if-not
+   (lambda (x)
+     (search "update ipns" (bt:thread-name x)))
+   (bt:all-threads)))
+
 (defun clear-worker-threads ()
   (mapcar #'bordeaux-threads:destroy-thread (all-worker-threads)))
 
