@@ -25,6 +25,9 @@
 (defun clear-worker-threads ()
   (mapcar #'bordeaux-threads:destroy-thread (all-worker-threads)))
 
+(defun clear-ipns-threads ()
+  (mapcar #'bordeaux-threads:destroy-thread (all-ipns-threads)))
+
 ;;Posting tools
 
 

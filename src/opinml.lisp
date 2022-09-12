@@ -76,12 +76,13 @@
 (deftype hashtag () `(satisfies hashtag-p))
 
 (defun url-p (item)
-  (handler-case
-      (progn (quri:parse-uri item)
-             item)
-    (error (e)
-      (declare (ignore e))
-      nil)))
+  (and (stringp item)
+       (handler-case
+           (progn (quri:parse-uri item)
+                  item)
+         (error (e)
+           (declare (ignore e))
+           nil))))
 
 (deftype uri () `(satisfies url-p))
 
