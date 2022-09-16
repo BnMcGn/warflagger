@@ -37,5 +37,6 @@
                               (:file "web/things")
                               (:file "web/opinion-form")
                               (:file "web/account")
+                              (:file "web/headers")
                               (:file "web/web")))))
 
