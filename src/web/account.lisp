@@ -59,6 +59,41 @@
           (:span (funcall links))))
         (:div :class "col-sm-2 wf-sidebar-width" " "))))))
 
+(defun tw-account-bar ()
+  (let* ((info (warflagger-user-info-bundle))
+         (name (when (webhax-user:signed-up?)
+                 (get-apparent-display-name (get-user-name))))
+         (links
+           (if (webhax-user:signed-up?)
+               (lambda ()
+                 (html-out
+                   (:a :href (assoc-cdr :settings-url info) "Settings")
+                   (:a :href (assoc-cdr :logout-url info) "Sign&nbsp;out")))
+               (lambda ()
+                 (html-out
+                   (:a :onclick
+                       (login-link-js (assoc-cdr :login-url info))
+                       :href "#" "Sign&nbsp;Up")
+                   (:a :onclick
+                       (login-link-js (assoc-cdr :login-url info))
+                       :href "#" "Log&nbsp;In"))))))
+    (html-out
+      (:div
+       :class "flex flex-row text-color-neutral-200 bg-black lineHeight-none h-9 w-full fontSize-sm m-0 p-0 border-0"
+       (:div :class "basis-44")
+       (:div
+        :class "grow"
+        (:div
+         :class "inline-flex flex-row content-center relative w-full top-2px"
+         (%logo)
+         (:span
+          :class "grow"
+          (if name
+              (htm (:a :href "/user/" (str name)))
+              (str "Not Signed In")))
+         (:span (funcall links))))
+       (:div :class "basis-44")))))
+
 (defun user-home-page ()
   (check-signed-up)
   (let ((since (userfig:userfig-value 'signed-up))

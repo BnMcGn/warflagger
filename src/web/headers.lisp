@@ -28,6 +28,29 @@
             (:div :class "featurebox_side" :style "opacity: 0;" "_"))))
     (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
 
+(define-layout (cljs-layout :wrapper #'webhax:page-base)
+  (:prepend-parts
+   :@head (html-out (:meta :charset "utf-8"))
+   :@head (html-out (:meta :name "viewport"
+                           :content "width=device-width, initial-scale=1, shrink-to-fit=no"))
+   :@css-link "/static/css/main.css")
+  (html-out
+    (:div :id "header_wrapper"
+          (:div :id "account_bar"
+                :@account-info))
+    (:div
+     :class "container-fluid"
+     (:div
+      :class "row"
+      (:div :id "left_side" :class "col-sm-2 wf-sidebar-width"
+            :@site-index :@side-content)
+      (:div :class "col"
+            :@messages :@inner :@footnotes)
+      (:div :id "right_side" :class "col-sm-2 wf-sidebar-width"
+            :@site-search :@notifications
+            (:div :class "featurebox_side" :style "opacity: 0;" "_"))))
+    (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
+
 
 ;;FIXME: react, react-dom should be loaded from the npm bundle.
 (define-default-parts warflagger-base
@@ -66,7 +89,7 @@
 (define-parts cljs-base
   :@javascript-link "/static/javascript/local.js"
   :@javascript-link "/static/cljs-out/dev-main.js"
-  :@account-info #'account-bar
+  :@account-info #'tw-account-bar
   :@head #'favicon-links
   :@site-index
   (lambda ()
@@ -110,3 +133,13 @@
     (:meta :name "msapplication-config" :content "/static/img/browserconfig.xml")
     (:meta :name "theme-color" :content "#ffffff")))
 
+(defmacro cljs-page ((&rest parts-and-templates) &body body)
+  `(webhax-core:input-function-wrapper
+    (lambda ()
+      (webhax-metaplate:display-page
+       #'cljs-layout
+       #'cljs-base
+       ,@parts-and-templates
+       ,@(when body `(:@inner
+                      (lambda ()
+                        ,@body)))))))

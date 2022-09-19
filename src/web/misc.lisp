@@ -34,17 +34,6 @@
        (grouped-page)
     ))
 
-(defmacro cljs-page ((&rest parts-and-templates) &body body)
-  `(webhax-core:input-function-wrapper
-    (lambda ()
-      (webhax-metaplate:display-page
-       webhax-metaplate:*metaplate-default-layout*
-       #'cljs-base
-       ,@parts-and-templates
-       ,@(when body `(:@inner
-                      (lambda ()
-                        ,@body)))))))
-
 (defun tracking-code ()
  "<!-- Start of StatCounter Code for Default Guide -->
 <script type=\"text/javascript\">
