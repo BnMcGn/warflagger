@@ -1,6 +1,26 @@
 (in-package :wf/web)
 
 
+;; CSS classes, tailwind style
+
+(defun featurebox (more-css)
+  (gadgets:strcat (or more-css "")
+          " m-0 p-2.5 w-4/5 font-xs lineHeight-5"))
+
+(defun featurebox-side (more-css)
+  (gadgets:strcat (featurebox more-css)
+                  " ml-2.5 mr-2.5 mb-4"))
+
+(defun sidebar-stuff (more-css)
+  (gadgets:strcat (or more-css "")
+          " heir-p:m-2.5 heir-p:mt-4 heir-p:mb-4"
+          " heir-p:text-xs heir-p:lineHeight-4"
+          " heir-h3:mb-2.5 heir-h3:mt-1.5 heir-h3:ml-neg2.5 heir-h3:mr-neg2.5"
+          " heir-h3:p-1 heir-h3:text-sm heir-h3:lineHeight-3.5 heir-h3:text-white"
+          " heir-h3:bg-black"
+          " heir-h4:mt-0 heir-h4:mb-0 heir-h4:ml-2.5"
+          " heir-h4:text-sm heir-h4:lineHeight-3.5"))
+
 (setf (cl-who:html-mode) :html5)
 (define-default-layout (warflagger-main :wrapper #'webhax:page-base)
   (:prepend-parts
@@ -39,16 +59,14 @@
           (:div :id "account_bar"
                 :@account-info))
     (:div
-     :class "container-fluid"
-     (:div
-      :class "row"
-      (:div :id "left_side" :class "col-sm-2 wf-sidebar-width"
-            :@site-index :@side-content)
-      (:div :class "col"
-            :@messages :@inner :@footnotes)
-      (:div :id "right_side" :class "col-sm-2 wf-sidebar-width"
-            :@site-search :@notifications
-            (:div :class "featurebox_side" :style "opacity: 0;" "_"))))
+     :class "flex flex-row"
+     (:div :id "left_side" :class (lisp (sidebar-stuff "basis-44"))
+           :@site-index :@side-content)
+     (:div :class "grow"
+           :@messages :@inner :@footnotes)
+     (:div :id "right_side" :class (lisp (sidebar-stuff "basis-44"))
+           :@site-search :@notifications
+           (:div :class (lisp (featurebox-side nil)) :style "opacity: 0;" "_")))
     (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
 
 
@@ -95,7 +113,7 @@
   (lambda ()
     (html-out
       (:div
-       :class "featurebox_side"
+       :class (lisp (featurebox-side nil))
        (:h3 "Index")
        (:div (:a :href "/" "Home"))
        (:div (:a :href "/introduction/" "Introduction"))

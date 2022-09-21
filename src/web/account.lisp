@@ -79,7 +79,7 @@
                        :href "#" "Log&nbsp;In"))))))
     (html-out
       (:div
-       :class "flex flex-row text-color-neutral-200 bg-black lineHeight-none h-9 w-full fontSize-sm m-0 p-0 border-0"
+       :class "flex flex-row text-color-neutral-800 bg-black lineHeight-none h-9 w-full fontSize-sm m-0 p-0 border-0"
        (:div :class "basis-44")
        (:div
         :class "grow"
