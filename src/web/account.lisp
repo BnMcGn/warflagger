@@ -79,12 +79,15 @@
                        :href "#" "Log&nbsp;In"))))))
     (html-out
       (:div
-       :class "flex flex-row text-color-neutral-800 bg-black lineHeight-none h-9 w-full fontSize-sm m-0 p-0 border-0"
+       :class (lisp (gadgets:strcat
+                     "flex flex-row text-white bg-black lineHeight-none h-9 w-full"
+                     " text-sm m-0 p-0 border-0 items-center"
+                     " heir-a:text-color-white heir-a:ml-4 heir-a:font-bold"))
        (:div :class "basis-44")
        (:div
         :class "grow"
         (:div
-         :class "inline-flex flex-row content-center relative w-full top-2px"
+         :class "inline-flex flex-row items-center relative w-full top-2px"
          (%logo)
          (:span
           :class "grow"

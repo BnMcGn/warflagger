@@ -5,7 +5,7 @@
 
 (defun featurebox (more-css)
   (gadgets:strcat (or more-css "")
-          " m-0 p-2.5 w-4/5 font-xs lineHeight-5"))
+          " m-0 p-2.5 w-4/5 text-xs lineHeight-5 leading-relaxed text-black"))
 
 (defun featurebox-side (more-css)
   (gadgets:strcat (featurebox more-css)
