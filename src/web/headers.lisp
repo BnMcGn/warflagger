@@ -13,11 +13,12 @@
 
 (defun sidebar-stuff (more-css)
   (gadgets:strcat (or more-css "")
+          " pt-1 pl-2 pr-2 tracking-[0.015rem]"
           " heir-p:m-2.5 heir-p:mt-4 heir-p:mb-4"
           " heir-p:text-xs heir-p:lineHeight-4"
           " heir-h3:mb-2.5 heir-h3:mt-1.5 heir-h3:ml-neg2.5 heir-h3:mr-neg2.5"
-          " heir-h3:p-1 heir-h3:text-sm heir-h3:lineHeight-3.5 heir-h3:text-white"
-          " heir-h3:bg-black"
+          " heir-h3:p-1 heir-h3:text-sm heir-h3:text-white heir-h3:text-med";heir-h3:lineHeight-3.5 "
+          " heir-h3:bg-black heir-h3:tracking-tighter"
           " heir-h4:mt-0 heir-h4:mb-0 heir-h4:ml-2.5"
           " heir-h4:text-sm heir-h4:lineHeight-3.5"))
 
