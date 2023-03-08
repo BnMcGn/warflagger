@@ -118,7 +118,7 @@
          (hu:collect :target (assoc-cdr :target opinion))
          (hu:collect :rooturl (assoc-cdr :rooturl opinion))
          (hu:collect :flag (assoc-cdr :flag opinion))
-         (hu:collect :author (or author (assoc-cdr :author opinion)))
+         (hu:collect :author (check-url (or author (assoc-cdr :author opinion))))
          (when-let ((url (assoc-cdr :url opinion)))
            (hu:collect :url url))
          (when-let ((comment (assoc-cdr :comment opinion)))
