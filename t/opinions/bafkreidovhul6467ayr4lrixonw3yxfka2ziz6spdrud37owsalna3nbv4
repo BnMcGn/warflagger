@@ -1,5 +1,5 @@
 ;;OpinML 0.0.1 :s-expression
 (:target "https://warflagger.net/static/html/sample.html" :rooturl
  "https://warflagger.net/static/html/sample.html" :flag (:custodial :blank)
- :comment "#ThisHashtagIsGoingToBeVeryLongAndStretttttchy" :author "WFTestUser"
+ :comment "#ThisHashtagIsGoingToBeVeryLongAndStretttttchy" :author "https://warflagger.net/u/WFTestUser"
  :created "2021-12-14T15:34:49+0000")

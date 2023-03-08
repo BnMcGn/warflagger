@@ -3,4 +3,4 @@
  "https://warflagger.net/static/html/sample.html" :flag (:custodial :blank)
  :comment "#(suggest-target-text)
 This is the secret real text of the page"
- :author "WFTestUser" :created "2021-12-14T17:37:37+0000")
+ :author "https://warflagger.net/u/WFTestUser" :created "2021-12-14T17:37:37+0000")

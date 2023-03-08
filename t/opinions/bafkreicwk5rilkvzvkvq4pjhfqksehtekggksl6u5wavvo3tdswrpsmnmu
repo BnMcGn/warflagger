@@ -1,4 +1,4 @@
 ;;OpinML 0.0.1 :s-expression
 (:target "https://warflagger.net/static/html/sample.html" :rooturl
  "https://warflagger.net/static/html/sample.html" :flag (:positive :isnt)
- :comment nil :author "WFTestUser" :created "2021-12-14T16:15:40+0000")
+ :comment nil :author "https://warflagger.net/u/WFTestUser" :created "2021-12-14T16:15:40+0000")

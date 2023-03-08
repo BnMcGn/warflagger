@@ -1,5 +1,5 @@
 ;;OpinML 0.0.1 :s-expression
 (:target "https://warflagger.net/static/html/sample.html" :rooturl
  "https://warflagger.net/static/html/sample.html" :flag (:positive :like)
- :comment nil :author "WFTestUser" :excerpt "tiped by hand" :created
+ :comment nil :author "https://warflagger.net/u/WFTestUser" :excerpt "tiped by hand" :created
  "2021-12-14T16:14:35+0000")

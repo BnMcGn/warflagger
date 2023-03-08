@@ -1,5 +1,5 @@
 ;;OpinML 0.0.1 :s-expression
 (:target "https://warflagger.net/static/html/sample.html" :rooturl
  "https://warflagger.net/static/html/sample.html" :flag (:custodial :blank)
- :comment "a very simple comment" :author "WFTestUser" :created
+ :comment "a very simple comment" :author "https://warflagger.net/u/WFTestUser" :created
  "2021-12-13T19:17:40+0000")
