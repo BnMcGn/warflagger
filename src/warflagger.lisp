@@ -98,7 +98,8 @@
   (unless wf/local-settings:*production* clause))
 
 (defun url-p (thing)
-  (quri:uri-host (quri:uri thing)))
+  (when thing
+    (quri:uri-host (quri:uri thing))))
 
 ;;FIXME: This should handle SameThing mirroring and url variants.
 ;;FIXME: Need to handle other bad URL types than 'unlisted'. Some URLs should be left alone. Non-permalinks
