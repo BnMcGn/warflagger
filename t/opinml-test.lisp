@@ -90,3 +90,13 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 ;;TODO: test square brackets that are not a markdown link
 
 ;;TODO: test multiple references in comment body
+
+(test write-read "serialize-opinion"
+  (let* ((iid "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+         (opinion (gethash iid *opinion-store*))
+         (opinion (remove-if (lambda (x) (eq (car x) :url)) opinion))
+         (opstring (warflagger:serialize-opinion opinion))
+         (opinion2 (warflagger::deserialize-opinion-from-stream (make-string-input-stream opstring))))
+    (is (equal (assoc-cdr :excerpt opinion) (assoc-cdr :excerpt opinion2)))
+    (is (equal (assoc-cdr :author opinion) (assoc-cdr :author opinion2)))
+    (is (equal (assoc-cdr :comment opinion) (assoc-cdr :comment opinion2)))))
