@@ -59,7 +59,7 @@
 (test create-opinions "Create opinions"
       (print "at create-opinions")
       (print *userid*)
-      (print (warflagger:make-author-id *userid*))
+      (print (warflagger:make-author-url *userid*))
   (let ((saved-opin (save-opinion *opin1* nil :authorid *userid*)))
     (print "First opinion saved")
     (setf *opin1id* (assoc-cdr :id saved-opin))
