@@ -58,7 +58,7 @@
 
 (test create-opinions "Create opinions"
       (print "at create-opinions")
-      (print *userid*)
+      (print *base-url*)
       (print (warflagger:make-author-url *userid*))
   (let ((saved-opin (save-opinion *opin1* nil :authorid *userid*)))
     (print "First opinion saved")
