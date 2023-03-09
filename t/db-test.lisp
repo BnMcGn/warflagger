@@ -57,11 +57,7 @@
   (is (author-representation-from-row (get-author-data *userid*)) *user*))
 
 (test create-opinions "Create opinions"
-      (print "at create-opinions")
-      (print *base-url*)
-      (print (warflagger:make-author-url *userid*))
   (let ((saved-opin (save-opinion *opin1* nil :authorid *userid*)))
-    (print "First opinion saved")
     (setf *opin1id* (assoc-cdr :id saved-opin))
     (is (gadgets:not-empty (assoc-cdr :target saved-opin)))
 
@@ -77,7 +73,6 @@
     (setf *opin2id* (assoc-cdr :id
                       (save-opinion
                        (cons (cons :target *ourl*) *opin2*) nil :authorid *userid*)))
-    (print "Second opinion saved")
     (is (gethash :text (opinion-text-server *ourl*)) *testcomment*)
     (is (gethash :text (opinion-text-server (assoc-cdr :url (opinion-by-id *opin2id*)))) "")
     (is (caar (opinion-tree-for-target *ourl*)) *opin2id*))
