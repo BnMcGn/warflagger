@@ -54,9 +54,9 @@
    :@head (html-out (:meta :charset "utf-8"))
    :@head (html-out (:meta :name "viewport"
                            :content "width=device-width, initial-scale=1, shrink-to-fit=no"))
-   :@css-link "/static/css/main.css"
    :@css-link "/static/css/re-com/re-com.css"
-   :@css-link "/static/css/re-com/material-design-iconic-font.min.css")
+   :@css-link "/static/css/re-com/material-design-iconic-font.min.css"
+   :@css-link "/static/css/main.css")
   (html-out
     (:div :id "header_wrapper"
           (:div :id "account_bar"
