@@ -322,7 +322,7 @@
           (let ((pos (+ right up))
                 (neg (+ wrong down)))
             (when (score-vast-majority-p pos neg)
-              (setf flag warstat) (nth-value 0 (score-controversy pos neg))))))
+              (setf (gethash flag warstat) (nth-value 0 (score-controversy pos neg)))))))
       (setf (gethash :hashtags warstat)
             (cl-utilities:collecting
               (gadgets:do-hash-table (tag balbox hashtags)
