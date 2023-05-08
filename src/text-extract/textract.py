@@ -121,7 +121,7 @@ def process_pdf(url):
         pdread = pp.PdfFileReader(open(page_loc(url)))
         title = pdread.getDocumentInfo().title
     except:
-        title = "No Title Found"
+        title = ""
         syslog(LOG_DEBUG, "PDF title not found: {0}".format(cache_loc(url)))
     gadgets.string_to_file(title.encode('utf-8'), title_loc(url))
 
