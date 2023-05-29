@@ -62,7 +62,7 @@
           (:div :id "account_bar"
                 :@account-info))
     (:div
-     :class "flex flex-row"
+     :class "flex sm:flex-row flex-col"
      (:div :id "left_side" :class (lisp (sidebar-stuff "basis-44"))
            :@site-index :@side-content)
      (:div :class "grow"
