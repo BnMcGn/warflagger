@@ -80,7 +80,7 @@
     (html-out
       (:div
        :class (lisp (gadgets:strcat
-                     "flex flex-col sm:flex-row sm:h-9"
+                     "flex flex-col sm:flex-row sm:h-9 h-32"
                      " text-white bg-black lineHeight-none w-full"
                      " text-sm m-0 p-0 border-0 items-center"
                      " heir-a:text-color-white heir-a:ml-4 heir-a:font-bold"))
@@ -88,10 +88,10 @@
        (:div
         :class "grow"
         (:div
-         :class "inline-flex sm:flex-row flex-col items-center relative w-full top-2px"
+         :class "inline-flex sm:flex-row flex-col justify-between sm:justify-normal items-center relative w-full top-2px h-full"
          (%logo)
          (:span
-          :class "grow"
+          :class "sm:grow"
           (if name
               (htm (:a :href "/user/" (str name)))
               (str "Not Signed In")))
