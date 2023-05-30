@@ -89,7 +89,9 @@
         :class "grow"
         (:div
          :class "inline-flex sm:flex-row flex-col justify-between sm:justify-normal items-center relative w-full top-2px h-full"
-         (%logo)
+         (:a :href wf/local-settings:*base-url*
+             :class "sm:pr-6"
+             (:img :src "/static/img/wf_logo_small.png" :alt "[WarFlagger]"))
          (:span
           :class "sm:grow"
           (if name
