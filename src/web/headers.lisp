@@ -63,15 +63,23 @@
                 :@account-info))
     (:div
      :class "flex sm:flex-row flex-col"
-     (:div :id "left_side" :class (lisp (sidebar-stuff "basis-44"))
+     (:div :id "left_side" :class (lisp (sidebar-stuff "sm:basis-44"))
            :@site-index :@side-content)
      (:div :class "grow"
            :@messages :@inner :@footnotes)
-     (:div :id "right_side" :class (lisp (sidebar-stuff "basis-44"))
+     (:div :id "right_side" :class (lisp (sidebar-stuff "sm:basis-44"))
            :@site-search :@notifications
            (:div :class (lisp (featurebox-side nil)) :style "opacity: 0;" "_")))
     (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
 
+(defparameter *index*
+  '(("/" "Home")
+    ("/introduction/" "Introduction")
+    ("/opinions-recent/" "Recent Opinions")
+    ("/grouped/" "Current Discussions")
+    ("/opinion/" "Write an Opinion")
+    ("/faq/" "FAQ")
+    ("http://warblog.warflagger.net/" "WarBlog")))
 
 ;;FIXME: react, react-dom should be loaded from the npm bundle.
 (define-default-parts warflagger-base
@@ -99,13 +107,9 @@
       (:div
        :class "featurebox_side"
        (:h3 "Index")
-       (:div (:a :href "/" "Home"))
-       (:div (:a :href "/introduction/" "Introduction"))
-       (:div (:a :href "/opinions-recent/" "Recent Opinions"))
-       (:div (:a :href "/grouped/" "Current Discussions"))
-       (:div (:a :href "/opinion/" "Write an Opinion"))
-       (:div (:a :href "/faq/" "FAQ"))
-       (:div (:a :href "http://warblog.warflagger.net/" "WarBlog"))))))
+       (lisp
+        (loop for (url label) in *index*
+              do (htm (:div (:a :href url (str label))))))))))
 
 (define-parts cljs-base
   :@javascript-link "/static/javascript/local.js"
@@ -118,13 +122,14 @@
       (:div
        :class (lisp (featurebox-side nil))
        (:h3 "Index")
-       (:div (:a :href "/" "Home"))
-       (:div (:a :href "/introduction/" "Introduction"))
-       (:div (:a :href "/opinions-recent/" "Recent Opinions"))
-       (:div (:a :href "/grouped/" "Current Discussions"))
-       (:div (:a :href "/opinion/" "Write an Opinion"))
-       (:div (:a :href "/faq/" "FAQ"))
-       (:div (:a :href "http://warblog.warflagger.net/" "WarBlog"))))))
+       (lisp
+        (loop for (url label) in *index*
+              do (htm (:div (:a :href url (str label)))))))
+      (:select
+       (:option :value "" :selected "selected" "Index")
+       (lisp
+        (loop for (url label) in *index*
+              do (htm (:option :value url (str label)))))))))
 
 (defun clath:clath-page-wrapper (title body-func)
   (funcall
