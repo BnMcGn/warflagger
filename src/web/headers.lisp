@@ -120,12 +120,20 @@
   (lambda ()
     (html-out
       (:div
-       :class (lisp (featurebox-side nil))
+       :class (lisp (gadgets:strcat (featurebox-side nil) " hidden sm:block"))
        (:h3 "Index")
        (lisp
         (loop for (url label) in *index*
               do (htm (:div (:a :href url (str label)))))))
       (:select
+       :class "sm:hidden block"
+       :|onChange| (ps:ps
+                    (ps:chain
+                     window location
+                     (replace
+                      (ps:@
+                       (ps:getprop (ps:@ this options) (ps:@ this selected-index))
+                       value))))
        (:option :value "" :selected "selected" "Index")
        (lisp
         (loop for (url label) in *index*
