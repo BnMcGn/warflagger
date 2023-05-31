@@ -13,6 +13,7 @@
 
 (defun sidebar-stuff (more-css)
   (gadgets:strcat (or more-css "")
+          " sm:basis-44"
           " pt-1 pl-2 pr-2 tracking-[0.015rem]"
           " heir-p:m-2.5 heir-p:mt-4 heir-p:mb-4"
           " heir-p:text-xs heir-p:lineHeight-4"
@@ -63,11 +64,12 @@
                 :@account-info))
     (:div
      :class "flex sm:flex-row flex-col"
-     (:div :id "left_side" :class (lisp (sidebar-stuff "sm:basis-44"))
+     (:div :id "left_side"
+           :class (lisp (sidebar-stuff "sm:bg-white bg-black mt-[2px] sm:mt-0"))
            :@site-index :@side-content)
      (:div :class "grow"
            :@messages :@inner :@footnotes)
-     (:div :id "right_side" :class (lisp (sidebar-stuff "sm:basis-44"))
+     (:div :id "right_side" :class (lisp (sidebar-stuff ""))
            :@site-search :@notifications
            (:div :class (lisp (featurebox-side nil)) :style "opacity: 0;" "_")))
     (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
@@ -126,7 +128,8 @@
         (loop for (url label) in *index*
               do (htm (:div (:a :href url (str label)))))))
       (:select
-       :class "sm:hidden block"
+       :class "sm:hidden block bg-black text-white p-2 mx-8"
+       :style "width: calc(100% - 4rem)"
        :|onChange| (ps:ps
                     (ps:chain
                      window location

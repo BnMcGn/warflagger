@@ -67,13 +67,15 @@
            (if (webhax-user:signed-up?)
                (lambda ()
                  (html-out
-                   (:a :href (assoc-cdr :settings-url info) "Settings")
-                   (:a :href (assoc-cdr :logout-url info) "Sign&nbsp;out")))
+                  (:a :href (assoc-cdr :settings-url info) "Settings")
+                  (:span :class "inline-block sm:hidden w-12")
+                  (:a :href (assoc-cdr :logout-url info) "Sign&nbsp;out")))
                (lambda ()
                  (html-out
                    (:a :onclick
                        (login-link-js (assoc-cdr :login-url info))
                        :href "#" "Sign&nbsp;Up")
+                   (:span :class "inline-block sm:hidden w-12")
                    (:a :onclick
                        (login-link-js (assoc-cdr :login-url info))
                        :href "#" "Log&nbsp;In"))))))
@@ -83,7 +85,7 @@
                      "flex flex-col sm:flex-row sm:h-9 h-32"
                      " text-white bg-black lineHeight-none w-full"
                      " text-sm m-0 p-0 border-0 items-center"
-                     " heir-a:text-color-white heir-a:ml-4 heir-a:font-bold"))
+                     " heir-a:text-color-white sm:heir-a:ml-4 heir-a:font-bold"))
        (:div :class "basis-2 sm:basis-44")
        (:div
         :class "grow"
