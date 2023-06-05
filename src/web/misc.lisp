@@ -75,8 +75,20 @@ sb-int:broken-pipe conditions. This macro should fix the problem when wrapped ar
         (,sym () (invoke-restart 'cl-user::abort)))
      `(progn ,@body))))
 
+;;Seems to be a problem between firefox and SSL hunchentoot, dumping a variety of errors into
+;; the interactive environment. Are they of consequence? Probably not, so we are going to ignore.
+(eval-always
+ (defmacro terminate-thread-on-a-few-different-things (&body body)
+   "The live server eventually clogs with hunchentoot-worker threads. These seem to be wedged by
+sb-int:broken-pipe conditions. This macro should fix the problem when wrapped around the startup code."
+
+   `(terminate-thread-on-broken-pipe
+     (handler-case
+         (progn ,@body)
+       (cl+ssl::ssl-error-syscall () (invoke-restart 'cl-user::abort))))))
+
 (defun handle-response-shim (res)
-  (terminate-thread-on-broken-pipe
+  (terminate-thread-on-a-few-different-things
     (%handle-response-copy res)))
 
 ;;FIXME: We are getting hung threads because of broken-pipe conditions on the server
