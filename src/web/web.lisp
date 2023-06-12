@@ -59,6 +59,11 @@
   (setf (ningle:route *app* "/make-opinion/")
         (cljs-page ()
           (make-opinion-page)))
+
+  (unless-production
+   (setf (ningle:route *app* "/mock-make/")
+         (cljs-page ()
+           (mock-make-page))))
  
   (setf (ningle:route *app* "/author-url-data/")
         (input-function-wrapper

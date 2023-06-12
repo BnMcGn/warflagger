@@ -356,3 +356,10 @@ This is for non-cljs
       :target-title (lisp target-title)
       :suggest-target-text (lisp suggest-target-text)
       :suggest-target-title (lisp suggest-target-title))))
+
+
+(defun mock-make-page ()
+  (bind-validated-input
+   ((section :string))
+   (mount-cljs-component ("mock-make")
+                         :section section)))
