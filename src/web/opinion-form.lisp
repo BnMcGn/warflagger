@@ -362,4 +362,4 @@ This is for non-cljs
   (bind-validated-input
    ((section :string))
    (mount-cljs-component ("mock-make")
-                         :section section)))
+                         :section (lisp section))))

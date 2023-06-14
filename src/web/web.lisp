@@ -61,7 +61,7 @@
           (make-opinion-page)))
 
   (unless-production
-   (setf (ningle:route *app* "/mock-make/")
+   (setf (ningle:route *app* "/mock-make/*")
          (cljs-page ()
            (mock-make-page))))
  
