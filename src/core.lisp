@@ -2,6 +2,8 @@
 
 (in-package #:warflagger-core)
 
+(setf (readtable-case *readtable*) :upcase)
+
 (defun known-flags ()
   (cl-utilities:collecting
     (loop for cat in *flag-category-keys*
