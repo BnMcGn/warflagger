@@ -186,9 +186,14 @@ the page text can be found in the cache."
               (when sig (return-from top val)))
             (when-let ((val (get-rooturl-for-url rurl)))
               (return-from top (get-rooturl-id val)))
-            (insert-record
-             'rooturl
-             `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false))))))
+            (handler-case
+                (insert-record
+                 'rooturl
+                 `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false)))
+              (sql-database-data-error (e)
+                (when (eq 'cl-postgres-error:unique-violation (sql-error-error-id e))
+                  (multiple-value-bind (val sig) (tryit (get-rooturl-id rurl))
+                    (when sig val))))))))
     (make-rooturl-real rootid) ;worth a try: might have been fetched by opinion page.
     rootid))
 
