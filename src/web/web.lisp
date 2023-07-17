@@ -111,6 +111,18 @@
                 :tmode (lisp tmode)
                 :child target-root)))))
 
+  (setf (ningle:route *app* "/target2/*")
+        ;;FIXME: figure out sidebar stuff
+        (cljs-page ()
+          (bind-validated-input
+           ((id :integer)
+            &key
+            (tmode :integer))
+           (let ((url (get-rooturl-by-id id)))
+             (mount-cljs-component ("target")
+               :rooturl (lisp url)
+               :tmode (lisp tmode))))))
+
 
   ;;FIXME: redirect if url found
   (setf (ningle:route *app* "/new-target/")
@@ -284,7 +296,7 @@
   (clack-server-manager
    *handler*
    (terminate-thread-on-broken-pipe
-     (clack-pretend:pretend-builder
+    (clack-pretend:pretend-builder
         (:insert 0)
         (clsql-middleware :postgresql-socket3 *test-db-connect-spec*)
         (webhax:header-adder "/static" '("Access-Control-Allow-Origin" "*"))
