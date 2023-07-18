@@ -150,5 +150,7 @@
    #:author-opinions
    #:author-urls
    #:is-location-opinml?
-   #:deserialize-warstat))
+   #:deserialize-warstat
+   #:refd-to
+   #:discussion-refd-to))
 

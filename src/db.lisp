@@ -36,6 +36,29 @@
      (list :from (tabl 'reference)
            :where (sql-= (colm 'reference 'opinion) (colm 'opinion 'id)))))))
 
+(def-query refd-to (iid-or-url)
+  (mapcar
+   #'car
+     (query-marker
+      (select
+       (colm 'iid)
+       :from (list (tabl 'opinion) (tabl 'reference))
+       :where (sql-and
+               (sql-= (colm 'opinion 'id) (colm 'reference 'opinion))
+               (if (iid-p iid-or-url)
+                   (sql-like (colm 'reference 'reference) iid-or-url)
+                 (sql-= (colm 'reference 'reference) iid-or-url)))))))
+
+;;FIXME: This needs proper testing!
+(defun discussion-refd-to (rooturl)
+  (let ((*id-return-type* :iid))
+    (cl-utilities:collecting
+     (dolist (itm (refd-to rooturl))
+       (cl-utilities:collect itm))
+     (dolist (opin (opinion-ids-for-rooturl rooturl))
+       (dolist (itm (refd-to opin))
+         (cl-utilities:collect itm))))))
+
 (defun opinion-tree-for-rooturl (rurl)
   ;;FIXME: fails to check for loops and dead trees.
   (proto:tree-by-parent
