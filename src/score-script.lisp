@@ -32,6 +32,14 @@
    #:target-title
    #:suggest-target-title))
 
+
+;; On incoming refs / refd stuff:
+
+;; It might make a sort of sense to handle incoming refs within score-script. They should contribute
+;; to the score of the target. But then we get hard-to-resolve loops of calculation and data coming
+;; in from other trees... which may not be calculated yet. So, better to add the refd stuff at a later
+;; stage.
+
 ;;; Typedefs
 
 (defun score-script-p (item)

@@ -84,6 +84,9 @@
                             (iid opin opinion-store)
                           (when (warflagger:reference-opinion-p opin)
                             (cl-utilities:collect iid)))))
+          ;;FIXME: Relies on local db. Should eventually be based on OrbitDB or whatever
+          ;; gets used long term.
+          (refd (warflagger:discussion-refd-to rooturl))
           ;;Because IPFS daemon unescapes the escaped url in the path. Since we are doing a one-
           ;; way transform of the rooturl for id purposes only, this shouldn't harm.
           (rootpath (ipfs-rooturl-path rooturl "")))
@@ -97,7 +100,8 @@
             (print score-script s))))
       (ipfs:with-files-write (s (strcat rootpath "references.data") :create t :truncate t)
         (warflagger:with-inverted-case
-          (print (list :references references) s)))
+         (print (list :references references
+                      :refd refd) s)))
       (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
         (princ (serialize-warstat
                 (hu:hash->plist
