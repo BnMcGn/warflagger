@@ -312,10 +312,11 @@
         ;;(snooze:make-clack-middleware)
         *app*))
    :port 5000
-   :ssl t
-   :ssl-key-file wf/local-settings:*ssl-key-file*
-   :ssl-cert-file wf/local-settings:*ssl-cert-file*
-   :ssl-key-password wf/local-settings:*ssl-password*))
+   ;:ssl t
+   ;:ssl-key-file wf/local-settings:*ssl-key-file*
+   ;:ssl-cert-file wf/local-settings:*ssl-cert-file*
+   ;:ssl-key-password wf/local-settings:*ssl-password*
+   ))
 
 (defun run-production-server ()
   ;; Because we aren't running the block below on live server
