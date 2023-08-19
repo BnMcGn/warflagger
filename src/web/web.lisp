@@ -117,7 +117,7 @@
           (bind-validated-input
            ((id :integer)
             &key
-            (tmode :integer))
+            (tmode :string))
            (let ((url (get-rooturl-by-id id)))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
