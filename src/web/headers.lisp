@@ -67,7 +67,7 @@
      (:div :id "left_side"
            :class (lisp (sidebar-stuff "sm:bg-white bg-black mt-[2px] sm:mt-0"))
            :@site-index :@side-content)
-     (:div :class "grow sm:w-min min-w-full"
+     (:div :class "grow sm:w-min min-w-full sm:min-w-0"
            :@messages :@inner :@footnotes)
      (:div :id "right_side" :class (lisp (sidebar-stuff ""))
            :@site-search :@notifications
