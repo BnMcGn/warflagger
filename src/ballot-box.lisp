@@ -163,6 +163,10 @@
   (when (>= 1 pos)
     (>= (/ 1 10) (/ neg pos))))
 
+(defun ballot-box-vast-majority-p (balbox)
+  (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
+    (score-vast-majority-p (+ right up) (+ wrong down))))
+
 (defun score-controversy (pos neg)
   (let* ((score (- pos neg))
          (effect (max 0 score))

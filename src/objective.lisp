@@ -21,7 +21,8 @@
    #:unknown-flag
    #:opinion-can-apply-hashtag-to-parent
    #:skip-opinion
-   #:has-found-excerpt-p))
+   #:has-found-excerpt-p
+   #:opinion-is-question))
 
 (in-package :wf/ipfs)
 
@@ -221,6 +222,9 @@
 (defun opinion-suggests-t/t (opinion)
   (let ((dircs))))
 
+(defun opinion-is-question (opinion)
+  (member '(second (assoc-cdr :flag opinion)) '(:raise-question :needs-evidence)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Score script creation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -338,6 +342,26 @@
 
 (defun title-warstats-from-scsc-results (result)
   (warstats-from-scsc-results result (gethash :title-ballot-box result)))
+
+;;For now we just indicate that something is a question, and how we decided that.
+(defun add-question-info (warstat result &optional opinion)
+  (hu:with-keys (:hashtags :ballot-box) result
+    (let* ((flag (when opinion (wf/ipfs:opinion-is-question opinion)))
+           (tag (alexandria:when-let ((bbox (gethash "list-of-things" hashtags)))
+             (ballot-box-vast-majority-p bbox)))
+           (quantity
+            ;;FIXME: Not very sophisticated.
+            ;; - check for redundant flags, though could do that in ballot box
+            ;; - don't count refs that are targetted at an excerpt
+            ;; - threshold is arbitrary
+            ;;3rd value of ballot-box-totals is :wrong
+            (and opinion (< 5 (nth-value 2 (ballot-box-totals ballot-box)))))
+           (res (cl-utilities:collecting
+                 (when flag (cl-utilities:collect :flag))
+                 (when flag (cl-utilities:collect :tag))
+                 (when quantity (cl-utilities:collect :replies)))))
+      (when (gadgets:not-empty res) (setf (gethash :question warstat) res))
+      warstat)))
 
 (defun add-root-text-info (stor url)
   (hu:with-keys (:text :status :message) (wf/text-extract:text-server url)

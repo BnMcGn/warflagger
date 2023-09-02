@@ -105,7 +105,9 @@
       (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
         (princ (serialize-warstat
                 (hu:hash->plist
-                 (warflagger::warstats-from-scsc-results (gethash rooturl results)))) s))
+                 (warflagger::add-question-info
+                  (warflagger::warstats-from-scsc-results (gethash rooturl results))
+                  (gethash rooturl results)))) s))
       (ipfs:with-files-write (s (strcat rootpath "text.data") :create t :truncate t)
         (princ (serialize-warstat
                 (alexandria:hash-table-plist
@@ -123,7 +125,9 @@
           (ipfs:with-files-write (s (strcat oppath "warstats.data") :create t :truncate t)
             (princ (serialize-warstat
                     (hu:hash->plist
-                     (warflagger::warstats-from-scsc-results (gethash iid results)))) s))
+                     (warflagger::add-question-info
+                      (warflagger::warstats-from-scsc-results (gethash iid results))
+                      (gethash iid results) opinion))) s))
           (ipfs:with-files-write (s (strcat oppath "title.data") :create t :truncate t)
             (princ (serialize-warstat
                     (alexandria:hash-table-plist
