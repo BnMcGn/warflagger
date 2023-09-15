@@ -37,7 +37,7 @@
 ;;; Preliminary to transition to IPFS.
 ;;; Should be able to operate without referring to the database.
 
-(declaim (ftype (function ((warflagger::list-of-type pathname)) list)
+(declaim (ftype (function (warflagger::list-of-pathname) list)
                 load-opinion-files))
 
 (defun load-opinion-files (opfilelist)

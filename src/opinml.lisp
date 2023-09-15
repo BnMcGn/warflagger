@@ -11,6 +11,15 @@
   (and (listp list)
        (every (alexandria:rcurry #'typep type) list)))
 
+(gadgets:eval-always
+ (defmacro def-list-of (type)
+   (let ((symname (gadgets:symb '%list-of- type '-p)))
+         `(progn (defun ,symname (itm) (list-of-type-p itm ',type))
+                 (deftype ,(gadgets:symb 'list-of- type) ()
+                           '(and list (satisfies ,symname)))))))
+
+(def-list-of pathname)
+
 (deftype list-of-type (type)
   (let ((predicate (gadgets:symbolize (gensym "%LIST-OF-TYPE-"))))
     (setf (symbol-function predicate)
