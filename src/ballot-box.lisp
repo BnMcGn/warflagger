@@ -16,6 +16,8 @@
 
 (deftype ballot-box () `(satisfies ballot-box-p))
 
+(def-list-of ballot-box)
+
 (defun vote-direction-p (item)
   (member item '(:up :down :right :wrong)))
 
@@ -44,7 +46,7 @@
   (setf (gethash 'cache balbox) nil)
   (push `(,iid ,author ,@(when reference (list reference))) (gethash direction balbox)))
 
-(declaim (ftype (function (&rest (list-of-type 'ballot-box)) ballot-box)
+(declaim (ftype (function (&rest list-of-ballot-box) ballot-box)
                 merge-ballot-boxes merge-ballot-boxes!
                 merge-with-inverted-ballot-boxes merge-with-inverted-ballot-boxes!))
 

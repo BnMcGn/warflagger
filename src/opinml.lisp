@@ -20,12 +20,6 @@
 
 (def-list-of pathname)
 
-(deftype list-of-type (type)
-  (let ((predicate (gadgets:symbolize (gensym "%LIST-OF-TYPE-"))))
-    (setf (symbol-function predicate)
-          #'(lambda (seq) (list-of-type-p seq type)))
-    `(and list (satisfies ,predicate))))
-
 (defun iid-p (item)
   (and (stringp item)
        (eq 59 (length item))
