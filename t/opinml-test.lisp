@@ -71,6 +71,15 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (is (equal "bafkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
                (gethash :text-source text-info)))))
 
+(test opinion-on-opinion "Effects cascade"
+  (let* ((rootres (gethash *target* *subjective*))
+         (target "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+         (targetres (gethash target *subjective*))
+         (rwarstats (warflagger::warstats-from-scsc-results rootres))
+         (twarstats (warflagger::warstats-from-scsc-results targetres)))
+    (is (gethash :inflammatory twarstats))
+    (is (not (gethash :inflammatory rwarstats)))))
+
 (test opinion-with-bad-excerpt "Excerpt not found"
   (let* ((iid "bafkreihv55u2tcj2m7dcxlr4twcqhhkafix56mrlfermuwz4tizsw7x7zy")
          (opinion (gethash iid *opinion-store*)))

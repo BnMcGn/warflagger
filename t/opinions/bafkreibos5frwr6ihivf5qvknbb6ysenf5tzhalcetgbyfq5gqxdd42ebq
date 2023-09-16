@@ -1,0 +1,5 @@
+;;OpinML 0.0.1 :s-expression
+(:target "https://warflagger.net/o/bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge" :rooturl
+ "https://warflagger.net/static/html/sample.html" :flag
+ (:negative :inflammatory) :author "https://warflagger.net/u/WFTestUser" :created
+ "2023-09-15T17:50:02+0000")
