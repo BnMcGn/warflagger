@@ -413,14 +413,14 @@
 
 
 (defflag scsc::negative-spam
-  (set-other-flag :spam)
+  (set-other-flag :negative-spam)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::negative-inflammatory
-  (set-other-flag :inflammatory)
+  (set-other-flag :negative-inflammatory)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
@@ -445,21 +445,21 @@
     (vote-down)))
 
 (defflag scsc::negative-language-warning
-  (set-other-flag :language-warning)
+  (set-other-flag :negative-language-warning)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::negative-disturbing
-  (set-other-flag :disturbing)
+  (set-other-flag :negative-disturbing)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::negative-logical-fallacy
-  (set-other-flag :logical-fallacy)
+  (set-other-flag :negative-logical-fallacy)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
@@ -484,14 +484,14 @@
     (vote-wrong)))
 
 (defflag scsc::negative-out-of-bounds
-  (set-other-flag :out-of-bounds)
+  (set-other-flag :negative-out-of-bounds)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::positive-funny
-  (set-other-flag :funny)
+  (set-other-flag :positive-funny)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
@@ -516,7 +516,7 @@
     (vote-up)))
 
 (defflag scsc::positive-interesting
-  (set-other-flag :interesting)
+  (set-other-flag :positive-interesting)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
@@ -552,14 +552,14 @@
       (vote-wrong ref))))
 
 (defflag scsc::custodial-redundant
-  (set-other-flag :redundant)
+  (set-other-flag :custodial-redundant)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::custodial-out-of-date
-  (set-other-flag :out-of-date)
+  (set-other-flag :custodial-out-of-date)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
@@ -567,14 +567,14 @@
 
 (defflag scsc::custodial-correction
   ;;FIXME: What do we actually do with this? Need to specify...
-  (set-other-flag :correction)
+  (set-other-flag :custodial-correction)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::custodial-flag-abuse
-  (set-other-flag :flag-abuse)
+  (set-other-flag :custodial-flag-abuse)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
@@ -585,21 +585,21 @@
     (disable-parent)))
 
 (defflag scsc::custodial-offtopic
-  (set-other-flag :offtopic)
+  (set-other-flag :custodial-offtopic)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::custodial-arcane
-  (set-other-flag :arcane)
+  (set-other-flag :custodial-arcane)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
   (save-flag)
   (post-flag))
 
 (defflag scsc::custodial-blank
-  (set-other-flag :blank)
+  (set-other-flag :custodial-blank)
   (dont-flag)
   (set-tree-freshness (get-opinion-created))
   (run-modifiers)
