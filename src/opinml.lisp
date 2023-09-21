@@ -153,6 +153,10 @@
              (hu:collect :clean-comment clean-comment))
            (when-let ((references (assoc-cdr :references opinion)))
              (hu:collect :references references))
+           (when-let ((refd-opinion (assoc-cdr :refd-opinion opinion)))
+             (hu:collect :refd-opinion refd-opinion))
+           (when-let ((reference-domain (assoc-cdr :reference-domain opinion)))
+             (hu:collect :reference-domain reference-domain))
            (when-let ((directives (assoc-cdr :directives opinion)))
              (hu:collect :directives directives)))))))))
 

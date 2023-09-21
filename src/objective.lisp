@@ -108,9 +108,9 @@
                          opinion)))
         ;;Additions for references placed here, outside of the *opinion-store* binding
         ;;FIXME: Currently using DB to look up outside reference opinions
-        (when (assoc :reference opinion)
-          (setf opinion (append opinion (opinion-reference-attributes opinion))))
-        opinion)))
+        (if (and (assoc :reference opinion) (gadgets:assoc-cdr :reference opinion))
+            (append opinion (opinion-reference-attributes opinion))
+            opinion))))
    plist))
 
 (defun extend-opinions (plist)
