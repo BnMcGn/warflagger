@@ -326,7 +326,7 @@
   (length1 (assoc-cdr :tree-address (get-opinion))))
 
 (defun blank-flag-p ()
-  (eq :blank (funcall *dispatch* :info :other-flag)))
+  (eq :custodial-blank (funcall *dispatch* :info :other-flag)))
 
 (defun vote-down ()
   (funcall *dispatch* :cast-vote :down))
