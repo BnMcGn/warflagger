@@ -77,8 +77,8 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
          (targetres (gethash target *subjective*))
          (rwarstats (warflagger::warstats-from-scsc-results rootres))
          (twarstats (warflagger::warstats-from-scsc-results targetres)))
-    (is (gethash :inflammatory twarstats))
-    (is (not (gethash :inflammatory rwarstats)))))
+    (is (gethash :negative-inflammatory twarstats))
+    (is (not (gethash :negative-inflammatory rwarstats)))))
 
 (test opinion-with-bad-excerpt "Excerpt not found"
   (let* ((iid "bafkreihv55u2tcj2m7dcxlr4twcqhhkafix56mrlfermuwz4tizsw7x7zy")
