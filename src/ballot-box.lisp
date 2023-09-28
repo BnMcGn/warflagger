@@ -12,7 +12,7 @@
 
 (defun ballot-box-p (item)
   (and (hash-table-p item)
-       (every (rcurry #'gadgets:key-in-hash? item) '(:right :wrong :up :down))))
+       (every (rcurry #'gadgets:key-in-hash? item) '(:right :wrong :up :down :author))))
 
 (deftype ballot-box () `(satisfies ballot-box-p))
 
@@ -23,13 +23,14 @@
 
 (deftype vote-direction () `(satisfies vote-direction-p))
 
-(declaim (ftype (function () ballot-box) make-ballot-box))
-(defun make-ballot-box ()
+(declaim (ftype (function (&optional iid uri) ballot-box) make-ballot-box))
+(defun make-ballot-box (&optional iid author)
   (let ((res (make-hash-table)))
     (setf (gethash :right res) nil)
     (setf (gethash :wrong res) nil)
     (setf (gethash :up res) nil)
     (setf (gethash :down res) nil)
+    (setf (gethash :author res) (list iid author))
     (setf (gethash 'cache res) nil)
     res))
 
@@ -37,7 +38,7 @@
 (defun copy-ballot-box (old)
   "Make a shallow copy of a ballot box"
   (let ((new (make-ballot-box)))
-    (dolist (k '(:up :down :right :wrong))
+    (dolist (k '(:up :down :right :wrong :author))
       (setf (gethash k new) (gethash k old)))
     new))
 
@@ -58,7 +59,9 @@
     (dolist (box (cdr boxes))
       (dolist (dir '(:right :wrong :up :down))
         (dolist (vote (gethash dir box))
-          (apply #'cast-vote! res dir vote))))
+          (apply #'cast-vote! res dir vote)))
+      (alexandria:when-let ((auth (gethash :author box)))
+        (cast-vote! res :up (car auth) (second auth))))
     res))
 
 (defun merge-with-inverted-ballot-boxes (&rest boxes)
@@ -72,13 +75,17 @@
       (loop for dir in '(:right :wrong :up :down)
             for swap in '(:wrong :right :down :up)
             do (dolist (vote (gethash dir box))
-                 (apply #'cast-vote! res swap vote))))
+                 (apply #'cast-vote! res swap vote)))
+      (alexandria:when-let ((auth (gethash :author box)))
+        (cast-vote! res :down (car auth) (second auth))))
     res))
 
 (declaim (ftype (function (ballot-box) boolean) ballot-box-empty-p))
 (defun ballot-box-empty-p (balbox)
-  (not (some (lambda (cat) (not-empty (gethash cat balbox)))
-             '(:right :up :wrong :down))))
+  (not (or
+        (some (lambda (cat) (not-empty (gethash cat balbox)))
+              '(:right :up :wrong :down))
+        (gethash :author balbox))))
 
 (declaim (ftype (function (ballot-box) ballot-box) remove-extra-votes print-ballot-box))
 (defun remove-extra-votes (balbox)
@@ -94,7 +101,8 @@
  - There can be multiple unique ref votes per iid."
   (let ((res (make-ballot-box))
         (present (make-hash-table :test #'equal))
-        (refcheck (make-hash-table :test #'equal)))
+        (refcheck (make-hash-table :test #'equal))
+        (balbox-author (when-let ((auth (gethash :author balbox))) (second auth))))
     (hu:collecting-hash-table (:existing present :mode :replace)
       (loop for (iid author . reference) in (gethash :right balbox)
             do (if (author-reasonable-p author)
@@ -110,6 +118,9 @@
             do (unless (gethash author present)
                  (cast-vote! res :up iid author)
                  (hu:collect author t))))
+    ;; We need author field if author is not present somewhere else in the upvotes.
+    (unless (and balbox-author (gethash balbox-author present))
+      (setf (gethash :author res) (gethash :author balbox)))
     (setf present (make-hash-table :test #'equal))
     (hu:collecting-hash-table (:existing present :mode :replace)
       (loop for (iid author . reference) in (gethash :wrong balbox)
@@ -142,6 +153,8 @@
        (down
          (loop for (nil author . nil) in (gethash :down balbox)
                sum (author-vote-value author))))
+    (when-let ((authvote (gethash :author balbox)))
+      (incf up (author-vote-value (second authvote))))
     (values right up wrong down)))
 
 (defun ballot-box-totals (balbox)
@@ -177,6 +190,13 @@
     (values effect balance score)))
 
 (defun apply-ballot-box-to-warstats! (balbox warstats)
+  (let ((bbcopy (copy-ballot-box balbox)))
+    (setf (gethash :author bbcopy) nil)
+    (multiple-value-bind (right up wrong down) (ballot-box-totals bbcopy)
+      (setf (gethash :x-right warstats) right)
+      (setf (gethash :x-up warstats) up)
+      (setf (gethash :x-wrong warstats) wrong)
+      (setf (gethash :x-down warstats) down)))
   (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
     (setf (gethash :x-right warstats) right)
     (setf (gethash :x-up warstats) up)

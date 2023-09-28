@@ -136,7 +136,7 @@
 
 (defun scsc-dispatch (key parent-dispatch info)
   "key is iid or rooturl"
-  (let ((ballot-box (warflagger:make-ballot-box))
+  (let ((ballot-box (warflagger:make-ballot-box (getf info :iid) (getf info :author)))
         (text-ballot-box (warflagger:make-ballot-box))
         (title-ballot-box (warflagger:make-ballot-box))
         (tree-freshness nil)
@@ -158,10 +158,6 @@
                  (:text text-ballot-box)
                  (:title title-ballot-box)
                  (otherwise ballot-box))))
-      ;;The author of the opinion has implicitly voted it up. Need this to give the flag effect
-      ;;This means a duplicate vote on the target, but ballot-box code should cancel that out.
-      (when (getf info :iid)
-        (warflagger:cast-vote! ballot-box :up (getf info :iid) (getf info :author)))
       (lambda (cmd param &rest params)
         (case cmd
           (:direction
