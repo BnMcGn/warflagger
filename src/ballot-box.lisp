@@ -118,9 +118,7 @@
             do (unless (gethash author present)
                  (cast-vote! res :up iid author)
                  (hu:collect author t))))
-    ;; We need author field if author is not present somewhere else in the upvotes.
-    (unless (and balbox-author (gethash balbox-author present))
-      (setf (gethash :author res) (gethash :author balbox)))
+    (setf (gethash :author res) (gethash :author balbox))
     (setf present (make-hash-table :test #'equal))
     (hu:collecting-hash-table (:existing present :mode :replace)
       (loop for (iid author . reference) in (gethash :wrong balbox)
@@ -153,8 +151,9 @@
        (down
          (loop for (nil author . nil) in (gethash :down balbox)
                sum (author-vote-value author))))
-    (when-let ((authvote (gethash :author balbox)))
-      (incf up (author-vote-value (second authvote))))
+    (when-let* ((authvote (gethash :author balbox))
+                (auth (second authvote)))
+      (incf up (author-vote-value auth)))
     (values right up wrong down)))
 
 (defun ballot-box-totals (balbox)
@@ -166,7 +165,8 @@
 
 (defun print-ballot-box (bb)
   (hu:with-keys
-      (:right :up :wrong :down) bb
+   (:right :up :wrong :down :author) bb
+    (format t ":author ~a~%" author)
     (format t ":right ~a~%" right)
     (format t ":up ~a~%" up)
     (format t ":wrong ~a~%" wrong)
@@ -198,10 +198,6 @@
       (setf (gethash :x-wrong warstats) wrong)
       (setf (gethash :x-down warstats) down)))
   (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
-    (setf (gethash :x-right warstats) right)
-    (setf (gethash :x-up warstats) up)
-    (setf (gethash :x-wrong warstats) wrong)
-    (setf (gethash :x-down warstats) down)
     (multiple-value-bind (effect controv) (score-controversy (+ right up) (+ wrong down))
       (setf (gethash :effect warstats) effect)
       (setf (gethash :controversy warstats) controv))))
