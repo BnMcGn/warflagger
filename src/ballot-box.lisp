@@ -30,7 +30,7 @@
     (setf (gethash :wrong res) nil)
     (setf (gethash :up res) nil)
     (setf (gethash :down res) nil)
-    (setf (gethash :author res) (list iid author))
+    (setf (gethash :author res) (when (and iid author) (list iid author)))
     (setf (gethash 'cache res) nil)
     res))
 
@@ -151,9 +151,8 @@
        (down
          (loop for (nil author . nil) in (gethash :down balbox)
                sum (author-vote-value author))))
-    (when-let* ((authvote (gethash :author balbox))
-                (auth (second authvote)))
-      (incf up (author-vote-value auth)))
+    (when-let* ((authvote (gethash :author balbox)))
+      (incf up (author-vote-value (second authvote))))
     (values right up wrong down)))
 
 (defun ballot-box-totals (balbox)
