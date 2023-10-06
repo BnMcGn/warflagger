@@ -115,7 +115,8 @@
 
 (define-parts cljs-base
   :@javascript-link "/static/javascript/local.js"
-  :@javascript-link "/static/cljs-out/dev-main.js"
+  ;;:@javascript-link "/static/cljs-out/dev-main.js"
+  :@javascript-link "/static/cljs-out/dev/main_bundle.js"
   :@account-info #'tw-account-bar
   :@head #'favicon-links
   :@site-index
