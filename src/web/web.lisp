@@ -177,6 +177,21 @@
                 (declare (ignore c))
                 (webhax-core:web-fail-404))))))
 
+  (setf (ningle:route *app* "/o2/*")
+        (cljs-page
+           ()
+         (bind-validated-input
+          ((iid :string))
+          (handler-case
+              (let* ((opin (opinion-by-id iid))
+                     (rooturl (assoc-cdr :rooturl opin)))
+                (mount-cljs-component ("opinion-page")
+                  :rooturl (lisp rooturl)
+                  :focus (lisp (list* 'list (wf/ipfs::tree-address opin)))))
+            (warflagger:not-found (c)
+              (declare (ignore c))
+              (webhax-core:web-fail-404))))))
+
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
             ()
