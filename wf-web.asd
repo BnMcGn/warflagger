@@ -33,7 +33,6 @@
 		 :components ((:file "web/package")
                               (:file "web/misc")
                               (:file "web/mood")
-                              (:file "web/grouped")
                               (:file "web/things")
                               (:file "web/opinion-form")
                               (:file "web/account")

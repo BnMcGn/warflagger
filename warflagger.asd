@@ -52,6 +52,7 @@
                              (:file "ipfs")
                              (:file "warflagger")
                              (:file "summarizer")
+                             (:file "grouped")
                              (:file "admin")
                              (:file "slicer"))))
   :in-order-to ((test-op (test-op "test-warflagger"))))

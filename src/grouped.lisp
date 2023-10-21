@@ -1,4 +1,4 @@
-(in-package :wf/web)
+(in-package :warflagger)
 
 ;;What will our datafile need?
 ;; - opins, warstats (opin and rooturl), headlines
@@ -98,8 +98,8 @@
           :refiid (assoc-cdr :iid refopin)
           :title (grab-title refurl)
           :title-key refurl
-          :looks (when (authenticated?)
-                   (get-looks (get-user-name) rootid))
+          ;;:looks (when (authenticated?)
+          ;;         (get-looks (get-user-name) rootid))
           :rootid rootid)
          (let ((refdat (warflagger::outgoing-reference-data refid)))
            ;;FIXME: warstats should come from context
@@ -125,8 +125,9 @@
           :rootid discrootid
           :title (grab-title url)
           :title-key url
-          :looks (when (authenticated?)
-                   (get-looks (get-user-name) discrootid))))))
+          ;;:looks (when (authenticated?)
+          ;;(get-looks (get-user-name) discrootid)
+          ))))
     (proto:dotree (opid tree :proc-leaf t :proc-branch nil)
       (when-let ((row (format-group-component-data opid (1- (length proto:*tree-stack*)))))
         (cl-utilities:collect row)))))
