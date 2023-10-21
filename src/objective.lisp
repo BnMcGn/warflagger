@@ -22,7 +22,8 @@
    #:opinion-can-apply-hashtag-to-parent
    #:skip-opinion
    #:has-found-excerpt-p
-   #:opinion-is-question))
+   #:opinion-is-question
+   #:ipfs-write-grouped-data))
 
 (in-package :wf/ipfs)
 

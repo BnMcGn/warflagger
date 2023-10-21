@@ -26,7 +26,10 @@
 
 (defun initialize-warstat-dirs ()
   (ipfs-ensure-directory-exists "/rooturls")
-  (ipfs-ensure-directory-exists "/opinions"))
+  (ipfs-ensure-directory-exists "/opinions")
+  ;;FIXME
+  (ipfs-ensure-directory-exists "/subjective")
+  (ipfs-ensure-directory-exists "/subjective/default"))
 
 ;;FIXME: MFS for now. We might transition to OrbitDB.
 (defun save-extended-opinion (opinion &key overwrite)
@@ -146,6 +149,43 @@
   (dolist (rurl (append (warflagger:all-rooturls) (warflagger:all-proper-references)))
     (ipfs-write-rooturl-data rurl))
   (update-ipns))
+
+;;;;;;;;;;;;;;;;
+;; Grouped stuff
+;;;;;;;;;;;;;;;;
+
+(defun tidy-grouped-item (itm)
+  (let ((allowed-keys '(:rowtype :display-depth :url :title :title-key :iid :comment :refparent
+                                 :reference :reference-domain :tree-address :refbot :refopiniid)))
+    (hu:collecting-hash-table ()
+     (dolist (k allowed-keys)
+       (when (gadgets:key-in-hash? k itm)
+         (hu:collect k (gethash k itm)))))))
+
+(defun serialize-grouped (grouped)
+  (warflagger:with-inverted-case
+   (prin1-to-string
+    (gadgets:mapcan-by-2
+     (lambda (k v)
+       (case k
+         (:group-opinions (list k v))
+         (:group-rooturls (list k v))
+         (:keywords (list k (hu:hash->plist v)))
+         (:groups (list k (proto:mapleaves
+                           (lambda (leaf)
+                             (if (hash-table-p leaf)
+                                 (hu:hash->plist (tidy-grouped-item leaf))
+                               leaf))
+                           v)))))
+     grouped))))
+
+(defun ipfs-write-grouped-data ()
+  (initialize-warstat-dirs)
+  ;;FIXME: load-static-grouped-list is a short term strategy
+  (let* ((data (warflagger::prep-data-for-grouped-ipfs (warflagger::load-static-grouped-list)))
+         (data (serialize-grouped data)))
+    (ipfs:with-files-write (s "/subjective/default/grouped.data" :create t :truncate t)
+     (princ data s))))
 
 ;;FIXME: This is ignorant. We are going to clear out everything. Probably wrong, but let's find out
 (defun reset-pins ()
