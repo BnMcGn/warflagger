@@ -222,6 +222,20 @@
          :opinions opinion-iids
          :rooturls rooturls)))))
 
+(defun prep-data-for-grouped-ipfs (rootlist)
+  (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
+         (discrootids (mapcar #'get-rooturl-id discroots))
+         (keywords (mapcar (rcurry #'getf :keywords) rootlist))
+         (groups (grouped-data discrootids)))
+    (multiple-value-bind (opinion-iids rooturls)
+        (gather-grouped-id-requirements (flatten groups))
+      (list
+       :groups groups
+       :keywords
+       (hu:alist->hash (pairlis discroots keywords))
+       :group-opinions opinion-iids
+       :group-rooturls rooturls))))
+
 (defun write-grouped-data-file ()
   (with-open-file (s (merge-pathnames "grouped.json" wf/local-settings:*warstats-path*)
                      :direction :output :if-exists :supersede :if-does-not-exist :create)
