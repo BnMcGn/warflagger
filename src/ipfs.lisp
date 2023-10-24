@@ -156,7 +156,8 @@
 
 (defun tidy-grouped-item (itm)
   (let ((allowed-keys '(:rowtype :display-depth :url :title :title-key :iid :comment :refparent
-                                 :reference :reference-domain :tree-address :refbot :refopiniid)))
+                                 :reference :reference-domain :tree-address :refbot :refopiniid
+                                 :refiid)))
     (hu:collecting-hash-table (:mode :replace)
      (dolist (k allowed-keys)
        (when (gadgets:key-in-hash? k itm)
