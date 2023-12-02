@@ -113,7 +113,12 @@
 
   (setf (ningle:route *app* "/target2/*")
         ;;FIXME: figure out sidebar stuff
-        (cljs-page ()
+        (cljs-page
+            (:@side-content
+             (lambda ()
+               (bind-validated-input
+                ((id :integer))
+                (target-participants-sidebar id))))
           (bind-validated-input
            ((id :integer)
             &key
@@ -195,7 +200,11 @@
   (setf (ningle:route *app* "/grouped/*")
         (quick-page
             ()
-          (grouped-page)))
+            (warflagger::grouped-page)))
+
+  (setf (ningle:route *app* "/grouped2/*")
+        (cljs-page ()
+          (mount-cljs-component ("grouped"))))
 
   (setf (ningle:route *app* "/faq/")
         (quick-page ()

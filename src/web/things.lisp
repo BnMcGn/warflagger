@@ -117,9 +117,10 @@
   (display-thing-block-in-sidebar
    (tag-as-author #'target-participants)
    (list id)
-   #'mount-react-thing
+   #'mount-cljs-thing
    (format nil "/target-participants/~a" id)
-   :label "Target: Participants"))
+   :label "Target: Participants"
+   :class (featurebox-side nil)))
 
 (setf (ningle:route *app* "/target-participants/*")
       (quick-page ()
@@ -325,3 +326,11 @@
              (list* 'list
                     (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))
     :trim (lisp *thing-summary-width*)))
+
+(defun mount-cljs-thing (items)
+  (let ((thingid (format nil "cljs-thing-~a" (incf *mr-counter*))))
+    (mount-cljs-component ("thing-lister" :mount-id thingid :key thingid)
+      :things (lisp
+               (list* 'list
+                      (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))
+      :trim (lisp *thing-summary-width*))))

@@ -101,17 +101,17 @@
           ;;:looks (when (authenticated?)
           ;;         (get-looks (get-user-name) rootid))
           :rootid rootid)
-         (let ((refdat (warflagger::outgoing-reference-data refid)))
-           ;;FIXME: warstats should come from context
-           (setf (getf refdat :warstats) (hu:plist->hash (getf refdat :warstats)))
-           (setf (getf refdat :refd-opinion-warstats)
-                 (hu:plist->hash (getf refdat :refd-opinion-warstats)))
-           (list*
-            :display-depth depth
-            :rowtype :reference
-            :refid refid
-            :refparent parent-rootid
-            refdat))))))
+       (let ((refdat (warflagger::outgoing-reference-data refid)))
+         ;;FIXME: warstats should come from context
+         (setf (getf refdat :warstats) (hu:plist->hash (getf refdat :warstats)))
+         (setf (getf refdat :refd-opinion-warstats)
+               (hu:plist->hash (getf refdat :refd-opinion-warstats)))
+         (list*
+          :display-depth depth
+          :rowtype :reference
+          :refid refid
+          :refparent parent-rootid
+          refdat))))))
 
 (defun format-group-data (discrootid tree)
   (cl-utilities:collecting
