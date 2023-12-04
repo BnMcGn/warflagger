@@ -9,12 +9,12 @@
 
 (defun featurebox-side (more-css)
   (gadgets:strcat (featurebox more-css)
-                  " ml-2.5 mr-2.5 mb-4"))
+                  " sm:ml-2.5 sm:mr-2.5 mb-4 mx-0"))
 
 (defun sidebar-stuff (more-css)
   (gadgets:strcat (or more-css "")
           " sm:basis-44"
-          " pt-1 pl-2 pr-2 tracking-[0.015rem]"
+          " pt-[2px] sm:pt-1 px-0 sm:pl-2 sm:pr-2 tracking-[0.015rem]"
           " heir-p:m-2.5 heir-p:mt-4 heir-p:mb-4"
           " heir-p:text-xs heir-p:lineHeight-4"
           " heir-h3:mb-2.5 heir-h3:mt-1.5 heir-h3:ml-neg2.5 heir-h3:mr-neg2.5"
@@ -65,7 +65,7 @@
     (:div
      :class "flex sm:flex-row flex-col"
      (:div :id "left_side"
-           :class (lisp (sidebar-stuff "sm:bg-white bg-black mt-[2px] sm:mt-0"))
+           :class (lisp (sidebar-stuff "mt-0 child:sm:mt-0 child:mb-[2px] "))
            :@site-index :@side-content)
      (:div :class "grow sm:w-min min-w-full sm:min-w-0"
            :@messages :@inner :@footnotes)
@@ -128,20 +128,21 @@
        (lisp
         (loop for (url label) in *index*
               do (htm (:div (:a :href url (str label)))))))
-      (:select
-       :class "sm:hidden block bg-black text-white p-2 mx-8"
-       :style "width: calc(100% - 4rem)"
-       :|onChange| (ps:ps
-                    (ps:chain
-                     window location
-                     (replace
-                      (ps:@
-                       (ps:getprop (ps:@ this options) (ps:@ this selected-index))
-                       value))))
-       (:option :value "" :selected "selected" "Index")
-       (lisp
-        (loop for (url label) in *index*
-              do (htm (:option :value url (str label)))))))))
+      (:div
+       :class "sm:hidden flex bg-black justify-center"
+       (:select
+        :class "p-2 bg-black text-white"
+        :|onChange| (ps:ps
+                     (ps:chain
+                      window location
+                      (replace
+                       (ps:@
+                        (ps:getprop (ps:@ this options) (ps:@ this selected-index))
+                        value))))
+        (:option :value "" :selected "selected" "Index")
+        (lisp
+         (loop for (url label) in *index*
+               do (htm (:option :value url (str label))))))))))
 
 (defun clath:clath-page-wrapper (title body-func)
   (funcall

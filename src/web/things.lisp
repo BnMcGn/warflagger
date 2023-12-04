@@ -108,13 +108,24 @@
      (:a :href (make-author-url authid)
          (str (warflagger:author-representation-from-row (get-author-data authid)))))))
 
+(defun special-side-block (source params display-func main-url
+                                  &key (class "featurebox_side")
+                                  label (trim *thing-sidebox-width*))
+  (html-out
+   (:div :class "flex justify-center bg-black"
+         (:h3 :class "sm:hidden block"
+              (:a :href main-url (str label))))
+   (lisp (display-thing-block-in-sidebar
+          source params display-func main-url
+          :class (gadgets:strcat class " hidden sm:block") :label label :trim trim))))
+
 (defun target-participants (targid &key getcount)
   (if getcount
       (length (flaggers-for-rooturl (get-rooturl-by-id targid)))
       (thing-slice (flaggers-for-rooturl (get-rooturl-by-id targid)))))
 
 (defun target-participants-sidebar (id)
-  (display-thing-block-in-sidebar
+  (special-side-block
    (tag-as-author #'target-participants)
    (list id)
    #'mount-cljs-thing
