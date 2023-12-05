@@ -90,7 +90,7 @@
           (order-by-mixin (colm 'datestamp) :desc))))))
 
 (setf (ningle:route *app* "/opinions-recent/")
-      (quick-page ()
+      (cljs-page ()
         (bind-validated-input
             (&key
              (index :integer))
@@ -98,7 +98,7 @@
             (thing-lister:display-thing-block-with-pagers
              (tag-as-opinion #'recent-opinions)
              nil
-             #'mount-react-thing
+             #'mount-cljs-thing
              "/opinions-recent/"
              (or index 0))))))
 
@@ -134,7 +134,7 @@
    :class (featurebox-side nil)))
 
 (setf (ningle:route *app* "/target-participants/*")
-      (quick-page ()
+      (cljs-page ()
         (bind-validated-input
             ((id :integer)
              &key
@@ -142,7 +142,7 @@
           (display-thing-block-with-pagers
            (tag-as-author #'target-participants)
            (list id)
-           #'mount-react-thing
+           #'mount-cljs-thing
            (format nil "/target-participants/~a" id)
            (or index 0)))))
 
