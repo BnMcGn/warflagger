@@ -162,12 +162,13 @@
           (list :order-by (list (list (colm 'datestamp) :desc))))))))
 
 (defun author-opinions-sidebar (id)
-  (display-thing-block-in-sidebar
+  (special-side-block
    (tag-as-opinion #'author-opinions '(:hide-author t))
    (list id)
-   #'mount-react-thing
+   #'mount-cljs-thing
    (format nil "/author-opinions/~a" id)
-   :label "Author: Opinions"))
+   :label "Author: Opinions"
+   :class (featurebox-side nil)))
 
 (setf (ningle:route *app* "/author-opinions/*")
       (quick-page ()
@@ -192,12 +193,13 @@
        (thing-slice rslt))))
 
 (defun author-discussions-sidebar (id)
-  (display-thing-block-in-sidebar
+  (special-side-block
    (tag-as-rooturl #'author-discussions)
    (list id)
-   #'mount-react-thing
+   #'mount-cljs-thing
    (format nil "/author-discussions/~a" id)
-   :label "Author: Discussions"))
+   :label "Author: Discussions"
+   :class (featurebox-side nil)))
 
 (setf (ningle:route *app* "/author-discussions/*")
       (quick-page ()
