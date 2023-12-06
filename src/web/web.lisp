@@ -258,10 +258,10 @@
           (user-home-page)))
 
   (setf (ningle:route *app* "/u/*")
-        (quick-page (#'author-page-parts)))
+        (cljs-page (#'author-page-parts)))
 
   (setf (ningle:route *app* "/author/*")
-        (quick-page (#'author-page-parts)))
+        (cljs-page (#'author-page-parts)))
 
   (unless-production
    (setf (ningle:route *app* "/demo/")

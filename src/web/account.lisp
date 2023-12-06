@@ -188,10 +188,10 @@
                         (local-time:timestamp-month since))
                    (local-time:timestamp-year since)))))
           (:h4 (format *webhax-output* "Opinions Posted: ~a" num)))
-        (thing-lister:display-thing-block-in-sidebar
+        (pagerless-main-block
          #'%author-references
          (list authid)
-         #'mount-react-thing
+         #'mount-cljs-thing
          (format nil "/author-references/~a" authid)
          :trim thing-lister:*thing-summary-width*
          :label "Author: References Made"

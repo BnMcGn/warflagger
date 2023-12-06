@@ -119,6 +119,13 @@
           source params display-func main-url
           :class (gadgets:strcat class " hidden sm:block") :label label :trim trim))))
 
+(defun pagerless-main-block (source params display-func main-url
+                                    &key (class "featurebox_side")
+                                    label (trim *thing-sidebox-width*))
+  (display-thing-block-in-sidebar
+   source params display-func main-url
+   :class (gadgets:strcat class " hidden sm:block") :label label :trim trim))
+
 (defun target-participants (targid &key getcount)
   (if getcount
       (length (flaggers-for-rooturl (get-rooturl-by-id targid)))
@@ -171,7 +178,7 @@
    :class (featurebox-side nil)))
 
 (setf (ningle:route *app* "/author-opinions/*")
-      (quick-page ()
+      (cljs-page ()
         (bind-validated-input
             ((id :integer)
              &key
@@ -179,7 +186,7 @@
           (display-thing-block-with-pagers
            (tag-as-opinion #'author-opinions)
            (list id)
-           #'mount-react-thing
+           #'mount-cljs-thing
            (format nil "/author-opinions/~a" id)
            (or index 0)))))
 
@@ -202,7 +209,7 @@
    :class (featurebox-side nil)))
 
 (setf (ningle:route *app* "/author-discussions/*")
-      (quick-page ()
+      (cljs-page ()
         (bind-validated-input
             ((id :integer)
              &key
@@ -210,7 +217,7 @@
           (display-thing-block-with-pagers
            (tag-as-rooturl #'author-discussions)
            (list id)
-           #'mount-react-thing
+           #'mount-cljs-thing
            (format nil "/author-discussions/~a" id)
            (or index 0)))))
 
@@ -243,7 +250,7 @@
         (list :order-by (list (list (colm 'datestamp) :desc)))))))
 
 (setf (ningle:route *app* "/author-replies/*")
-      (quick-page ()
+      (cljs-page ()
         (bind-validated-input
             ((id :integer)
              &key
@@ -251,7 +258,7 @@
           (display-thing-block-with-pagers
            (tag-as-opinion #'%author-replies)
            (list id)
-           #'mount-react-thing
+           #'mount-cljs-thing
            (format nil "/author-replies/~a" id)
            (or index 0)))))
 
@@ -274,7 +281,7 @@
                  (:id url))))))))
 
 (setf (ningle:route *app* "/author-references/*")
-      (quick-page ()
+      (cljs-page ()
         (bind-validated-input
             ((id :integer)
              &key
@@ -282,7 +289,7 @@
           (display-thing-block-with-pagers
            #'%author-references
            (list id)
-           #'mount-react-thing
+           #'mount-cljs-thing
            (format nil "/author-references/~a" id)
            (or index 0)))))
 
