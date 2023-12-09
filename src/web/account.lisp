@@ -118,21 +118,7 @@
       (when-let ((id (get-local-user-id (get-user-name))))
         (htm (:div (:a :href (make-author-url id) "View public page"))))
       (:br)))
-  (let ((*thing-sidebox-length* 20)
-        (*thing-sidebox-width* 40)
-        (uid (get-local-user-id (get-user-name))))
-    (thing-lister:display-things-sidebar
-     #'user-recently-viewed
-     (list (get-user-name))
-     (lambda (row)
-       (destructuring-bind (key type) row
-         (case type
-           (target (display-target-line key))
-           (opinion (display-opinion-line key)))))
-     ;;FIXME: For now:
-     nil
-     :label "Recently Viewed:"
-     :class "featurebox")
+  (let ((uid (get-local-user-id (get-user-name))))
     (thing-lister:display-thing-block-in-sidebar
      (tag-as-opinion #'author-opinions)
      (list (get-local-user-id (get-user-name)))

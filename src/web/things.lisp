@@ -12,50 +12,8 @@
 (setf thing-lister:*thing-sidebox-width* 18)
 
 
-(defun display-opinion-line (opid)
-  (let ((opinion (opinion-by-id opid))
-        (line-id (gadgets:mkstr (gensym "mount-opinion-"))))
-    (html-out
-      (:div :id line-id)
-      (mount-component (opinion-line :mount-id (lisp line-id))
-        :opinion (lisp (ps-gadgets:as-ps-data opinion))
-        :trim (lisp thing-lister:*thing-summary-width*)))))
-
-(defun display-target-line (rootid)
-  ;;FIXME: would be nice to display flavor. Needs server code!
-  (let* ((target (target-info-for-line rootid))
-         (warstats (getf target :warstats)))
-    (if (< 20 thing-lister:*thing-summary-width*)
-        (html-out
-          (:div
-           (:a :href (make-rootid-url rootid)
-               (str (truncate-string (getf target :title) :length 80)))
-           (:span
-            :title
-            (format nil "~a direct responses, ~a in conversation"
-                    (getf warstats :replies-immediate) (getf warstats :replies-total))
-            (str (format nil "(~a/~a)"
-                         (getf warstats :replies-immediate) (getf warstats :replies-total))))
-           (str (with-output-to-string (*webhax-output*)
-                  (display-warstats warstats)))))
-        (html-out
-          (:div
-           (:a :href (make-rootid-url rootid)
-               (str (truncate-string (getf target :title)
-                                     :length 18))))))))
-
 (defun opinion-thing-link (opid)
   (format nil "/opinion-page/~a" opid))
-
-(defun target-info-for-line (rootid)
-  (let ((url (get-rooturl-by-id rootid)))
-    (list
-     :id rootid
-     ;;FIXME: tryit isn't the safest thing to use
-     :title (or (tryit (grab-title url)) "PAGE UNAVAILABLE")
-     :text (or (tryit (grab-text url)) "PAGE UNAVAILABLE")
-     :url url
-     :warstats (warstats-for-target url))))
 
 ;;FIXME: Should all be done in query or else with something like an ordered
 ;; hash table.
@@ -101,12 +59,6 @@
              #'mount-cljs-thing
              "/opinions-recent/"
              (or index 0))))))
-
-(defun display-author-line (authid)
-  (html-out
-    (:div
-     (:a :href (make-author-url authid)
-         (str (warflagger:author-representation-from-row (get-author-data authid)))))))
 
 (defun special-side-block (source params display-func main-url
                                   &key (class "featurebox_side")
