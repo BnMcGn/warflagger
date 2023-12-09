@@ -119,18 +119,18 @@
         (htm (:div (:a :href (make-author-url id) "View public page"))))
       (:br)))
   (let ((uid (get-local-user-id (get-user-name))))
-    (thing-lister:display-thing-block-in-sidebar
+    (pagerless-main-block
      (tag-as-opinion #'author-opinions)
      (list (get-local-user-id (get-user-name)))
-     #'mount-react-thing
+     #'mount-cljs-thing
      (format nil "/author-opinions/~a" uid)
      :trim thing-lister:*thing-summary-width*
      :label "Your Opinions:"
      :class "featurebox")
-    (thing-lister:display-thing-block-in-sidebar
+    (pagerless-main-block
      (tag-as-opinion #'%author-replies)
      (list (get-local-user-id (get-user-name)))
-     #'mount-react-thing
+     #'mount-cljs-thing
      (format nil "/author-replies/~a" uid)
      :trim thing-lister:*thing-summary-width*
      :label "Replies to your Posts:"
