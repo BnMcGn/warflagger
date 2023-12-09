@@ -124,7 +124,7 @@
                                     label (trim *thing-sidebox-width*))
   (display-thing-block-in-sidebar
    source params display-func main-url
-   :class (gadgets:strcat class " hidden sm:block") :label label :trim trim))
+   :class class :label label :trim trim))
 
 (defun target-participants (targid &key getcount)
   (if getcount
@@ -138,7 +138,8 @@
    #'mount-cljs-thing
    (format nil "/target-participants/~a" id)
    :label "Target: Participants"
-   :class (featurebox-side nil)))
+   :class (featurebox-side nil)
+   :trim *thing-sidebox-width*))
 
 (setf (ningle:route *app* "/target-participants/*")
       (cljs-page ()
@@ -175,7 +176,8 @@
    #'mount-cljs-thing
    (format nil "/author-opinions/~a" id)
    :label "Author: Opinions"
-   :class (featurebox-side nil)))
+   :class (featurebox-side nil)
+   :trim *thing-sidebox-width*))
 
 (setf (ningle:route *app* "/author-opinions/*")
       (cljs-page ()
@@ -206,7 +208,8 @@
    #'mount-cljs-thing
    (format nil "/author-discussions/~a" id)
    :label "Author: Discussions"
-   :class (featurebox-side nil)))
+   :class (featurebox-side nil)
+   :trim *thing-sidebox-width*))
 
 (setf (ningle:route *app* "/author-discussions/*")
       (cljs-page ()
@@ -276,7 +279,7 @@
                    (:key (assoc-cdr :id opinion))
                    (:id (assoc-cdr :iid opinion))))
                 (hu:hash
-                 (:type :rooturl)
+                 (:type :reference)
                  (:key (tryit (get-rooturl-id url)))
                  (:id url))))))))
 
