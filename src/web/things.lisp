@@ -295,13 +295,6 @@
 ;;FIXME: counter doesn't seem like a healthy idea...
 (defparameter *mr-counter* 0)
 
-(defun mount-react-thing (items)
-  (mount-component (thing-loader :mount-id (format nil "react-thing-~a" (incf *mr-counter*)))
-    :things (lisp
-             (list* 'list
-                    (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))
-    :trim (lisp *thing-summary-width*)))
-
 (defun mount-cljs-thing (items)
   (let ((thingid (format nil "cljs-thing-~a" (incf *mr-counter*))))
     (mount-cljs-component ("thing-lister" :mount-id thingid :key thingid)

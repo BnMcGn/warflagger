@@ -254,7 +254,7 @@
          #'flag-color-page))
 
   (setf (ningle:route *app* "/user/")
-        (quick-page ()
+        (cljs-page ()
           (user-home-page)))
 
   (setf (ningle:route *app* "/u/*")
@@ -331,7 +331,7 @@
         (claxy:middleware (list (list "/ipfs/" "http://localhost:8080/ipfs/")
                                 (list "/ipns/" "http://localhost:8080/ipns/")))
         (clath:component
-         "https://logintest.warflagger.com:5000/")
+         wf/local-settings::*base-url*)
         (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
         ;;(snooze:make-clack-middleware)
         *app*))
