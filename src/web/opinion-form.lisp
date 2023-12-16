@@ -341,13 +341,15 @@ This is for non-cljs
   (check-signed-up)
   (bind-validated-input
       (&key
-       (target :url)
+       (target :string) ;;FIXME: use (or :url iid?)
        (excerpt :string)
        (offset :unsigned-integer)
        (target-text :boolean)
        (target-title :boolean)
        (suggest-target-text :boolean)
        (suggest-target-title :boolean))
+      (unless (or (ratify:url-p target) (warflagger:iid-p target))
+        (webhax-core:web-fail-400 "Target must be URL or IID"))
     (mount-cljs-component ("make-opinion")
       :target (lisp target)
       :excerpt (lisp excerpt)

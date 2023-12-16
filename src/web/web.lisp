@@ -64,7 +64,7 @@
    (setf (ningle:route *app* "/mock-make/*")
          (cljs-page ()
            (mock-make-page))))
- 
+
   (setf (ningle:route *app* "/author-url-data/")
         (input-function-wrapper
          (lambda ()
