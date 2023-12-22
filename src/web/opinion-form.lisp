@@ -22,7 +22,8 @@
   (gadgets:mapcan-by-2
    (lambda (k v) (list k (webhax-validate:normalize-fieldspec-body v)))
    `(:target
-     ((:url :notnull) :description "Target URL")
+     ((:or (:url :notnull) ,(webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID"))
+      :description "Target URL")
      :excerpt
      (:string)
      :excerpt-offset
@@ -93,7 +94,7 @@
   (save-new-references (assoc-cdr :url opinion))
   (wf/ipfs:ipfs-write-rooturl-data (assoc-cdr :rooturl opinion))
   (wf/ipfs::update-ipns)
-  (write-grouped-data-file)
+  (warflagger::write-grouped-data-file)
   ;;FIXME: pre-ipfs stuff that should go away
   (write-all-rootid-warstats (assoc-cdr :rootid opinion)))
 
@@ -341,15 +342,15 @@ This is for non-cljs
   (check-signed-up)
   (bind-validated-input
       (&key
-       (target :string) ;;FIXME: use (or :url iid?)
+       (target (:or :url (webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID"))) 
        (excerpt :string)
        (offset :unsigned-integer)
        (target-text :boolean)
        (target-title :boolean)
        (suggest-target-text :boolean)
        (suggest-target-title :boolean))
-      (unless (or (ratify:url-p target) (warflagger:iid-p target))
-        (webhax-core:web-fail-400 "Target must be URL or IID"))
+      ;(unless (or (ratify:url-p target) (warflagger:iid-p target))
+      ;  (webhax-core:web-fail-400 "Target must be URL or IID"))
     (mount-cljs-component ("make-opinion")
       :target (lisp target)
       :excerpt (lisp excerpt)
