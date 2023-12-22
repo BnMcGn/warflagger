@@ -161,6 +161,7 @@
 (defun all-proper-references ()
   (get-column (tabl 'reference) (colm 'reference)))
 
+;;FIXME: obsolete
 (defun get-rooturl-for-url (url)
   "Tries to find the url at the root of a tree of comments. The primary value will always be a guess at the url. The second value tells whether get-rooturl is sure of its result. Get-rooturl does not do network lookups. The rooturl must exist in the database as a rooturl."
   (declare (type string url))
@@ -174,6 +175,9 @@
         (when (rooturl-p url)
           url))))
 
+(defun get-rootid-for-iid (iid)
+  (assoc-cdr :rootid (opinion-by-id iid)))
+
 (defun get-rooturl-id (rurl)
   (if-let ((rec (get-assoc-by-col (colm 'rooturl 'rooturl) rurl)))
        (assoc-cdr :id rec)
@@ -184,6 +188,7 @@
     (values (assoc-cdr :rooturl rec) (assoc-cdr :rooturl-real rec))
        (error "Rooturl ID not found")))
 
+;;FIXME: obsolete
 ;;;FIXME: Each opinion should record its rooturl. Needs access to targetted opinion, therefore.
 ;;; this will save hunting down the rooturl and all of the uncertainty code
 (defun rooturl-real-p (id)
@@ -191,6 +196,7 @@
 the page text can be found in the cache."
   (nth-value 1 (get-rooturl-by-id id)))
 
+;;FIXME: obsolete
 ;;;FIXME: What to do if it isn't the real root? Who corrects the rooturl field
 ;; on all those opinions?
 ;;; FIXME: Should this check for opinml meta tags?
@@ -202,9 +208,11 @@ the page text can be found in the cache."
         ;;FIXME: Implement offsite opinml hunting
         t))) ;Why the trailing t? Who receives?
 
+;;FIXME: obsolete
 (defun find/store-root-url (rurl)
   (let ((rootid
-          (block top
+         (block top
+            (when (iid-p rurl) (return-from top (get-rootid-for-iid rurl)))
             (multiple-value-bind (val sig) (tryit (get-rooturl-id rurl))
               (when sig (return-from top val)))
             (when-let ((val (get-rooturl-for-url rurl)))
