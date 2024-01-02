@@ -31,11 +31,11 @@
 		 :src
 		 :serial t
 		 :components ((:file "web/package")
+                              (:file "web/headers")
                               (:file "web/misc")
                               (:file "web/mood")
                               (:file "web/things")
                               (:file "web/opinion-form")
                               (:file "web/account")
-                              (:file "web/headers")
                               (:file "web/web")))))
 
