@@ -146,7 +146,7 @@
 
 (defun clath:clath-page-wrapper (title body-func)
   (funcall
-   (webhax-route:quick-page
+   (cljs-page
        (:@title title)
      (princ (funcall body-func) *webhax-output*))))
 
@@ -172,13 +172,14 @@
     (:meta :name "msapplication-config" :content "/static/img/browserconfig.xml")
     (:meta :name "theme-color" :content "#ffffff")))
 
-(defmacro cljs-page ((&rest parts-and-templates) &body body)
-  `(webhax-core:input-function-wrapper
-    (lambda ()
-      (webhax-metaplate:display-page
-       #'cljs-layout
-       #'cljs-base
-       ,@parts-and-templates
-       ,@(when body `(:@inner
-                      (lambda ()
-                        ,@body)))))))
+(eval-always
+ (defmacro cljs-page ((&rest parts-and-templates) &body body)
+   `(webhax-core:input-function-wrapper
+     (lambda ()
+       (webhax-metaplate:display-page
+        #'cljs-layout
+        #'cljs-base
+        ,@parts-and-templates
+        ,@(when body `(:@inner
+                       (lambda ()
+                         ,@body))))))))

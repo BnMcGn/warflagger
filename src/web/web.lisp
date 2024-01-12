@@ -53,7 +53,7 @@
                     (text-server-dispatcher url)))))))
 
   (setf (ningle:route *app* "/old-opinion/")
-        (quick-page ()
+        (cljs-page ()
           (opinion-form-page)))
 
   (setf (ningle:route *app* "/opinion/")
@@ -113,7 +113,7 @@
 
   ;;FIXME: redirect if url found
   (setf (ningle:route *app* "/new-target/")
-        (quick-page
+        (cljs-page
             ()
           (bind-validated-input
               (&key
@@ -142,13 +142,13 @@
           (mount-cljs-component ("grouped"))))
 
   (setf (ningle:route *app* "/faq/")
-        (quick-page ()
+        (cljs-page ()
           (html-out
             (:div :class "featurebox"
                   (named-text :faq)))))
 
   (setf (ningle:route *app* "/introduction/")
-        (quick-page ()
+        (cljs-page ()
           :@inner
           (large-logo)
           (html-out
@@ -156,19 +156,19 @@
                   (named-text :introduction)))))
 
   (setf (ningle:route *app* "/user-manual/")
-        (quick-page ()
+        (cljs-page ()
           (html-out
             (:div :class "featurebox"
                   (named-text :user-manual)))))
 
   (setf (ningle:route *app* "/bookmarklet/")
-        (quick-page ()
+        (cljs-page ()
           (html-out
             (:div :class "featurebox"
                   (named-text :bookmarklet)))))
 
   (setf (ningle:route *app* "/flags/")
-        (quick-page ()
+        (cljs-page ()
           (loop
              for category in *flag-categories*
              for labels in *flag-labels*
@@ -200,16 +200,16 @@
 
   (unless-production
    (setf (ningle:route *app* "/demo/")
-         (quick-page ()
+         (cljs-page ()
            (demo-pages))))
 
   (unless-production
    (setf (ningle:route *app* "/radmin/")
-         (quick-page ()
+         (cljs-page ()
            (mount-component (admin-page)))))
 
   (setf (ningle:route *app* "/private-call-cleanup-test-user/")
-        (quick-page ()
+        (cljs-page ()
           (cleanup-test-user)
           (html-out
             (:h1 "Done"))))
@@ -240,7 +240,7 @@
          :headers '("Access-Control-Allow-Origin" "*")))
 
   (setf (ningle:route *app* "/")
-        (quick-page (
+        (cljs-page (
                      #'main-page-parts))))
 
 ;;FIXME: Need to handle the user information that will be passed out in OpinML
