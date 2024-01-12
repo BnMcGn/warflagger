@@ -31,8 +31,7 @@
          "You don't seem to have posted on WarFlagger yet."
          (:a :href "/introduction/" "Click here")
          " for a guide to posting.")))
-       (grouped-page)
-    ))
+    (mount-cljs-component ("grouped"))))
 
 (defun tracking-code ()
  "<!-- Start of StatCounter Code for Default Guide -->

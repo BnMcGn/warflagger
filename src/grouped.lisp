@@ -191,9 +191,6 @@
         (dolist (discroot (order-discussions-by-most-recent-opinion rootids))
           (cl-utilities:collect (format-group-data discroot (getf groups discroot))))))))
 
-(defun grouped-page ()
-  (mount-component (grouped-main)))
-
 (defun prep-data-for-grouped-json (rootlist)
   (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
          (discrootids (mapcar #'get-rooturl-id discroots))
