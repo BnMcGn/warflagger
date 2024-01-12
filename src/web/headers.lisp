@@ -24,31 +24,6 @@
           " heir-h4:text-sm heir-h4:lineHeight-3.5"))
 
 (setf (cl-who:html-mode) :html5)
-(define-default-layout (warflagger-main :wrapper #'webhax:page-base)
-  (:prepend-parts
-   :@head (html-out (:meta :charset "utf-8"))
-   :@head (html-out (:meta :name "viewport"
-                           :content "width=device-width, initial-scale=1, shrink-to-fit=no"))
-   :@css-link "https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-   :@css-link "/static/css/style.css"
-   :@css-link "/static/css/target.css"
-   :@css-link "/static/css/react-tabs.css")
-  (html-out
-    (:div :id "header_wrapper"
-          (:div :id "account_bar"
-                :@account-info))
-    (:div
-     :class "container-fluid"
-     (:div
-      :class "row"
-      (:div :id "left_side" :class "col-sm-2 wf-sidebar-width"
-            :@site-index :@side-content)
-      (:div :class "col"
-            :@messages :@inner :@footnotes)
-      (:div :id "right_side" :class "col-sm-2 wf-sidebar-width"
-            :@site-search :@notifications
-            (:div :class "featurebox_side" :style "opacity: 0;" "_"))))
-    (:div :id "footer" :class "jumbotron-fluid" :@copyright)))
 
 (define-layout (cljs-layout :wrapper #'webhax:page-base)
   (:prepend-parts
@@ -82,36 +57,6 @@
     ("/opinion/" "Write an Opinion")
     ("/faq/" "FAQ")
     ("http://warblog.warflagger.net/" "WarBlog")))
-
-;;FIXME: react, react-dom should be loaded from the npm bundle.
-(define-default-parts warflagger-base
-  :@javascript-link "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"
-  :@javascript-link "/static/javascript/local.js"
-  :@javascript-link "/static/javascript/warflagger-bundle.js"
-  :@javascript (ps:ps
-                 (setf -react (require "react"))
-                 (setf (ps:@ -react #:create-class) (require "create-react-class"))
-                 (setf (ps:@ -react -d-o-m) (require "react-dom-factories"))
-                 (setf -redux (require "redux"))
-                 (setf -react-redux (require "react-redux")))
-
-  :@account-info #'account-bar
-  :@javascript-link "/static/javascript/jquery/1.9.1/jquery.js"
-  :@javascript-link  "https://cdn.jsdelivr.net/npm/lodash@4/lodash.min.js"
-  ;;FIXME: Should be able to bundle these with browserify. Can't.
-  :@javascript-link "/static/node_modules/rangy/lib/rangy-core.js"
-  :@javascript-link "/static/node_modules/rangy/lib/rangy-textrange.js"
-  :@javascript-link *warflagger-js-resources*
-  :@head #'favicon-links
-  :@site-index
-  (lambda ()
-    (html-out
-      (:div
-       :class "featurebox_side"
-       (:h3 "Index")
-       (lisp
-        (loop for (url label) in *index*
-              do (htm (:div (:a :href url (str label))))))))))
 
 (define-parts cljs-base
   :@javascript-link "/static/javascript/local.js"

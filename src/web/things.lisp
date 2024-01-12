@@ -12,9 +12,6 @@
 (setf thing-lister:*thing-sidebox-width* 18)
 
 
-(defun opinion-thing-link (opid)
-  (format nil "/opinion-page/~a" opid))
-
 ;;FIXME: Should all be done in query or else with something like an ordered
 ;; hash table.
 (defun flaggers-for-rooturl (rooturl)

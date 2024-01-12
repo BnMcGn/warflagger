@@ -21,44 +21,6 @@
     (author-representation-from-row (get-author-data id))
     (userfig:userfig-value-for loginid 'screen-name)))
 
-(defun account-bar ()
-  (let* ((info (warflagger-user-info-bundle))
-         (name (when (webhax-user:signed-up?)
-                 (get-apparent-display-name (get-user-name))))
-         (links
-           (if (webhax-user:signed-up?)
-               (lambda ()
-                 (html-out
-                   (:a :href (assoc-cdr :settings-url info) "Settings")
-                   (:a :href (assoc-cdr :logout-url info) "Sign&nbsp;out")))
-               (lambda ()
-                 (html-out
-                   (:a :onclick
-                       (login-link-js (assoc-cdr :login-url info))
-                       :href "#" "Sign&nbsp;Up")
-                   (:a :onclick
-                       (login-link-js (assoc-cdr :login-url info))
-                       :href "#" "Log&nbsp;In"))))))
-    (html-out
-      (:div
-       :class "container-fluid"
-       (:div
-        :class "row"
-        (:div :class "col-sm-2 wf-sidebar-width" " ")
-        (:div
-         :class "col"
-         (:div
-          :class "d-inline-flex flex-row align-items-center"
-          :style "position: relative; width: 100%; top: 2px;"
-          (%logo)
-          (:span
-           :class "flex-grow-1"
-           (if name
-               (htm (:a :href "/user/" (str name)))
-               (str "Not Signed In")))
-          (:span (funcall links))))
-        (:div :class "col-sm-2 wf-sidebar-width" " "))))))
-
 (defun tw-account-bar ()
   (let* ((info (warflagger-user-info-bundle))
          (name (when (webhax-user:signed-up?)

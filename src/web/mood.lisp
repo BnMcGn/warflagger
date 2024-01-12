@@ -24,6 +24,8 @@
 ;;; Status indicator for targets
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;FIXME: is any of this in use?
+
 (defparameter *indicator-names* (list :x-supported "thumbs_up_sign"
                                       :x-dissed "thumbs_down_sign"
                                       :x-right "check_mark"

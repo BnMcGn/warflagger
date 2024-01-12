@@ -7,33 +7,6 @@
 
 ;;Compile resources
 
-;;FIXME: How do we update? Won't run if recompiled
-(defun write-warflagger-js-resources ()
-  (write-js-resources
-   (concatenate 'string wf/local-settings:*static-path* "javascript/warflagger-resources.js")
-   'react:build
-   ;;FIXME: Shouldn't need to specify this
-   (ps-lib-tool:get-code 'ps-lisp-library)
-   (ps-lib-tool:get-code 'ps-gadgets)
-   'webhax-widgets:ps-widgets
-   (ps-lib-tool:get-code 'ps-react-gadgets)
-   'webhax-ask
-   (ps-lib-tool:get-code 'flaglib)
-   ;'wf-web-library
-   ;'mood-lib
-   ;'displayables
-   'opinion-components
-   ;'grouped-components
-   ;'titlebar-components
-   ;'target-article
-   ;'target-thread
-   ;'target-summary
-   ;'target-components
-   ;'opinion-page
-   ;'warflagger-things
-  ;; 'radmin
-   ))
-
 (defun warflagger-user-info-bundle ()
   (cons
    (cons :user-url "")
@@ -51,10 +24,6 @@
                   (list
                    (json:encode-json-to-string
                     (text-server-dispatcher url)))))))
-
-  (setf (ningle:route *app* "/old-opinion/")
-        (cljs-page ()
-          (opinion-form-page)))
 
   (setf (ningle:route *app* "/opinion/")
         (cljs-page ()
@@ -110,7 +79,7 @@
                :rooturl (lisp url)
                :tmode (lisp tmode))))))
 
-
+  ;;FIXME: obsolete. remove after functionality check
   ;;FIXME: redirect if url found
   (setf (ningle:route *app* "/new-target/")
         (cljs-page
@@ -203,11 +172,6 @@
          (cljs-page ()
            (demo-pages))))
 
-  (unless-production
-   (setf (ningle:route *app* "/radmin/")
-         (cljs-page ()
-           (mount-component (admin-page)))))
-
   (setf (ningle:route *app* "/private-call-cleanup-test-user/")
         (cljs-page ()
           (cleanup-test-user)
@@ -268,14 +232,8 @@
         (clath:component
          wf/local-settings::*base-url*)
         (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
-        ;;(snooze:make-clack-middleware)
         *app*))
-   :port 5000
-   ;:ssl t
-   ;:ssl-key-file wf/local-settings:*ssl-key-file*
-   ;:ssl-cert-file wf/local-settings:*ssl-cert-file*
-   ;:ssl-key-password wf/local-settings:*ssl-password*
-   ))
+   :port 5000))
 
 (defun run-production-server ()
   ;; Because we aren't running the block below on live server
@@ -310,10 +268,6 @@
                   :database-type wf/local-settings:*db-connect-type*)
    (clsql:connect wf/local-settings:*test-db-connect-spec*
                   :database-type wf/local-settings:*db-connect-type* :if-exists :old))
-  (unless-production
-   ;;FIXME: we don't have write permission on production, so update through git instead.
-   ;; This isn't quite the best way to do things.
-   (write-warflagger-js-resources))
   (unless-production
    (clerk:start))
   (if-production (run-production-server) (run-test-server))
