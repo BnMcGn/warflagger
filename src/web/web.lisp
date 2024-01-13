@@ -68,13 +68,13 @@
             (:@side-content
              (lambda ()
                (bind-validated-input
-                ((id :integer))
-                (target-participants-sidebar id))))
+                ((id (:or :integer :url)))
+                (target-participants-sidebar (if (integerp id) id (get-rooturl-id id))))))
           (bind-validated-input
-           ((id :integer)
+           ((id (:or :integer :url))
             &key
             (tmode :string))
-           (let ((url (get-rooturl-by-id id)))
+           (let ((url (if (integerp id) (get-rooturl-by-id id) id)))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
                :tmode (lisp tmode))))))
