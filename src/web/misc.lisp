@@ -8,6 +8,39 @@
           :alt "[WarFlagger: Because someone is wrong on the internet]"
           :style "display: block; margin-left: auto; margin-right: auto; margin-top: 3em; margin-bottom: 3em;")))
 
+(defun %sign-up-form (screen-name email screen-name-error email-error)
+  (html-out
+   (:div
+    (:h2 "New Account")
+    (:p "Please confirm a few details to create your account.")
+    (:form :action "/sign-up/" :method "POST"
+     (:label :for "screen-name" "Screen Name:")
+     (:input :type "text" :id "screen-name" :name "screen-name":value screen-name)
+     (when screen-name-error
+       (htm (:div :class "text-red-700" screen-name-error)))
+     (:label :for "email" "Email:")
+     (:input :type "text" :id "email" :name "email":value email)
+     (when email-error
+       (htm (:div :class "text-red-700" email-error)))
+     (:input :type "submit" :value "Create")))))
+
+(defun webhax-user:sign-up-page ()
+  (bind-tested-input (&key (page-test-enabled :boolean)
+                           (screen-name (:unique :options-func 'webhax-user:list-of-screen-names))
+                           (email :email))
+    (unless page-test-enabled (check-authenticated))
+    (if (and screen-name (not *bvi-errors*))
+        (progn
+          (save-signed-up-user (hu:hash (:screen-name screen-name :email email)))
+          (html-out (:script (str (ps (setf (@ window location)
+                                            (lisp (webhax-user:login-destination))))))))
+      (if *bvi-errors*
+          (%sign-up-form (or screen-name (assoc-cdr :screen-name *key-web-input*))
+                         (or email (assoc-cdr :email *key-web-input*))
+                         (assoc-cdr :screen-name *bvi-errors*)
+                         (assoc-cdr :email *bvi-errors*))
+          (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))))
+
 (define-parts main-page-parts
   ;;:@css-link "/static/css/push_button.css"
   :@notifications

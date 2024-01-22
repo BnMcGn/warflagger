@@ -1,6 +1,18 @@
 (in-package :wf/web)
 
 
+(eval-always
+ (defmacro cljs-page ((&rest parts-and-templates) &body body)
+   `(webhax-core:input-function-wrapper
+     (lambda ()
+       (webhax-metaplate:display-page
+        #'cljs-layout
+        #'cljs-base
+        ,@parts-and-templates
+        ,@(when body `(:@inner
+                       (lambda ()
+                         ,@body))))))))
+
 ;; CSS classes, tailwind style
 
 (defun featurebox (more-css)
@@ -117,14 +129,3 @@
     (:meta :name "msapplication-config" :content "/static/img/browserconfig.xml")
     (:meta :name "theme-color" :content "#ffffff")))
 
-(eval-always
- (defmacro cljs-page ((&rest parts-and-templates) &body body)
-   `(webhax-core:input-function-wrapper
-     (lambda ()
-       (webhax-metaplate:display-page
-        #'cljs-layout
-        #'cljs-base
-        ,@parts-and-templates
-        ,@(when body `(:@inner
-                       (lambda ()
-                         ,@body))))))))
