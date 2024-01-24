@@ -25,21 +25,24 @@
      (:input :type "submit" :value "Create")))))
 
 (defun webhax-user:sign-up-page ()
-  (bind-tested-input (&key (page-test-enabled :boolean)
-                           (screen-name (:unique :options-func 'webhax-user:list-of-screen-names))
-                           (email :email))
-    (unless page-test-enabled (check-authenticated))
-    (if (and screen-name (not *bvi-errors*))
-        (progn
-          (save-signed-up-user (hu:hash (:screen-name screen-name :email email)))
-          (html-out (:script (str (ps (setf (@ window location)
-                                            (lisp (webhax-user:login-destination))))))))
-      (if *bvi-errors*
-          (%sign-up-form (or screen-name (assoc-cdr :screen-name *key-web-input*))
-                         (or email (assoc-cdr :email *key-web-input*))
-                         (assoc-cdr :screen-name *bvi-errors*)
-                         (assoc-cdr :email *bvi-errors*))
-          (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))))
+  (funcall
+   (cljs-page ()
+     (bind-tested-input (&key (page-test-enabled :boolean)
+                         (screen-name (:unique :options-func 'webhax-user:list-of-screen-names))
+                         (email :email))
+       (unless page-test-enabled (check-authenticated))
+       (if (and screen-name (not *bvi-errors*))
+           (progn
+             (unless page-test-enabled
+               (save-signed-up-user (hu:hash (:screen-name screen-name :email email))))
+             (html-out (:script (str (ps (setf (@ window location)
+                                               (lisp (webhax-user:login-destination))))))))
+           (if *bvi-errors*
+               (%sign-up-form (or screen-name (assoc-cdr :screen-name *key-web-input*))
+                              (or email (assoc-cdr :email *key-web-input*))
+                              (assoc-cdr :screen-name *bvi-errors*)
+                              (assoc-cdr :email *bvi-errors*))
+               (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))))))
 
 (define-parts main-page-parts
   ;;:@css-link "/static/css/push_button.css"
