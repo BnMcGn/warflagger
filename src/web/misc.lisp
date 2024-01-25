@@ -8,21 +8,31 @@
           :alt "[WarFlagger: Because someone is wrong on the internet]"
           :style "display: block; margin-left: auto; margin-right: auto; margin-top: 3em; margin-bottom: 3em;")))
 
+(defparameter *input-tw-classes* "block flex-none py-1 px-3 m-0 min-w-0 h-8 min-h-0 text-sm bg-white bg-none rounded border border-solid cursor-text border-stone-300 text-neutral-600 focus:border-blue-400 leading-snug shadow-sm transition-[border-color_0.15s_ease-in-out_0s] transition-[box-shadow-0.15s-ease-in-out_0s] pr-3.5")
+
 (defun %sign-up-form (screen-name email screen-name-error email-error)
   (html-out
    (:div
     (:h2 "New Account")
     (:p "Please confirm a few details to create your account.")
-    (:form :action "/sign-up/" :method "POST"
-     (:label :for "screen-name" "Screen Name:")
-     (:input :type "text" :id "screen-name" :name "screen-name":value screen-name)
-     (when screen-name-error
-       (htm (:div :class "text-red-700" screen-name-error)))
-     (:label :for "email" "Email:")
-     (:input :type "text" :id "email" :name "email":value email)
-     (when email-error
-       (htm (:div :class "text-red-700" email-error)))
-     (:input :type "submit" :value "Create")))))
+    (:div :class "border-solid border-8 rounded-lg m-2 p-2 border-blue-200 inline-block"
+     (:form
+      :class "flex flex-col gap-4 m-4"
+      :action "/sign-up/" :method "POST"
+      (:div
+       (:label :for "screen-name" "Screen Name:")
+       (:input :class *input-tw-classes*
+               :type "text" :id "screen-name" :name "screen-name" :value screen-name)
+       (when screen-name-error
+         (htm (:div :class "text-red-700" screen-name-error))))
+      (:div
+       (:label :for "email" "Email:")
+       (:input :class *input-tw-classes*
+               :type "text" :id "email" :name "email":value email)
+       (when email-error
+         (htm (:div :class "text-red-700" email-error))))
+      (:input :type "submit" :value "Create"
+              :class "py-1 px-3 text-center whitespace-nowrap align-center self-end text-sm font-normal whitespace-nowrap bg-none rounded border border-solid cursor-pointer select-none leading-snug inline-block rc-button w-32"))))))
 
 (defun webhax-user:sign-up-page ()
   (funcall
