@@ -64,12 +64,6 @@
       ((assoc :email authdat)
        (strcat *base-url* "author/" (quri:url-encode (assoc-cdr :email authdat)))))))
 
-#|
-(defun make-opinion-url (userid opinid)
-  (declare (ignore userid))
-  (strcat *base-url* "things/thing/opinion/" (princ-to-string opinid)))
-|#
-
 (defun make-opinion-url (opinion)
   (if-let ((iid (assoc :iid opinion)))
     (strcat *base-url* "o/" (cdr iid))
@@ -77,10 +71,6 @@
 
 (defun make-rootid-url (rid)
   (strcat *base-url* "target/" (princ-to-string rid)))
-
-(defun make-missing-rootid-url (url)
-  "Sometimes we want to display a target that is not yet entered into WarFlagger. Make a link that will result in such a display."
-  (strcat *base-url* "new-target/?url=" (quri:url-encode url)))
 
 ;;FIXME: rethink user urls
 (defun warflagger-user-from-url (url)
@@ -111,8 +101,9 @@
      (if id
          (list :status "success"
                :message ""
-               :warstats (make-warstats-url id :warstats)
-               :opinions (make-warstats-url id :opinions))
+               ;;FIXME: Warstats should come from ipfs. Obsolete
+               :warstats nil ;(make-warstats-url id :warstats)
+               :opinions nil ;(make-warstats-url id :opinions))
          (list :status "missing"
                :message "URL not listed on server")))))
 

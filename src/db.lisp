@@ -364,16 +364,6 @@ the page text can be found in the cache."
 (defmethod get-target-text ((opinid integer))
   (gethash :text (text-server-dispatcher (assoc-cdr :target (opinion-by-id opinid)))))
 
-(defun make-wf-url-for-url (url)
-  (multiple-value-bind (id type) (get-target-id-from-url url)
-    (case type
-      (:rooturl (make-rootid-url id))
-      (:opinion (make-opinion-url (opinion-by-id id)))
-      (otherwise
-       (if (stringp (is-location-opinml? url))
-         url
-         (make-missing-rootid-url url))))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users and Authors
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -58,16 +58,9 @@
    #:grab-links
    #:save-new-references
    #:*flag-colors*
-   #:make-warstats-path
-   #:make-warstats-url
-   #:write-all-rootid-warstats
    #:*direction-colors*
-   #:write-all-warstats
    #:make-opinion-url
    #:make-rootid-url
-   #:make-missing-rootid-url
-   #:make-wf-url-for-url
-   #:*warstats-path-types*
    #:cluster-discussions
    #:*flag-category-keys*
    #:*default-vote*

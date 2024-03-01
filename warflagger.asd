@@ -40,7 +40,6 @@
                               :depends-on ("local-settings"))
                              (:file "package")
                              (:file "db")
-                             (:file "bulk-enter")
                              (:file "references")
                              (:file "excerpts")
                              (:file "ranking")

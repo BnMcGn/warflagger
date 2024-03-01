@@ -23,7 +23,8 @@
    #:skip-opinion
    #:has-found-excerpt-p
    #:opinion-is-question
-   #:ipfs-write-grouped-data))
+   #:ipfs-write-grouped-data
+   #:ipfs-warstats))
 
 (in-package :wf/ipfs)
 

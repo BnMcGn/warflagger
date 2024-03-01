@@ -402,8 +402,8 @@ Some of these factors will obviously affect the respect points more than others.
   "The total approval effect of incoming reference opinions. All effects are assumed to be positive because the opins are using the reference as a resource."
   (reduce #'+
           (mapcar (lambda (id)
-                    (getf (request-warstats-for-url
-                           (assoc-cdr :url (opinion-by-id id)))
+                    (getf (request-warstats
+                           (assoc-cdr :iid (opinion-by-id id)))
                           :effect))
                   refopinids)))
 
