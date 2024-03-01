@@ -145,6 +145,14 @@
 (defun ipfs-rooturl-exists-p (rooturl)
   (ipfs-directory-exists-p (ipfs-rooturl-path rooturl)))
 
+(defun ipfs-opinion-path (iid &optional more)
+  (strcat "/opinions/" iid
+          (when more "/")
+          more))
+
+(defun ipfs-opinion-exists-p (iid)
+  (ipfs-directory-exists-p (ipfs-opinion-path iid)))
+
 (defun ipfs-write-all-rooturl-data ()
   (dolist (rurl (append (warflagger:all-rooturls) (warflagger:all-proper-references)))
     (ipfs-write-rooturl-data rurl))
@@ -242,6 +250,7 @@
     (warflagger:deserialize-warstat (ipfs:files-read (ipfs-rooturl-path rooturl "warstats.data")))))
 
 (defun ipfs-warstats-for-opinion (iid)
-  nil)
+  (when (ipfs-opinion-exists-p iid)
+    (warflagger:deserialize-warstat (ipfs:files-read (ipfs-opinion-path iid "warstats.data")))))
 
 
