@@ -80,9 +80,11 @@
   (check-signed-up)
   (bind-validated-input
       (&key
-       (target (:or :url (webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID"))) 
+       (target (:or :url (webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID")))
        (excerpt :string)
        (offset :unsigned-integer)
+       ;;FIXME: should check for existence
+       (flag :string)
        (target-text :boolean)
        (target-title :boolean)
        (suggest-target-text :boolean)
@@ -93,6 +95,7 @@
       :target (lisp target)
       :excerpt (lisp excerpt)
       :offset (lisp offset)
+      :flag (lisp flag)
       :target-text (lisp target-text)
       :target-title (lisp target-title)
       :suggest-target-text (lisp suggest-target-text)

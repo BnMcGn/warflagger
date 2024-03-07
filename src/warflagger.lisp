@@ -103,7 +103,7 @@
                :message ""
                ;;FIXME: Warstats should come from ipfs. Obsolete
                :warstats nil ;(make-warstats-url id :warstats)
-               :opinions nil ;(make-warstats-url id :opinions))
+               :opinions nil) ;(make-warstats-url id :opinions))
          (list :status "missing"
                :message "URL not listed on server")))))
 
