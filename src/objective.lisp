@@ -222,7 +222,7 @@
   (some (curry #'opinion-has-dirc opinion) '(:target-title :suggest-target-title)))
 
 (defun opinion-suggests-t/t (opinion)
-  (let ((dircs))))
+  (some (curry #'opinion-has-dirc opinion) '(:suggest-target-text :suggest-target-title)))
 
 (defun opinion-is-question (opinion)
   (member '(second (assoc-cdr :flag opinion)) '(:raise-question :needs-evidence)))
