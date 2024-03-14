@@ -95,12 +95,15 @@
         (cljs-page
            ()
          (bind-validated-input
-          ((iid :string))
+          ((iid :string)
+           &key
+           (tmode :string))
           (handler-case
               (let* ((opin (opinion-by-id iid))
                      (rooturl (assoc-cdr :rooturl opin)))
                 (mount-cljs-component ("opinion-page")
                   :rooturl (lisp rooturl)
+                  :tmode (lisp tmode)
                   :focus (lisp (list* 'list (wf/ipfs::tree-address opin)))))
             (warflagger:not-found (c)
               (declare (ignore c))
