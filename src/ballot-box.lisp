@@ -173,13 +173,19 @@
     (format t "~{~a~^ ~}~%" (multiple-value-list (ballot-box-totals bb))))
   bb)
 
-(defun score-vast-majority-p (pos neg)
-  (when (>= 1 pos)
-    (>= (/ 1 10) (/ neg pos))))
+(defun vast-majority-p (a b)
+  (and (< 0 a)
+       (< b a)
+       (or (> 0 b) (>= (/ 1 10) (/ b a)))))
+
+(defun significant-majority-p (a b)
+  (and (< 0 a)
+       (< b a)
+       (or (> 0 b) (>= (/ 7 10) (/ b a)))))
 
 (defun ballot-box-vast-majority-p (balbox)
   (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
-    (score-vast-majority-p (+ right up) (+ wrong down))))
+    (vast-majority-p (+ right up) (+ wrong down))))
 
 (defun score-controversy (pos neg)
   (let* ((score (- pos neg))
@@ -215,3 +221,8 @@
   (nreverse
    (mapcar #'car
            (sort (pairlis keys boxes) #'compare-ballot-boxes :key #'cdr))))
+
+(defun tally-ballot-box (balbox category)
+  (let ((balbox (remove-extra-votes balbox)))
+    ;;Get all iids of qualifying votes in a category
+    (mapcar #'car (gethash category balbox))))

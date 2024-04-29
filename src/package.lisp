@@ -102,7 +102,6 @@
    #:ballot-box-empty-p
    #:apply-ballot-box-to-warstats!
    #:ballot-box-totals
-   #:score-vast-majority-p
    #:score-controversy
    #:cast-vote!
    #:merge-ballot-boxes
@@ -145,5 +144,6 @@
    #:is-location-opinml?
    #:deserialize-warstat
    #:refd-to
-   #:discussion-refd-to))
+   #:discussion-refd-to
+   #:vast-majority-p))
 

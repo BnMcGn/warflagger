@@ -227,6 +227,16 @@
 (defun opinion-is-question (opinion)
   (member '(second (assoc-cdr :flag opinion)) '(:raise-question :needs-evidence)))
 
+(defun opinion-is-answer (opinion)
+  (destructuring-bind (cat flag) (assoc-cdr :flag opinion)
+    (or (eq flag :disagree)
+        (and (eq flag :evidence) (eq cat :negative)))))
+
+(defun opinion-is-supporting-answer (opinion)
+  (destructuring-bind (cat flag) (assoc-cdr :flag opinion)
+    (or (eq flag :agree)
+        (and (eq flag :evidence) (eq cat :positive)))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Score script creation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -327,7 +337,7 @@
         (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
           (let ((pos (+ right up))
                 (neg (+ wrong down)))
-            (when (score-vast-majority-p pos neg)
+            (when (vast-majority-p pos neg)
               (setf (gethash flag warstat) (nth-value 0 (score-controversy pos neg)))))))
       (setf (gethash :hashtags warstat)
             (cl-utilities:collecting
@@ -335,7 +345,7 @@
                 (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
                   (let ((pos (+ right up))
                         (neg (+ wrong down)))
-                    (when (score-vast-majority-p pos neg)
+                    (when (vast-majority-p pos neg)
                       (cl-utilities:collect tag)))))))
             warstat)))
 
@@ -361,8 +371,20 @@
            (res (cl-utilities:collecting
                  (when flag (cl-utilities:collect :flag))
                  (when flag (cl-utilities:collect :tag))
-                 (when quantity (cl-utilities:collect :replies)))))
+                 (when quantity (cl-utilities:collect :replies))))
+           (answered
+             ;;Our spec for answered is different for #list-of-things
+             (if (member :tag res)
+                 (and
+                  ;;pick a number...
+                  (< 6 (+ (length (tally-ballot-box ballot-box :right))
+                          (length (tally-ballot-box ballot-box :wrong))))
+                  (< 10 (+ (gethash :x-right warstat) (gethash :x-wrong warstat))))
+                 (and
+                  (< 5 (gethash :x-wrong warstat))
+                  (significant-majority-p (gethash :x-wrong warstat) (gethash :x-right warstat))))))
       (when (gadgets:not-empty res) (setf (gethash :question warstat) res))
+      (when answered (setf (gethash :question-answered warstat) t))
       warstat)))
 
 (defun add-root-text-info (stor url)

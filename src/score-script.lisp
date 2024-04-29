@@ -369,7 +369,7 @@
         (multiple-value-bind (right up wrong down) (warflagger:ballot-box-totals (get-ballot-box))
           (let ((pos (+ right up))
                 (neg (+ wrong down)))
-            (warflagger:score-vast-majority-p pos neg))))))
+            (warflagger:vast-majority-p pos neg))))))
 
 (defun run-modifiers ()
   (let ((mods (funcall *dispatch* :info :modifiers)))
