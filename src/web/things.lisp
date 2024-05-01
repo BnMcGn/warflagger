@@ -245,6 +245,29 @@
            (format nil "/author-references/~a" id)
            (or index 0)))))
 
+(defun %author-questions (authid &key getcount)
+  (let ((query (sql-stuff:unexecuted (author-questions authid))))
+    (if getcount
+        (get-count query)
+        (mapcar
+         #'car
+         (merge-query
+          query
+          (sql-stuff:limit-mixin *thing-limit* *thing-index*)
+          (list :order-by (list (list (colm 'datestamp) :desc))))))))
+
+(setf (ningle:route *app* "/author-questions/*")
+      (cljs-page ()
+        (bind-validated-input
+            ((id :integer)
+             &key
+             (index :integer))
+          (display-thing-block-with-pagers
+           (tag-as-opinion #'%author-questions)
+           (list id)
+           #'mount-cljs-thing
+           (format nil "/author-questions/~a" id)
+           (or index 0)))))
 
 ;; React thing tools
 

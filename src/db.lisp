@@ -541,6 +541,19 @@ the page text can be found in the cache."
             :from (tabl :opinion)
             :where (sql-= (colm :author) authid)))))
 
+(def-query author-questions (authid)
+  (mapcar #'car
+          (query-marker
+           (select
+            (case *id-return-type*
+              (:id (colm :id))
+              (:iid (colm :iid))
+              (otherwise (error "not implemented")))
+            :from (tabl :opinion)
+            :where (sql-and
+                    (sql-= (colm :author) authid)
+                    (sql-in (colm 'flag) '("Negative RaiseQuestion" "Negative NeedsEvidence")))))))
+
 
 ;;FIXME: broken
 (def-query author-reply-references (authid)

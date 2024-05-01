@@ -143,4 +143,12 @@
          (format nil "/author-references/~a" authid)
          :trim thing-lister:*thing-summary-width*
          :label "Author: References Made"
+         :class "featurebox")
+        (pagerless-main-block
+         #'%author-questions
+         (list authid)
+         #'mount-cljs-thing
+         (format nil "/author-questions/~a" authid)
+         :trim thing-lister:*thing-summary-width*
+         :label "Author: Questions Asked"
          :class "featurebox")))))
