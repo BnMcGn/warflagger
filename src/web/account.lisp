@@ -145,7 +145,7 @@
          :label "Author: References Made"
          :class "featurebox")
         (pagerless-main-block
-         #'%author-questions
+         (tag-as-question #'%author-questions)
          (list authid)
          #'mount-cljs-thing
          (format nil "/author-questions/~a" authid)

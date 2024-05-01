@@ -263,7 +263,7 @@
              &key
              (index :integer))
           (display-thing-block-with-pagers
-           (tag-as-opinion #'%author-questions)
+           (tag-as-question #'%author-questions)
            (list id)
            #'mount-cljs-thing
            (format nil "/author-questions/~a" id)
@@ -296,6 +296,19 @@
                      :key itm
                      :id (assoc-cdr :iid (opinion-by-id itm))
                      options)))
+           res)
+          res))))
+
+(defun tag-as-question (func)
+  (lambda (&rest params)
+    (let ((res (apply func params)))
+      (if (listp res)
+          (mapcar
+           (lambda (itm)
+             (hu:hash
+              (:type :question)
+              (:key itm)
+              (:id (assoc-cdr :iid (opinion-by-id itm)))))
            res)
           res))))
 
