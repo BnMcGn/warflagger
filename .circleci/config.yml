@@ -49,7 +49,7 @@ jobs:
             psql -h 127.0.0.1 -d 'test_opinions' -c "create user postgres with password 'test_password';"
             #psql -h 127.0.0.1 -c 'create database test_opinions;' -U postgres 
             psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
-            psql -h 127.0.0.1 -d 'test_opinions' -1 -f src/opinions.schema.sql
+            psql -h 127.0.0.1 -d 'test_opinions' -P pager=off -1 -f src/opinions.schema.sql
 
       - run:
           command: |
