@@ -45,6 +45,7 @@ jobs:
       - run:
           command: |
             psql -h 127.0.0.1 -d 'test_opinions' -c "create user ben with password 'test_password';"
+            psql -h 127.0.0.1 -d 'test_opinions' -c "create user warflagger with password 'test_password';"
             psql -h 127.0.0.1 -d 'test_opinions' -c "create user postgres with password 'test_password';"
             #psql -h 127.0.0.1 -c 'create database test_opinions;' -U postgres 
             psql -h 127.0.0.1 -d 'test_opinions' -c 'grant all privileges on database test_opinions to ben;'
