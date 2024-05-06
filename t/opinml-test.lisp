@@ -32,7 +32,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 
   (let* ((opin-path (asdf:system-relative-pathname 'warflagger "t/opinions/"))
          (rtext (try-awhile
-                 (lambda () (gadgets:tryit (wf/text:grab-text *target*)))
+                 (lambda () (gadgets:tryit (wf/text-extract:grab-text *target*)))
                  :sleep 0.5
                  :wait 8.0))
          ;;FIXME: Should handle the illegal token better, not just drop the opinion
