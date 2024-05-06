@@ -30,7 +30,7 @@
 
 (test process-page "Process a page"
   (update-page *testurl*)
-  (sleep 0.50)
+  (try-awhile (lambda (old-page-available *test-url*)) :sleep 0.5 :wait 8.0)
   (print "Printing script errors")
   (print (grab-messages *testurl*))
   (is (is-cached *testurl*))
@@ -41,7 +41,7 @@
 (test bad-page "Handle bad page"
   (let ((test-url2 (strcat *testurl* "x")))
     (update-page test-url2)
-    (sleep 0.50)
+    (sleep 2.0)
     (is (is-cached test-url2))
     (is (has-failure test-url2))
     (is (fresh-failure test-url2))
