@@ -143,7 +143,7 @@
          (format nil "/author-references/~a" authid)
          :trim thing-lister:*thing-summary-width*
          :label "Author: References Made"
-         :class "featurebox")
+         :class "featurebox mt-4")
         (pagerless-main-block
          (tag-as-question #'%author-questions)
          (list authid)
@@ -151,4 +151,4 @@
          (format nil "/author-questions/~a" authid)
          :trim thing-lister:*thing-summary-width*
          :label "Author: Questions Asked"
-         :class "featurebox")))))
+         :class "featurebox mt-4")))))
