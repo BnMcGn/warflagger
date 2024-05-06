@@ -145,5 +145,6 @@
    #:deserialize-warstat
    #:refd-to
    #:discussion-refd-to
-   #:vast-majority-p))
+   #:vast-majority-p
+   #:author-questions))
 

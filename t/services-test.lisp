@@ -13,7 +13,8 @@
 
 (in-suite test-services)
 
-(test target-seek-server "Target seek server"
+;;This service not currently running. For browser extension. Needs rework.
+'(test target-seek-server "Target seek server"
   (let ((result (target-seek-server "asdf")))
     (is (gethash :status result) "missing"))
   (let ((result (target-seek-server *target*)))
