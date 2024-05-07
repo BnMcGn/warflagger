@@ -30,7 +30,7 @@
 
 (test process-page "Process a page"
   (update-page *testurl*)
-  (try-awhile (lambda () (old-page-available *test-url*)) :sleep 0.5 :wait 8.0)
+  (try-awhile (lambda () (old-page-available *testurl*)) :sleep 0.5 :wait 8.0)
   (print "Printing script errors")
   (print (grab-messages *testurl*))
   (is (is-cached *testurl*))
@@ -43,7 +43,7 @@
     (update-page test-url2)
     (sleep 2.0)
     (is (is-cached test-url2))
-    (is (has-failure test-url2))
-    (is (fresh-failure test-url2))
+    (is (not (null (has-failure test-url2))))
+    (is (not (null (fresh-failure test-url2))))
     (is (null (is-pending test-url2)))))
 
