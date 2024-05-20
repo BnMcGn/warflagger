@@ -234,6 +234,23 @@
 
 (clerk:job "update ipns" every 12.hours (update-ipns))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Original tt
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun ipfs-write-original-text (rooturl text)
+  (initialize-warstat-dirs)
+  (let ((rootpath (ipfs-rooturl-path rooturl "")))
+    (ipfs-ensure-directory-exists rootpath)
+    (ipfs:with-files-write (s (strcat rootpath "original-text.txt"))
+      (princ text s))))
+
+(defun ipfs-write-original-title (rooturl title)
+  (initialize-warstat-dirs)
+  (let ((rootpath (ipfs-rooturl-path rooturl "")))
+    (ipfs-ensure-directory-exists rootpath)
+    (ipfs:with-files-write (s (strcat rootpath "original-title.txt"))
+      (princ title s))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IPFS read
@@ -253,4 +270,10 @@
   (when (ipfs-opinion-exists-p iid)
     (warflagger:deserialize-warstat (ipfs:files-read (ipfs-opinion-path iid "warstats.data")))))
 
+;;FIXME: any UTF-8 conversion needed?
+(defun ipfs-original-text (rooturl)
+  (ipfs:files-read (ipfs-rooturl-path rooturl "original-text.txt")))
+
+(defun ipfs-original-title (rooturl)
+  (ipfs:files-read (ipfs-rooturl-path rooturl "original-title.txt")))
 

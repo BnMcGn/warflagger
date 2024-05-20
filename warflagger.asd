@@ -30,7 +30,8 @@
                #:cl-csv
                #:plump-sexp
                #:dexador
-               #:osicat)
+               #:osicat
+               #:readability/plump)
   :serial t
   :components ((:module
                 :src
