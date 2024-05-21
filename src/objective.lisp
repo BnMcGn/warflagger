@@ -24,7 +24,16 @@
    #:has-found-excerpt-p
    #:opinion-is-question
    #:ipfs-write-grouped-data
-   #:ipfs-warstats))
+   #:ipfs-warstats
+   #:ipfs-rooturl-path
+   #:ipfs-file-exists-p
+   #:ipfs-original-text
+   #:ipfs-original-title
+   #:ipfs-write-original-text
+   #:ipfs-write-original-title
+   #:ipfs-write-original-failure
+   #:ipfs-delete-original-failure
+   #:ipfs-original-failure))
 
 (in-package :wf/ipfs)
 

@@ -31,6 +31,7 @@
                #:plump-sexp
                #:dexador
                #:osicat
+               #:crawly
                #:readability/plump)
   :serial t
   :components ((:module
@@ -52,6 +53,7 @@
                              (:file "ipfs")
                              (:file "warflagger")
                              (:file "summarizer")
+                             (:file "textract")
                              (:file "grouped")
                              (:file "admin")
                              (:file "slicer"))))
