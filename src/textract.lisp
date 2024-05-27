@@ -23,10 +23,11 @@
        errors))
     (let ((captures (crawly:url-search url :limit 1 :source :internet-archive))
           (page (when captures (crawly:get-archive-from-capture :internet-archive (car captures)))))
-      (if page (return-from tt-get-page-from-archive (values (nreverse errors) page))
+      (if page
+          (return-from tt-get-page-from-archive (values (nreverse errors) page))
           (push
-           (cond ((captures "Internet Archive: unable to fetch page")
-                  (t "Internet Archive: URL not found")))
+           (cond (captures "Internet Archive: unable to fetch page")
+                 (t "Internet Archive: URL not found"))
            errors))
       (values (nreverse errors) page))))
 
