@@ -242,25 +242,27 @@
   (initialize-warstat-dirs)
   (let ((rootpath (ipfs-rooturl-path rooturl "")))
     (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "original-text.txt"))
+    (ipfs:with-files-write (s (strcat rootpath "original-text.txt") :create t :truncate t)
       (princ text s))))
 
 (defun ipfs-write-original-title (rooturl title)
   (initialize-warstat-dirs)
   (let ((rootpath (ipfs-rooturl-path rooturl "")))
     (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "original-title.txt"))
+    (ipfs:with-files-write (s (strcat rootpath "original-title.txt") :create t :truncate t)
       (princ title s))))
 
 (defun ipfs-write-original-failure (rooturl failure)
   (initialize-warstat-dirs)
   (let ((rootpath (ipfs-rooturl-path rooturl "")))
     (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "original-failure.txt"))
-      (princ title s))))
+    (ipfs:with-files-write (s (strcat rootpath "original-failure.txt") :create t :truncate t)
+      (princ failure s))))
 
 (defun ipfs-delete-original-failure (rooturl)
-  (ipfs:files-rm (ipfs-rooturl-path rooturl "original-failure.txt")))
+  (let ((fname (ipfs-rooturl-path rooturl "original-failure.txt")))
+    (when (ipfs-file-exists-p fname)
+      (ipfs:files-rm fname))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IPFS read

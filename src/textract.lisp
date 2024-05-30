@@ -41,19 +41,27 @@
            (cl-utilities:collect err)
            (mapcar #'cl-utilities:collect err))))))
 
+(defun tt-write-page-data (url errors page)
+  (if page
+      (multiple-value-bind (title text) (tt-extract page)
+        (if text
+            (progn
+              (wf/ipfs:ipfs-delete-original-failure url)
+              (wf/ipfs:ipfs-write-original-title url title)
+              (wf/ipfs:ipfs-write-original-text url text))
+            (wf/ipfs:ipfs-write-original-failure
+             url
+             (join-errors errors "Warflagger: Couldn't extract text from page"))))
+      (wf/ipfs:ipfs-write-original-failure url (join-errors errors))))
+
 (defun tt-update-page-data (url)
   (multiple-value-bind (errors page)
       (tt-get-page-from-archive url)
-    (if page
-        (multiple-value-bind (title text) (tt-extract page)
-          (if text
-              (progn
-                (wf/ipfs:ipfs-delete-original-failure url)
-                (wf/ipfs:ipfs-write-original-title title)
-                (wf/ipfs:ipfs-write-original-text text))
-              (wf/ipfs:ipfs-write-original-failure
-               (join-errors errors "Warflagger: Couldn't extract text from page"))))
-        (wf/ipfs:ipfs-write-original-failure (join-errors errors)))))
+    (tt-write-page-data url errors page)))
+
+(defun tt-update-page-data-from-file (url path)
+  (with-open-file (s path)
+    (tt-write-page-data url nil s)))
 
 (defun tt-is-cached (url)
   (or (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "original-text.txt"))
