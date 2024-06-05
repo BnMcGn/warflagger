@@ -235,34 +235,40 @@
 (clerk:job "update ipns" every 12.hours (update-ipns))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Original tt
+;; Extracted tt
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun ipfs-write-original-text (rooturl text)
+
+(defun serialize-extracted-metadata (data)
+  (warflagger:with-inverted-case
+    (prin1-to-string
+     (gadgets:mapcan-by-2
+      (lambda (k v)
+        (case k)
+        (:title (list k v))
+        (:errors (list k v))
+        (:opinml-metadata (list k (hu:alist->plist v))))
+      data))))
+
+;;FIXME: Should constrain some lengths and keys
+(defun deserialize-extracted-metadata (data)
+  (let* ((data (if (stringp data) (make-string-input-stream data) data))
+         (metadata (proto:limited-reader data #'keywordp)))
+    metadata))
+
+(defun ipfs-write-extracted-text (rooturl text)
   (initialize-warstat-dirs)
   (let ((rootpath (ipfs-rooturl-path rooturl "")))
     (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "original-text.txt") :create t :truncate t)
+    (ipfs:with-files-write (s (strcat rootpath "extracted-text.txt") :create t :truncate t)
       (princ text s))))
 
-(defun ipfs-write-original-title (rooturl title)
+(defun ipfs-write-extracted-metadata (rooturl data)
   (initialize-warstat-dirs)
   (let ((rootpath (ipfs-rooturl-path rooturl "")))
     (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "original-title.txt") :create t :truncate t)
-      (princ title s))))
-
-(defun ipfs-write-original-failure (rooturl failure)
-  (initialize-warstat-dirs)
-  (let ((rootpath (ipfs-rooturl-path rooturl "")))
-    (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "original-failure.txt") :create t :truncate t)
-      (princ failure s))))
-
-(defun ipfs-delete-original-failure (rooturl)
-  (let ((fname (ipfs-rooturl-path rooturl "original-failure.txt")))
-    (when (ipfs-file-exists-p fname)
-      (ipfs:files-rm fname))))
+    (ipfs:with-files-write (s (strcat rootpath "extracted-metadata.txt") :create t :truncate t)
+      (princ (serialize-extracted-metadata data) s))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IPFS read
@@ -283,12 +289,11 @@
     (warflagger:deserialize-warstat (ipfs:files-read (ipfs-opinion-path iid "warstats.data")))))
 
 ;;FIXME: any UTF-8 conversion needed?
-(defun ipfs-original-text (rooturl)
-  (ipfs:files-read (ipfs-rooturl-path rooturl "original-text.txt")))
+(defun ipfs-extracted-text (rooturl)
+  (ipfs:files-read (ipfs-rooturl-path rooturl "extracted-text.txt")))
 
-(defun ipfs-original-title (rooturl)
-  (ipfs:files-read (ipfs-rooturl-path rooturl "original-title.txt")))
+(defun ipfs-extracted-metadata (rooturl)
+  (deserialize-extracted-metadata
+   (ipfs:files-read (ipfs-rooturl-path rooturl "extracted-metadata.txt"))) )
 
-(defun ipfs-original-failure (rooturl)
-  (ipfs:files-read (ipfs-rooturl-path rooturl "original-failure.txt")))
 

@@ -1,12 +1,26 @@
 (in-package :warflagger)
 
+(defun extract-opinml-meta-from-html (stream)
+  (let ((nodes (lquery:$ (initialize stream) "[property^=opinml:]")))
+    (loop for node across nodes
+          for attribs = (plump:attributes node)
+          collect (cons (gethash "property" attribs) (gethash "content" attribs)))))
+
+;;FIXME...
+(defun file-points-to-opinml-source? (stream)
+  (let ((res (extract-opinml-meta-from-html stream)))
+    (and (assoc "opinml:opinion" res :test #'equal)
+         (< (length (gadgets:assoc-all "opinml:opinion" res :test #'equal)) 2)
+         (assoc-cdr "opinml:opinion" res :test #'equal))))
+
 (defun tt-extract (page)
   (let* ((pobj (plump:parse page))
          (title (readability::get-article-title pobj))
+         (meta (extract-opinml-meta-from-html page))
          (article (readability::grab-article pobj))
          (simple-page (plump:serialize article nil))
          (text (readability::inner-text article)))
-    (values title text article)))
+    (values title text meta article)))
 
 (defun tt-get-page-from-archive (url)
   ;;Try common crawl first
@@ -43,16 +57,20 @@
 
 (defun tt-write-page-data (url errors page)
   (if page
-      (multiple-value-bind (title text) (tt-extract page)
+      (multiple-value-bind (title text metadata) (tt-extract page)
         (if text
             (progn
-              (wf/ipfs:ipfs-delete-original-failure url)
-              (wf/ipfs:ipfs-write-original-title url title)
-              (wf/ipfs:ipfs-write-original-text url text))
-            (wf/ipfs:ipfs-write-original-failure
+              (wf/ipfs:ipfs-write-extracted-metadata
+               url
+               `(list
+                 :title ,title
+                 ,@(when metadata (list :opinml-metadata metadata))))
+              (wf/ipfs:ipfs-write-extracted-text url text))
+            (wf/ipfs:ipfs-write-extracted-metadata
              url
-             (join-errors errors "Warflagger: Couldn't extract text from page"))))
-      (wf/ipfs:ipfs-write-original-failure url (join-errors errors))))
+             (list :errors
+                   (join-errors errors "Warflagger: Couldn't extract text from page")))))
+      (wf/ipfs:ipfs-write-extracted-metadata url (list :errors (join-errors errors)))))
 
 (defun tt-update-page-data (url)
   (multiple-value-bind (errors page)
@@ -64,49 +82,51 @@
     (tt-write-page-data url nil s)))
 
 (defun tt-is-cached (url)
-  (or (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "original-text.txt"))
-      (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "original-title.txt"))))
+  (or (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
+      (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.txt"))))
 
 (defun tt-has-failure (url)
-  (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "original-failure.txt")))
+  (getf (wf/ipfs:ipfs-extracted-metadata url) :errors))
 
 (defun text-server (url)
   "This function, served as JSON, is the text server. Url is the address of the desired text"
-  (hu:collecting-hash-table (:mode :replace)
-    (labels ((get-text ()
-               (if (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "original-text.txt"))
-                   (wf/ipfs:ipfs-original-text url)
-                   ""))
-             (get-title ()
-               (if (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "original-title.txt"))
-                   (wf/ipfs:ipfs-original-title url)
-                   "")))
-      (cond
-        ((or (null url) (eq 0 (length url)))
-         (hu:collect :text "")
-         (hu:collect :title "")
-         (hu:collect :status "failure")
-         (hu:collect :message "No URL provided"))
-        ((not (ratify:url-p url))
-         (hu:collect :text "")
-         (hu:collect :title "")
-         (hu:collect :status "failure")
-         (hu:collect :message "Not a valid URL"))
-        ((tt-has-failure url)
-         (hu:collect :text (get-text))
-         (hu:collect :title (get-title))
-         (hu:collect :status "failure")
-         (hu:collect :message (wf/ipfs:ipfs-original-failure url)))
-        ((tt-is-cached url)
-         (hu:collect :text (get-text))
-         (hu:collect :title (get-title))
-         (hu:collect :status "success")
-         (hu:collect :message ""))
-        (t
-         ;;Can't detect pending now. Change that if needed?
-         ;;(unless (is-pending url) (update-page url))
-         (tt-update-page-data url)
-         (hu:collect :text (get-text))
-         (hu:collect :title (get-title))
-         (hu:collect :status "wait")
-         (hu:collect :message "Loading page text..."))))))
+  (hu:collecting-hash-table
+   (:mode :replace)
+   (cond
+     ((or (null url) (eq 0 (length url)))
+      (hu:collect :text "")
+      (hu:collect :title "")
+      (hu:collect :status "failure")
+      (hu:collect :message "No URL provided"))
+     ((not (ratify:url-p url))
+      (hu:collect :text "")
+      (hu:collect :title "")
+      (hu:collect :status "failure")
+      (hu:collect :message "Not a valid URL"))
+     (t
+      (let* ((meta (when (wf/ipfs:ipfs-file-exists-p
+                          (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.txt"))
+                     (wf/ipfs:ipfs-extracted-metadata url)))
+             (text (if
+                    (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
+                    (wf/ipfs:ipfs-extracted-text url)
+                    "")))
+        (cond
+          ((getf meta :errors)
+           (hu:collect :text text)
+           (hu:collect :title (getf meta :title ""))
+           (hu:collect :status "failure")
+           (hu:collect :message (getf meta :errors)))
+          ((or text (getf meta :title))
+           (hu:collect :text text)
+           (hu:collect :title (getf meta :title ""))
+           (hu:collect :status "success")
+           (hu:collect :message ""))
+          (t
+           ;;Can't detect pending now. Change that if needed?
+           ;;(unless (is-pending url) (update-page url))
+           (tt-update-page-data url)
+           (hu:collect :text text)
+           (hu:collect :title (getf meta :title ""))
+           (hu:collect :status "wait")
+           (hu:collect :message "Loading page text..."))))))))

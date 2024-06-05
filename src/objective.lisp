@@ -27,13 +27,10 @@
    #:ipfs-warstats
    #:ipfs-rooturl-path
    #:ipfs-file-exists-p
-   #:ipfs-original-text
-   #:ipfs-original-title
-   #:ipfs-write-original-text
-   #:ipfs-write-original-title
-   #:ipfs-write-original-failure
-   #:ipfs-delete-original-failure
-   #:ipfs-original-failure))
+   #:ipfs-extracted-text
+   #:ipfs-write-extracted-text
+   #:ipfs-extracted-metadata
+   #:ipfs-write-extracted-metadata))
 
 (in-package :wf/ipfs)
 

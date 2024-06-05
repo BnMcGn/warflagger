@@ -2,18 +2,6 @@
 
 (in-package #:warflagger)
 
-(defun extract-opinml-meta-from-html (stream)
-  (let ((nodes (lquery:$ (initialize stream) "[property^=opinml:]")))
-    (loop for node across nodes
-          for attribs = (plump:attributes node)
-          collect (cons (gethash "property" attribs) (gethash "content" attribs)))))
-
-(defun file-points-to-opinml-source? (stream)
-  (let ((res (extract-opinml-meta-from-html stream)))
-    (and (assoc "opinml:opinion" res :test #'equal)
-         (< (length (gadgets:assoc-all "opinml:opinion" res :test #'equal)) 2)
-         (assoc-cdr "opinml:opinion" res :test #'equal))))
-
 ;;FIXME: Bit of a hack. Can we do away with this?
 (defun known-translatable-opinurl (url)
   (sequence-starts-with url (strcat *base-url* "opinion-page/")))
