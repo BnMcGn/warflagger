@@ -13,14 +13,23 @@
          (< (length (gadgets:assoc-all "opinml:opinion" res :test #'equal)) 2)
          (assoc-cdr "opinml:opinion" res :test #'equal))))
 
+;;FIXME: need offset info
+(defun extract-links-from-plump-object (pobj)
+  (let ((links (lquery:$ (lquery:initialize pobj) "a")))
+    (cl-utilities:collect
+        (loop for link across links
+             do (cl-utilities:collect (list :excerpt (plump:text link)
+                                            :target (plump:attribute link "href")))))))
+
 (defun tt-extract (page)
   (let* ((pobj (plump:parse page))
          (title (readability::get-article-title pobj))
          (meta (extract-opinml-meta-from-html page))
          (article (readability::grab-article pobj))
+         (links (extract-links-from-plump-object article))
          (simple-page (plump:serialize article nil))
          (text (readability::inner-text article)))
-    (values title text meta article)))
+    (values title text meta links article)))
 
 (defun tt-get-page-from-archive (url)
   ;;Try common crawl first
@@ -57,14 +66,15 @@
 
 (defun tt-write-page-data (url errors page)
   (if page
-      (multiple-value-bind (title text metadata) (tt-extract page)
+      (multiple-value-bind (title text metadata links) (tt-extract page)
         (if text
             (progn
               (wf/ipfs:ipfs-write-extracted-metadata
                url
                `(list
                  :title ,title
-                 ,@(when metadata (list :opinml-metadata metadata))))
+                 ,@(when metadata (list :opinml-metadata metadata))
+                 ,@(when links (list :links links))))
               (wf/ipfs:ipfs-write-extracted-text url text))
             (wf/ipfs:ipfs-write-extracted-metadata
              url
