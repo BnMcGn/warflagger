@@ -18,7 +18,7 @@
     ((opinion-exists-p url) t)
     ((known-translatable-opinurl url) (translate-opinurl url))
     ((and (is-cached url) (old-page-available url))
-     (if-let ((link (file-points-to-opinml-source? (grab-page url :update nil))))
+     (if-let ((link (url-metadata-points-to-opinml-source? url)))
        link nil))
     (t nil)))
 

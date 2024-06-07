@@ -16,7 +16,7 @@
 
 (defun load-text ()
   ;;For now. Might want edited text from ipfs?
-  (setf *text* (wf/text-extract:grab-text *url*))
+  (setf *text* (wf/ipfs:ipfs-extracted-text *url*))
   (setf *tdat* (warflagger:create-textdata *text*)))
 
 (defun raw-links ()

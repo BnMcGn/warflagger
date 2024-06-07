@@ -6,9 +6,13 @@
           for attribs = (plump:attributes node)
           collect (cons (gethash "property" attribs) (gethash "content" attribs)))))
 
-;;FIXME...
-(defun file-points-to-opinml-source? (stream)
-  (let ((res (extract-opinml-meta-from-html stream)))
+(defun url-has-opinml-metadata? (url)
+  (let ((meta (wf/ipfs:ipfs-extracted-metadata url)))
+    (when meta
+      (getf meta :opinml-metadata))))
+
+(defun url-metadata-points-to-opinml-source? (url)
+  (let ((res (url-has-opinml-metadata? url)))
     (and (assoc "opinml:opinion" res :test #'equal)
          (< (length (gadgets:assoc-all "opinml:opinion" res :test #'equal)) 2)
          (assoc-cdr "opinml:opinion" res :test #'equal))))

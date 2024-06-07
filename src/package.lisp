@@ -55,7 +55,6 @@
    #:unless-production
    #:delete-opinion
    #:get-target-id-from-url
-   #:grab-links
    #:save-new-references
    #:*flag-colors*
    #:*direction-colors*

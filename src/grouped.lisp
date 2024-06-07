@@ -96,7 +96,7 @@
           :refparent parent-rootid
           :refid refid
           :refiid (assoc-cdr :iid refopin)
-          :title (grab-title refurl)
+          :title (wf/ipfs:ipfs-extracted-title refurl)
           :title-key refurl
           ;;:looks (when (authenticated?)
           ;;         (get-looks (get-user-name) rootid))
@@ -123,7 +123,7 @@
           :display-depth 0
           :url url
           :rootid discrootid
-          :title (grab-title url)
+          :title (wf/ipfs:ipfs-extracted-title url)
           :title-key url
           ;;:looks (when (authenticated?)
           ;;(get-looks (get-user-name) discrootid)

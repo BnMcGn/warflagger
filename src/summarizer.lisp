@@ -73,8 +73,7 @@
              (hu:collect :natural-title comment)
              (hu:collect :title comment))))
         ((eq type :rooturl)
-         (when-let ((title (and (is-cached url)
-                                (grab-title url :alternate nil :update nil))))
+         (when-let ((title (wf/ipfs:ipfs-extracted-title url)))
            (hu:collect :natural-title title)
            (hu:collect :title title)))
          ;;FIXME: Don't yet know what to do if reference isn't a target.

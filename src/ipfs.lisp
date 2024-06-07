@@ -294,6 +294,9 @@
 
 (defun ipfs-extracted-metadata (rooturl)
   (deserialize-extracted-metadata
-   (ipfs:files-read (ipfs-rooturl-path rooturl "extracted-metadata.txt"))) )
+   (ipfs:files-read (ipfs-rooturl-path rooturl "extracted-metadata.txt"))))
+
+(defun ipfs-extracted-title (rooturl)
+  (getf (ipfs-extracted-metadata rooturl) :title))
 
 

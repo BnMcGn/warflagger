@@ -101,9 +101,10 @@
   (let ((text))
     (cond
       ((is-cached url)
-       (if-let ((links (grab-links url)))
-         (return-from %extract-links-from-target links)
-         (setf text (grab-text url))))
+       (if-let ((links (getf (wf/ipfs:ipfs-extracted-metadata url) :links)))
+         (return-from %extract-links-from-target
+           (mapcar (alexandria:rcurry #'getf :target) links))
+         (setf text (wf/ipfs:ipfs-extracted-text url))))
       ((opinion-exists-p url)
        (setf text (assoc-cdr :comment (opinion-exists-p url))))
       (t (error "Target not found as RootURL or as opinion")))
