@@ -41,12 +41,12 @@
                              (:file "text-extract/textract"
                               :depends-on ("local-settings"))
                              (:file "package")
+                             (:file "objective")
                              (:file "db")
                              (:file "references")
                              (:file "excerpts")
                              (:file "ranking")
                              (:file "opinml")
-                             (:file "objective")
                              (:file "ballot-box")
                              (:file "author-stats")
                              (:file "score-script")

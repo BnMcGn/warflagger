@@ -145,5 +145,7 @@
    #:refd-to
    #:discussion-refd-to
    #:vast-majority-p
-   #:author-questions))
+   #:author-questions
+   #:tt-update-page-data
+   #:tt-update-page-data-from-file))
 

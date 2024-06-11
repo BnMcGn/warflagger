@@ -19,11 +19,13 @@
 
 ;;FIXME: need offset info
 (defun extract-links-from-plump-object (pobj)
-  (let ((links (lquery:$ (lquery:initialize pobj) "a")))
-    (cl-utilities:collect
+  ;; "a" -> "p[href]" for readability processed stuff
+  (let ((links (lquery:with-master-document (pobj) (lquery:$ "p[href]"))))
+    (cl-utilities:collecting
         (loop for link across links
              do (cl-utilities:collect (list :excerpt (plump:text link)
                                             :target (plump:attribute link "href")))))))
+
 
 (defun tt-extract (page)
   (let* ((pobj (plump:parse page))
@@ -97,7 +99,7 @@
 
 (defun tt-is-cached (url)
   (or (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
-      (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.txt"))))
+      (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.data"))))
 
 (defun tt-has-failure (url)
   (getf (wf/ipfs:ipfs-extracted-metadata url) :errors))

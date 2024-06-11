@@ -267,12 +267,15 @@
   (initialize-warstat-dirs)
   (let ((rootpath (ipfs-rooturl-path rooturl "")))
     (ipfs-ensure-directory-exists rootpath)
-    (ipfs:with-files-write (s (strcat rootpath "extracted-metadata.txt") :create t :truncate t)
+    (ipfs:with-files-write (s (strcat rootpath "extracted-metadata.data") :create t :truncate t)
       (princ (serialize-extracted-metadata data) s))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IPFS read
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-condition extracted-data-not-found (error)
+  ((text :initarg :text :reader text)))
 
 (defun ipfs-warstats (item)
   (if (warflagger:iid-p item)
@@ -290,13 +293,24 @@
 
 ;;FIXME: any UTF-8 conversion needed?
 (defun ipfs-extracted-text (rooturl)
-  (ipfs:files-read (ipfs-rooturl-path rooturl "extracted-text.txt")))
+  (let ((fname (ipfs-rooturl-path rooturl "extracted-text.txt")))
+    (unless (ipfs-file-exists-p fname)
+      (error 'extracted-data-not-found :text "No extracted-text.txt file found for this URL"))
+    (ipfs:files-read fname)))
 
 (defun ipfs-extracted-metadata (rooturl)
-  (deserialize-extracted-metadata
-   (ipfs:files-read (ipfs-rooturl-path rooturl "extracted-metadata.txt"))))
+  (let ((fname (ipfs-rooturl-path rooturl "extracted-metadata.data")))
+    (unless (ipfs-file-exists-p fname)
+      (error 'extracted-data-not-found :text "No extracted-metadata.txt file found for this URL"))
+    (deserialize-extracted-metadata (ipfs:files-read fname))))
 
 (defun ipfs-extracted-title (rooturl)
   (getf (ipfs-extracted-metadata rooturl) :title))
+
+(defun extraction-attempted? (rooturl)
+  (gadgets:tryit (ipfs-extracted-metadata rooturl)))
+
+(defun extracted? (rooturl)
+  (gadgets:tryit (ipfs-extracted-text rooturl)))
 
 

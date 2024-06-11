@@ -31,7 +31,10 @@
    #:ipfs-write-extracted-text
    #:ipfs-extracted-metadata
    #:ipfs-write-extracted-metadata
-   #:ipfs-extracted-title))
+   #:ipfs-extracted-title
+   #:extracted-data-not-found
+   #:extraction-attempted?
+   #:extracted?))
 
 (in-package :wf/ipfs)
 
