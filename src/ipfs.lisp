@@ -244,10 +244,10 @@
     (prin1-to-string
      (gadgets:mapcan-by-2
       (lambda (k v)
-        (case k)
-        (:title (list k v))
-        (:errors (list k v))
-        (:opinml-metadata (list k (hu:alist->plist v))))
+        (case k
+          (:title (list k v))
+          (:errors (list k v))
+          (:opinml-metadata (list k (hu:alist->plist v)))))
       data))))
 
 ;;FIXME: Should constrain some lengths and keys

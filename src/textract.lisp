@@ -77,8 +77,7 @@
             (progn
               (wf/ipfs:ipfs-write-extracted-metadata
                url
-               `(list
-                 :title ,title
+               `(:title ,title
                  ,@(when metadata (list :opinml-metadata metadata))
                  ,@(when links (list :links links))))
               (wf/ipfs:ipfs-write-extracted-text url text))
