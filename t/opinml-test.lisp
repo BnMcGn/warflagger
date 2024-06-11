@@ -21,6 +21,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 
 (in-suite test-opinml)
 
+#|
 (defun init-test-opinml ()
   ;;Rob the content from the file, then hijack the url.
   (unless (gethash *target* *byurl*)
@@ -35,6 +36,22 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
                  (lambda () (gadgets:tryit (wf/text-extract:grab-text *target*)))
                  :sleep 0.5
                  :wait 8.0))
+         ;;FIXME: Should handle the illegal token better, not just drop the opinion
+         (data (handler-bind ((proto:illegal-token #'wf/ipfs:skip-opinion))
+                 (wf/ipfs::objective-data-for-dir opin-path)))
+         (more-data (warflagger:execute-score-script data)))
+    (setf *opinion-store* (getf data :opinion-store))
+    (setf *opinion-tree* (getf data :opinion-tree))
+    (setf *score-script* (getf data :score-script))
+    (setf *rooturl-text* rtext)
+    (setf *subjective* more-data)))
+|#
+
+(defun init-test-opinml ()
+  (tt-update-page-data-from-file *testurl* (asdf:system-relative-pathname 'warflagger "t/sample.html"))
+
+  (let* ((opin-path (asdf:system-relative-pathname 'warflagger "t/opinions/"))
+         (rtext (wf/ipfs:ipfs-extracted-text *testurl*))
          ;;FIXME: Should handle the illegal token better, not just drop the opinion
          (data (handler-bind ((proto:illegal-token #'wf/ipfs:skip-opinion))
                  (wf/ipfs::objective-data-for-dir opin-path)))
