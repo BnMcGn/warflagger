@@ -17,7 +17,7 @@
   (cond
     ((opinion-exists-p url) t)
     ((known-translatable-opinurl url) (translate-opinurl url))
-    ((and (is-cached url) (old-page-available url))
+    ((tt-is-cached url)
      (if-let ((link (url-metadata-points-to-opinml-source? url)))
        link nil))
     (t nil)))

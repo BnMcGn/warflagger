@@ -199,11 +199,12 @@ the page text can be found in the cache."
 ;;FIXME: obsolete
 ;;;FIXME: What to do if it isn't the real root? Who corrects the rooturl field
 ;; on all those opinions?
-;;; FIXME: Should this check for opinml meta tags?
 (defun make-rooturl-real (root-id)
   (let ((url (get-rooturl-by-id root-id)))
     (or (rooturl-real-p root-id)
-        (and (is-cached url) (old-page-available url)
+        (and (tt-is-cached url)
+             (wf/ipfs:extracted? url)
+             (not (is-location-opinml? url))
              (update-record 'rooturl  root-id `((,(colm :rooturl-real) . t))))
         ;;FIXME: Implement offsite opinml hunting
         t))) ;Why the trailing t? Who receives?

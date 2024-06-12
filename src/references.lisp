@@ -100,7 +100,7 @@
 (defun %extract-links-from-target (url)
   (let ((text))
     (cond
-      ((is-cached url)
+      ((tt-is-cached url)
        (if-let ((links (getf (wf/ipfs:ipfs-extracted-metadata url) :links)))
          (return-from %extract-links-from-target
            (mapcar (alexandria:rcurry #'getf :target) links))
