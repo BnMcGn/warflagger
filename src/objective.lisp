@@ -398,7 +398,7 @@
       warstat)))
 
 (defun add-root-text-info (stor url)
-  (hu:with-keys (:text :status :message) (wf/text-extract:text-server url)
+  (hu:with-keys (:text :status :message) (text-server url)
     (hu:collecting-hash-table (:existing stor :mode :replace)
      (hu:collect :initial-text (and (not-empty text) text))
      (hu:collect :initial-status status)
@@ -439,7 +439,7 @@
     warstats))
 
 (defun add-root-title-info (stor url)
-  (hu:with-keys (:title :status :message) (wf/text-extract:text-server url)
+  (hu:with-keys (:title :status :message) (text-server url)
     (hu:collecting-hash-table (:existing stor :mode :replace)
       (hu:collect :initial-title (and (not-empty title) title))
       (hu:collect :initial-status status)
