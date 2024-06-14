@@ -71,6 +71,7 @@ jobs:
             git clone https://github.com/bnmcgn/paren6.git quicklisp/local-projects/paren6
             git clone https://github.com/bnmcgn/flaglib.git quicklisp/local-projects/flaglib
             git clone https://github.com/bnmcgn/crawly.git quicklisp/local-projects/crawly
+            git clone https://github.com/bnmcgn/cl-readability.git quicklisp/local-projects/cl-readability
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
             git clone https://github.com/bnmcgn/warflagger.git quicklisp/local-projects/warflagger
             sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (uiop:symbol-call :quicklisp-quickstart :install))"
