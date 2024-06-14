@@ -15,12 +15,12 @@
   nil)
 
 (test core-extractor "Test the extraction process"
-  (multiple-value-bind (title text metadata links) (tt-extract *sample-file*)
+  (multiple-value-bind (title text metadata links) (warflagger::tt-extract *sample-file*)
     (is (string= title "Sample Web Page"))
     (is (stringp text))
     (is (sequence-starts-with text "Sample"))
     (is (identity links))
-    (let ((link (some (lambda (l) (eq "CLICK HERE" (getf l :excerpt))) links)))
+    (let ((link (first-match (lambda (l) (equal "CLICK HERE" (getf l :excerpt))) links)))
       (is (identity link))
       (is (string= (getf link :target) "entities.html")))
     (is (null metadata))))

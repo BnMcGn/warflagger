@@ -49,6 +49,8 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 
 (defun init-test-opinml ()
   (tt-update-page-data-from-file *testurl* (asdf:system-relative-pathname 'warflagger "t/sample.html"))
+  (tt-update-page-data-from-file "https://warflagger.net/static/html/sample.html"
+                                 (asdf:system-relative-pathname 'warflagger "t/sample.html"))
 
   (let* ((opin-path (asdf:system-relative-pathname 'warflagger "t/opinions/"))
          (rtext (wf/ipfs:ipfs-extracted-text *testurl*))

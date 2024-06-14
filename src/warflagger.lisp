@@ -30,7 +30,7 @@
   (let ((otest (is-location-opinml? url)))
     (cond
       ((not otest)
-       (let ((res (wf/text-extract:text-server url)))
+       (let ((res (text-server url)))
          (setf (gethash :available res) (wf/ipfs::ipfs-rooturl-exists-p url))
          res))
       ((eq otest t) (warflagger:opinion-text-server url))

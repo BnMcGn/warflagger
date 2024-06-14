@@ -250,10 +250,14 @@
           (:opinml-metadata (list k (hu:alist->plist v)))))
       data))))
 
+(defun extracted-reader-predicate (symbol symtype)
+  (declare (ignore symbol))
+  (eq :keyword symtype))
+
 ;;FIXME: Should constrain some lengths and keys
 (defun deserialize-extracted-metadata (data)
   (let* ((data (if (stringp data) (make-string-input-stream data) data))
-         (metadata (proto:limited-reader data #'keywordp)))
+         (metadata (proto:limited-reader data #'extracted-reader-predicate)))
     metadata))
 
 (defun ipfs-write-extracted-text (rooturl text)

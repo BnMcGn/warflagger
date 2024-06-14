@@ -29,12 +29,12 @@
 
 (defun tt-extract (page)
   (let* ((pobj (plump:parse page))
-         (title (readability::get-article-title pobj))
+         (title (string-strip (readability::get-article-title pobj)))
          (meta (extract-opinml-meta-from-html page))
          (article (readability::grab-article pobj))
          (links (extract-links-from-plump-object article))
          (simple-page (plump:serialize article nil))
-         (text (readability::inner-text article)))
+         (text (string-strip (readability::inner-text article))))
     (values title text meta links article)))
 
 (defun tt-get-page-from-archive (url)
@@ -120,7 +120,7 @@
       (hu:collect :message "Not a valid URL"))
      (t
       (let* ((meta (when (wf/ipfs:ipfs-file-exists-p
-                          (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.txt"))
+                          (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.data"))
                      (wf/ipfs:ipfs-extracted-metadata url)))
              (text (if
                     (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
@@ -132,7 +132,7 @@
            (hu:collect :title (getf meta :title ""))
            (hu:collect :status "failure")
            (hu:collect :message (getf meta :errors)))
-          ((or text (getf meta :title))
+          ((or (not-empty text) (getf meta :title))
            (hu:collect :text text)
            (hu:collect :title (getf meta :title ""))
            (hu:collect :status "success")
