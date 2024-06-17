@@ -34,7 +34,8 @@
    #:ipfs-extracted-title
    #:extracted-data-not-found
    #:extraction-attempted?
-   #:extracted?))
+   #:extracted?
+   #:ipfs-opinion-path))
 
 (in-package :wf/ipfs)
 

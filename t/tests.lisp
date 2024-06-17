@@ -11,9 +11,9 @@
          (opins (mapcar #'pathname-name (uiop:directory-files opin-path)))
          (roots (list "https://warflagger.net/static/html/sample.html" *testurl*)))
     (dolist (op opins)
-      (cl-ipfs:files-rm (wf/ipfs:ipfs-opinion-path op "") :recursive t))
+      (cl-ipfs:files-rm (wf/ipfs:ipfs-opinion-path op "") :recursive t :force t))
     (dolist (rt roots)
-      (cl-ipfs:files-rm (wf/ipfs:ipfs-rooturl-path rt "") :recursive t))))
+      (cl-ipfs:files-rm (wf/ipfs:ipfs-rooturl-path rt "") :recursive t :force t))))
 
 (defun test-warflagger ()
   (gadgets:with-temporary-directory (:pathname tmpdir)
