@@ -6,6 +6,15 @@
 
 (in-suite wf-tests)
 
+(defun test-cleanup ()
+  (let* ((opin-path (asdf:system-relative-pathname 'warflagger "t/opinions/"))
+         (opins (mapcar #'pathname-name (uiop:directory-files opin-path)))
+         (roots (list "https://warflagger.net/static/html/sample.html" *testurl*)))
+    (dolist (op opins)
+      (cl-ipfs:files-rm (wf/ipfs:ipfs-opinion-path op "") :recursive t))
+    (dolist (rt roots)
+      (cl-ipfs:files-rm (wf/ipfs:ipfs-rooturl-path rt "") :recursive t))))
+
 (defun test-warflagger ()
   (gadgets:with-temporary-directory (:pathname tmpdir)
     (let* ((*cache-path* (merge-pathnames "cache/" tmpdir))
@@ -32,6 +41,8 @@
                  (when restart
                    (invoke-restart restart))))))
         (clsql:connect *test-db-connect-spec* :database-type *db-connect-type*))
+
+      (test-cleanup)
 
       (init-test-textract)
       (init-test-db)
