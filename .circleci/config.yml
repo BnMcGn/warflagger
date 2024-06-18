@@ -73,6 +73,7 @@ jobs:
             git clone https://github.com/bnmcgn/crawly.git quicklisp/local-projects/crawly
             git clone https://github.com/atlas-engineer/cl-readability quicklisp/local-projects/cl-readability
             git clone https://github.com/bnmcgn/clerk.git quicklisp/local-projects/clerk
+            git clone https://github.com/bnmcgn/cl-ipfs-api2.git quicklisp/local-projects/cl-ipfs-api2
             git clone https://github.com/bnmcgn/warflagger.git quicklisp/local-projects/warflagger
             sbcl --eval "(progn (load \"/tmp/quicklisp.lisp\") (uiop:symbol-call :quicklisp-quickstart :install))"
             cd ~/quicklisp/local-projects/warflagger/
