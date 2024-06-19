@@ -23,12 +23,12 @@ jobs:
 
       - run: echo $LISP
 
-      - run:
-          command: |
-            pip install --user pattern
-            pip install --user beautifulsoup4
-            pip install --user PyPDF2
-            pip install --user readability-lxml
+        #      - run:
+        #   command: |
+        #    pip install --user pattern
+        #    pip install --user beautifulsoup4
+        #    pip install --user PyPDF2
+        #    pip install --user readability-lxml
 
       - run:
           name: Waiting for Postgres to be ready
