@@ -19,7 +19,7 @@
   (gadgets:with-temporary-directory (:pathname tmpdir)
     (let* ((*cache-path* (merge-pathnames "cache/" tmpdir))
            (*warstats-path* (merge-pathnames "warstats/" tmpdir))
-           (*static-path* "quicklisp/local-projects/wf-static/")
+           (*static-path* #p"~/quicklisp/local-projects/wf-static/")
            (*base-url* (or (gadgets:not-empty *base-url*) "https://test.warflagger.net/"))
            (wf/text-extract::*bynum* nil)
            (wf/text-extract:*byurl* nil)

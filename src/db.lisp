@@ -294,8 +294,6 @@ the page text can be found in the cache."
     (push (cons :tree-address (tree-address (assoc-cdr :id opinion))) opinion))
   opinion)
 
-(defparameter *opinion-store* nil "Allows us to shim opinion-by-id so that we can avoid the database.")
-
 ;;FIXME: we might want to dispatch on string vs. integer here.
 (defun opinion-by-id (oid &key extra text)
   (when (and text (not extra))

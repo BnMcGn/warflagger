@@ -2,6 +2,8 @@
 
 (in-package #:warflagger)
 
+(defparameter *opinion-store* nil "Allows us to shim opinion-by-id so that we can avoid the database.")
+
 ;;FIXME: Bit of a hack. Can we do away with this?
 (defun known-translatable-opinurl (url)
   (sequence-starts-with url (strcat *base-url* "opinion-page/")))

@@ -1,42 +1,3 @@
-(in-package :cl-user)
-
-
-(defpackage #:wf/ipfs
-  (:use #:cl #:gadgets #:alexandria #:access)
-  (:export
-   #:target-text
-   #:suggest-target-title
-   #:target-title
-   #:text-comments-tree-p
-   #:title-comments-tree-p
-   #:text-script
-   #:title-script
-   #:general-script
-   #:participants
-   #:flag-core
-   #:opinion-references
-   #:opinion-can-apply-dircs-to-parent
-   #:objective-data-for-opinions
-   #:ipfs-write-rooturl-data
-   #:unknown-flag
-   #:opinion-can-apply-hashtag-to-parent
-   #:skip-opinion
-   #:has-found-excerpt-p
-   #:opinion-is-question
-   #:ipfs-write-grouped-data
-   #:ipfs-warstats
-   #:ipfs-rooturl-path
-   #:ipfs-file-exists-p
-   #:ipfs-extracted-text
-   #:ipfs-write-extracted-text
-   #:ipfs-extracted-metadata
-   #:ipfs-write-extracted-metadata
-   #:ipfs-extracted-title
-   #:extracted-data-not-found
-   #:extraction-attempted?
-   #:extracted?
-   #:ipfs-opinion-path))
-
 (in-package :wf/ipfs)
 
 ;;;
@@ -94,9 +55,9 @@
     (warn "Expecting type iid"))
   (let* ((op (warflagger:opinion-by-id opiniid))
          (treead (assoc-cdr :tree-address op)))
-    (if (length1 treead)
-        (gethash :text (warflagger:text-server-dispatcher (assoc-cdr :target op)))
-        (warflagger::opinion-text (last-car (butlast treead))))))
+    (if (and treead (not (length1 treead)))
+        (warflagger::opinion-text (last-car (butlast treead)))
+        (gethash :text (warflagger:text-server-dispatcher (assoc-cdr :target op))))))
 
 (defun opinion-reference-attributes (opinion)
   (let ((ref (assoc-cdr :reference opinion)))
@@ -128,15 +89,18 @@
 
 (defun extend-opinions (plist)
   (let ((warflagger:*opinion-store* (hu:plist->hash (%extend-opinions plist)
-                                                    :existing (make-hash-table :test #'equal))))
+                                                    :existing (make-hash-table :test #'equal)))
+        (res (make-hash-table :test #'equal)))
     (do-hash-table (iid opinion warflagger:*opinion-store*)
-      (setf (gethash iid warflagger:*opinion-store*)
+      (setf (gethash iid res)
             (cons (cons :tree-address (tree-address opinion warflagger:*opinion-store*)) opinion)))
     (do-hash-table (iid opinion warflagger:*opinion-store*)
-      (setf (gethash iid warflagger:*opinion-store*)
+      (setf (gethash iid res)
             ;;FIXME: get-target-text may still rely on db.
-            (warflagger::add-extras-to-opinion opinion (warflagger:get-target-text iid))))
-    warflagger:*opinion-store*))
+            (warflagger::add-extras-to-opinion
+             (cons (cons :tree-address (tree-address opinion)) opinion)
+             (warflagger:get-target-text iid))))
+    res))
 
 (defun opinion-references (opinion)
   "Note: Strips the link text out of :references"

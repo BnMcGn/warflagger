@@ -41,6 +41,7 @@
                              (:file "text-extract/textract"
                               :depends-on ("local-settings"))
                              (:file "package")
+                             (:file "warflagger")
                              (:file "objective")
                              (:file "db")
                              (:file "references")
@@ -52,7 +53,6 @@
                              (:file "score-script")
                              (:file "ipfs")
                              (:file "textract")
-                             (:file "warflagger")
                              (:file "summarizer")
                              (:file "grouped")
                              (:file "admin")

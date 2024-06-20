@@ -149,3 +149,38 @@
    #:tt-update-page-data
    #:tt-update-page-data-from-file))
 
+(defpackage #:wf/ipfs
+  (:use #:cl #:gadgets #:alexandria #:access)
+  (:export
+   #:target-text
+   #:suggest-target-title
+   #:target-title
+   #:text-comments-tree-p
+   #:title-comments-tree-p
+   #:text-script
+   #:title-script
+   #:general-script
+   #:participants
+   #:flag-core
+   #:opinion-references
+   #:opinion-can-apply-dircs-to-parent
+   #:objective-data-for-opinions
+   #:ipfs-write-rooturl-data
+   #:unknown-flag
+   #:opinion-can-apply-hashtag-to-parent
+   #:skip-opinion
+   #:has-found-excerpt-p
+   #:opinion-is-question
+   #:ipfs-write-grouped-data
+   #:ipfs-warstats
+   #:ipfs-rooturl-path
+   #:ipfs-file-exists-p
+   #:ipfs-extracted-text
+   #:ipfs-write-extracted-text
+   #:ipfs-extracted-metadata
+   #:ipfs-write-extracted-metadata
+   #:ipfs-extracted-title
+   #:extracted-data-not-found
+   #:extraction-attempted?
+   #:extracted?
+   #:ipfs-opinion-path))
