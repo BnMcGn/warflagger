@@ -77,10 +77,12 @@
            ((id (:or :integer :url))
             &key
             (tmode :string))
-           (let ((url (if (integerp id) (get-rooturl-by-id id) id)))
+           (let ((url (if (integerp id) (get-rooturl-by-id id) id))
+                 (touched (or (rooturl-p url) (wf/ipfs:ipfs-have-text-for-rooturl? url))))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
-               :postedp (lisp (rooturl-p url))
+               :touched-p (lisp touched)
+               :refd (lisp (unless touched (refd-to url)))
                :tmode (lisp tmode))))))
 
   ;;FIXME: obsolete. remove after functionality check

@@ -295,6 +295,13 @@
   (when (ipfs-opinion-exists-p iid)
     (warflagger:deserialize-warstat (ipfs:files-read (ipfs-opinion-path iid "warstats.data")))))
 
+(defun ipfs-have-text-for-rooturl? (rooturl)
+  (and (ipfs-rooturl-exists-p rooturl) (ipfs-file-exists-p (ipfs-rooturl-path "text.data"))))
+
+(defun ipfs-text-info-for-rooturl (rooturl)
+  "Load text info for a rooturl from IPFS"
+  (declare (ignore rooturl)))
+
 ;;FIXME: any UTF-8 conversion needed?
 (defun ipfs-extracted-text (rooturl)
   (let ((fname (ipfs-rooturl-path rooturl "extracted-text.txt")))
