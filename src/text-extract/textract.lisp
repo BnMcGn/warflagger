@@ -336,3 +336,20 @@
         for x in (failures-by-number)
         do (failure-report x)))
 
+
+(defun conversion-code (url)
+  (let ((text (tryit (wf/text-extract:grab-text url :update nil))))
+    (if (and text (not-empty text))
+        (let ((title (wf/text-extract:grab-title url :update nil :alternate nil)))
+          (progn
+            (wf/ipfs:ipfs-write-extracted-text url text)
+            (wf/ipfs:ipfs-write-extracted-metadata
+             url
+             (list :title title))))
+        ;(format nil "Failed: ~a ~a" url text)
+        url)))
+
+(defun reread-code (url)
+  (when-let ((fname (wf/text-extract::old-page-available url)))
+    (or (tryit (progn (warflagger:tt-update-page-data-from-file url fname) :worked)) url)))
+

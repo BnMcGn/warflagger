@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:warflagger
-  (:use #:cl #:wf/local-settings #:warflagger-core #:wf/text-extract #:sql-stuff #:clsql
+  (:use #:cl #:wf/local-settings #:warflagger-core #:sql-stuff #:clsql
         #:gadgets #:alexandria #:anaphora #:kebab #:webhax #:cl-postgres #:liql)
   (:shadowing-import-from #:wf/local-settings #:*ssl-key-file*)
   (:export

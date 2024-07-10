@@ -12,7 +12,7 @@
    (cons :user-url "")
    (webhax-user:user-info-bundle)))
 
-(wf/text-extract:initialize-indices)
+;;(wf/text-extract:initialize-indices)
 
 (setf (webhax-user::login-destination) "/user/")
 
@@ -68,8 +68,11 @@
             (:@side-content
              (lambda ()
                (bind-validated-input
-                ((id (:or :integer :url)))
-                (target-participants-sidebar (if (integerp id) id (get-rooturl-id id))))))
+                   ((id (:or :integer :url)))
+                 (when-let ((id (if (integerp id)
+                                    id
+                                    (and (rooturl-p id) (get-rooturl-id id)))))
+                   (target-participants-sidebar id)))))
           (bind-validated-input
            ((id (:or :integer :url))
             &key
@@ -77,6 +80,7 @@
            (let ((url (if (integerp id) (get-rooturl-by-id id) id)))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
+               :postedp (lisp (rooturl-p url))
                :tmode (lisp tmode))))))
 
   ;;FIXME: obsolete. remove after functionality check

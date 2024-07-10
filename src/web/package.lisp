@@ -13,7 +13,6 @@
         #:warflagger-core
         #:warflagger
         #:wf/local-settings
-        #:wf/text-extract
         #:sql-stuff
         #:thing-lister
         #:parenscript
