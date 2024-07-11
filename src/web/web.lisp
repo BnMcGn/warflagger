@@ -77,8 +77,8 @@
            ((id (:or :integer :url))
             &key
             (tmode :string))
-           (let ((url (if (integerp id) (get-rooturl-by-id id) id))
-                 (touched (or (rooturl-p url) (wf/ipfs:ipfs-have-text-for-rooturl? url))))
+           (let* ((url (if (integerp id) (get-rooturl-by-id id) id))
+                  (touched (or (rooturl-p url) (wf/ipfs:ipfs-have-text-for-rooturl? url))))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
                :touched-p (lisp touched)

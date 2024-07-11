@@ -48,6 +48,7 @@
                      " text-white bg-black lineHeight-none w-full"
                      " text-sm m-0 p-0 border-0 items-center"
                      " heir-a:text-color-white sm:heir-a:ml-4 heir-a:font-bold"))
+       (:script :type "text/javascript" (str (ps:ps (defparameter |username| (ps:lisp name)))))
        (:div :class "basis-2 sm:basis-44")
        (:div
         :class "grow"
