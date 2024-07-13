@@ -85,7 +85,8 @@
              url
              (list :errors
                    (join-errors errors "Warflagger: Couldn't extract text from page")))))
-      (wf/ipfs:ipfs-write-extracted-metadata url (list :errors (join-errors errors)))))
+      (wf/ipfs:ipfs-write-extracted-metadata url (list :errors (join-errors errors))))
+  (wf/ipfs:ipfs-write-partial-rooturl-data url))
 
 (defun tt-update-page-data (url)
   (multiple-value-bind (errors page)

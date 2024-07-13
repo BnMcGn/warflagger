@@ -137,6 +137,23 @@
                      (warflagger::title-info-from-scsc-results results :iid iid)))
                    s)))))))
 
+(defun ipfs-write-partial-rooturl-data (rooturl)
+  "For writing freshly extracted text data before any opinions are available."
+  (let ((rootpath (ipfs-rooturl-path rooturl "")))
+    (if (or (ipfs-file-exists-p (strcat rootpath "text.data"))
+            (ipfs-file-exists-p (strcat rootpath "title.data")))
+        (warn "Text/title data already exists. Skipping write.")
+        (let ((text-info (warflagger::add-root-text-info (make-hash-table)))
+              (title-info (warflagger::add-root-title-info (make-hash-table))))
+          (setf (gethash :text text-info) (gethash :initial-text text-info))
+          (setf (gethash :text-source text-info) :initial)
+          (setf (gethash :title title-info) (gethash :initial-title title-info))
+          (setf (gethash :title-source title-info) :initial)
+          (ipfs:with-files-write (s (strcat rootpath "text.data") :create t :truncate t)
+            (princ (serialize-warstat (alexandria:hash-table-plist text-info))) s)
+          (ipfs:with-files-write (s (strcat rootpath "title.data") :create t :truncate t)
+            (princ (serialize-warstat (alexandria:hash-table-plist title-info)) s))))))
+
 (defun ipfs-rooturl-path (rooturl &optional more)
   (strcat "/rooturls/" (substitute #\* #\% (quri:url-encode rooturl))
           (when more "/")
