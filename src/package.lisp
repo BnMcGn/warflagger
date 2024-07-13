@@ -183,4 +183,5 @@
    #:extracted-data-not-found
    #:extraction-attempted?
    #:extracted?
-   #:ipfs-opinion-path))
+   #:ipfs-opinion-path
+   #:ipfs-have-text-for-rooturl?))
