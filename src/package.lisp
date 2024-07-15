@@ -184,4 +184,5 @@
    #:extraction-attempted?
    #:extracted?
    #:ipfs-opinion-path
-   #:ipfs-have-text-for-rooturl?))
+   #:ipfs-have-text-for-rooturl?
+   #:ipfs-write-partial-rooturl-data))
