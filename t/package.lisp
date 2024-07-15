@@ -1,7 +1,7 @@
 
 (defpackage #:test-warflagger
   (:use #:cl #:fiveam #:gadgets #:alexandria
-        #:warflagger #:wf/text-extract #:wf/local-settings)
+        #:warflagger #:wf/local-settings)
   (:export
    #:test-warflagger))
 

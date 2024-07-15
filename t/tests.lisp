@@ -21,8 +21,8 @@
            (*warstats-path* (merge-pathnames "warstats/" tmpdir))
            (*static-path* #p"~/quicklisp/local-projects/wf-static/")
            (*base-url* (or (gadgets:not-empty *base-url*) "https://test.warflagger.net/"))
-           (wf/text-extract::*bynum* nil)
-           (wf/text-extract:*byurl* nil)
+           ;;(wf/text-extract::*bynum* nil)
+           ;;(wf/text-extract:*byurl* nil)
            ;;FIXME: Need better general way to handle db credentials.
            (*test-db-connect-spec*
              #+ci '("localhost" "test_opinions" "ben" "test_password")
