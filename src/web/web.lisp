@@ -81,7 +81,7 @@
                   (touched (or (rooturl-p url) (wf/ipfs:ipfs-have-text-for-rooturl? url))))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
-               :touched-p (lisp touched)
+               :touched-p (lisp (if touched 'true 'false))
                :refd (lisp (unless touched (refd-to url)))
                :tmode (lisp tmode))))))
 
