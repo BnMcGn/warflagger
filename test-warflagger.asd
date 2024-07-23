@@ -21,7 +21,7 @@
                                      (:file "opinml-test")
 				     (:file "services-test")
                                      (:file "form-validator-test")
-                                     (:file "auth-test")))
+                                     (:file "auth-test"))))
   :perform (test-op (o s)
             (uiop:symbol-call :fiveam :run! 
               (intern "TEST-WARFLAGGER" (find-package :test-warflagger)))))
