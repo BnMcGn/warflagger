@@ -64,12 +64,18 @@
    (webhax-user:webhax-user :userfig-specs wf/web::*userfig-fieldspecs*)
    core))
 
+(defparameter *destination*
+  "https://127.0.0.1/o/bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+
 (test login-page "Login page functionality"
       (let* ((app (test-app-1
                    (lambda (env)
-                     (is (equal
-                          "https://127.0.0.1/o/bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge"
-                          (gethash :clath-destination (webhax:session-from-env env)))))))
+                     (is (equal *destination*
+                                (gethash :clath-destination (webhax:session-from-env env))))
+                     (let ((ningle:*context* (hu:hash (:session (hu:hash)))))
+                       (is (equal "/sign-up/" (clath::destination-on-login)))
+                       (let ((userfig:*new-user-p* (lambda (_) nil)))
+                         (is (equal *destination* (clath::destination-on-login))))))))
              (res (funcall app *test-env-1*))
              (cookie (getf (second res) :set-cookie))
              (cookie (subseq cookie (search "lack." cookie) (search ";" cookie))))
