@@ -51,7 +51,7 @@
                 (cl-utilities:collect k)
                 ;;Warstat for empty tree has nil tree freshness
                 (cl-utilities:collect (if v (warflagger:js-compatible-utcstamp v) nil)))
-               (t
+               ((keywordp k)
                 (cl-utilities:collect k)
                 (cl-utilities:collect v))))))))
 
@@ -150,7 +150,7 @@
           (setf (gethash :title title-info) (gethash :initial-title title-info))
           (setf (gethash :title-source title-info) :initial)
           (ipfs:with-files-write (s (strcat rootpath "text.data") :create t :truncate t)
-            (princ (serialize-warstat (alexandria:hash-table-plist text-info))) s)
+            (princ (serialize-warstat (alexandria:hash-table-plist text-info)) s))
           (ipfs:with-files-write (s (strcat rootpath "title.data") :create t :truncate t)
             (princ (serialize-warstat (alexandria:hash-table-plist title-info)) s))))))
 
