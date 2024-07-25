@@ -72,10 +72,11 @@
                    (lambda (env)
                      (is (equal *destination*
                                 (gethash :clath-destination (webhax:session-from-env env))))
-                     (let ((ningle:*context* (hu:hash (:session (hu:hash)))))
+                     (let ((ningle:*context* (hu:hash (:session (hu:hash (:clath-destination "x"))))))
                        (is (equal "/sign-up/" (clath::destination-on-login)))
+                       (is (equal *destination* (webhax-user:login-destination)))
                        (let ((userfig:*new-user-p* (lambda (_) nil)))
-                         (is (equal *destination* (clath::destination-on-login))))))))
+                         (is (equal "x" (clath::destination-on-login))))))))
              (res (funcall app *test-env-1*))
              (cookie (getf (second res) :set-cookie))
              (cookie (subseq cookie (search "lack." cookie) (search ";" cookie))))
