@@ -7,6 +7,9 @@
 
 (in-suite test-auth)
 
+;;FIXME: Much of this testing should be done under webhax or somewhere like that, but the tests won't
+;; be run there at the moment. Here is good enough for now, but consider transferring at some point.
+
 (defparameter *test-env-1*
   (list
    :REQUEST-METHOD :GET :SCRIPT-NAME "" :PATH-INFO "/clath/login/"
@@ -82,4 +85,25 @@
              (cookie (subseq cookie (search "lack." cookie) (search ";" cookie))))
         (is (not-empty cookie))
         (funcall app (test-env-2 cookie))))
+
+(test sign-up-page "Sign up page functionality"
+  ;;Shim (check-authenticated)
+  (let ((webhax:*session* (hu:hash (:username "fake")))
+        (save-called nil))
+    ;;Shim save-signed-up-user
+    (proto:shadow-func webhax-user::save-signed-up-user
+        (lambda (_) (declare (ignore _)) (setf save-called t))
+      (let ((page (car (third (webhax-user:sign-up-page)))))
+        (is-false (search "text-red-700" page))
+        (is-true (search "Create" page)))
+      (let* ((webhax:*key-web-input* (list (cons :screen-name "Mr. X")  (cons :email "X")))
+             (page (car (third (webhax-user:sign-up-page)))))
+        (is-true (search "text-red-700" page))
+        (is-true (search "Create" page)))
+      ;(is (print (webhax-user:sign-up-page)))
+      (let* ((webhax:*key-web-input* (list (cons :screen-name "Mr. X")
+                                           (cons :email "x@warflagger.net")))
+             (res (webhax-user:sign-up-page)))
+        (is-true save-called)
+        (is (eq 302 (car res)))))))
 

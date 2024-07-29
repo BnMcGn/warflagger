@@ -37,16 +37,16 @@
 (defun webhax-user:sign-up-page ()
   (funcall
    (cljs-page ()
-     (bind-tested-input (&key (page-test-enabled :boolean)
-                         (screen-name (:unique :options-func 'webhax-user:list-of-screen-names))
+     (bind-tested-input (&key (screen-name (:unique :options-func 'webhax-user:list-of-screen-names))
                          (email :email))
-       (unless page-test-enabled (check-authenticated))
+       (check-authenticated)
        (if (and screen-name (not *bvi-errors*))
            (progn
-             (unless page-test-enabled
-               (save-signed-up-user (hu:hash (:screen-name screen-name :email email))))
-             (html-out (:script (str (ps (setf (@ window location)
-                                               (lisp (webhax-user:login-destination))))))))
+             (webhax-user::save-signed-up-user (hu:hash (:screen-name screen-name :email email)))
+             ;(html-out (:script (str (ps (setf (@ window location)
+             ;                                  (lisp (webhax-user:login-destination)))))))
+             (web-redirect (webhax-user:login-destination))
+             )
            (if *bvi-errors*
                (%sign-up-form (or screen-name (assoc-cdr :screen-name *key-web-input*))
                               (or email (assoc-cdr :email *key-web-input*))
