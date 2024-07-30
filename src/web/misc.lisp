@@ -45,8 +45,7 @@
              (webhax-user::save-signed-up-user (hu:hash (:screen-name screen-name :email email)))
              ;(html-out (:script (str (ps (setf (@ window location)
              ;                                  (lisp (webhax-user:login-destination)))))))
-             (web-redirect (webhax-user:login-destination))
-             )
+             (webhax-core:web-redirect (webhax-user:login-destination)))
            (if *bvi-errors*
                (%sign-up-form (or screen-name (assoc-cdr :screen-name *key-web-input*))
                               (or email (assoc-cdr :email *key-web-input*))

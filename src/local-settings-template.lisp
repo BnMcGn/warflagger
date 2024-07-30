@@ -53,4 +53,5 @@
 (defparameter *ssl-cert-file* nil)
 (defparameter *ssl-password* nil)
 
-(pushnew #p"" webhax:*named-text-locations*)
+(pushnew (asdf:system-relative-pathname 'warflagger "src/texts/ ")
+         webhax:*named-text-locations* :test #'equal)
