@@ -1,7 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:wf/admin
-  (:use #:cl #:gadgets #:alexandria #:access)
+  (:use #:cl #:gadgets #:alexandria #:access #:sql-stuff #:clsql)
   )
 
 (in-package #:wf/admin)
@@ -129,9 +129,24 @@
 (defun %parse-csv-opinion-input (source)
   (mapcar #'%parse-csv-row (cdr (cl-csv:read-csv source))))
 
+;;Assumes a db backend
+(def-query iid-search (search)
+  (mapcar
+   #'car
+   (query-marker
+    (select (colm 'opinion 'iid)
+      :from (tabl 'opinion)
+      :where (sql-like (colm 'opinion 'iid) (strcat "%" search "%"))))))
 
+(def-query rooturl-search (search)
+  (mapcar
+   #'car
+   (query-marker
+    (select (colm 'rooturl 'rooturl)
+      :from (tabl 'rooturl)
+      :where (sql-like (colm 'rooturl 'rooturl) (strcat "%" search "%"))))))
 
-
-
-
-
+;;(with-open-file (s #p"~/tmp/file.edn")
+;;  (ipfs:with-files-write 
+;;      (sout (wf/ipfs:ipfs-opinion-path tiid "hiccup.edn") :create t :truncate t)
+;;    (uiop:copy-stream-to-stream s sout)))
