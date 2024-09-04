@@ -32,7 +32,8 @@
                #:dexador
                #:osicat
                #:crawly
-               #:readability/plump)
+               #:readability/plump
+               #:log4cl)
   :serial t
   :components ((:module
                 :src

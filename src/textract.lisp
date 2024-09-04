@@ -39,26 +39,22 @@
 
 (defun tt-get-page-from-archive (url)
   ;;Try common crawl first
-  (let* ((errors nil)
-         (captures (crawly:url-search url :limit 1 :source :common-crawl))
+  (let* ((captures (crawly:url-search url :limit 1 :source :common-crawl))
          (warc (when captures (crawly:get-archive-from-capture :common-crawl (car captures))))
          (page (when warc (crawly:get-record-for-url warc url))))
-    (if page
-        (return-from tt-get-page-from-archive (values nil page))
-      (push
-       (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
-             (captures "Common Crawl: unable to fetch WARC for URL")
-             (t "Common Crawl: URL not found"))
-       errors))
-    (let ((captures (crawly:url-search url :limit 1 :source :internet-archive))
-          (page (when captures (crawly:get-archive-from-capture :internet-archive (car captures)))))
-      (if page
-          (return-from tt-get-page-from-archive (values (nreverse errors) page))
-          (push
-           (cond (captures "Internet Archive: unable to fetch page")
-                 (t "Internet Archive: URL not found"))
-           errors))
-      (values (nreverse errors) page))))
+    (or page
+        (progn
+          (log:warn (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
+                          (captures "Common Crawl: unable to fetch WARC for URL")
+                          (t "Common Crawl: URL not found")))
+          (let ((captures (crawly:url-search url :limit 1 :source :internet-archive))
+                (page (when captures
+                        (crawly:get-archive-from-capture :internet-archive (car captures)))))
+            (or page
+                (progn
+                  (log:warn (cond (captures "Internet Archive: unable to fetch page")
+                                 (t "Internet Archive: URL not found")))
+                  nil)))))))
 
 (defun join-errors (&rest erratum)
   (funcall
@@ -69,6 +65,43 @@
        (if (stringp err)
            (cl-utilities:collect err)
            (mapcar #'cl-utilities:collect err))))))
+
+(defvar *string-stream* nil)
+(defclass stream-appender2 (log4cl:stream-appender) ())
+(defmethod log4cl:appender-stream ((this stream-appender2)) *string-stream*)
+
+(defun call-with-log-dump (callable)
+  (let ((appender (make-instance 'stream-appender2))
+        (res nil))
+    (log4cl:add-appender log4cl:*root-logger* appender)
+    (unwind-protect
+         (let ((errlog
+                 (with-output-to-string (*string-stream*)
+                   (setf res (values-list (funcall callable))))))
+           (apply #'values (list* errlog res)))
+      (log4cl:remove-appender log4cl:*root-logger* appender))))
+
+(defun tt-process-page (url page)
+  (if page
+      (multiple-value-bind (title text metadata links) (tt-extract page)
+        (values text `(:title
+                       ,title
+                       ,@(when metadata (list :opinml-metadata metadata))
+                       ,@(when links (list :links links)))))
+      (log:error "Page not available for extraction")))
+
+(defun tt-process (url path)
+  (if path
+      (with-open-file (s path)
+        (tt-process-page url s))
+      (tt-process-page url (tt-get-page-from-archive url))))
+
+(defun tt-update-page-data (url &optional path)
+  (multiple-value-bind (log text meta)
+      (call-with-log-dump (lambda () (tt-process url path)))
+    (when text (wf/ipfs:ipfs-write-extracted-text url text))
+    (wf/ipfs:ipfs-write-extracted-metadata url (list* :errors log meta))
+    (wf/ipfs:ipfs-write-partial-rooturl-data url)))
 
 (defun tt-write-page-data (url errors page)
   (if page
@@ -88,7 +121,7 @@
       (wf/ipfs:ipfs-write-extracted-metadata url (list :errors (join-errors errors))))
   (wf/ipfs:ipfs-write-partial-rooturl-data url))
 
-(defun tt-update-page-data (url)
+(defun tt-update-page-datax (url)
   (multiple-value-bind (errors page)
       (tt-get-page-from-archive url)
     (tt-write-page-data url errors page)))
