@@ -43,9 +43,6 @@
                              (:file "warflagger")
                              (:file "objective")
                              (:file "db")
-
-;                             (:file "text-extract/textract"
- ;                             :depends-on ("local-settings"))
                              (:file "references")
                              (:file "excerpts")
                              (:file "ranking")

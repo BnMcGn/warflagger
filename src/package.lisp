@@ -146,8 +146,7 @@
    #:discussion-refd-to
    #:vast-majority-p
    #:author-questions
-   #:tt-update-page-data
-   #:tt-update-page-data-from-file))
+   #:tt-update-page-data))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)

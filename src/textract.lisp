@@ -26,7 +26,6 @@
              do (cl-utilities:collect (list :excerpt (plump:text link)
                                             :target (plump:attribute link "href")))))))
 
-
 (defun tt-extract (page)
   (let* ((pobj (plump:parse page))
          (title (string-strip (readability::get-article-title pobj)))
@@ -55,16 +54,6 @@
                   (log:warn (cond (captures "Internet Archive: unable to fetch page")
                                  (t "Internet Archive: URL not found")))
                   nil)))))))
-
-(defun join-errors (&rest erratum)
-  (funcall
-   #'gadgets:string-join
-   #\Newline
-   (cl-utilities:collecting
-     (dolist (err erratum)
-       (if (stringp err)
-           (cl-utilities:collect err)
-           (mapcar #'cl-utilities:collect err))))))
 
 (defvar *string-stream* nil)
 (defclass stream-appender2 (log4cl:stream-appender) ())
@@ -102,33 +91,6 @@
     (when text (wf/ipfs:ipfs-write-extracted-text url text))
     (wf/ipfs:ipfs-write-extracted-metadata url (list* :errors log meta))
     (wf/ipfs:ipfs-write-partial-rooturl-data url)))
-
-(defun tt-write-page-data (url errors page)
-  (if page
-      (multiple-value-bind (title text metadata links) (tt-extract page)
-        (if text
-            (progn
-              (wf/ipfs:ipfs-write-extracted-metadata
-               url
-               `(:title ,title
-                 ,@(when metadata (list :opinml-metadata metadata))
-                 ,@(when links (list :links links))))
-              (wf/ipfs:ipfs-write-extracted-text url text))
-            (wf/ipfs:ipfs-write-extracted-metadata
-             url
-             (list :errors
-                   (join-errors errors "Warflagger: Couldn't extract text from page")))))
-      (wf/ipfs:ipfs-write-extracted-metadata url (list :errors (join-errors errors))))
-  (wf/ipfs:ipfs-write-partial-rooturl-data url))
-
-(defun tt-update-page-datax (url)
-  (multiple-value-bind (errors page)
-      (tt-get-page-from-archive url)
-    (tt-write-page-data url errors page)))
-
-(defun tt-update-page-data-from-file (url path)
-  (with-open-file (s path)
-    (tt-write-page-data url nil s)))
 
 (defun tt-is-cached (url)
   (or (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
