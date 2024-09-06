@@ -63,12 +63,18 @@
   (let ((appender (make-instance 'stream-appender2))
         (res nil))
     (log4cl:add-appender log4cl:*root-logger* appender)
-    (unwind-protect
-         (let ((errlog
-                 (with-output-to-string (*string-stream*)
-                   (setf res (values-list (funcall callable))))))
-           (apply #'values (list* errlog res)))
-      (log4cl:remove-appender log4cl:*root-logger* appender))))
+    (let
+        ((errlog
+           (with-output-to-string (s)
+             (let ((*string-stream* s))
+               (handler-case
+                   (progn
+                     (setf res (values-list (funcall callable)))
+                     (log4cl:remove-appender log4cl:*root-logger* appender))
+                 (error (e)
+                   (log:error e)
+                   (log4cl:remove-appender log4cl:*root-logger* appender)))))))
+      (apply #'values (list* errlog res)))))
 
 (defun tt-process-page (url page)
   (if page
