@@ -146,7 +146,8 @@
    #:discussion-refd-to
    #:vast-majority-p
    #:author-questions
-   #:tt-update-page-data))
+   #:tt-update-page-data
+   #:*handle-extraction-errors*))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)
