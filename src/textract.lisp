@@ -39,8 +39,9 @@
 (defun tt-get-page-from-archive (url)
   ;;Try common crawl first
   (let* ((captures (crawly:url-search url :limit 1 :source :common-crawl))
+         (newurl (crawly:capture-url (car captures)))
          (warc (when captures (crawly:get-archive-from-capture :common-crawl (car captures))))
-         (page (when warc (crawly:get-record-for-url warc url))))
+         (page (when warc (crawly:get-record-for-url warc newurl))))
     (or page
         (progn
           (log:warn (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
