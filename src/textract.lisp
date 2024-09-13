@@ -72,15 +72,15 @@
                (if *handle-extraction-errors*
                    (handler-case
                        (progn
-                         (setf res (values-list (funcall callable)))
+                         (setf res (multiple-value-list (funcall callable)))
                          (log4cl:remove-appender log4cl:*root-logger* appender))
                      (error (e)
                        (log:error e)
                        (log4cl:remove-appender log4cl:*root-logger* appender)))
                    (unwind-protect
-                        (setf res (values-list (funcall callable)))
+                        (setf res (multiple-value-list (funcall callable)))
                      (log4cl:remove-appender log4cl:*root-logger* appender)))))))
-      (apply #'values (list* errlog res)))))
+      (values-list (list* errlog res)))))
 
 (defun tt-process-page (url page)
   (if page
@@ -114,42 +114,42 @@
 (defun text-server (url)
   "This function, served as JSON, is the text server. Url is the address of the desired text"
   (hu:collecting-hash-table
-   (:mode :replace)
-   (cond
-     ((or (null url) (eq 0 (length url)))
-      (hu:collect :text "")
-      (hu:collect :title "")
-      (hu:collect :status "failure")
-      (hu:collect :message "No URL provided"))
-     ((not (ratify:url-p url))
-      (hu:collect :text "")
-      (hu:collect :title "")
-      (hu:collect :status "failure")
-      (hu:collect :message "Not a valid URL"))
-     (t
-      (let* ((meta (when (wf/ipfs:ipfs-file-exists-p
-                          (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.data"))
-                     (wf/ipfs:ipfs-extracted-metadata url)))
-             (text (if
-                    (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
-                    (wf/ipfs:ipfs-extracted-text url)
-                    "")))
-        (cond
-          ((getf meta :errors)
-           (hu:collect :text text)
-           (hu:collect :title (getf meta :title ""))
-           (hu:collect :status "failure")
-           (hu:collect :message (getf meta :errors)))
-          ((or (not-empty text) (getf meta :title))
-           (hu:collect :text text)
-           (hu:collect :title (getf meta :title ""))
-           (hu:collect :status "success")
-           (hu:collect :message ""))
-          (t
-           ;;Can't detect pending now. Change that if needed?
-           ;;(unless (is-pending url) (update-page url))
-           (tt-update-page-data url)
-           (hu:collect :text text)
-           (hu:collect :title (getf meta :title ""))
-           (hu:collect :status "wait")
-           (hu:collect :message "Loading page text..."))))))))
+      (:mode :replace)
+    (cond
+      ((or (null url) (eq 0 (length url)))
+       (hu:collect :text "")
+       (hu:collect :title "")
+       (hu:collect :status "failure")
+       (hu:collect :message "No URL provided"))
+      ((not (ratify:url-p url))
+       (hu:collect :text "")
+       (hu:collect :title "")
+       (hu:collect :status "failure")
+       (hu:collect :message "Not a valid URL"))
+      (t
+       (let* ((meta (when (wf/ipfs:ipfs-file-exists-p
+                           (wf/ipfs:ipfs-rooturl-path url "extracted-metadata.data"))
+                      (wf/ipfs:ipfs-extracted-metadata url)))
+              (text (if
+                     (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
+                     (wf/ipfs:ipfs-extracted-text url)
+                     "")))
+         (cond
+           ((getf meta :errors)
+            (hu:collect :text text)
+            (hu:collect :title (getf meta :title ""))
+            (hu:collect :status "failure")
+            (hu:collect :message (getf meta :errors)))
+           ((or (not-empty text) (getf meta :title))
+            (hu:collect :text text)
+            (hu:collect :title (getf meta :title ""))
+            (hu:collect :status "success")
+            (hu:collect :message ""))
+           (t
+            ;;Can't detect pending now. Change that if needed?
+            ;;(unless (is-pending url) (update-page url))
+            (tt-update-page-data url)
+            (hu:collect :text text)
+            (hu:collect :title (getf meta :title ""))
+            (hu:collect :status "wait")
+            (hu:collect :message "Loading page text..."))))))))
