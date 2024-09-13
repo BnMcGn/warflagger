@@ -40,7 +40,7 @@
 
 (test extracted-page "Test extracted page storage"
   (unless (wf/ipfs:extracted? *testurl*)
-    (tt-update-page-data-from-file *testurl* *sample-file*))
+    (tt-update-page-data *testurl* *sample-file*))
   (is (wf/ipfs:extraction-attempted? *testurl*))
   (is (wf/ipfs:extracted? *testurl*))
   (is (string= (wf/ipfs:ipfs-extracted-title *testurl*) "Sample Web Page"))
