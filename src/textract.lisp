@@ -26,7 +26,7 @@
              do (cl-utilities:collect (list :excerpt (plump:text link)
                                             :target (plump:attribute link "href")))))))
 
-(defun tt-extract (page)
+(defun tt-extract-html (page)
   (let* ((pobj (plump:parse page))
          (title (string-strip (readability::get-article-title pobj)))
          (meta (extract-opinml-meta-from-html page))
@@ -36,25 +36,35 @@
          (text (string-strip (readability::inner-text article))))
     (values title text meta links article)))
 
+(defun tt-extract-text (page)
+  (let* ((text (string-strip (read-stream-content-into-string page)))
+         (title (gadgets:part-on-true
+                 (lambda (x) (member x '(#\Linefeed #\Newline #\Return)))
+                 text))
+         ;;FIXME: Extract links
+         (links nil))
+    (values title nil links nil)))
+
 (defun tt-get-page-from-archive (url)
   ;;Try common crawl first
   (let* ((captures (crawly:url-search url :limit 1 :source :common-crawl))
          (newurl (crawly:capture-url (car captures)))
-         (warc (when captures (crawly:get-archive-from-capture :common-crawl (car captures))))
-         (page (when warc (crawly:get-record-for-url warc newurl))))
-    (or page
-        (progn
-          (log:warn (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
-                          (captures "Common Crawl: unable to fetch WARC for URL")
-                          (t "Common Crawl: URL not found")))
-          (let ((captures (crawly:url-search url :limit 1 :source :internet-archive))
-                (page (when captures
-                        (crawly:get-archive-from-capture :internet-archive (car captures)))))
-            (or page
-                (progn
-                  (log:warn (cond (captures "Internet Archive: unable to fetch page")
-                                 (t "Internet Archive: URL not found")))
-                  nil)))))))
+         (warc (when captures (crawly:get-archive-from-capture :common-crawl (car captures)))))
+    (multiple-value-bind (page header) (when warc (crawly:get-record-for-url warc newurl))
+      (or (and page (values page (gethash :content-type header)))
+          (progn
+            (log:warn (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
+                            (captures "Common Crawl: unable to fetch WARC for URL")
+                            (t "Common Crawl: URL not found")))
+            (let ((captures (crawly:url-search url :limit 1 :source :internet-archive))
+                  (content-type (when captures (gadgets:assoc-cdr :mime (car captures))))
+                  (page (when captures
+                          (crawly:get-archive-from-capture :internet-archive (car captures)))))
+              (or (and page (values page content-type))
+                  (progn
+                    (log:warn (cond (captures "Internet Archive: unable to fetch page")
+                                    (t "Internet Archive: URL not found")))
+                    nil))))))))
 
 (defvar *string-stream* nil)
 (defclass stream-appender2 (log4cl:stream-appender) ())
@@ -82,24 +92,33 @@
                      (log4cl:remove-appender log4cl:*root-logger* appender)))))))
       (values-list (list* errlog res)))))
 
-(defun tt-process-page (url page)
+(defun tt-process-page (url page mime-type)
   (if page
-      (multiple-value-bind (title text metadata links) (tt-extract page)
+      (multiple-value-bind (title text metadata links)
+          (cond
+            ((equal mime-type "application/pdf")
+             (error "PDF extraction not currently supported"))
+            ((equal mime-type "text/html")
+             (tt-extract-html page))
+            ((equal mime-type "text/plain")
+             (tt-extract-text page))
+            (t (error (format nil "Extraction of mime type ~a not currently supported" mime-type))))
         (values text `(:title
                        ,title
                        ,@(when metadata (list :opinml-metadata metadata))
                        ,@(when links (list :links links)))))
       (log:error "Page not available for extraction")))
 
-(defun tt-process (url path)
+(defun tt-process (url path mime-type)
   (if path
       (with-open-file (s path)
-        (tt-process-page url s))
-      (tt-process-page url (tt-get-page-from-archive url))))
+        (tt-process-page url s mime-type))
+      (multiple-value-bind (page type) (tt-get-page-from-archive url)
+        (tt-process-page url page (or mime-type type)))))
 
-(defun tt-update-page-data (url &optional path)
+(defun tt-update-page-data (url &optional path mime-type)
   (multiple-value-bind (log text meta)
-      (call-with-log-dump (lambda () (tt-process url path)))
+      (call-with-log-dump (lambda () (tt-process url path mime-type)))
     (when text (wf/ipfs:ipfs-write-extracted-text url text))
     (wf/ipfs:ipfs-write-extracted-metadata url (list* :errors log meta))
     (wf/ipfs:ipfs-write-partial-rooturl-data url)))
