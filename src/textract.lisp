@@ -51,7 +51,8 @@
          (newurl (crawly:capture-url (car captures)))
          (warc (when captures (crawly:get-archive-from-capture :common-crawl (car captures)))))
     (multiple-value-bind (page header) (when warc (crawly:get-record-for-url warc newurl))
-      (or (and page (values page (gethash :content-type header)))
+      (if page
+          (values page (gethash :content-type header))
           (progn
             (log:warn (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
                             (captures "Common Crawl: unable to fetch WARC for URL")
@@ -60,7 +61,8 @@
                   (content-type (when captures (gadgets:assoc-cdr :mime (car captures))))
                   (page (when captures
                           (crawly:get-archive-from-capture :internet-archive (car captures)))))
-              (or (and page (values page content-type))
+              (if page
+                  (values page content-type)
                   (progn
                     (log:warn (cond (captures "Internet Archive: unable to fetch page")
                                     (t "Internet Archive: URL not found")))
