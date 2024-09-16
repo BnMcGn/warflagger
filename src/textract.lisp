@@ -119,11 +119,13 @@
         (tt-process-page url page (or mime-type type)))))
 
 (defun tt-update-page-data (url &optional path mime-type)
-  (multiple-value-bind (log text meta)
-      (call-with-log-dump (lambda () (tt-process url path mime-type)))
-    (when text (wf/ipfs:ipfs-write-extracted-text url text))
-    (wf/ipfs:ipfs-write-extracted-metadata url (list* :errors log meta))
-    (wf/ipfs:ipfs-write-partial-rooturl-data url)))
+  (restart-case
+      (multiple-value-bind (log text meta)
+          (call-with-log-dump (lambda () (tt-process url path mime-type)))
+        (when text (wf/ipfs:ipfs-write-extracted-text url text))
+        (wf/ipfs:ipfs-write-extracted-metadata url (list* :errors log meta))
+        (wf/ipfs:ipfs-write-partial-rooturl-data url))
+    (skip-extraction () nil)))
 
 (defun tt-is-cached (url)
   (or (wf/ipfs:ipfs-file-exists-p (wf/ipfs:ipfs-rooturl-path url "extracted-text.txt"))
