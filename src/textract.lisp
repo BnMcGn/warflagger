@@ -95,21 +95,22 @@
       (values-list (list* errlog res)))))
 
 (defun tt-process-page (url page mime-type)
-  (if page
-      (multiple-value-bind (title text metadata links)
-          (cond
-            ((equal mime-type "application/pdf")
-             (error "PDF extraction not currently supported"))
-            ((equal mime-type "text/html")
-             (tt-extract-html page))
-            ((equal mime-type "text/plain")
-             (tt-extract-text page))
-            (t (error (format nil "Extraction of mime type ~a not currently supported" mime-type))))
-        (values text `(:title
-                       ,title
-                       ,@(when metadata (list :opinml-metadata metadata))
-                       ,@(when links (list :links links)))))
-      (log:error "Page not available for extraction")))
+  (let ((mime-type (car (split-sequence:split-sequence #\; mime-type))))
+    (if page
+        (multiple-value-bind (title text metadata links)
+            (cond
+              ((equal mime-type "application/pdf")
+               (error "PDF extraction not currently supported"))
+              ((equal mime-type "text/html")
+               (tt-extract-html page))
+              ((equal mime-type "text/plain")
+               (tt-extract-text page))
+              (t (error (format nil "Extraction of mime type ~a not currently supported" mime-type))))
+          (values text `(:title
+                         ,title
+                         ,@(when metadata (list :opinml-metadata metadata))
+                         ,@(when links (list :links links)))))
+        (log:error "Page not available for extraction"))))
 
 (defun tt-process (url path mime-type)
   (if path
