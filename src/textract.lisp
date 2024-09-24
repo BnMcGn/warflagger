@@ -54,7 +54,8 @@
       (if page
           (values page (gethash :content-type header))
           (progn
-            (log:warn (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
+            (log:warn "~a"
+                      (cond ((and captures warc) "Common Crawl: unable to extract page from WARC")
                             (captures "Common Crawl: unable to fetch WARC for URL")
                             (t "Common Crawl: URL not found")))
             (let ((captures (crawly:url-search url :limit 1 :source :internet-archive))
@@ -64,8 +65,8 @@
               (if page
                   (values page content-type)
                   (progn
-                    (log:warn (cond (captures "Internet Archive: unable to fetch page")
-                                    (t "Internet Archive: URL not found")))
+                    (log:warn "~a" (cond (captures "Internet Archive: unable to fetch page")
+                                         (t "Internet Archive: URL not found")))
                     nil))))))))
 
 (defvar *string-stream* nil)
@@ -87,7 +88,7 @@
                          (setf res (multiple-value-list (funcall callable)))
                          (log4cl:remove-appender log4cl:*root-logger* appender))
                      (error (e)
-                       (log:error e)
+                       (log:error "~a" e)
                        (log4cl:remove-appender log4cl:*root-logger* appender)))
                    (unwind-protect
                         (setf res (multiple-value-list (funcall callable)))
