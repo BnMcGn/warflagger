@@ -146,6 +146,15 @@
       :from (tabl 'rooturl)
       :where (sql-like (colm 'rooturl 'rooturl) (strcat "%" search "%"))))))
 
+(def-query reference-search (search)
+  (mapcar
+   #'car
+   (query-marker
+    (select (colm 'reference 'reference)
+      :from (tabl 'reference)
+      :where (sql-like (colm 'reference 'reference) (strcat "%" search "%"))))))
+
+
 ;;(with-open-file (s #p"~/tmp/file.edn")
 ;;  (ipfs:with-files-write 
 ;;      (sout (wf/ipfs:ipfs-opinion-path tiid "hiccup.edn") :create t :truncate t)
