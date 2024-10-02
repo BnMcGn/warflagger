@@ -184,6 +184,10 @@
 ;; references as the source of info. We can also use: word clustering, participants,
 ;; hashtags.
 
+;;FIXME: May slip through: initial opinions may be posted to prep an article before posting a
+;; reference to it. For example, user may want to refer to an excerpt. This could break the
+;; test.
+
 (defun discussion-root-p (rootid)
   "For now, we consider a RootURL to be a discussion root if it has opinions on it and if one of those opinions predate any references to it."
   (let* ((rooturl (get-rooturl-by-id rootid))
@@ -206,17 +210,54 @@
                       :ascending t))))
         (if first-ref
             (when (time< first-opin first-ref)
-              t)
-            t)))))
+              rootid)
+            rootid)))))
 
-;;FIXME: Should also return references to any child of URL?
-(defun get-rootids-of-references-to (url)
+(def-query reference-opinion-ids-for-rooturl (rurl)
+  (mapcar
+   #'car
+   (query-marker
+    (merge-query
+     (opinion-ids-for-rooturl rurl)
+     (list :from (tabl 'reference)
+           :where (sql-= (colm 'reference 'opinion) (colm 'opinion 'id)))))))
+
+(def-query refd-to (iid-or-url)
+  (mapcar
+   #'car
+     (query-marker
+      (select
+       (colm 'iid)
+       :from (list (tabl 'opinion) (tabl 'reference))
+       :where (sql-and
+               (sql-= (colm 'opinion 'id) (colm 'reference 'opinion))
+               (if (iid-p iid-or-url)
+                   (sql-like (colm 'reference 'reference) iid-or-url)
+                 (sql-= (colm 'reference 'reference) iid-or-url)))))))
+
+;;FIXME: This needs proper testing!
+(defun discussion-refd-to (rooturl)
+  (let ((*id-return-type* :iid))
+    (cl-utilities:collecting
+     (dolist (itm (refd-to rooturl))
+       (cl-utilities:collect itm))
+     (dolist (opin (opinion-ids-for-rooturl rooturl))
+       (dolist (itm (refd-to opin))
+         (cl-utilities:collect itm))))))
+
+(defun get-rooturls-of-references-to (url)
   (proto:collecting-set ()
-    (dolist (refid (get-references-to url))
+    (dolist (refid (discussion-refd-to url))
       (when-let*
           ((opin (opinion-by-id refid))
            (rootid (assoc-cdr :rooturl opin)))
         (proto:set< rootid)))))
+
+(defun discussion-root-of (rooturl)
+  (or (and (discussion-root-p rooturl) rooturl)
+      (let ((refroots (get-rooturls-of-references-to rooturl)))
+        (or (gadgets:first-match #'discussion-root-p refroots)
+            (some #'discussion-root-of refroots)))))
 
 (defun get-reference-opinions-under-rooturl (url)
   "Returns all of the reference opinions in the discussion tree under url, including references made in the root article itself."
