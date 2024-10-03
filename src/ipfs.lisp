@@ -295,6 +295,13 @@
 ;; IPFS read
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;FIXME: needs better checking
+;;FIXME; deserializers need refactoring
+(defun deserialize-title-info (data)
+  (let* ((data (if (stringp data) (make-string-input-stream data) data))
+         (tdat (proto:limited-reader data #'extracted-reader-predicate)))
+    tdat))
+
 (define-condition extracted-data-not-found (error)
   ((text :initarg :text :reader text)))
 
@@ -318,6 +325,12 @@
 (defun ipfs-text-info-for-rooturl (rooturl)
   "Load text info for a rooturl from IPFS"
   (declare (ignore rooturl)))
+
+(defun ipfs-title-info-for-rooturl (rooturl)
+  (let ((fname (ipfs-rooturl-path rooturl "title.data")))
+    (unless (ipfs-file-exists-p fname)
+      (error "No title.data found"))
+    (deserialize-title-info (ipfs:files-read fname))))
 
 ;;FIXME: any UTF-8 conversion needed?
 (defun ipfs-extracted-text (rooturl)
