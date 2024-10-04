@@ -190,7 +190,8 @@
 
 (defun discussion-root-p (rootid)
   "For now, we consider a RootURL to be a discussion root if it has opinions on it and if one of those opinions predate any references to it."
-  (let* ((rooturl (get-rooturl-by-id rootid))
+  (let* ((rootid (normalize-root-id rootid))
+         (rooturl (get-rooturl-by-id rootid))
          (first-opin
           (take-one
            (select (colm 'opinion 'datestamp)
@@ -286,9 +287,10 @@
 ;; but for simplicity we are just taking the first occurrence.
 (defun discussion-tree-for-root (discroot discroots)
   "Given a discussion root rootURL ID, and a list of all such ids, builds a tree of the reference opinion ids in the discussion. Discroots are ids to be excluded. When the search touches one of these, it stops. Second value is a list of rootURL ids in the discussion. Third value is a list of exclusions that got touched during the search."
-  (let ((found (make-hash-table :test #'equal))
-        (otherdisc nil)
-        (rootids (list discroot)))
+  (let* ((discroot (normalize-root-id discroot))
+         (found (make-hash-table :test #'equal))
+         (otherdisc nil)
+         (rootids (list discroot)))
     (setf (gethash discroot found) t)
     (labels ((proc (curr)
                (when (integerp curr)

@@ -157,6 +157,9 @@
     (values (assoc-cdr :rooturl rec) (assoc-cdr :rooturl-real rec))
        (error "Rooturl ID not found")))
 
+(defun normalize-root-id (rid)
+  (if (integerp rid) rid (get-rooturl-id rid)))
+
 ;;FIXME: obsolete
 ;;;FIXME: Each opinion should record its rooturl. Needs access to targetted opinion, therefore.
 ;;; this will save hunting down the rooturl and all of the uncertainty code

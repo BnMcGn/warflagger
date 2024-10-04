@@ -174,7 +174,11 @@
 
 (defun display-rooturl (rooturl stream)
   (format stream "Article: ~a" rooturl)
-  (let ((tinfo (wf/ipfs:ipfs-title-info-for-rooturl rooturl)))
+  (let ((tinfo (handler-case
+                   (wf/ipfs:ipfs-title-info-for-rooturl rooturl)
+                 (t (e)
+                   (declare (ignore e))
+                   (hu:hash (:title "NO TITLE FOUND"))))))
     (alexandria:when-let ((title (gethash :title tinfo)))
       (princ title stream))))
 
@@ -188,11 +192,11 @@
 
 (defun discussion-summary (rooturl &optional (stream *standard-output*))
   (let* ((discroot (warflagger:discussion-root-of rooturl))
-         (disctree (warflagger:discussion-tree-for-root discroot nil))
-         (disclist (flatten disctree)))
-    (rooturl-discussion-summary (car disclist) stream)
-    (dolist (rooturl (cdr disclist))
+         (disctree (nth-value 1 (warflagger:discussion-tree-for-root discroot nil)))
+         (disclist (gadgets:flatten-when #'identity disctree)))
+    (rooturl-discussion-summary (warflagger:get-rooturl-by-id (car disclist)) stream)
+    (dolist (rootid (cdr disclist))
       (terpri stream)
       (terpri stream)
       (terpri stream)
-      (rooturl-discussion-summary rooturl stream))))
+      (rooturl-discussion-summary (warflagger:get-rooturl-by-id rootid) stream))))
