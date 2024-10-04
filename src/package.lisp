@@ -147,7 +147,8 @@
    #:vast-majority-p
    #:author-questions
    #:tt-update-page-data
-   #:*handle-extraction-errors*))
+   #:*handle-extraction-errors*
+   #:discussion-root-of))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)
@@ -185,4 +186,5 @@
    #:extracted?
    #:ipfs-opinion-path
    #:ipfs-have-text-for-rooturl?
-   #:ipfs-write-partial-rooturl-data))
+   #:ipfs-write-partial-rooturl-data
+   #:ipfs-title-info-for-rooturl))

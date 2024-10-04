@@ -295,11 +295,17 @@
 ;; IPFS read
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun general-reader-predicate (symbol symtype)
+  (or
+   (string-equal nil symbol)
+   (eq :keyword symtype)))
+
 ;;FIXME: needs better checking
 ;;FIXME; deserializers need refactoring
 (defun deserialize-title-info (data)
   (let* ((data (if (stringp data) (make-string-input-stream data) data))
-         (tdat (proto:limited-reader data #'extracted-reader-predicate)))
+         (tdat (proto:limited-reader data #'general-reader-predicate))
+         (tdat (hu:plist->hash tdat)))
     tdat))
 
 (define-condition extracted-data-not-found (error)

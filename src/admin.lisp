@@ -156,6 +156,43 @@
 
 
 ;;(with-open-file (s #p"~/tmp/file.edn")
-;;  (ipfs:with-files-write 
+;;  (ipfs:with-files-write
 ;;      (sout (wf/ipfs:ipfs-opinion-path tiid "hiccup.edn") :create t :truncate t)
 ;;    (uiop:copy-stream-to-stream s sout)))
+
+
+;; Dump tool
+
+(defun display-opinion (iid stream)
+  (gadgets:with-alist-keys ((:flag :authorname :comment) (warflagger::add-extras-to-opinion (warflagger:opinion-by-id iid) ""))
+    (princ iid stream)
+    (terpri stream)
+    (format stream "~a ~a" flag authorname)
+    ;;FIXME: use :clean-comment?
+    (when comment
+      (print comment stream))))
+
+(defun display-rooturl (rooturl stream)
+  (format stream "Article: ~a" rooturl)
+  (let ((tinfo (wf/ipfs:ipfs-title-info-for-rooturl rooturl)))
+    (alexandria:when-let ((title (gethash :title tinfo)))
+      (princ title stream))))
+
+(defun rooturl-discussion-summary (rooturl &optional (stream *standard-output*))
+  (display-rooturl rooturl stream)
+  (dolist (iid (let ((warflagger:*id-return-type* :iid))
+                 (warflagger:opinion-ids-for-rooturl rooturl)))
+    (terpri stream)
+    (terpri stream)
+    (display-opinion iid stream)))
+
+(defun discussion-summary (rooturl &optional (stream *standard-output*))
+  (let* ((discroot (warflagger:discussion-root-of rooturl))
+         (disctree (warflagger:discussion-tree-for-root discroot nil))
+         (disclist (flatten disctree)))
+    (rooturl-discussion-summary (car disclist) stream)
+    (dolist (rooturl (cdr disclist))
+      (terpri stream)
+      (terpri stream)
+      (terpri stream)
+      (rooturl-discussion-summary rooturl stream))))
