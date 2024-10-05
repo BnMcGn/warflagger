@@ -164,13 +164,15 @@
 ;; Dump tool
 
 (defun display-opinion (iid stream)
-  (gadgets:with-alist-keys ((:flag :authorname :comment) (warflagger::add-extras-to-opinion (warflagger:opinion-by-id iid) ""))
+  (gadgets:with-alist-keys ((:flag :authorname :comment :reference) (warflagger::add-extras-to-opinion (warflagger:opinion-by-id iid) ""))
     (princ iid stream)
     (terpri stream)
     (format stream "~a ~a" flag authorname)
     ;;FIXME: use :clean-comment?
     (when comment
-      (print comment stream))))
+      (print comment stream))
+    (when reference
+      (format stream "Reference: ~a" reference))))
 
 (defun display-rooturl (rooturl stream)
   (format stream "Article: ~a" rooturl)
