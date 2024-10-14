@@ -172,7 +172,7 @@
     (when comment
       (print comment stream))
     (when reference
-      (format stream "Reference: ~a" reference))))
+      (format stream "~&Reference: ~a" reference))))
 
 (defun display-rooturl (rooturl stream)
   (format stream "Article: ~a" rooturl)

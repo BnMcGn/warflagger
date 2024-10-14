@@ -107,3 +107,11 @@
         (is-true save-called)
         (is (eq 302 (car res)))))))
 
+(test clath-paths "Clath path sanity check"
+  (let* ((app (test-app-1
+               (lambda (env)
+                 (declare (ignore env))
+                 (is (equal "/clath/login/" (clath:login-url)))
+                 (is (equal "/clath/logout/" (clath:logout-url)))))))
+    (funcall app (test-env-2 ""))))
+
