@@ -155,6 +155,15 @@
       :where (sql-like (colm 'reference 'reference) (strcat "%" search "%"))))))
 
 
+(defun server-tmp-path (appendage)
+  (concatenate 'string "/home/cluestick/tmp/" appendage))
+
+(defun write-hiccup (iid fname)
+  (with-open-file (s (server-tmp-path fname))
+    (ipfs:with-files-write
+        (sout (wf/ipfs:ipfs-opinion-path iid "hiccup.edn") :create t :truncate t)
+      (uiop:copy-stream-to-stream s sout))))
+
 ;;(with-open-file (s #p"~/tmp/file.edn")
 ;;  (ipfs:with-files-write
 ;;      (sout (wf/ipfs:ipfs-opinion-path tiid "hiccup.edn") :create t :truncate t)
