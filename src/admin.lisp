@@ -158,11 +158,12 @@
 (defun server-tmp-path (appendage)
   (concatenate 'string "/home/cluestick/tmp/" appendage))
 
-(defun write-hiccup (iid fname)
-  (with-open-file (s (server-tmp-path fname))
+(defun write-hiccup (iid fname &key fullname)
+  (with-open-file (s (if fullname fname (server-tmp-path fname)))
     (ipfs:with-files-write
         (sout (wf/ipfs:ipfs-opinion-path iid "hiccup.edn") :create t :truncate t)
-      (uiop:copy-stream-to-stream s sout))))
+      (uiop:copy-stream-to-stream s sout))
+    (wf/ipfs:update-ipns)))
 
 ;;(with-open-file (s #p"~/tmp/file.edn")
 ;;  (ipfs:with-files-write

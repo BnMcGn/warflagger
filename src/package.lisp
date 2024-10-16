@@ -148,7 +148,8 @@
    #:author-questions
    #:tt-update-page-data
    #:*handle-extraction-errors*
-   #:discussion-root-of))
+   #:discussion-root-of
+   #:normalize-root-id))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)
@@ -187,4 +188,5 @@
    #:ipfs-opinion-path
    #:ipfs-have-text-for-rooturl?
    #:ipfs-write-partial-rooturl-data
-   #:ipfs-title-info-for-rooturl))
+   #:ipfs-title-info-for-rooturl
+   #:update-ipns))
