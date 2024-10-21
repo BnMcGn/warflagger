@@ -61,7 +61,6 @@
    ;;Don't need a full warstats dict to seed the tree.
    (list :effect 1 :controversy 0)))
 
-;;FIXME: Don't yet have system in place for discussing headlines.
 (defun get-headline-for-url (url)
   (multiple-value-bind (id type) (get-target-id-from-url url)
     (hu:collecting-hash-table (:mode :replace)

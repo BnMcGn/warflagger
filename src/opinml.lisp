@@ -233,9 +233,6 @@
     (push :datestamp opinion)
     (hu:plist->alist opinion)))
 
-(defun make-experimental-opinion-url (oiid)
-  (strcat *base-url* "o/" oiid))
-
 (defparameter *ipfs-hash-pattern* (ppcre:create-scanner "baf[a-z0-9]{56}"))
 (defun get-ipfs-hash-from-url (string)
   (ppcre:scan-to-strings *ipfs-hash-pattern* string))

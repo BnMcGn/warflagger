@@ -7,7 +7,6 @@
   (:export
    #:opinion-ids-for-rooturl
    #:opinion-tree-for-rooturl
-   #:controversial-p
    #:get-rooturl
    #:get-rooturl-id
    #:get-opinion-peers
@@ -37,7 +36,6 @@
    #:opinion-tree-for-target
    #:for-rooturl-mixin
    #:insert-new-author
-   #:save-opinion-from-user
    #:author-lister
    #:author-identification-from-row
    #:get-author-identification

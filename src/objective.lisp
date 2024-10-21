@@ -28,7 +28,7 @@
         (when opinion
           (push (cons :iid iid) opinion)
           (unless (assoc :url opinion)
-            (push (cons :url (warflagger::make-experimental-opinion-url iid)) opinion))
+            (push (cons :url (warflagger:make-opinion-url iid)) opinion))
           (cl-utilities:collect iid)
           (cl-utilities:collect opinion))))))
 

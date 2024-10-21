@@ -55,9 +55,11 @@
        (strcat *base-url* "author/" (quri:url-encode (assoc-cdr :email authdat)))))))
 
 (defun make-opinion-url (opinion)
-  (if-let ((iid (assoc :iid opinion)))
-    (strcat *base-url* "o/" (cdr iid))
-    (strcat *base-url* "things/thing/opinion/" (princ-to-string (assoc-cdr :id opinion)))))
+  (if (iid-p opinion)
+      (strcat *base-url* "o/" opinion)
+      (if-let ((iid (assoc :iid opinion)))
+              (strcat *base-url* "o/" (cdr iid))
+              (strcat *base-url* "things/thing/opinion/" (princ-to-string (assoc-cdr :id opinion))))))
 
 (defun make-rootid-url (rid)
   (strcat *base-url* "target/" (princ-to-string rid)))

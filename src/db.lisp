@@ -73,13 +73,6 @@
   "Return a list of immediate replies to a target. Replies are opinids."
   (mapcar #'car (opinion-tree-for-target turl)))
 
-(defun controversial-p (url)
-  (exists
-   (unexecuted
-     (select (colm 'id) :from (tabl 'opinion)
-             :where (sql-and (sql-= (sql-escape url) (colm 'target))
-                             (sql-> 0 (colm 'votevalue)))))))
-
 (def-query replies-by-date (&rest rootid/s)
   (query-marker
    (select 'id 'datestamp
@@ -552,20 +545,6 @@ the page text can be found in the cache."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Opinion insert and delete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;FIXME: Obsolete. Can probably remove.
-(defun save-opinion-from-user (opinion authorid
-                               &key (opinurl #'make-opinion-url))
-  "Opinions need to be set up with some stuff."
-  (unless (listp opinion)
-    (error "Opinion needs to be an alist"))
-  (let* ((id (next-val "opinion_id_seq"))
-         (url (funcall opinurl id)))
-    (insert-opinion
-     (cons (cons :url url) opinion)
-     authorid
-     id)
-    (values id url)))
 
 (defun insert-opinion (opin authorid &optional id)
   "Stores the opinion, represented as an alist, in the database"
