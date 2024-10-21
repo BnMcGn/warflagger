@@ -111,7 +111,8 @@
   (lambda ()
     (bind-validated-input
         ((author :string))
-      (let* ((authid (find-author-id author))
+      (let* ((authid (or (find-author-id author)
+                         (webhax-core:web-fail-404)))
              (auth-data (get-author-data authid))
              (user (get-local-user-from-id authid))
              (screen-name (author-representation-from-row auth-data))
