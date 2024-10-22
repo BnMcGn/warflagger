@@ -68,9 +68,8 @@
   (save-new-references (assoc-cdr :url opinion))
   (wf/ipfs:ipfs-write-rooturl-data (assoc-cdr :rooturl opinion))
   (wf/ipfs::update-ipns)
-  (warflagger::write-grouped-data-file)
-  ;;FIXME: pre-ipfs stuff that should go away
-  (write-all-rootid-warstats (assoc-cdr :rootid opinion)))
+  ;;FIXME: should we be updating the grouped data here?
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; New opinion form

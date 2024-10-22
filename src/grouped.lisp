@@ -10,41 +10,6 @@
 ;; - group reference data
 ;; - keywords (hashtags). These could come out of warstats eventually. But maybe not per group.
 
-(defun gather-grouped-data-requirements (components)
-  ;;What about looks?
-  (cl-utilities:with-collectors (opins< warstats< headlines<)
-    (dolist (c components)
-      (case (gethash :rowtype c)
-        (:rooturl
-         (warstats< (gethash :url c))
-         (headlines< (gethash :url c))
-         (when (gethash :refparent c)
-           (opins< (gethash :refid c))
-           (let ((opinion (opinion-by-id (gethash :refid c))))
-             ;;Could also add warstats/headlines for rooturl of opinion. Don't think we use now.
-             (warstats< (assoc-cdr :url opinion))
-             (headlines< (assoc-cdr :url opinion)))))
-        (:reference
-         (let ((opinion (opinion-by-id (gethash :refopinid c))))
-           (warstats< (assoc-cdr :url opinion))
-           (headlines< (assoc-cdr :url opinion))
-           (opins< (gethash :refopinid c))
-           (if (gethash :refd-opinion-id c)
-               (let* ((ropin (opinion-by-id (gethash :refd-opinion-id c)))
-                      (url (assoc-cdr :url ropin))
-                      (rooturl (assoc-cdr :rooturl ropin)))
-                 (mapcar #'opins< (butlast (tree-address (gethash :refd-opinion-id c))))
-                 (warstats< url) (headlines< url)
-                 (opins< (gethash :refd-opinion-id c))
-                 (warstats< rooturl) (headlines< rooturl)
-               (headlines< (gethash :reference c))))))
-        (:question
-         (let* ((opinion (opinion-by-id (gethash :id c)))
-                (url (assoc-cdr :url opinion)))
-           (opins< (gethash :id c))
-           (headlines< url) (warstats< url)))))))
-
-;;Will replace gather-grouped-data-requirements
 (defun gather-grouped-id-requirements (components)
   (cl-utilities:with-collectors (opins< roots<)
     (dolist (c components)
@@ -191,35 +156,6 @@
         (dolist (discroot (order-discussions-by-most-recent-opinion rootids))
           (cl-utilities:collect (format-group-data discroot (getf groups discroot))))))))
 
-(defun prep-data-for-grouped-json (rootlist)
-  (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
-         (discrootids (mapcar #'get-rooturl-id discroots))
-         (keywords (mapcar (rcurry #'getf :keywords) rootlist))
-         (groups (grouped-data discrootids)))
-    (multiple-value-bind (opinions warstats headlines)
-        (gather-grouped-data-requirements (flatten groups))
-      (multiple-value-bind (opinion-iids rooturls)
-          (gather-grouped-id-requirements (flatten groups))
-        (list
-         :groups groups
-         :keywords
-         (hu:alist->hash (pairlis discroots keywords))
-         ;;FIXME: dual system. drop the stores.
-         :opinion-store
-         (hu:collecting-hash-table (:mode :replace)
-           (dolist (opid opinions)
-             (hu:collect opid (opinion-by-id opid :extra t))))
-         :warstats-store
-         (hu:collecting-hash-table (:mode :replace)
-           (dolist (target warstats)
-             (hu:collect target (hu:plist->hash (warstats-for-target target)))))
-         :headlines
-         (hu:collecting-hash-table (:mode :replace)
-           (dolist (target headlines)
-             (hu:collect target (get-headline-for-url target))))
-         :opinions opinion-iids
-         :rooturls rooturls)))))
-
 (defun prep-data-for-grouped-ipfs (rootlist)
   (let* ((discroots (mapcar (rcurry #'getf :url) rootlist))
          (discrootids (mapcar #'get-rooturl-id discroots))
@@ -234,10 +170,6 @@
        :group-opinions opinion-iids
        :group-rooturls rooturls))))
 
-(defun write-grouped-data-file ()
-  (with-open-file (s (merge-pathnames "grouped.json" wf/local-settings:*warstats-path*)
-                     :direction :output :if-exists :supersede :if-does-not-exist :create)
-    (cl-json:encode-json-plist (prep-data-for-grouped-json (load-static-grouped-list)) s)))
 
 ;;FIXME: rework, maybe, someday
 ;; This retrieves a manually created list of discussion roots for the grouped (main) page.

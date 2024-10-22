@@ -31,7 +31,6 @@
    #:*vote-ranges*
    #:*flag-types-source*
    #:author-representation-from-row
-   #:warstats-for-target
    #:get-ranked-rootids
    #:opinion-tree-for-target
    #:for-rooturl-mixin
@@ -45,9 +44,6 @@
    #:set-look
    #:make-user-url
    #:get-local-user-from-id
-   #:opinion-effect
-   #:*opinion-effect-cache*
-   #:generate-rooturl-warstats
    #:if-production
    #:when-production
    #:unless-production

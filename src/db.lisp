@@ -84,12 +84,6 @@
 ;;FIXME: Obsolete? will be storing as static json.
 (defparameter *warstat-store* (make-hash-table :test #'equal))
 
-(defun warstats-for-target (target)
-  (unless (gethash target *warstat-store*)
-    ;;Will place the root warstat in the store.
-    (generate-rooturl-warstats (get-rooturl-for-url target)))
-  (gethash target *warstat-store*))
-
 (defun opinion-reference (opinion)
   (when-let* ((ref (assoc :reference opinion))
               (ref (and (listp ref) (cdr ref))))
@@ -585,7 +579,7 @@ the page text can be found in the cache."
                                         val))))
       id)))
 
-;; Opinion will still appear on site until write-all-rootid-warstats is run for the root target.
+;; Opinion will still appear on site until ipfs data is updated for the root target.
 (defun delete-opinion (oid &key (remove-rooturl t))
   (let* ((oid (if (numberp oid) oid (parse-integer oid)))
          (rooturl (car (col-from-pkey (colm 'opinion 'rooturl) oid))))
