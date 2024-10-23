@@ -544,6 +544,8 @@ the page text can be found in the cache."
   "Stores the opinion, represented as an alist, in the database"
   (hu:with-keys (:target :votevalue :datestamp :url :comment :reference :flag)
       (hu:alist->hash opin)
+    (unless (not-empty target)
+      (error "Empty target!"))
     (let ((id
            (insert-record
             'opinion

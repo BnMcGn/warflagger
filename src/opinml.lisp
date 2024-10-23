@@ -96,6 +96,18 @@
            (when-let ((refs (assoc :references opinion)))
              (cdr refs)))))
 
+(defun normalize-iid (item)
+  "Warning: accepts as iid from any domain"
+  (or
+   (iid-p item)
+   (handler-case
+       (let ((res (nth-value 4 (quri:parse-uri item))))
+         (and (starts-with-subseq "/o/" res)
+              (iid-p (subseq res 3))))
+     (error (e)
+       (declare (ignore e))
+       nil))))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Save and load
 ;;;;;;;;;;;;;;;;;;;;
@@ -174,13 +186,17 @@
         (ipfs:add p :pin nil :only-hash t :cid-version 1))
       :test #'equal))
 
+(defun iid-from-ipfs-hash (hash)
+  "Caution: no checking!"
+  (strcat "pnn" (subseq hash 3)))
+
 (defun save-opinion-to-folder (opinion folder)
   (let* ((author (unless (assoc-cdr :author opinion)
                    (make-author-url (assoc-cdr :author-id opinion))))
          (datestamp (unless (assoc-cdr :datestamp opinion)
                       (get-universal-time)))
          (strop (serialize-opinion opinion :author author :created datestamp))
-         (iid (ipfs-data-hash strop)))
+         (iid (iid-from-ipfs-hash (ipfs-data-hash strop))))
     (alexandria:write-string-into-file strop (merge-pathnames folder iid))
     iid))
 
@@ -234,8 +250,10 @@
     (hu:plist->alist opinion)))
 
 (defparameter *ipfs-hash-pattern* (ppcre:create-scanner "baf[a-z0-9]{56}"))
-(defun get-ipfs-hash-from-url (string)
-  (ppcre:scan-to-strings *ipfs-hash-pattern* string))
+(defparameter *iid-pattern* (ppcre:create-scanner "pnn[a-z0-9]{56}"))
+
+(defun get-iid-from-url (string)
+  (ppcre:scan-to-strings *iid-pattern* string))
 
 ;;FIXME: Just returns canonical text. Reconsider when we have edited available.
 (defun opinion-text (opin)

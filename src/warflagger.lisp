@@ -4,25 +4,19 @@
 
 (defparameter *opinion-store* nil "Allows us to shim opinion-by-id so that we can avoid the database.")
 
-;;FIXME: Bit of a hack. Can we do away with this?
-(defun known-translatable-opinurl (url)
-  (sequence-starts-with url (strcat *base-url* "opinion-page/")))
-
-(defun translate-opinurl (url)
-  (ppcre:regex-replace "opinion-page" url "things/thing/opinion"))
-
 ;;FIXME: Don't have an OpinML mime-type. Will want to try a link for OpinML. We might return different
 ;; things for different request types. Rework opinion urls?
-;;FIXME: Will want to check IPFS/whatever. Don't have that yet.
 (defun is-location-opinml? (url)
   "Returns T when link is OpinML, returns canonical url when appropriate. Returns nil if url is a root url or is unknown."
-  (cond
-    ((opinion-exists-p url) t)
-    ((known-translatable-opinurl url) (translate-opinurl url))
-    ((tt-is-cached url)
-     (if-let ((link (url-metadata-points-to-opinml-source? url)))
-       link nil))
-    (t nil)))
+  (or (normalize-iid url)
+      (and (tt-is-cached url)
+           (if-let ((link (url-metadata-points-to-opinml-source? url)))
+             link nil))))
+
+(defun iid-or-url (item)
+  "Returns an iid if possible, or else an url"
+  (or (normalize-iid item)
+      (url-p item)))
 
 (defun opinion-for-location (url)
   (when-let ((correct-url (is-location-opinml? url)))
@@ -55,11 +49,7 @@
        (strcat *base-url* "author/" (quri:url-encode (assoc-cdr :email authdat)))))))
 
 (defun make-opinion-url (opinion)
-  (if (iid-p opinion)
-      (strcat *base-url* "o/" opinion)
-      (if-let ((iid (assoc :iid opinion)))
-              (strcat *base-url* "o/" (cdr iid))
-              (strcat *base-url* "things/thing/opinion/" (princ-to-string (assoc-cdr :id opinion))))))
+  (strcat *base-url* "o/" (assoc-cdr :iid opinion)))
 
 (defun make-rootid-url (rid)
   (strcat *base-url* "target/" (princ-to-string rid)))
@@ -168,10 +158,11 @@
                          (default-votevalue (assoc-cdr :flag opinion))))
          (opinion (cons (cons :votevalue votevalue) opinion))
          (strop (serialize-opinion opinion :author author-url :created datestamp))
-         (iid (ipfs-data-hash strop))
+         (iid (iid-from-ipfs-hash (ipfs-data-hash strop)))
          (opinion (cons (cons :iid iid) opinion))
          (opinion (cons (cons :datestamp datestamp) opinion))
          (opinion (cons (cons :url (make-opinion-url opinion)) opinion))
+         (opinion (cons (cons :target (iid-or-url (assoc-cdr :target opinion))) opinion))
          (id (insert-opinion opinion authorid))
          (opinion (opinion-by-id id)))
     (when (functionp post)

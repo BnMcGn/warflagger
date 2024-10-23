@@ -76,7 +76,7 @@
    #:get-headline-for-url
    #:make-author-url
    #:deserialize-opinion-from-stream
-   #:get-ipfs-hash-from-url
+   #:get-iid-from-url
    #:*opinion-store*
    #:iid
    #:opinion
@@ -143,7 +143,8 @@
    #:tt-update-page-data
    #:*handle-extraction-errors*
    #:discussion-root-of
-   #:normalize-root-id))
+   #:normalize-root-id
+   #:normalize-iid))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)

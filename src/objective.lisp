@@ -119,7 +119,7 @@
   (or (access opinion :tree-address)
       (if (string-equal (access opinion :target) (access opinion :rooturl))
           (list (access opinion :iid))
-          (let ((tiid (warflagger::get-ipfs-hash-from-url (access opinion :target))))
+          (let ((tiid (warflagger::get-iid-from-url (access opinion :target))))
             (if (warflagger:iid-p tiid)
                 (append (tree-address (if opinion-store
                                           (access opinion-store tiid)
