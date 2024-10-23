@@ -13,6 +13,7 @@
            (if-let ((link (url-metadata-points-to-opinml-source? url)))
              link nil))))
 
+;;Complement of get-target-url
 (defun iid-or-url (item)
   "Returns an iid if possible, or else an url"
   (or (normalize-iid item)

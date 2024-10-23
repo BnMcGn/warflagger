@@ -192,9 +192,9 @@ the page text can be found in the cache."
 ;;; Other accessors
 ;;;
 
-(defun opinion-exists-p (url)
-  (when url
-    (get-assoc-by-col (colm 'opinion 'url) url)))
+(defun opinion-exists-p (id)
+  (when id
+    (get-assoc-by-col (colm 'opinion 'iid) (normalize-iid id))))
 
 (defun get-excerpt-data (eid)
   (ret res (proto:map-tuples
@@ -286,23 +286,22 @@ the page text can be found in the cache."
 
 (defun opinion-text-server (url)
   (hu:plist->hash
-   (if (opinion-exists-p url)
-       (let ((res (select (colm 'comment 'comment)
-                          :from (list (tabl 'opinion) (tabl 'comment))
-                          :where (sql-and (sql-= (colm 'opinion 'url) url)
-                                          (sql-= (colm 'opinion 'id)
-                                                 (colm 'comment 'opinion))))))
-         (if res
-             (list :text (caar res)
+   (handler-case
+       (let ((opinion (opinion-by-id (normalize-iid url))))
+         (if (gethash :comment opinion)
+             (list :text (gethash :comment opinion)
                    :status "success"
                    :message "")
              (list :text ""
                    :status "success"
                    :message "[No comment text]")))
+     (error (e)
+       (declare (ignore e))
        (list :text ""
              :status "failure"
-             :message "Opinion not found"))))
+             :message "Opinion not found")))))
 
+;;Complement of iid-or-url
 (defun get-target-url (identifier)
   (if (iid-p identifier)
       (assoc-cdr :url (opinion-by-id identifier))
@@ -316,7 +315,7 @@ the page text can be found in the cache."
               :opinion))))
 
 (defun get-target-id (opinid)
-  (get-target-id-from-url (assoc-cdr :target (opinion-by-id opinid))))
+  (assoc-cdr :target (opinion-by-id opinid)))
 
 (defgeneric get-target-text (opinish))
 (defmethod get-target-text ((opinid integer))
