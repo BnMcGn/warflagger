@@ -34,7 +34,7 @@
    (merge-query
     (opinion-ids-for-rooturl rurl)
     (select (colm 'opinion 'target)
-            (colm 'opinion 'url))
+            (colm 'opinion 'iid))
     (order-by-mixin (colm 'opinion 'datestamp) :asc))
    #'second
    :root rurl
@@ -48,7 +48,7 @@
        (merge-query
         (opinion-ids-for-rooturl (get-rooturl-for-url turl))
         (select (colm 'opinion 'target)
-                (colm 'opinion 'url)))
+                (colm 'opinion 'iid)))
        #'second
        :root turl
        :format #'car
@@ -272,7 +272,7 @@ the page text can be found in the cache."
         (add-extras-to-opinion opinion (or text (get-target-text oid)))
         opinion)))
 
-(def-query get-opinion-peers (o-url)
+(def-query get-opinion-peers (iid)
   (mapcar
    #'car
    (query-marker
@@ -281,8 +281,7 @@ the page text can be found in the cache."
                        (sql-= (colm 'target)
                               (sql-query (colm 'target)
                                          :from (tabl 'opinion)
-                                         :where (sql-= (colm 'url)
-                                                       (sql-escape o-url))))))))
+                                         :where (sql-= (colm 'iid) iid)))))))
 
 (defun opinion-text-server (url)
   (hu:plist->hash
