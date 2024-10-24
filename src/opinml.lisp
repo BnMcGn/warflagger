@@ -23,7 +23,7 @@
 (defun iid-p (item)
   (and (stringp item)
        (eq 59 (length item))
-       (ppcre:scan *ipfs-hash-pattern* item)
+       (ppcre:scan *iid-pattern* item)
        item))
 
 (deftype iid () `(satisfies iid-p))
