@@ -64,7 +64,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (setf *subjective* more-data)))
 
 (test opinion-with-excerpt "Excerpt opinion"
- (let* ((iid "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+ (let* ((iid "pnnkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
         (opinion (gethash iid *opinion-store*))
         (text-position (assoc-cdr :text-position opinion)))
    (is (string-equal
@@ -76,9 +76,9 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
          (warstats (warflagger::warstats-from-scsc-results rootres))
          (title-info (warflagger::title-info-from-scsc-results *subjective* :rooturl *target*))
          (text-info (warflagger::text-info-from-scsc-results *subjective* *target*)))
-    (is (member "bafkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
+    (is (member "pnnkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
                 (gethash :alternatives rootres) :test #'equal))
-    (is (member "bafkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
+    (is (member "pnnkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
                 (gethash :alternatives rootres) :test #'equal))
     (is (member "#Test" (alexandria:hash-table-keys (gethash :hashtags rootres)) :test #'equal))
     (is (typep (gethash :tree-freshness rootres) 'local-time:timestamp))
@@ -86,15 +86,15 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (is (< 0 (nth-value 3 (warflagger:ballot-box-totals (gethash :title-ballot-box rootres)))))
     (is (member "#Test" (gethash :hashtags warstats) :test #'equal))
     (is (equal "Saample Web Pge" (gethash :title title-info)))
-    (is (equal "bafkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
+    (is (equal "pnnkreicbieru4ms6ixsgggbxhhgdo3f5lhnu7tbhzaxs632ihuszsyvl34"
                (gethash :title-source title-info)))
     (is (equal "This is the secret real text of the page" (gethash :text text-info)))
-    (is (equal "bafkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
+    (is (equal "pnnkreiexeatmiyguvk6nk7jfmj7auwdcmvi4jdbrj3vompefc6avppfvbi"
                (gethash :text-source text-info)))))
 
 (test opinion-on-opinion "Effects cascade"
   (let* ((rootres (gethash *target* *subjective*))
-         (target "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+         (target "pnnkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
          (targetres (gethash target *subjective*))
          (rwarstats (warflagger::warstats-from-scsc-results rootres))
          (twarstats (warflagger::warstats-from-scsc-results targetres)))
@@ -102,7 +102,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
     (is (not (gethash :negative-inflammatory rwarstats)))))
 
 (test opinion-with-bad-excerpt "Excerpt not found"
-  (let* ((iid "bafkreihv55u2tcj2m7dcxlr4twcqhhkafix56mrlfermuwz4tizsw7x7zy")
+  (let* ((iid "pnnkreihv55u2tcj2m7dcxlr4twcqhhkafix56mrlfermuwz4tizsw7x7zy")
          (opinion (gethash iid *opinion-store*)))
     (is (assoc-cdr :text-position opinion))
     (is (not (car (assoc-cdr :text-position opinion))))
@@ -112,7 +112,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 
 ;;FIXME: loading of nonexistent flag is not currently implemented
 ;(test opinion-nonexistent-flag "Unrecognized flag"
-;  (let* ((iid "bafkreicwk5rilkvzvkvq4pjhfqksehtekggksl6u5wavvo3tdswrpsmnmu"))))
+;  (let* ((iid "pnnkreicwk5rilkvzvkvq4pjhfqksehtekggksl6u5wavvo3tdswrpsmnmu"))))
 
 ;;TODO: test all of the different flags
 ;;TODO: test different forms of adversity in votes
@@ -122,7 +122,7 @@ This is an [URL](http://no.where.com:0016500/things#and?more=things&even=more)as
 ;;TODO: test multiple references in comment body
 
 (test write-read "serialize-opinion"
-  (let* ((iid "bafkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
+  (let* ((iid "pnnkreiab3ysddpms3i4hzfx2oyr42ysm6fmpdd2zm3qug73n4g3tz5zsge")
          (opinion (gethash iid *opinion-store*))
          (opinion (remove-if (lambda (x) (eq (car x) :url)) opinion))
          (opstring (warflagger:serialize-opinion opinion))
