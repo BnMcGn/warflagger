@@ -48,9 +48,9 @@
        (merge-query
         (opinion-ids-for-rooturl (get-rooturl-for-url turl))
         (select (colm 'opinion 'target)
-                (colm 'opinion 'iid)))
+          (colm 'opinion 'iid)))
        #'second
-       :root turl
+       :root (normalize-iid turl)
        :format #'car
        :identity-func #'third)))
 
@@ -123,11 +123,9 @@
   (declare (type string url))
   (let ((opinfo (is-location-opinml? url)))
     (if opinfo
-        (if (stringp opinfo)
-            (get-rooturl-for-url opinfo)
-            (let* ((oid (get-target-id-from-url url))
-                   (opinion (opinion-by-id oid)))
-              (get-rooturl-for-url (assoc-cdr :rooturl opinion))))
+        (if (iid-p opinfo)
+            (assoc-cdr :rooturl (opinion-by-id opinfo))
+            (get-rooturl-for-url opinfo))
         (when (rooturl-p url)
           url))))
 
