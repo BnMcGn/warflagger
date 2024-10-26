@@ -176,9 +176,11 @@ the page text can be found in the cache."
             (when-let ((val (get-rooturl-for-url rurl)))
               (return-from top (get-rooturl-id val)))
             (handler-case
-                (insert-record
-                 'rooturl
-                 `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false)))
+                (if (url-p rurl)
+                    (insert-record
+                     'rooturl
+                     `((,(colm :rooturl) . ,rurl) (,(colm :rooturl-real) . false)))
+                    (error "Not an URL"))
               (sql-database-data-error (e)
                 (when (eq 'cl-postgres-error:unique-violation (sql-error-error-id e))
                   (multiple-value-bind (val sig) (tryit (get-rooturl-id rurl))
