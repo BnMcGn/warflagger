@@ -184,4 +184,5 @@
    #:ipfs-have-text-for-rooturl?
    #:ipfs-write-partial-rooturl-data
    #:ipfs-title-info-for-rooturl
-   #:update-ipns))
+   #:update-ipns
+   #:ipfs-write-all-rooturl-data))

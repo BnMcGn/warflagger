@@ -69,7 +69,8 @@
                                          (t "Internet Archive: URL not found")))
                     nil))))))))
 
-(defvar *string-stream* nil)
+;; Default to /dev/null
+(defvar *string-stream* (make-broadcast-stream))
 (defclass stream-appender2 (log4cl:stream-appender) ())
 (defmethod log4cl:appender-stream ((this stream-appender2)) *string-stream*)
 (defparameter *handle-extraction-errors* t)
