@@ -193,8 +193,9 @@ the page text can be found in the cache."
 ;;;
 
 (defun opinion-exists-p (id)
-  (when id
-    (get-assoc-by-col (colm 'opinion 'iid) (normalize-iid id))))
+  (when-let* ((id id)
+              (id (normalize-iid id)))
+    (get-assoc-by-col (colm 'opinion 'iid) id)))
 
 (defun get-excerpt-data (eid)
   (ret res (proto:map-tuples

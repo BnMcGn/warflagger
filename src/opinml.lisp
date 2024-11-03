@@ -431,7 +431,7 @@
 
 (defparameter *safe-warstat-symbols*
   '(:replies-total :replies-immediate :tree-freshness :effect :controversy :direction :direction-on-root
-    :x-right :x-wrong :x-up :x-down :neutral :pro :con))
+    :x-right :x-wrong :x-up :x-down :neutral :pro :con :hashtags))
 
 (defun safe-warstat-symbol-p (namestr package)
   (cond
@@ -448,8 +448,10 @@
       (error "Bad direction field"))
     (unless (member (gethash :direction-on-root warstat) '(:neutral :pro :con))
       (error "Bad direction-on-root field"))
-    (setf (gethash :tree-freshness warstat)
-          (local-time:parse-timestring (gethash :tree-freshness warstat)))
+    (if (not-empty (gethash :tree-freshness warstat))
+        (setf (gethash :tree-freshness warstat)
+              (local-time:parse-timestring (gethash :tree-freshness warstat)))
+        (setf (gethash :tree-freshness warstat) nil))
     (check-type (gethash :replies-total warstat) integer)
     (check-type (gethash :replies-immediate warstat) integer)
     (check-type (gethash :effect warstat) integer)

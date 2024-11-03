@@ -171,7 +171,9 @@
   (ipfs-directory-exists-p (ipfs-opinion-path iid)))
 
 (defun ipfs-write-all-rooturl-data ()
-  (dolist (rurl (append (warflagger:all-rooturls) (warflagger:all-proper-references)))
+  ;;Doesn't need ordered...
+  (dolist (rurl (gadgets:ordered-unique
+                 (append (warflagger:all-rooturls) (warflagger:all-proper-references))))
     (ipfs-write-rooturl-data rurl))
   (update-ipns))
 

@@ -96,3 +96,13 @@
   ;(signals simple-error (opinion-by-id *opin1id*))
   (signals simple-error (opinion-by-id *opin2id*)))
 
+
+;;FIXME: doesn't really belong here
+
+(test grouped "Generate grouped data"
+  (let ((data (warflagger::prep-data-for-grouped-ipfs
+               (warflagger::load-static-grouped-list))))
+    (is (every #'url-p (getf data :group-rooturls)))
+    (is (every #'iid-p (getf data :group-opinions)))
+    (is (not-empty (getf data :groups)))))
+
