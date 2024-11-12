@@ -244,6 +244,7 @@
         *app*))
    :port 5000))
 
+
 (defun run-production-server ()
   ;; Because we aren't running the block below on live server
   (clsql:connect wf/local-settings:*db-connect-spec*
@@ -269,6 +270,12 @@
     (lambda (th)
       (string= (bordeaux-threads:thread-name th) "clack-handler-hunchentoot"))
     (bordeaux-threads:all-threads))))
+
+
+(defun web-restart ()
+  (clack:stop *handler*)
+  (if-production (run-production-server) (run-test-server))
+  (shim-handle-response))
 
 (when wf/local-settings:*auto-run*
   ;;FIXME: isn't working for production.

@@ -29,4 +29,5 @@
   (:shadowing-import-from #:anaphora #:it)
   (:export
    #:dump-static-grouped-suggestions
-   #:terminate-thread-on-broken-pipe))
+   #:terminate-thread-on-broken-pipe
+   #:web-restart))
