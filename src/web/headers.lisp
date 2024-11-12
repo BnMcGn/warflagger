@@ -113,8 +113,12 @@
   (clath:clath-page-wrapper
    "Login"
    (lambda ()
-     (named-text :login-page)
-     (clath:login-links))))
+     (html-out
+       (:div
+        :class "border-solid border-8 rounded-lg m-2 p-2 border-blue-200 inline-block"
+        (named-text :login-page)
+        (:div :class "m-2"
+              (str (clath:login-links))))))))
 
 (defun favicon-links ()
   (html-out
