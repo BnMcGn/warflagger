@@ -45,7 +45,7 @@
           (order-by-mixin (colm 'datestamp) :desc))))))
 
 (setf (ningle:route *app* "/opinions-recent/")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Recent Opinions"))
         (bind-validated-input
             (&key
              (index :integer))
@@ -90,8 +90,9 @@
    :class (featurebox-side nil)
    :trim *thing-sidebox-width*))
 
+;;FIXME: title could identity subject of list for most thing listers
 (setf (ningle:route *app* "/target-participants/*")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Target: Participants"))
         (bind-validated-input
             ((id :integer)
              &key
@@ -129,7 +130,7 @@
    :trim *thing-sidebox-width*))
 
 (setf (ningle:route *app* "/author-opinions/*")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Author: Opinions"))
         (bind-validated-input
             ((id :integer)
              &key
@@ -161,7 +162,7 @@
    :trim *thing-sidebox-width*))
 
 (setf (ningle:route *app* "/author-discussions/*")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Author: Discussions"))
         (bind-validated-input
             ((id :integer)
              &key
@@ -202,7 +203,7 @@
         (list :order-by (list (list (colm 'datestamp) :desc)))))))
 
 (setf (ningle:route *app* "/author-replies/*")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Replies to Author"))
         (bind-validated-input
             ((id :integer)
              &key
@@ -233,7 +234,7 @@
                  (:id url))))))))
 
 (setf (ningle:route *app* "/author-references/*")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Author: References Made"))
         (bind-validated-input
             ((id :integer)
              &key
@@ -257,7 +258,7 @@
           (list :order-by (list (list (colm 'datestamp) :desc))))))))
 
 (setf (ningle:route *app* "/author-questions/*")
-      (cljs-page ()
+      (cljs-page ((title-part "WF: Author: Questions Asked"))
         (bind-validated-input
             ((id :integer)
              &key

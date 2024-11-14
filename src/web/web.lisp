@@ -31,7 +31,7 @@
 
   (unless-production
    (setf (ningle:route *app* "/mock-make/*")
-         (cljs-page ()
+         (cljs-page ((title-part "WF: Opinion Maker Mockups"))
            (mock-make-page))))
 
   (setf (ningle:route *app* "/author-url-data/")
@@ -116,17 +116,17 @@
               (webhax-core:web-fail-404))))))
 
   (setf (ningle:route *app* "/grouped/*")
-        (cljs-page ()
+        (cljs-page ((title-part "WF: Discussions"))
           (mount-cljs-component ("grouped"))))
 
   (setf (ningle:route *app* "/faq/")
-        (cljs-page ()
+        (cljs-page ((title-part "WF: Frequently Asked Questions"))
           (html-out
             (:div :class "featurebox"
                   (named-text :faq)))))
 
   (setf (ningle:route *app* "/introduction/")
-        (cljs-page ()
+        (cljs-page ((title-part "WF: Introduction"))
           :@inner
           (large-logo)
           (html-out
@@ -134,7 +134,7 @@
                   (named-text :introduction)))))
 
   (setf (ningle:route *app* "/user-manual/")
-        (cljs-page ()
+        (cljs-page ((title-part "WF: User Manual"))
           (html-out
             (:div :class "featurebox"
                   (named-text :user-manual)))))
@@ -146,7 +146,7 @@
                   (named-text :bookmarklet)))))
 
   (setf (ningle:route *app* "/flags/")
-        (cljs-page ()
+        (cljs-page ((title-part "WF: Available Flags"))
           (loop
              for category in *flag-categories*
              for labels in *flag-labels*
@@ -213,8 +213,7 @@
          :headers '("Access-Control-Allow-Origin" "*")))
 
   (setf (ningle:route *app* "/")
-        (cljs-page (
-                     #'main-page-parts))))
+        (cljs-page (#'main-page-parts (title-part "WF: Join the Fray!")))))
 
 ;;FIXME: Need to handle the user information that will be passed out in OpinML
 ;; exports. User needs to be able to specify a homepage, whether email address
