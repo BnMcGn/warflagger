@@ -107,6 +107,15 @@
       (let ((authid (find-author-id author)))
         (author-discussions-sidebar authid)
         (author-opinions-sidebar authid))))
+  :@title
+  (lambda ()
+    (bind-validated-input
+        ((author :string))
+      (let* ((authid (or (find-author-id author)
+                         (webhax-core:web-fail-404)))
+             (screen-name (author-representation-from-row (get-author-data authid))))
+        (html-out
+          (str (format nil "WF: User: ~a" screen-name))))))
   :@inner
   (lambda ()
     (bind-validated-input
