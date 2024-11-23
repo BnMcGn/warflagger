@@ -167,7 +167,10 @@
          #'flag-color-page))
 
   (setf (ningle:route *app* "/user/")
-        (cljs-page ()
+        (cljs-page ((title-part
+                     (format nil "WF: User: ~a"
+                             (get-apparent-display-name
+                              (get-user-name)))))
           (user-home-page)))
 
   (setf (ningle:route *app* "/u/*")
