@@ -168,9 +168,11 @@
 
   (setf (ningle:route *app* "/user/")
         (cljs-page ((title-part
-                     (format nil "WF: User: ~a"
-                             (get-apparent-display-name
-                              (get-user-name)))))
+                     (if (signed-up?)
+                         (format nil "WF: User: ~a"
+                                 (get-apparent-display-name
+                                  (get-user-name)))
+                         "WF: Not Logged In")))
           (user-home-page)))
 
   (setf (ningle:route *app* "/u/*")
