@@ -61,8 +61,6 @@
            (print (json:encode-json-to-string "OK") *webhax-output*))
          :content-type "application/json"))
 
-  ;;FIXME: Target page needs to handle URLs that don't have a rootid yet.
-
   (setf (ningle:route *app* "/target/*")
         (cljs-page
             (:@side-content
@@ -84,18 +82,6 @@
                :touched-p (lisp (if touched 'true 'false))
                :refd (lisp (unless touched (refd-to url)))
                :tmode (lisp tmode))))))
-
-  ;;FIXME: obsolete. remove after functionality check
-  ;;FIXME: redirect if url found
-  (setf (ningle:route *app* "/new-target/")
-        (cljs-page
-            ()
-          (bind-validated-input
-              (&key
-               (url :url))
-            (mount-component (new-target)
-              :url (lisp url)
-              :username (lisp (webhax-user:get-user-name))))))
 
   (setf (ningle:route *app* "/o/*")
         (cljs-page
