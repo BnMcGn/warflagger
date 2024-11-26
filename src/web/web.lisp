@@ -101,6 +101,14 @@
               (declare (ignore c))
               (webhax-core:web-fail-404))))))
 
+  (setf (ningle:route *app* "/social-image-source/*")
+        (plain-page ()
+           (bind-validated-input
+               ((target (:or :url (webhax-validate:predicate-test
+                                   #'warflagger:iid-p "Not an OpinionID"))))
+             (mount-cljs-component ("social-image")
+               :target (lisp target)))))
+
   (setf (ningle:route *app* "/grouped/*")
         (cljs-page ((title-part "WF: Discussions"))
           (mount-cljs-component ("grouped"))))

@@ -13,6 +13,18 @@
                        (lambda ()
                          ,@body))))))))
 
+(eval-always
+  (defmacro plain-page ((&rest parts-and-templates) &body body)
+    `(webhax-core:input-function-wrapper
+      (lambda ()
+        (webhax-metaplate:display-page
+         #'webhax:page-base
+         #'cljs-base
+         ,@parts-and-templates
+         ,@(when body `(:@inner
+                        (lambda ()
+                          ,@body))))))))
+
 ;; CSS classes, tailwind style
 
 (defun featurebox (more-css)
@@ -38,15 +50,6 @@
 (setf (cl-who:html-mode) :html5)
 
 (define-layout (cljs-layout :wrapper #'webhax:page-base)
-  (:prepend-parts
-   :@head (html-out (:meta :charset "utf-8"))
-   :@head (html-out (:meta :name "viewport"
-                           :content "width=device-width, initial-scale=1, shrink-to-fit=no"))
-   :@css-link "/static/css/re-com/re-com.css"
-   ;;FIXME: We have both fontawesome, for clath, and material design icons. Refactor
-   :@css-link "/static/css/re-com/material-design-iconic-font.min.css"
-   :@css-link "/static/css/main.css"
-   :@css clath::*provider-container-css*)
   (html-out
     (:div :id "header_wrapper"
           (:div :id "account_bar"
@@ -73,6 +76,16 @@
     ("http://warblog.warflagger.net/" "WarBlog")))
 
 (define-parts cljs-base
+  :@head (lambda () (html-out (:meta :charset "utf-8")))
+  :@head (lambda ()
+           (html-out
+             (:meta :name "viewport"
+                    :content "width=device-width, initial-scale=1, shrink-to-fit=no")))
+  :@css-link "/static/css/re-com/re-com.css"
+  ;;FIXME: We have both fontawesome, for clath, and material design icons. Refactor
+  :@css-link "/static/css/re-com/material-design-iconic-font.min.css"
+  :@css-link "/static/css/main.css"
+  :@css clath::*provider-container-css*
   :@javascript-link "/static/javascript/local.js"
   :@javascript-link "/static/cljs-out/main.js"
   ;;:@javascript-link "/static/cljs-out/dev/main_bundle.js"
