@@ -106,8 +106,12 @@
            (bind-validated-input
                ((target (:or :url (webhax-validate:predicate-test
                                    #'warflagger:iid-p "Not an OpinionID"))))
-             (mount-cljs-component ("social-image")
-               :target (lisp target)))))
+             (mount-cljs-component ("social-card")
+               :target (lisp target)
+               :rooturl (lisp
+                         (if (iid-p target)
+                             (assoc-cdr :rooturl (opinion-by-id target))
+                             target))))))
 
   (setf (ningle:route *app* "/grouped/*")
         (cljs-page ((title-part "WF: Discussions"))
