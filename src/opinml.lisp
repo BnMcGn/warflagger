@@ -431,7 +431,10 @@
 
 (defparameter *safe-warstat-symbols*
   '(:replies-total :replies-immediate :tree-freshness :effect :controversy :direction :direction-on-root
-    :x-right :x-wrong :x-up :x-down :neutral :pro :con :hashtags))
+    :x-right :x-wrong :x-up :x-down
+    :x-right-source :x-wrong-source :x-up-source :x-down-source
+    :neutral :pro :con :hashtags :question :question-answered
+    :flag :tag :replies))
 
 (defun safe-warstat-symbol-p (namestr package)
   (cond
@@ -439,7 +442,8 @@
      (member namestr *safe-warstat-symbols* :test #'string-equal))
     ;;Allow NIL
     ((eq package :current)
-     (string-equal namestr nil))))
+     (or (string-equal namestr nil)
+         (string-equal namestr t)))))
 
 (defun deserialize-warstat (data)
   (let* ((data (if (stringp data) (make-string-input-stream data) data))
