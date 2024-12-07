@@ -535,7 +535,7 @@
   (post-flag)
   (when (and (enabledp) (directional-p))
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
-      (vote-right ref))))
+      (vote-wrong ref))))
 
 (defflag scsc::positive-evidence
   (set-direction :pro)
@@ -545,7 +545,7 @@
   (post-flag)
   (when (and (enabledp) (directional-p))
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
-      (vote-wrong ref))))
+      (vote-right ref))))
 
 (defflag scsc::custodial-redundant
   (set-other-flag :custodial-redundant)
