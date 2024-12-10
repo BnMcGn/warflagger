@@ -136,7 +136,7 @@
 
 (defun scsc-dispatch (key parent-dispatch info)
   "key is iid or rooturl"
-  (let ((ballot-box (warflagger:make-ballot-box (getf info :iid) (getf info :author)))
+  (let ((ballot-box (warflagger:make-ballot-box))
         (text-ballot-box (warflagger:make-ballot-box))
         (title-ballot-box (warflagger:make-ballot-box))
         (tree-freshness nil)
@@ -235,6 +235,9 @@
                         (:replies-immediate replies-immediate) (:other-flags other-flags)
                         (:hashtags hashtags)
                         (:alternatives alternatives))))
+             (when-let ((iid (getf info :iid)))
+               (setf (gethash :iid data) iid)
+               (setf (gethash :author data) (getf info :author)))
              (setf (gethash key score-script-support::*score-data*) data)))
           (:post
            (mapcan #'funcall on-post-procedures)

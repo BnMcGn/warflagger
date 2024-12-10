@@ -12,7 +12,7 @@
 
 (defun ballot-box-p (item)
   (and (hash-table-p item)
-       (every (rcurry #'gadgets:key-in-hash? item) '(:right :wrong :up :down :author))))
+       (every (rcurry #'gadgets:key-in-hash? item) '(:right :wrong :up :down))))
 
 (deftype ballot-box () `(satisfies ballot-box-p))
 
@@ -24,13 +24,12 @@
 (deftype vote-direction () `(satisfies vote-direction-p))
 
 (declaim (ftype (function (&optional iid uri) ballot-box) make-ballot-box))
-(defun make-ballot-box (&optional iid author)
+(defun make-ballot-box ()
   (let ((res (make-hash-table)))
     (setf (gethash :right res) nil)
     (setf (gethash :wrong res) nil)
     (setf (gethash :up res) nil)
     (setf (gethash :down res) nil)
-    (setf (gethash :author res) (when (and iid author) (list iid author)))
     (setf (gethash 'cache res) nil)
     res))
 
@@ -38,7 +37,7 @@
 (defun copy-ballot-box (old)
   "Make a shallow copy of a ballot box"
   (let ((new (make-ballot-box)))
-    (dolist (k '(:up :down :right :wrong :author))
+    (dolist (k '(:up :down :right :wrong))
       (setf (gethash k new) (gethash k old)))
     new))
 
@@ -59,9 +58,7 @@
     (dolist (box (cdr boxes))
       (dolist (dir '(:right :wrong :up :down))
         (dolist (vote (gethash dir box))
-          (apply #'cast-vote! res dir vote)))
-      (alexandria:when-let ((auth (gethash :author box)))
-        (cast-vote! res :up (car auth) (second auth))))
+          (apply #'cast-vote! res dir vote))))
     res))
 
 (defun merge-with-inverted-ballot-boxes (&rest boxes)
@@ -75,9 +72,7 @@
       (loop for dir in '(:right :wrong :up :down)
             for swap in '(:wrong :right :down :up)
             do (dolist (vote (gethash dir box))
-                 (apply #'cast-vote! res swap vote)))
-      (alexandria:when-let ((auth (gethash :author box)))
-        (cast-vote! res :down (car auth) (second auth))))
+                 (apply #'cast-vote! res swap vote))))
     res))
 
 (declaim (ftype (function (ballot-box) boolean) ballot-box-empty-p))
@@ -101,8 +96,7 @@
  - There can be multiple unique ref votes per iid."
   (let ((res (make-ballot-box))
         (present (make-hash-table :test #'equal))
-        (refcheck (make-hash-table :test #'equal))
-        (balbox-author (when-let ((auth (gethash :author balbox))) (second auth))))
+        (refcheck (make-hash-table :test #'equal)))
     (hu:collecting-hash-table (:existing present :mode :replace)
       (loop for (iid author . reference) in (gethash :right balbox)
             do (if (author-reasonable-p author)
@@ -118,7 +112,6 @@
             do (unless (gethash author present)
                  (cast-vote! res :up iid author)
                  (hu:collect author t))))
-    (setf (gethash :author res) (gethash :author balbox))
     (setf present (make-hash-table :test #'equal))
     (hu:collecting-hash-table (:existing present :mode :replace)
       (loop for (iid author . reference) in (gethash :wrong balbox)
@@ -151,8 +144,6 @@
        (down
          (loop for (nil author . nil) in (gethash :down balbox)
                sum (author-vote-value author))))
-    (when-let* ((authvote (gethash :author balbox)))
-      (incf up (author-vote-value (second authvote))))
     (values right up wrong down)))
 
 (defun ballot-box-totals (balbox)
@@ -164,8 +155,7 @@
 
 (defun print-ballot-box (bb)
   (hu:with-keys
-   (:right :up :wrong :down :author) bb
-    (format t ":author ~a~%" author)
+   (:right :up :wrong :down) bb
     (format t ":right ~a~%" right)
     (format t ":up ~a~%" up)
     (format t ":wrong ~a~%" wrong)
@@ -194,22 +184,27 @@
     ;;FIXME: Should this have a multiplier? Should it be a ratio?
     (values effect balance score)))
 
-(defun apply-ballot-box-to-warstats! (balbox warstats)
-  (let ((bbcopy (copy-ballot-box balbox)))
-    (setf (gethash :author bbcopy) nil)
-    (multiple-value-bind (right up wrong down) (ballot-box-totals bbcopy)
-      (setf (gethash :x-right warstats) right)
-      (setf (gethash :x-up warstats) up)
-      (setf (gethash :x-wrong warstats) wrong)
-      (setf (gethash :x-down warstats) down)))
+(defun ballot-box-controversy (balbox author iid)
+  (let ((xbal (make-ballot-box)))
+    (when author
+      (cast-vote! xbal :up iid author))
+    (merge-ballot-boxes! xbal balbox)
+    (multiple-value-bind (right up wrong down) (ballot-box-totals xbal)
+      (score-controversy (+ right up) (+ wrong down)))))
+
+(defun apply-ballot-box-to-warstats! (balbox warstats author iid)
+  (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
+    (setf (gethash :x-right warstats) right)
+    (setf (gethash :x-up warstats) up)
+    (setf (gethash :x-wrong warstats) wrong)
+    (setf (gethash :x-down warstats) down))
   (setf (gethash :x-right-source warstats) (tally-ballot-box balbox :right))
   (setf (gethash :x-up-source warstats) (tally-ballot-box balbox :up))
   (setf (gethash :x-wrong-source warstats) (tally-ballot-box balbox :wrong))
   (setf (gethash :x-down-source warstats) (tally-ballot-box balbox :down))
-  (multiple-value-bind (right up wrong down) (ballot-box-totals balbox)
-    (multiple-value-bind (effect controv) (score-controversy (+ right up) (+ wrong down))
-      (setf (gethash :effect warstats) effect)
-      (setf (gethash :controversy warstats) controv))))
+  (multiple-value-bind (effect controv) (ballot-box-controversy balbox author iid)
+    (setf (gethash :effect warstats) effect)
+    (setf (gethash :controversy warstats) controv)))
 
 ;; Comparison is a bit tricky!
 ;; - Need to be careful that users can't sneak in extra votes

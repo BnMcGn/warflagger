@@ -299,10 +299,10 @@
 (defun warstats-from-scsc-results (result &optional bbox)
   "The optional bbox is to allow this function to prepare warstats from an alternate ballot box, such as for text or title."
   (hu:with-keys (:ballot-box :tree-freshness :direction :replies-total :replies-immediate
-                             :other-flags :direction-on-root :hashtags) result
+                             :other-flags :direction-on-root :hashtags :author) result
     (let ((warstat (initialize-warstats))
           (ballot-box (or bbox ballot-box)))
-      (warflagger:apply-ballot-box-to-warstats! ballot-box warstat)
+      (warflagger:apply-ballot-box-to-warstats! ballot-box warstat author iid)
       (setf (gethash :tree-freshness warstat) tree-freshness)
       (incf (gethash :replies-immediate warstat) replies-immediate)
       (incf (gethash :replies-total warstat) replies-total)
