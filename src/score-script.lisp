@@ -336,9 +336,10 @@
 (defun vote-wrong (&optional ref)
   (funcall *dispatch* :cast-vote :wrong :reference ref))
 
-(defun apply-hashtag (tag)
+(defun apply-hashtag (tag iid author)
   (funcall (funcall *dispatch* :info :parent)
-           :apply-hashtag tag (funcall *dispatch* :info :ballot-box)))
+           :apply-hashtag tag (warflagger:up-voted
+                               (funcall *dispatch* :info :ballot-box) iid author)))
 
 (defun add-alternative (iid)
   (if-let ((parent (funcall *dispatch* :info :parent)))
@@ -668,9 +669,8 @@
   (set-direction :neutral))
 
 (defun scsc::hashtag (tag &key iid author)
-  (declare (ignore tag iid author))
   ;; Some hashtags may get own functions, but this will need to be added in scsc maker.
   (on-save
-    (apply-hashtag tag)))
+    (apply-hashtag tag iid author)))
 
 

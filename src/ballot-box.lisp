@@ -46,6 +46,11 @@
   (setf (gethash 'cache balbox) nil)
   (push `(,iid ,author ,@(when reference (list reference))) (gethash direction balbox)))
 
+(defun up-voted (balbox iid author)
+  (let ((newbox (copy-ballot-box balbox)))
+    (cast-vote! newbox :up iid author)
+    newbox))
+
 (declaim (ftype (function (&rest list-of-ballot-box) ballot-box)
                 merge-ballot-boxes merge-ballot-boxes!
                 merge-with-inverted-ballot-boxes merge-with-inverted-ballot-boxes!))
