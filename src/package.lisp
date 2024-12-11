@@ -144,7 +144,8 @@
    #:*handle-extraction-errors*
    #:discussion-root-of
    #:normalize-root-id
-   #:normalize-iid))
+   #:normalize-iid
+   #:up-voted))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)
