@@ -270,6 +270,28 @@
            (format nil "/author-questions/~a" id)
            (or index 0)))))
 
+(setf (ningle:route *app* "/thing-source/*")
+      (input-function-wrapper
+       (lambda ()
+         (bind-validated-input
+             ((name :string)
+              (id :integer)
+              &key
+              (index :integer)
+              (limit :integer))
+           (let ((*thing-limit* limit)
+                 (*thing-index* index)
+                 (source
+                   (cdr
+                    (assoc name
+                           (list
+                            (cons "author-open" (tag-as-question #'%author-questions)))
+                           :test #'equal))))
+             (prin1 (funcall source id) *webhax-output*))))
+       ;;Is this right for unicode?
+       :content-type "text/plain"))
+
+
 ;; React thing tools
 
 (defun tag-as-author (func)
@@ -329,10 +351,12 @@
 ;;FIXME: counter doesn't seem like a healthy idea...
 (defparameter *mr-counter* 0)
 
-(defun mount-cljs-thing (items)
+(defun mount-cljs-thing (items &key url)
   (let ((thingid (format nil "cljs-thing-~a" (incf *mr-counter*))))
     (mount-cljs-component ("thing-lister" :mount-id thingid :key thingid)
       :things (lisp
                (list* 'list
-                      (mapcar #'ps-gadgets:alist->ps-object-code (mapcar #'hu:hash->alist items))))
+                      (mapcar #'ps-gadgets:alist->ps-object-code
+                              (mapcar #'hu:hash->alist items))))
+      :url (lisp url)
       :trim (lisp *thing-summary-width*))))
