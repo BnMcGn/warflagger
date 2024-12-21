@@ -351,7 +351,7 @@
 ;;FIXME: counter doesn't seem like a healthy idea...
 (defparameter *mr-counter* 0)
 
-(defun mount-cljs-thing (items &key url)
+(defun mount-cljs-thing (items &key url name)
   (let ((thingid (format nil "cljs-thing-~a" (incf *mr-counter*))))
     (mount-cljs-component ("thing-lister" :mount-id thingid :key thingid)
       :things (lisp
@@ -359,4 +359,5 @@
                       (mapcar #'ps-gadgets:alist->ps-object-code
                               (mapcar #'hu:hash->alist items))))
       :url (lisp url)
+      :name (lisp name)
       :trim (lisp *thing-summary-width*))))

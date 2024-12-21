@@ -170,6 +170,7 @@
          (list authid)
          (lambda (x) (mount-cljs-thing
                       x
+                      :name "author-open-questions"
                       :url
                       (lisp (gadgets:strcat "/thing-source/author-open/" authid))))
          (format nil "/author-open-questions/~a" authid)
