@@ -172,7 +172,7 @@
                       x
                       :name "author-open-questions"
                       :url
-                      (lisp (gadgets:strcat "/thing-source/author-open/" authid))))
+                      (lisp (format nil "/thing-source/author-open/~a" authid))))
          (format nil "/author-open-questions/~a" authid)
          :trim thing-lister:*thing-summary-width*
          :label "Author: Open Questions"
