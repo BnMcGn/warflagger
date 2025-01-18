@@ -317,6 +317,11 @@ the page text can be found in the cache."
 (defun get-target-id (opinid)
   (assoc-cdr :target (opinion-by-id opinid)))
 
+(defun target-exists-p (target)
+  (if (iid-p target)
+      (select (colm 'id) :from (tabl 'opinion) :where (sql-= (colm 'iid) target))
+      (select (colm 'id) :from (tabl 'rooturl) :where (sql-= (colm 'rooturl) target))))
+
 (defgeneric get-target-text (opinish))
 (defmethod get-target-text ((opinid integer))
   (gethash :text (text-server-dispatcher (assoc-cdr :target (opinion-by-id opinid)))))

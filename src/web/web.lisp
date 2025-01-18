@@ -113,6 +113,32 @@
                              (assoc-cdr :rooturl (opinion-by-id target))
                              target))))))
 
+  (setf (ningle:route *app* "/social-image/*")
+        (input-function-wrapper
+         (lambda ()
+           (bind-validated-input
+               ((target (:or :url (webhax-validate:predicate-test
+                                   #'warflagger:iid-p "Not an OpinionID"))))
+             (unless (target-exists-p target)
+               (webhax-core:web-fail "Target not found"))
+             (let* ((api-url "http://screeenly.com/api/v1")
+                    (target (if (iid-p target) target (quri:url-encode target)))
+                    (params (quri:url-encode-params
+                             (list
+                              (cons "key" wf/local-settings:*screeenly-api-key*)
+                              (cons "url" (gadgets:strcat
+                                           "https://warflagger.net/social-image-source/"
+                                           target))
+                              (cons "height" 630)
+                              (cons "width" 1200)
+                              (cons "delay" 10))))
+                    (results (json:decode-json (dexador:get
+                                                (gadgets:strcat api-url "?" params)
+                                                :want-stream t))))
+
+               )))
+         :content-type "image/png"))
+
   (setf (ningle:route *app* "/grouped/*")
         (cljs-page ((title-part "WF: Discussions"))
           (mount-cljs-component ("grouped"))))

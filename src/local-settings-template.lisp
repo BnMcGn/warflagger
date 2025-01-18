@@ -28,7 +28,8 @@
    #:*supply-text*
    #:*ssl-key-file*
    #:*ssl-cert-file*
-   #:*ssl-password*))
+   #:*ssl-password*
+   #:*screeenly-api-key*))
 
 (in-package :wf/local-settings)
 
@@ -52,6 +53,8 @@
 (defparameter *ssl-key-file* nil)
 (defparameter *ssl-cert-file* nil)
 (defparameter *ssl-password* nil)
+
+(defparameter *screeenly-api-key* "")
 
 (pushnew (asdf:system-relative-pathname 'warflagger "src/texts/ ")
          webhax:*named-text-locations* :test #'equal)
