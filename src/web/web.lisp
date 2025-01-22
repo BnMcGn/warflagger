@@ -120,24 +120,28 @@
                ((target (:or :url (webhax-validate:predicate-test
                                    #'warflagger:iid-p "Not an OpinionID"))))
              (unless (target-exists-p target)
-               (webhax-core:web-fail "Target not found"))
-             (let* ((api-url "http://screeenly.com/api/v1")
+               (webhax-core:web-fail-500 "Target not found"))
+             (let* ((api-url "http://screeenly.com/api/v1/fullsize")
                     (target (if (iid-p target) target (quri:url-encode target)))
-                    (params (quri:url-encode-params
-                             (list
-                              (cons "key" wf/local-settings:*screeenly-api-key*)
-                              (cons "url" (gadgets:strcat
-                                           "https://warflagger.net/social-image-source/"
-                                           target))
-                              (cons "height" 630)
-                              (cons "width" 1200)
-                              (cons "delay" 10))))
-                    (results (json:decode-json (dexador:get
-                                                (gadgets:strcat api-url "?" params)
+                    (params (list
+                             (cons "key" wf/local-settings:*screeenly-api-key*)
+                             (cons "url" (gadgets:strcat
+                                          "https://warflagger.net/social-image-source/"
+                                          target))
+                             (cons "height" "630")
+                             (cons "width" "1200")
+                             (cons "delay" "10")))
+                    (results (json:decode-json (drakma:http-request
+                                                api-url
+                                                :method :post
+                                                :parameters params
                                                 :want-stream t))))
-
-               )))
-         :content-type "image/png"))
+               (unless (assoc :base64--raw results)
+                 (webhax-core:web-fail-500 "Unable to generate card"))
+               (cl-base64:base64-string-to-usb8-array
+                (gadgets:assoc-cdr :base64--raw results)))))
+         :content-type "image/png"
+         :capture-html false))
 
   (setf (ningle:route *app* "/grouped/*")
         (cljs-page ((title-part "WF: Discussions"))

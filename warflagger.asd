@@ -30,6 +30,7 @@
                #:cl-csv
                #:plump-sexp
                #:dexador
+               #:drakma
                #:osicat
                #:crawly
                #:readability/plump

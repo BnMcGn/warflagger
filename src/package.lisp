@@ -145,7 +145,8 @@
    #:discussion-root-of
    #:normalize-root-id
    #:normalize-iid
-   #:up-voted))
+   #:up-voted
+   #:target-exists-p))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)
