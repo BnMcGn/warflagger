@@ -136,10 +136,11 @@
                                                 :method :post
                                                 :parameters params
                                                 :want-stream t))))
-               (unless (assoc :base64--raw results)
+               (unless (assoc :base-64--raw results)
                  (webhax-core:web-fail-500 "Unable to generate card"))
-               (cl-base64:base64-string-to-usb8-array
-                (gadgets:assoc-cdr :base64--raw results)))))
+               (coerce (cl-base64:base64-string-to-usb8-array
+                        (gadgets:assoc-cdr :base-64--raw results))
+                       '(vector (unsigned-byte 8))))))
          :content-type "image/png"
          :capture-html false))
 
