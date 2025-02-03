@@ -664,6 +664,15 @@
       (progn (set-direction :neutral) (disable))
       (post-error "#(vote-value): can only set to 0")))
 
+;;FIXME: Need to review no-cascade. Exactly what is it for? Does it have a legitimate, clear
+;; use?
+;; - To be able to show disapproval of a quote within a document without giving the document
+;; a negative reputation. An accurate transcript might, for example, contain a false statement
+;; from an interviewee. We want to excerpt to show up as problematic without discrediting the
+;; creator of the document. #no-cascade isn't a clear description of this problem. Could it
+;; be applying to other things? Rather vague. Are there non-excerpt use cases? What are they?
+;; - Perhaps a sort of replacement for vote-value? #neutralize-vote?
+;; - Not exactly the same thing as stopping the cascade.
 (defun scsc::no-cascade (&key iid author)
   (declare (ignore iid author))
   (set-direction :neutral))

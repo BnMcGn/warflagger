@@ -212,3 +212,6 @@
       (terpri stream)
       (terpri stream)
       (rooturl-discussion-summary (warflagger:get-rooturl-by-id rootid) stream))))
+
+(defun may-have-bad-uc (seq)
+  (find #\latin_capital_letter_a_with_tilde seq))

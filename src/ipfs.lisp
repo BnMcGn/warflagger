@@ -310,6 +310,12 @@
          (tdat (hu:plist->hash tdat)))
     tdat))
 
+(defun deserialize-text-info (data)
+  (let* ((data (if (stringp data) (make-string-input-stream data) data))
+         (tdat (proto:limited-reader data #'general-reader-predicate))
+         (tdat (hu:plist->hash tdat)))
+    tdat))
+
 (define-condition extracted-data-not-found (error)
   ((text :initarg :text :reader text)))
 
@@ -332,7 +338,10 @@
 
 (defun ipfs-text-info-for-rooturl (rooturl)
   "Load text info for a rooturl from IPFS"
-  (declare (ignore rooturl)))
+  (let ((fname (ipfs-rooturl-path rooturl "text.data")))
+    (unless (ipfs-file-exists-p fname)
+      (error "No text.data found"))
+    (deserialize-text-info (ipfs:files-read fname))))
 
 (defun ipfs-title-info-for-rooturl (rooturl)
   (let ((fname (ipfs-rooturl-path rooturl "title.data")))

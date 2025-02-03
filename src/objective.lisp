@@ -324,6 +324,7 @@
                       (cl-utilities:collect tag)))))))
             warstat)))
 
+;;FIXME: Counts and flags from main results leak through. Needs a rethink/rewrite
 (defun text-warstats-from-scsc-results (result)
   (warstats-from-scsc-results result (gethash :text-ballot-box result)))
 
