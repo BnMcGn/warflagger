@@ -213,5 +213,16 @@
       (terpri stream)
       (rooturl-discussion-summary (warflagger:get-rooturl-by-id rootid) stream))))
 
+(defun text-summary (rooturl)
+  (let* ((tinfo (wf/ipfs::ipfs-text-info-for-rooturl rooturl))
+         (tsource (gethash :text-source tinfo)))
+    (format t "~&Found ~a Original ~a Unicode ~a~&"
+            (if (gethash :text tinfo) "Y" "N")
+            (if (eq :original tsource) "Y" "N")
+            (if (may-have-bad-uc (gethash :text tinfo)) "Y" "N"))))
+
 (defun may-have-bad-uc (seq)
   (find #\latin_capital_letter_a_with_tilde seq))
+
+(defun may-also-have-bad-uc (seq)
+  (find #\latin_small_letter_a_with_acute seq))

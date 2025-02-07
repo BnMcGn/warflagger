@@ -27,17 +27,19 @@
                                             :target (plump:attribute link "href")))))))
 
 (defun tt-extract-html (page)
-  (let* ((pobj (plump:parse page))
+  (let* (;;(page (flexi-streams:make-flexi-stream page :external-format :utf-8))
+         (pobj (plump:parse page))
          (title (string-strip (readability::get-article-title pobj)))
          (meta (extract-opinml-meta-from-html page))
          (article (readability::grab-article pobj))
          (links (extract-links-from-plump-object article))
-         (simple-page (plump:serialize article nil))
+         ;(simple-page (plump:serialize article nil))
          (text (string-strip (readability::inner-text article))))
     (values title text meta links article)))
 
 (defun tt-extract-text (page)
-  (let* ((text (string-strip (read-stream-content-into-string page)))
+  (let* ((;page (flexi-streams:make-flexi-stream page :external-format :utf-8))
+         (text (string-strip (read-stream-content-into-string page)))
          (title (gadgets:part-on-true
                  (lambda (x) (member x '(#\Linefeed #\Newline #\Return)))
                  text))
