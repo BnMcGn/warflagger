@@ -38,7 +38,7 @@
     (values title text meta links article)))
 
 (defun tt-extract-text (page)
-  (let* ((;page (flexi-streams:make-flexi-stream page :external-format :utf-8))
+  (let* (;(page (flexi-streams:make-flexi-stream page :external-format :utf-8))
          (text (string-strip (read-stream-content-into-string page)))
          (title (gadgets:part-on-true
                  (lambda (x) (member x '(#\Linefeed #\Newline #\Return)))

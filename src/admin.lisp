@@ -216,9 +216,9 @@
 (defun text-summary (rooturl)
   (let* ((tinfo (wf/ipfs::ipfs-text-info-for-rooturl rooturl))
          (tsource (gethash :text-source tinfo)))
-    (format t "~&Found ~a Original ~a Unicode ~a~&"
+    (format t "~&Found ~a Initial ~a Unicode ~a~&"
             (if (gethash :text tinfo) "Y" "N")
-            (if (eq :original tsource) "Y" "N")
+            (if (eq :initial tsource) "Y" "N")
             (if (may-have-bad-uc (gethash :text tinfo)) "Y" "N"))))
 
 (defun may-have-bad-uc (seq)
@@ -226,3 +226,10 @@
 
 (defun may-also-have-bad-uc (seq)
   (find #\latin_small_letter_a_with_acute seq))
+
+(defun get-extracted-text-cid (rooturl)
+  (assoc-cdr "Hash"
+             (ipfs:files-stat (wf/ipfs:ipfs-rooturl-path rooturl "extracted-text.txt"))
+             :test #'equal))
+
+
