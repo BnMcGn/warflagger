@@ -11,6 +11,7 @@
 ;;; Save opinions and warstats to IPFS
 ;;; General equivalent to db.lisp
 
+(setf ipfs:*external-format* :utf-8)
 
 (defun ipfs-directory-exists-p (path)
   (let ((stat (ipfs:files-stat path)))
@@ -103,8 +104,8 @@
             (print score-script s))))
       (ipfs:with-files-write (s (strcat rootpath "references.data") :create t :truncate t)
         (warflagger:with-inverted-case
-         (print (list :references references
-                      :refd refd) s)))
+          (print (list :references references
+                       :refd refd) s)))
       (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
         (princ (serialize-warstat
                 (hu:hash->plist
