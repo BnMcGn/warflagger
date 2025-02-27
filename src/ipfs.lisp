@@ -97,7 +97,8 @@
       ;;Rooturl stuff
       (ipfs-ensure-directory-exists rootpath)
       (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t :truncate t)
-        (print opinion-tree s))
+        (warflagger:with-inverted-case
+          (print opinion-tree s)))
       (ipfs:with-files-write (s (strcat rootpath "score-script.data") :create t :truncate t)
         (let ((*package* (find-package :warflagger)))
           (warflagger:with-inverted-case

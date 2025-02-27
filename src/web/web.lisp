@@ -80,7 +80,7 @@
              (mount-cljs-component ("target")
                :rooturl (lisp url)
                :touched-p (lisp (if touched 'true 'false))
-               :refd (lisp (unless touched (refd-to url)))
+               :refd (lisp (unless touched (cons 'list (refd-to url))))
                :tmode (lisp tmode))))))
 
   (setf (ningle:route *app* "/o/*")
