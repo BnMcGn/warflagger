@@ -65,6 +65,31 @@
          (:span (funcall links))))
        (:div :class "basis-2 sm:basis-44")))))
 
+(defun %prep-fieldspecs (fs)
+  (let ((removables (list :compiled-validator :options-func)))
+    (mapcan-by-2
+     (lambda (k v)
+       (list k
+             (remove-if-by-2 (lambda (k v) (declare (ignore v)) (member k removables))
+                             v)))
+     fs)))
+
+(defun userfig::settings-page (fieldspecs display-name)
+  (funcall
+   (cljs-page ()
+     (html-out
+       (:h2 (format webhax-core:*webhax-output* "Settings: ~a" display-name))
+       (webhax:mount-cljs-component ("userfig-form")
+         :fieldspecs
+         (lisp (warflagger:with-inverted-case
+                 (with-output-to-string (s)
+                   (print (userfig::user-visible-fieldspecs
+                           (%prep-fieldspecs fieldspecs)) s))))
+         :data-url (lisp
+                    (concatenate 'string userfig::*userfig-url-path* "/get-user-info"))
+         :save-url (lisp
+                    (concatenate 'string userfig::*userfig-url-path* "/set-user-info")))))))
+
 (defun user-home-page ()
   (check-signed-up)
   (let ((since (userfig:userfig-value 'signed-up))
