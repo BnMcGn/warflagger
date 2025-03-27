@@ -54,7 +54,7 @@
             (get-local-user-id *system-author-user*)
             (insert-new-author
              :wf-user *system-author-user*
-             :display-name *system-author-display*))))
+             :screen-name *system-author-display*))))
 
 (defun system-generated-p (opinid)
   (when-let ((opin (opinion-by-id opinid)))

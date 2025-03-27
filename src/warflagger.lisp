@@ -42,8 +42,6 @@
     (cond
       ((assoc :screen-name authdat)
        (strcat *base-url* "u/" (quri:url-encode (assoc-cdr :screen-name authdat))))
-      ((assoc :display-name authdat)
-       (strcat *base-url* "u/" (quri:url-encode (assoc-cdr :display-name authdat))))
       ((assoc :homepage authdat)
        (strcat *base-url* "author/" (quri:url-encode (assoc-cdr :homepage authdat))))
       ((assoc :email authdat)

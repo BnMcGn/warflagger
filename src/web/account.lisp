@@ -74,11 +74,11 @@
                              v)))
      fs)))
 
-(defun userfig::settings-page (fieldspecs display-name)
+(defun userfig::settings-page (fieldspecs screen-name)
   (funcall
    (cljs-page ()
      (html-out
-       (:h2 (format webhax-core:*webhax-output* "Settings: ~a" display-name))
+       (:h2 (format webhax-core:*webhax-output* "Settings: ~a" screen-name))
        (webhax:mount-cljs-component ("userfig-form")
          :fieldspecs
          (lisp (warflagger:with-inverted-case

@@ -351,7 +351,7 @@ the page text can be found in the cache."
 ;;FIXME: Perhaps in the case of WF user, we shouldn't be looking here for the screen
 ;; name. That breaks a few assumptions. We don't have userfig here.
 (defun author-representation-from-row (data)
-  (when-let ((res (assoc-or '(:screen-name :display-name :homepage :email) data)))
+  (when-let ((res (assoc-or '(:screen-name :homepage :email) data)))
     (values (cdr res) (car res))))
 
 (defun get-author-representation (aid)
@@ -387,15 +387,6 @@ the page text can be found in the cache."
       (error "Multiple :wf-user fields for id"))
     (car luser)))
 
-;;FIXME: doesn't look like a very reliable way to do things.
-(defun author-type (author)
-  "For parsing incoming RDF"
-  (cond
-    ((integerp author) :id)
-    ((starts-with "http" author) :homepage)
-    ((starts-with "mailto" author) :email)
-    (t :string)))
-
 (defun find-author-id (author)
   (let ((author (gadgets:string-unless-number author)))
     (if (integerp author)
@@ -406,7 +397,7 @@ the page text can be found in the cache."
            :where (sql-and (sql-in
                             (colm 'type)
                             ;; Limit the types that the public can search
-                            (mapcar #'to-snake-case '(:homepage :email :display-name :screen-name)))
+                            (mapcar #'to-snake-case '(:homepage :email :screen-name)))
                            (sql-= (colm 'value) author)))))))
 
 (defun insert-new-author (&rest atypes-and-values)

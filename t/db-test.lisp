@@ -36,7 +36,7 @@
                      :id
                      (sql-stuff:get-assoc-by-col (sql-stuff:colm 'author 'value) *user*)))
   (unless (integerp *userid*)
-    (setf *userid* (insert-new-author :display-name *user*)))
+    (setf *userid* (insert-new-author :screen-name *user*)))
   (setf *opin1id* nil)
   (setf *opin2id* nil)
   (setf *ourl* nil))
