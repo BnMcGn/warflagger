@@ -146,7 +146,8 @@
    #:normalize-root-id
    #:normalize-iid
    #:up-voted
-   #:target-exists-p))
+   #:target-exists-p
+   #:update-author-field))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)

@@ -409,6 +409,23 @@ the page text can be found in the cache."
        :values (list aid (kebab:to-snake-case (mkstr atype)) (sql-escape value))))
     aid))
 
+(defun update-author-field (authid field value)
+  (unless (member field '(:homepage :email :screen-name :wf-user))
+    (error "Not a legitimate field"))
+  (let ((xfield (symbol-name (to-snake-case field))))
+    (if (select (colm 'id)
+          :from (tabl 'author)
+          :where (sql-and (sql-= (colm 'type) xfield)
+                          (sql-= (colm 'id) authid)))
+        (update-records (tabl 'author)
+                        :av-pairs (list (list (colm 'type) xfield)
+                                        (list (colm 'value) value))
+                        :where (sql-and (sql-= (colm 'type) xfield)
+                                        (sql-= (colm 'id) authid)))
+        (insert-record (tabl 'author) (list (cons (colm 'id) authid)
+                                            (cons (colm 'type) xfield)
+                                            (cons (colm 'value) value))))))
+
 (def-query author-lister (&key limit offset order-by)
   (mapcar #'car
           (query-marker

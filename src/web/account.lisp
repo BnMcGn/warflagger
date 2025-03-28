@@ -90,6 +90,14 @@
          :save-url (lisp
                     (concatenate 'string userfig::*userfig-url-path* "/set-user-info")))))))
 
+(defun userfig:after-update-from-user-hook (user fieldspecs values)
+  (declare (ignore fieldspecs))
+  (when-let ((authid (warflagger:get-local-user-id user)))
+    (when-let ((email (gethash '(webhax-user:email) data)))
+      (warflagger:update-author-field authid :email email))
+    (when-let ((screen-name (gethash '(webhax-user:screen-name) data)))
+      (warflagger:update-author-field authid :screen-name screen-name))))
+
 (defun user-home-page ()
   (check-signed-up)
   (let ((since (userfig:userfig-value 'signed-up))
