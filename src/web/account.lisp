@@ -93,9 +93,9 @@
 (defun userfig:after-update-from-user-hook (user fieldspecs values)
   (declare (ignore fieldspecs))
   (when-let ((authid (warflagger:get-local-user-id user)))
-    (when-let ((email (gethash '(webhax-user:email) data)))
+    (when-let ((email (gethash '(webhax-user:email) values)))
       (warflagger:update-author-field authid :email email))
-    (when-let ((screen-name (gethash '(webhax-user:screen-name) data)))
+    (when-let ((screen-name (gethash '(webhax-user:screen-name) values)))
       (warflagger:update-author-field authid :screen-name screen-name))))
 
 (defun user-home-page ()
