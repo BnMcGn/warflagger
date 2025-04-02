@@ -24,31 +24,35 @@
        (:input :class *input-tw-classes*
                :type "text" :id "screen-name" :name "screen-name" :value screen-name)
        (when screen-name-error
-         (htm (:div :class "text-red-700" screen-name-error))))
+         (htm (:div :class "text-red-700" (str screen-name-error)))))
       (:div
        (:label :for "email" "Email:")
        (:input :class *input-tw-classes*
                :type "text" :id "email" :name "email":value email)
        (when email-error
-         (htm (:div :class "text-red-700" email-error))))
+         (htm (:div :class "text-red-700" (str email-error)))))
       (:input :type "submit" :value "Create"
               :class "py-1 px-3 text-center whitespace-nowrap align-center self-end text-sm font-normal whitespace-nowrap bg-none rounded border border-solid cursor-pointer select-none leading-snug inline-block rc-button w-32"))))))
 
 (defun webhax-user:sign-up-page ()
   (funcall
    (cljs-page ()
-     (bind-tested-input (&key (screen-name (:unique :options-func 'webhax-user:list-of-screen-names))
+     (bind-tested-input (&key (screen-name
+                               (:unique :options-func 'webhax-user:list-of-screen-names
+                                        :message "Name in use. Please choose again."))
                          (email :email))
        (check-authenticated)
        (if (and screen-name (not *bvi-errors*))
            (progn
-             (webhax-user::save-signed-up-user (hu:hash (:screen-name screen-name :email email)))
-             ;(html-out (:script (str (ps (setf (@ window location)
-             ;                                  (lisp (webhax-user:login-destination)))))))
+             (webhax-user::save-signed-up-user
+              (hu:hash (:screen-name screen-name :email email)))
              (webhax-core:web-redirect (webhax-user:login-destination)))
            (if *bvi-errors*
-               (%sign-up-form (or screen-name (assoc-cdr :screen-name *key-web-input*))
-                              (or email (assoc-cdr :email *key-web-input*))
+               (%sign-up-form (or screen-name
+                                  (proto:assoc-cdr2 :screen-name *key-web-input*
+                                                    :test #'string-equal))
+                              (or email
+                                  (proto:assoc-cdr2 :email *key-web-input* :test #'string-equal))
                               (assoc-cdr :screen-name *bvi-errors*)
                               (assoc-cdr :email *bvi-errors*))
                (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))))))
