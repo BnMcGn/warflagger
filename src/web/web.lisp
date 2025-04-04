@@ -254,6 +254,9 @@
 ;; should go out in the data.
 (defparameter *userfig-fieldspecs* nil)
 
+(defun all-fieldspecs ()
+  (concatenate 'list webhax-user::*userfig-for-user* *userfig-fieldspecs*))
+
 ;;;Code below starts server. To restart, first stop server thusly:
 ;;;(clack:stop wf/web::*handler*)
 ;;;Then evaluate code below.

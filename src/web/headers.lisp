@@ -75,6 +75,12 @@
     ("/faq/" "FAQ")
     ("http://warblog.warflagger.net/" "WarBlog")))
 
+(defun get-all-user-visible-data ()
+  (when (signed-up?)
+    (hu:hash->plist
+     (userfig::prep-user-data
+      (userfig:get-user-visible-data (get-user-name) (all-fieldspecs))))))
+
 (define-parts cljs-base
   :@head (lambda () (html-out (:meta :charset "utf-8")))
   :@head (lambda ()
@@ -89,6 +95,10 @@
   :@javascript-link "/static/javascript/local.js"
   :@javascript-link "/static/cljs-out/main.js"
   ;;:@javascript-link "/static/cljs-out/dev/main_bundle.js"
+  :@javascript
+  (ps:ps
+    (defparameter |userfig-data|
+      (ps:lisp (list* 'ps:create (get-all-user-visible-data)))))
   :@account-info #'tw-account-bar
   :@head #'favicon-links
   :@site-index
