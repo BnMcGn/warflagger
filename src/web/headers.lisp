@@ -77,9 +77,13 @@
 
 (defun get-all-user-visible-data ()
   (when (signed-up?)
-    (hu:hash->plist
-     (userfig::prep-user-data
-      (userfig:get-user-visible-data (get-user-name) (all-fieldspecs))))))
+    (mapcar (lambda (x)
+              (if (eq 'local-time:timestamp (type-of x))
+                  (warflagger:js-compatible-utcstamp x)
+                  x))
+            (hu:hash->plist
+             (userfig::prep-user-data
+              (userfig:get-user-visible-data (get-user-name) (all-fieldspecs)))))))
 
 (define-parts cljs-base
   :@head (lambda () (html-out (:meta :charset "utf-8")))
@@ -96,9 +100,10 @@
   :@javascript-link "/static/cljs-out/main.js"
   ;;:@javascript-link "/static/cljs-out/dev/main_bundle.js"
   :@javascript
-  (ps:ps
-    (defparameter |userfig-data|
-      (ps:lisp (list* 'ps:create (get-all-user-visible-data)))))
+  (with-inverted-case
+    (ps:ps
+      (defparameter *userfig-data*
+        (ps:lisp (list* 'ps:create (get-all-user-visible-data))))))
   :@account-info #'tw-account-bar
   :@head #'favicon-links
   :@site-index
