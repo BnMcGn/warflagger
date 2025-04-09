@@ -252,7 +252,9 @@
 ;;FIXME: Need to handle the user information that will be passed out in OpinML
 ;; exports. User needs to be able to specify a homepage, whether email address
 ;; should go out in the data.
-(defparameter *userfig-fieldspecs* nil)
+(defparameter *userfig-fieldspecs*
+  '(advanced (:yesno :initial nil :editable t
+              :description "Advanced posting options")))
 
 (defun all-fieldspecs ()
   (concatenate 'list webhax-user::*userfig-for-user* *userfig-fieldspecs*))

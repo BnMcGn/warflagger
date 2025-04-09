@@ -73,7 +73,24 @@
     ("/grouped/" "Current Discussions")
     ("/opinion/" "Write an Opinion")
     ("/faq/" "FAQ")
-    ("http://warblog.warflagger.net/" "WarBlog")))
+    ;("http://warblog.warflagger.net/" "WarBlog")
+    ))
+
+(defun index-links ()
+  (let* ((user (get-user-name))
+         (advanced (and user (userfig:userfig-value 'advanced))))
+    (if advanced
+        '(("/" "Home")
+          ("/introduction/" "Introduction")
+          ("/opinions-recent/" "Recent Opinions")
+          ("/grouped/" "Current Discussions")
+          ("/opinion/" "Write an Opinion")
+          ("/faq/" "FAQ"))
+        '(("/" "Home")
+          ("/introduction/" "Introduction")
+          ("/opinions-recent/" "Recent Opinions")
+          ("/grouped/" "Current Discussions")
+          ("/faq/" "FAQ")))))
 
 (defun get-all-user-visible-data ()
   (when (signed-up?)
@@ -113,7 +130,7 @@
        :class (lisp (gadgets:strcat (featurebox-side nil) " hidden sm:block"))
        (:h3 "Index")
        (lisp
-        (loop for (url label) in *index*
+        (loop for (url label) in (index-links)
               do (htm (:div (:a :href url (str label)))))))
       (:div
        :class "sm:hidden flex bg-black justify-center"
