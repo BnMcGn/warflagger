@@ -273,7 +273,11 @@
         (:static
          :path "/static/"
          :root #p"~/quicklisp/local-projects/wf-static/")
-        :session
+        (:session
+         :store
+         (lack.session.store.dbi:make-dbi-store
+          :connector (lambda () (apply #'dbi:connect
+                                       wf/local-settings:*session-db-connect-spec*))))
         (claxy:middleware (list (list "/ipfs/" "http://localhost:8080/ipfs/")
                                 (list "/ipns/" "http://localhost:8080/ipns/")))
         (clath:component

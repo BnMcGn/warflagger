@@ -78,7 +78,7 @@
 
 (defun index-links ()
   (let* ((user (get-user-name))
-         (advanced (and user (userfig:userfig-value 'advanced))))
+         (advanced (and user (gadgets:tryit (userfig:userfig-value-for user 'advanced)))))
     (if advanced
         '(("/" "Home")
           ("/introduction/" "Introduction")
