@@ -11,8 +11,6 @@ Go to the discussion that you wish to join. The header of each target or opinion
 
 Start by selecting the Flag. **Like** or **Dislike** are safest when starting out. Visit the [Flags](http://warflagger.net/flags/) page to learn about other flag options.
 
-Select a VoteValue. For now, use 1 with Like and -1 with Dislike.
-
 Fill out the optional Comment field, if you wish.
 
 Click **Post** to finish.

@@ -38,16 +38,6 @@ They can be found [here](/flags/) with descriptions.
 
 If in doubt, you are fine to just use the **Like** and **Dislike** flags.
 
-### What is the reference field for?
-
-Like target, reference is meant to hold an URL. Unlike target, it is optional. Use it to connect something to a target link. 
-
-Examples: 
-
-- If you wish to flag an opinion as **Redundant**, it's a good practice to link to the post that the opinion duplicates.
-- When replying to a **NeedsEvidence** request, you can put an answering URL in the reference field, especially if you are leaving the comment field blank.
-- The reference field is mandatory when using the **SameThing** flag to merge two discussions.
-
 ## Future
 
 ### Can OpinML be used for scientific peer review and research?
@@ -57,11 +47,6 @@ Possibly. This would require investigation by people familiar with the needs of 
 ### Can WarFlagger be used in place of the legal system for trying cases and evaluating evidence?
 
 While its goals are analogous to some things in the court system, OpinML is not currently intended for legal use. For one, it will take significant effort to work out all the possible methods of subversion and causes of inaccuracy in OpinML evidence. Perhaps it will some day provide the inspiration for a legal evidence markup system.
-
-### What other possible uses will WarFlagger/OpinML find?
-
-Citizen reporting and media verification. The **EyeWitness** and **SecondHand** flags were made with this use in mind.
-
 
 
 
