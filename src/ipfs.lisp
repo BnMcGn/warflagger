@@ -342,7 +342,7 @@
         (setf (gethash :tree-freshness tdat) nil))
     tdat))
 
-(define-condition extracted-data-not-found (error)
+(define-condition data-not-found (error)
   ((text :initarg :text :reader text)))
 
 (defun ipfs-warstats (item)
@@ -366,26 +366,26 @@
   "Load text info for a rooturl from IPFS"
   (let ((fname (ipfs-rooturl-path rooturl "text.data")))
     (unless (ipfs-file-exists-p fname)
-      (error "No text.data found"))
+      (error 'data-not-found :text "No text.data found"))
     (deserialize-text-info (ipfs:files-read fname))))
 
 (defun ipfs-title-info-for-rooturl (rooturl)
   (let ((fname (ipfs-rooturl-path rooturl "title.data")))
     (unless (ipfs-file-exists-p fname)
-      (error "No title.data found"))
+      (error 'data-not-found :text "No title.data found"))
     (deserialize-title-info (ipfs:files-read fname))))
 
 ;;FIXME: any UTF-8 conversion needed?
 (defun ipfs-extracted-text (rooturl)
   (let ((fname (ipfs-rooturl-path rooturl "extracted-text.txt")))
     (unless (ipfs-file-exists-p fname)
-      (error 'extracted-data-not-found :text "No extracted-text.txt file found for this URL"))
+      (error 'data-not-found :text "No extracted-text.txt file found for this URL"))
     (ipfs:files-read fname)))
 
 (defun ipfs-extracted-metadata (rooturl)
   (let ((fname (ipfs-rooturl-path rooturl "extracted-metadata.data")))
     (unless (ipfs-file-exists-p fname)
-      (error 'extracted-data-not-found :text "No extracted-metadata.txt file found for this URL"))
+      (error 'data-not-found :text "No extracted-metadata.txt file found for this URL"))
     (deserialize-extracted-metadata (ipfs:files-read fname))))
 
 (defun ipfs-extracted-title (rooturl)

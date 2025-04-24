@@ -180,7 +180,6 @@
    #:ipfs-extracted-metadata
    #:ipfs-write-extracted-metadata
    #:ipfs-extracted-title
-   #:extracted-data-not-found
    #:extraction-attempted?
    #:extracted?
    #:ipfs-opinion-path
@@ -188,4 +187,6 @@
    #:ipfs-write-partial-rooturl-data
    #:ipfs-title-info-for-rooturl
    #:update-ipns
-   #:ipfs-write-all-rooturl-data))
+   #:ipfs-write-all-rooturl-data
+   #:ipfs-text-info-for-rooturl
+   #:data-not-found))

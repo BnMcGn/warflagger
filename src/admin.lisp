@@ -1,8 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:wf/admin
-  (:use #:cl #:gadgets #:alexandria #:access #:sql-stuff #:clsql)
-  )
+  (:use #:cl #:gadgets #:alexandria #:access #:sql-stuff #:clsql))
 
 (in-package #:wf/admin)
 

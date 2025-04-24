@@ -188,17 +188,20 @@
 ;; reference to it. For example, user may want to refer to an excerpt. This could break the
 ;; test.
 
+(defun earliest-opinion (target)
+  "Returns IID of the earliest opinion that targets an id"
+  (take-one
+   (select (colm 'opinion 'iid)
+     :from (tabl 'opinion)
+     :where (sql-= (colm 'target) target)
+     :order-by (colm 'datestamp)
+     :ascending t)))
+
 (defun discussion-root-p (rootid)
   "For now, we consider a RootURL to be a discussion root if it has opinions on it and if one of those opinions predate any references to it."
   (let* ((rootid (normalize-root-id rootid))
          (rooturl (get-rooturl-by-id rootid))
-         (first-opin
-          (take-one
-           (select (colm 'opinion 'datestamp)
-                   :from (tabl 'opinion)
-                   :where (sql-= (colm 'target) rooturl)
-                   :order-by (colm 'datestamp)
-                   :ascending t))))
+         (first-opin (earliest-opinion rooturl)))
     (when first-opin
       (let ((first-ref
              (take-one
@@ -210,7 +213,7 @@
                       :order-by (colm 'datestamp)
                       :ascending t))))
         (if first-ref
-            (when (time< first-opin first-ref)
+            (when (time< (assoc-cdr :datestamp (opinion-by-id first-opin)) first-ref)
               rootid)
             rootid)))))
 
@@ -235,6 +238,23 @@
                (if (iid-p iid-or-url)
                    (sql-like (colm 'reference 'reference) iid-or-url)
                  (sql-= (colm 'reference 'reference) iid-or-url)))))))
+
+(defun earliest-refd-to (iid-or-url)
+  (take-one
+   (merge-query
+    (refd-to iid-or-url)
+    (order-by-mixin (colm 'datestamp) :asc))))
+
+(defun earliest-mention (iid-or-url)
+  (let ((refd (earliest-refd-to iid-or-url))
+        (opin (earliest-opinion iid-or-url)))
+    (cond
+      ((not refd) opin)
+      ((not opin) refd)
+      (t (if (time< (assoc-cdr :datestamp (opinion-by-id opin))
+                    (assoc-cdr :datestamp (opinion-by-id refd)))
+             opin
+             refd)))))
 
 ;;FIXME: This needs proper testing!
 (defun discussion-refd-to (rooturl)

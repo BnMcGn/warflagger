@@ -52,6 +52,7 @@
                              (:file "author-stats")
                              (:file "score-script")
                              (:file "ipfs")
+			     (:file "sysmon")
                              (:file "textract")
                              (:file "summarizer")
                              (:file "grouped")
