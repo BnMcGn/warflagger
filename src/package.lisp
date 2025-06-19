@@ -147,7 +147,10 @@
    #:normalize-iid
    #:up-voted
    #:target-exists-p
-   #:update-author-field))
+   #:update-author-field
+   #:latest-opinion
+   #:latest-refd-to
+   #:latest-mention))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)

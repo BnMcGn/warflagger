@@ -256,6 +256,34 @@
              opin
              refd)))))
 
+;Note: thus far only used by admin
+(defun latest-opinion (target)
+  "Returns IID of the latest opinion that targets an id"
+  (take-one
+   (select (colm 'opinion 'iid)
+     :from (tabl 'opinion)
+     :where (sql-= (colm 'target) target)
+     :order-by (colm 'datestamp)
+     :ascending nil)))
+
+(defun latest-refd-to (iid-or-url)
+  (take-one
+   (merge-query
+    (refd-to iid-or-url)
+    (order-by-mixin (colm 'datestamp) :desc))))
+
+(defun latest-mention (iid-or-url)
+  (let* ((refd (latest-refd-to iid-or-url))
+         (opin (latest-opinion iid-or-url))
+         (rdate (and refd (assoc-cdr :datestamp (opinion-by-id refd))))
+         (odate (and opin (assoc-cdr :datestamp (opinion-by-id opin)))))
+    (cond
+      ((not refd) (values opin odate))
+      ((not opin) (values refd rdate))
+      (t (if (time> odate rdate)
+             (values opin odate)
+             (values refd rdate))))))
+
 ;;FIXME: This needs proper testing!
 (defun discussion-refd-to (rooturl)
   (let ((*id-return-type* :iid))

@@ -223,7 +223,7 @@
             (if (eq :initial tsource) "Y" "N")
             (if (may-have-bad-uc (gethash :text tinfo)) "Y" "N"))))
 
-(defun text-report ()
+(defun all-external-urls ()
   (let* ((urlist (concatenate 'list (warflagger:all-rooturls)
                               (warflagger:all-proper-references)))
          (urlist (remove-if #'warflagger:iid-p urlist))
@@ -232,20 +232,24 @@
                    #'gadgets:sequence-starts-with "http://warflagger.net/")
                   urlist))
          (urlist (remove-if
-                   (alexandria:rcurry
-                    #'gadgets:sequence-starts-with "https://warflagger.net/")
-                   urlist)))
-    (dolist (url urlist)
-      (let* ((tinfo (wf/ipfs::ipfs-text-info-for-rooturl url))
-             (tsource (gethash :text-source tinfo))
-             (text (gethash :text tinfo))
-             (initial (eq :initial tsource))
-             (baduc (may-have-bad-uc text)))
-        (when (or (not text)
-                  (and initial baduc))
-          (print url)
-          (print (get-extracted-text-cid url))
-          (text-summary url))))))
+                  (alexandria:rcurry
+                   #'gadgets:sequence-starts-with "https://warflagger.net/")
+                  urlist)))
+    urlist
+    (remove-duplicates urlist :test #'equal)))
+
+(defun text-report ()
+  (dolist (url (all-external-urls))
+    (let* ((tinfo (wf/ipfs::ipfs-text-info-for-rooturl url))
+           (tsource (gethash :text-source tinfo))
+           (text (gethash :text tinfo))
+           (initial (eq :initial tsource))
+           (baduc (may-have-bad-uc text)))
+      (when (or (not text)
+                (and initial baduc))
+        (print url)
+        (print (get-extracted-text-cid url))
+        (text-summary url)))))
 
 (defun may-have-bad-uc (seq)
   (find #\latin_capital_letter_a_with_tilde seq))
@@ -258,4 +262,10 @@
              (ipfs:files-stat (wf/ipfs:ipfs-rooturl-path rooturl "extracted-text.txt"))
              :test #'equal))
 
+(defun rooturls-by-recentness ()
+  (sort (all-external-urls)
+        #'string>
+        :key (lambda (x)
+               (let ((ts (nth-value 1 (warflagger:latest-mention x))))
+                 (print (and ts (clsql-helper:print-timestamp ts)))))))
 
