@@ -617,7 +617,12 @@ the page text can be found in the cache."
                     (sql-= flag (colm 'flag))
                     (sql-= authorid (colm 'author))))))
 
-
+(defun write-comment (oid comment)
+  (let ((row (get-record-by-pkey (tabl 'comment) oid)))
+    (insert-or-update (tabl 'comment)
+                      (and row oid)
+                      (list (cons (colm 'opinion) oid)
+                            (cons (colm 'comment) comment)))))
 
 ;;;;;;;;;;;;;;
 ;; Looks stuff

@@ -150,7 +150,8 @@
    #:update-author-field
    #:latest-opinion
    #:latest-refd-to
-   #:latest-mention))
+   #:latest-mention
+   #:write-comment))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)

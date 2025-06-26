@@ -269,3 +269,4 @@
                (let ((ts (nth-value 1 (warflagger:latest-mention x))))
                  (print (and ts (clsql-helper:print-timestamp ts)))))))
 
+;;; (mapcar #'display-rooturl-summary rooturls)
