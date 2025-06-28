@@ -27,7 +27,7 @@
 
 (test nonexistent-page "Handle request for non-extracted page"
   (let ((test-url2 (strcat *testurl* "abc")))
-    (signals wf/ipfs:extracted-data-not-found (wf/ipfs:ipfs-extracted-metadata test-url2))
+    (signals wf/ipfs:data-not-found (wf/ipfs:ipfs-extracted-metadata test-url2))
     (is (null (wf/ipfs:extraction-attempted? test-url2)))))
 
 (test bad-page "Handle bad page"
