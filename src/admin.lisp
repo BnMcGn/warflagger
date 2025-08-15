@@ -270,3 +270,12 @@
                  (print (and ts (clsql-helper:print-timestamp ts)))))))
 
 ;;; (mapcar #'display-rooturl-summary rooturls)
+
+;;quick search and save
+;;FIXME: refactor the defparameters
+(defun sid (frag)
+  (let ((iids (iid-search frag)))
+    (if (length1 iids)
+        (progn (defparameter iid (car iids))
+               (defparameter id (gadgets:assoc-cdr :id (warflagger:opinion-by-id iid))))
+        iids)))
