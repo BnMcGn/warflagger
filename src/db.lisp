@@ -624,6 +624,13 @@ the page text can be found in the cache."
                       (list (cons (colm 'opinion) oid)
                             (cons (colm 'comment) comment)))))
 
+(defun write-reference (oid reference)
+  (let ((row (get-record-by-pkey (tabl 'reference) oid)))
+    (insert-or-update (tabl 'reference)
+                      (and row oid)
+                      (list (cons (colm 'opinion) oid)
+                            (cons (colm 'reference) reference)))))
+
 ;;;;;;;;;;;;;;
 ;; Looks stuff
 ;;;;;;;;;;;;;;
