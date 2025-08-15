@@ -82,18 +82,23 @@
   (initialize-warstat-dirs)
   (hu:with-keys (:opinion-store :opinion-tree :score-script :results)
       (hu:plist->hash (ipfs-make-rooturl-data rooturl))
-    (let ((warflagger:*opinion-store* opinion-store)
-          (references (cl-utilities:collecting
-                        (do-hash-table
-                            (iid opin opinion-store)
-                          (when (warflagger:reference-opinion-p opin)
-                            (cl-utilities:collect iid)))))
-          ;;FIXME: Relies on local db. Should eventually be based on OrbitDB or whatever
-          ;; gets used long term.
-          (refd (warflagger:discussion-refd-to rooturl))
-          ;;Because IPFS daemon unescapes the escaped url in the path. Since we are doing a one-
-          ;; way transform of the rooturl for id purposes only, this shouldn't harm.
-          (rootpath (ipfs-rooturl-path rooturl "")))
+    (let* ((warflagger:*opinion-store* opinion-store)
+           (refopins (remove-if-not #'warflagger:reference-opinion-p
+                                    (alexandria:hash-table-values opinion-store)))
+           (references (flatten-1 (mapcar #'opinion-references refopins)))
+           (references (mapcar
+                        (lambda (x)
+                          (if-let ((iid (warflagger:get-iid-from-url x)))
+                            iid
+                            x))
+                        references))
+           (refiids (mapcar (alexandria:curry #'gadgets:assoc-cdr :iid) refopins))
+           ;;FIXME: Relies on local db. Should eventually be based on OrbitDB or whatever
+           ;; gets used long term.
+           (refd (warflagger:discussion-refd-to rooturl))
+           ;;Because IPFS daemon unescapes the escaped url in the path. Since we are doing a one-
+           ;; way transform of the rooturl for id purposes only, this shouldn't harm.
+           (rootpath (ipfs-rooturl-path rooturl "")))
       ;;Rooturl stuff
       (ipfs-ensure-directory-exists rootpath)
       (ipfs:with-files-write (s (strcat rootpath "opinion-tree.data") :create t :truncate t)
@@ -106,6 +111,7 @@
       (ipfs:with-files-write (s (strcat rootpath "references.data") :create t :truncate t)
         (warflagger:with-inverted-case
           (print (list :references references
+                       :reference-opinions refiids
                        :refd refd) s)))
       (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
         (princ (serialize-warstat
