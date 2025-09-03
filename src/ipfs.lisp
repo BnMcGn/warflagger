@@ -83,6 +83,8 @@
   (hu:with-keys (:opinion-store :opinion-tree :score-script :results)
       (hu:plist->hash (ipfs-make-rooturl-data rooturl))
     (let* ((warflagger:*opinion-store* opinion-store)
+           ;;Would be nice to narrow the scope a little... What's causing the trouble?
+           (ipfs:*connection-timeout* 100)
            (refopins (remove-if-not #'warflagger:reference-opinion-p
                                     (alexandria:hash-table-values opinion-store)))
            (references (flatten-1 (mapcar #'opinion-references refopins)))
@@ -251,6 +253,7 @@
 (defun update-ipns ()
   (let* ((stat (ipfs:files-stat "/"))
          (roothash (assoc-cdr "Hash" stat :test #'equal))
+         (ipfs:*connection-timeout* 100)
          ;;FIXME: IPNS is dog slow. Can we do without it?
          (namestat (ipfs:name-publish (strcat "/ipfs/" roothash))))
     (assoc-cdr "Name" namestat :test #'equal)))
