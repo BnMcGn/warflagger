@@ -151,7 +151,8 @@
    #:latest-opinion
    #:latest-refd-to
    #:latest-mention
-   #:write-comment))
+   #:write-comment
+   #:quick-desc))
 
 (defpackage #:wf/ipfs
   (:use #:cl #:gadgets #:alexandria #:access)

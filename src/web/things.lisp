@@ -143,10 +143,13 @@
            (or index 0)))))
 
 (defun author-discussions (authid &key getcount)
-  (let ((rslt  (ordered-unique (mapcar #'car (clsql:select (colm 'opinion 'rooturl)
-                                            :from (tabl 'opinion)
-                                            :where
-                                            (clsql:sql-= (colm 'author) (sql-escape authid)))))))
+  (let ((rslt  (ordered-unique (mapcar #'car
+                                       (clsql:select (colm 'opinion 'rooturl)
+                                         :from (tabl 'opinion)
+                                         :where
+                                         (clsql:sql-= (colm 'author) (sql-escape authid))
+                                         :order-by
+                                         (list (list (colm 'opinion 'id) :desc)))))))
    (if getcount
        (length rslt)
        (thing-slice rslt))))
@@ -220,7 +223,8 @@
   (if getcount
       (get-count (unexecuted (author-references authid)))
       (cl-utilities:collecting
-        (dolist (url (author-references authid))
+        (dolist (url (quick-desc (unexecuted (author-references authid))
+                                 (colm 'reference 'opinion)))
           (cl-utilities:collect
               (if-let ((opurl (is-location-opinml? url)))
                 (let ((opinion (opinion-exists-p opurl)))

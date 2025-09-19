@@ -460,6 +460,13 @@ the page text can be found in the cache."
      :where (sql-and (sql-= (colm 'type) "wf_user")
                      (sql-= (colm 'id) userid)))))
 
+(defun quick-desc (query col-obj)
+  (mapcar #'car
+          (merge-query
+           query
+           (list 'select col-obj)
+           (order-by-mixin col-obj :desc))))
+
 (def-query author-rooturls (authid)
   (mapcar #'car
           (query-marker
@@ -539,9 +546,10 @@ the page text can be found in the cache."
   (let ((*id-return-type* :iid)
         (authid (find-author-id author)))
     (list
-     :rooturls (author-rooturls authid)
+     :rooturls (quick-desc (unexecuted (author-rooturls authid)) (colm 'rooturl 'id))
      ;;FIXME: Want inline references as well. Need IPFS read for that, probably
-     :references (author-references authid)
+     :references (quick-desc (unexecuted (author-references authid))
+                             (colm 'reference 'opinion))
      :replies
      (cl-utilities:collecting
        (dolist (opid (author-replies authid))
