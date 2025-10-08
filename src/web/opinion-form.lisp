@@ -53,15 +53,23 @@
         (webhax-validate:validate-batch
          *key-web-input*
          *opinion-form-specs*)
-      (when sig
-        (unless (is-author-initialized (get-user-name))
-          (apply #'initialize-author (create-author-spec-from-current-user)))
-        (gadgets:hashval! (val :flag values)
-          (warflagger::flag-to-lisp
-           (apply #'gadgets:strcat (split-sequence:split-sequence #\: val))))
-        (save-opinion (hu:hash->alist values) (get-user-name) :post #'after-save-opinion))
-      (list 200 '(:content-type "text/json")
-            (list (webhax-validate:batch-response-json values sig))))))
+      (let* ((opinion (when sig
+                        (unless (is-author-initialized (get-user-name))
+                          (apply #'initialize-author (create-author-spec-from-current-user)))
+                        (gadgets:hashval! (val :flag values)
+                          (warflagger::flag-to-lisp
+                           (apply #'gadgets:strcat (split-sequence:split-sequence #\: val))))
+                        (save-opinion (hu:hash->alist values)
+                                      (get-user-name)
+                                      :post #'after-save-opinion)))
+             (iid (when opinion (assoc-cdr :iid opinion))))
+        (list 200 '(:content-type "text/json")
+              (list
+               (cl-json:encode-json-plist-to-string
+                (list
+                 :iid iid
+                 (if sig :success :errors)
+                 values))))))))
 
 (defun after-save-opinion (opinion)
   ;;FIXME: this is not working
