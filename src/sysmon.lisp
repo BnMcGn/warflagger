@@ -14,9 +14,12 @@
 ;; - should check a remote node or two...
 
 (defun is-ipfs-online? ()
-  (let* ((stats (ipfs:diag-sys))
-         (net (proto:assoc-cdr2 :net stats :test #'string-equal)))
-    (proto:assoc-cdr2 :online net :test #'string-equal)))
+  (handler-case
+      (let* ((stats (ipfs:diag-sys))
+             (net (proto:assoc-cdr2 :net stats :test #'string-equal)))
+        (proto:assoc-cdr2 :online net :test #'string-equal))
+    (usocket:timeout-error ()
+      nil)))
 
 ;; Web
 
