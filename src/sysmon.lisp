@@ -35,13 +35,31 @@
 
 ;; active sessions
 
-(defun how-many-active-sessions? ()
+(defun get-active-session-data ()
   (let ((conn (apply #'dbi:connect wf/local-settings:*session-db-connect-spec*)))
     (unwind-protect
          (let ((query (dbi:prepare conn
                                    "SELECT * FROM sessions")))
-           (length (dbi:fetch-all (dbi:execute query))))
-         (dbi:disconnect conn))))
+           (dbi:fetch-all (dbi:execute query)))
+      (dbi:disconnect conn))))
+
+;;Bunch of stuff imported by lack.session.store.dbi
+(defun deserialize-session (sess)
+  (hu:hash->plist
+   (marshal:unmarshal
+    (read-from-string
+     (trivial-utf-8:utf-8-bytes-to-string
+      (cl-base64:base64-string-to-usb8-array sess))))))
+
+(defun sessions ()
+  (cl-utilities:collecting
+    (dolist (itm (get-active-session-data))
+      (cl-utilities:collect
+          (list (getf itm :|id|)
+                (deserialize-session (getf itm :|session_data|)))))))
+
+(defun how-many-active-sessions? ()
+  (length (get-active-session-data)))
 
 ;; new posts
 
