@@ -149,6 +149,7 @@
         (hashtags (make-hash-table :test 'equal))
         (direction :neutral)
         (direction-on-root :neutral)
+        (tt-thread (funcall parent-dispatch :info :tt-thread))
         (alternatives nil)
         (on-post-procedures nil)
         (on-save-procedures nil)
@@ -176,6 +177,7 @@
              (:direction-on-root direction-on-root)
              (:ballot-box ballot-box)
              (:other-flag other-flag)
+             (:tt-thread tt-thread)
              (otherwise (getf info param))))
           (:apply-to
            (setf apply-to param))
@@ -212,6 +214,8 @@
            (setf other-flag param))
           (:post-other-flag
            (setf post-other-flag param))
+          (:tt-thread
+           (setf tt-thread param))
           (:apply-hashtag
            (if-let ((bb (gethash param hashtags)))
              (merge-ballot-boxes! bb (car params))
@@ -231,6 +235,7 @@
                         (:ballot-box ballot-box) (:text-ballot-box text-ballot-box)
                         (:title-ballot-box title-ballot-box) (:tree-freshness tree-freshness)
                         (:direction direction) (:direction-on-root direction-on-root)
+                        (:tt-thread tt-thread)
                         (:replies-total replies-total)
                         (:replies-immediate replies-immediate) (:other-flags other-flags)
                         (:hashtags hashtags)
@@ -300,6 +305,9 @@
 
 (defun set-other-flag (flag)
   (funcall *dispatch* :other-flag flag))
+
+(defun set-tt-thread ()
+  (funcall *dispatch* :tt-thread t))
 
 (defun dont-flag ()
   (funcall *dispatch* :post-other-flag nil))
@@ -633,6 +641,7 @@
 ;;FIXME: only one of these should be used at a time. Add a check. Or prime position?
 (defun scsc::target-text (&key iid author)
   (declare (ignore author iid))
+  (set-tt-thread)
   (set-apply-to :text))
 (defun scsc::suggest-target-text (&key iid author)
   (declare (ignore author))
@@ -642,19 +651,25 @@
     ((not (blank-flag-p))
      (post-error "Text suggestions must be made with Custodial:Blank flag type"))
     (t
-     (on-post
-       (when (enabledp)
-         (add-alternative iid))))))
+     (progn
+       (set-tt-thread)
+       (on-post
+         (when (enabledp)
+           (add-alternative iid))))
+     )))
 (defun scsc::target-title (&key iid author)
   (declare (ignore author iid))
+  (set-tt-thread)
   (set-apply-to :title))
 (defun scsc::suggest-target-title (&key iid author)
   (declare (ignore author))
   (if (not (blank-flag-p))
       (post-error "Title suggestions must be made with Custodial:Blank flag type")
-      (on-post
-        (when (enabledp)
-          (add-alternative iid)))))
+      (progn
+        (set-tt-thread)
+        (on-post
+          (when (enabledp)
+            (add-alternative iid))))))
 
 (defun scsc::vote-value (value &key iid author)
   (declare (ignore iid author))
