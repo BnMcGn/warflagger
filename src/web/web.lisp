@@ -32,7 +32,10 @@
   (unless-production
    (setf (ningle:route *app* "/mock-make/*")
          (cljs-page ((title-part "WF: Opinion Maker Mockups"))
-           (mock-make-page))))
+           (mock-make-page)))
+   (setf (ningle:route *app* "/mock-vis/*")
+         (cljs-page ((title-part "WF: Visibility Mockups"))
+           (mount-cljs-component ("mock-vis")))))
 
   (setf (ningle:route *app* "/author-url-data/")
         (input-function-wrapper
@@ -74,14 +77,16 @@
           (bind-validated-input
            ((id (:or :integer :url))
             &key
-            (tmode :string))
+            (tmode :string)
+            (showall :boolean))
            (let* ((url (if (integerp id) (get-rooturl-by-id id) id))
                   (touched (or (rooturl-p url) (wf/ipfs:ipfs-have-text-for-rooturl? url))))
              (mount-cljs-component ("target")
                :rooturl (lisp url)
                :touched-p (lisp (if touched 'true 'false))
                :refd (lisp (unless touched (cons 'list (refd-to url))))
-               :tmode (lisp tmode))))))
+               :tmode (lisp tmode)
+               :showall (lisp showall))))))
 
   (setf (ningle:route *app* "/o/*")
         (cljs-page
@@ -89,14 +94,16 @@
          (bind-validated-input
           ((iid :string)
            &key
-           (tmode :string))
+           (tmode :string)
+           (showall :boolean))
           (handler-case
               (let* ((opin (opinion-by-id iid))
                      (rooturl (assoc-cdr :rooturl opin)))
                 (mount-cljs-component ("opinion-page")
                   :rooturl (lisp rooturl)
                   :tmode (lisp tmode)
-                  :focus (lisp (list* 'list (wf/ipfs::tree-address opin)))))
+                  :focus (lisp (list* 'list (wf/ipfs::tree-address opin)))
+                  :showall (lisp showall)))
             (warflagger:not-found (c)
               (declare (ignore c))
               (webhax-core:web-fail-404))))))

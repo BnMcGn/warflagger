@@ -48,12 +48,13 @@
       (cljs-page ((title-part "WF: Recent Opinions"))
         (bind-validated-input
             (&key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (let ((thing-lister:*thing-summary-width* 40))
             (thing-lister:display-thing-block-with-pagers
              (tag-as-opinion #'recent-opinions)
              nil
-             #'mount-cljs-thing
+             (mount-cljs-thing-func :showall showall)
              "/opinions-recent/"
              (or index 0))))))
 
@@ -96,11 +97,12 @@
         (bind-validated-input
             ((id :integer)
              &key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (display-thing-block-with-pagers
            (tag-as-author #'target-participants)
            (list id)
-           #'mount-cljs-thing
+           (mount-cljs-thing-func :showall showall)
            (format nil "/target-participants/~a" id)
            (or index 0)))))
 
@@ -134,11 +136,12 @@
         (bind-validated-input
             ((id :integer)
              &key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (display-thing-block-with-pagers
            (tag-as-opinion #'author-opinions)
            (list id)
-           #'mount-cljs-thing
+           (mount-cljs-thing-func :showall showall)
            (format nil "/author-opinions/~a" id)
            (or index 0)))))
 
@@ -169,11 +172,12 @@
         (bind-validated-input
             ((id :integer)
              &key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (display-thing-block-with-pagers
            (tag-as-rooturl #'author-discussions)
            (list id)
-           #'mount-cljs-thing
+           (mount-cljs-thing-func :showall showall)
            (format nil "/author-discussions/~a" id)
            (or index 0)))))
 
@@ -210,11 +214,12 @@
         (bind-validated-input
             ((id :integer)
              &key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (display-thing-block-with-pagers
            (tag-as-opinion #'%author-replies)
            (list id)
-           #'mount-cljs-thing
+           (mount-cljs-thing-func :showall showall)
            (format nil "/author-replies/~a" id)
            (or index 0)))))
 
@@ -242,11 +247,12 @@
         (bind-validated-input
             ((id :integer)
              &key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (display-thing-block-with-pagers
            #'%author-references
            (list id)
-           #'mount-cljs-thing
+           (mount-cljs-thing-func :showall showall)
            (format nil "/author-references/~a" id)
            (or index 0)))))
 
@@ -266,11 +272,12 @@
         (bind-validated-input
             ((id :integer)
              &key
-             (index :integer))
+             (index :integer)
+             (showall :boolean))
           (display-thing-block-with-pagers
            (tag-as-question #'%author-questions)
            (list id)
-           #'mount-cljs-thing
+           (mount-cljs-thing-func :showall showall)
            (format nil "/author-questions/~a" id)
            (or index 0)))))
 
@@ -355,7 +362,8 @@
 ;;FIXME: counter doesn't seem like a healthy idea...
 (defparameter *mr-counter* 0)
 
-(defun mount-cljs-thing (items &key url name)
+;;Params should be a plist. Will be passed to client side.
+(defun mount-cljs-thing (items &key url name showall)
   (let ((thingid (format nil "cljs-thing-~a" (incf *mr-counter*))))
     (mount-cljs-component ("thing-lister" :mount-id thingid :key thingid)
       :things (lisp
@@ -364,4 +372,9 @@
                               (mapcar #'hu:hash->alist items))))
       :url (lisp url)
       :name (lisp name)
+      :showall (lisp showall)
       :trim (lisp *thing-summary-width*))))
+
+(defun mount-cljs-thing-func (&rest params)
+  (lambda (&rest all)
+    (apply #'mount-cljs-thing (append all params))))
