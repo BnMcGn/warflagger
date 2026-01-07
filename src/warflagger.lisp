@@ -63,11 +63,11 @@
 (defmacro if-production (true-clause false-clause)
   (if wf/local-settings:*production* true-clause false-clause))
 
-(defmacro when-production (clause)
-  (when wf/local-settings:*production* clause))
+(defmacro when-production (&body clauses)
+  (when wf/local-settings:*production* `(progn ,@clauses)))
 
-(defmacro unless-production (clause)
-  (unless wf/local-settings:*production* clause))
+(defmacro unless-production (&body clauses)
+  (unless wf/local-settings:*production* `(progn ,@clauses)))
 
 (defun url-p (thing)
   (when thing
