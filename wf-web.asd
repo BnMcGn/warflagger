@@ -6,6 +6,7 @@
   :license "Apache License, version 2.0"
   :depends-on (#:webhax
                #:clack
+	       #:clack-handler-hunchentoot
 	       #:lack-session-store-dbi
                #:ningle
                #:clack-pretend

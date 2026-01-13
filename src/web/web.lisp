@@ -284,7 +284,8 @@
          :store
          (lack.session.store.dbi:make-dbi-store
           :connector (lambda () (apply #'dbi:connect
-                                       wf/local-settings:*session-db-connect-spec*))))
+                                       wf/local-settings:*session-db-connect-spec*))
+          :disconnector (lambda (conn) (dbi:disconnect conn))))
         (claxy:middleware (list (list "/ipfs/" "http://localhost:8080/ipfs/")
                                 (list "/ipns/" "http://localhost:8080/ipns/")))
         (clath:component
@@ -292,7 +293,6 @@
         (webhax-user:webhax-user :userfig-specs *userfig-fieldspecs*)
         *app*))
    :port 5000))
-
 
 (defun run-production-server ()
   ;; Because we aren't running the block below on live server
