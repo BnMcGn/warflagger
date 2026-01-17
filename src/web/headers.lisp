@@ -57,7 +57,7 @@
     (:div
      :class "flex sm:flex-row flex-col"
      (:div :id "left_side"
-           :class (lisp (sidebar-stuff "mt-0 child:sm:mt-0 child:mb-[2px] "))
+           :class (lisp (sidebar-stuff "mt-0 child:sm:mt-0 child:mb-[2px] shrink-0 "))
            :@site-index :@side-content)
      (:div :class "grow sm:w-min min-w-full sm:min-w-0"
            :@messages :@inner :@footnotes)
