@@ -31,7 +31,6 @@
                #:plump-sexp
                #:dexador
                #:drakma
-               #:osicat
                #:crawly
                #:readability/plump
                #:log4cl)
