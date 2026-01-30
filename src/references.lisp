@@ -326,7 +326,7 @@
   (if (rooturl-p refurl)
       (get-rooturl-id refurl)
       ;;FIXME: We don't handle references to outside opinions ATM. Consider.
-      (unless (opinion-exists-p refurl)
+      (unless (iid-p refurl)
         refurl)))
 
 ;;FIXME: For now, we are not attaching incoming refs to the discussion.

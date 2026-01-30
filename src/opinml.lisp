@@ -210,6 +210,13 @@
     ((url-p url) url)
     (t (error "Not an URL"))))
 
+(defun check-url-or-iid (itm)
+  (cond
+    ((iid-p itm) itm)
+    ((< 2000 (length itm)) (error "URL too long"))
+    ((url-p itm) itm)
+    (t (error "Not an IID or URL"))))
+
 (defun check-length (itm len)
   (if (< len (length itm))
       (error "Field too long")
@@ -239,7 +246,7 @@
   (let ((opinion (proto:limited-reader stream #'safe-symbol-p)))
     (mapc (lambda (key) (check-url (getf opinion key))) '(:target :rooturl :author))
     (when (getf opinion :reference)
-      (check-url (getf opinion :reference)))
+      (check-url-or-iid (getf opinion :reference)))
     (check-length (getf opinion :comment) *max-comment-length*)
     (when (getf opinion :excerpt)
       (check-length (getf opinion :excerpt) *max-excerpt-length*))
@@ -318,12 +325,12 @@
       (let ((text (and start (subseq curr (elt starts 0) (elt ends 0))))
             (link (and start (subseq curr (elt starts 1) (elt ends 1)))))
         (if (or (null start)
-                (not (url-p link))
+                (and (not (url-p link)) (not (iid-p link)))
                 (not (eq start 0)))
             ;;Fail!
             (progn (funcall input 1) #\[)
             (progn
-              (push (list text link) *found-references*)
+              (push (list text (or (normalize-iid link) link)) *found-references*)
               (funcall input end)
               ;;Not sure that this is right: Front end will need to reparse.
               (subseq curr start end)))))))

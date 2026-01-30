@@ -129,7 +129,6 @@
         (princ (serialize-warstat
                 (alexandria:hash-table-plist
                  (warflagger::title-info-from-scsc-results results :rooturl rooturl))) s))
-      ;;FIXME: Handle incoming references
       ;;Opinion stuff
       (gadgets:do-hash-table (iid opinion opinion-store)
         ;;FIXME: optimize the writings!
@@ -208,9 +207,9 @@
 ;;;;;;;;;;;;;;;;
 
 (defun tidy-grouped-item (itm)
-  (let ((allowed-keys '(:rowtype :display-depth :url :title :title-key :iid :comment :refparent
-                                 :reference :reference-domain :tree-address :refbot :refopiniid
-                                 :refiid)))
+  (let ((allowed-keys
+          '(:rowtype :display-depth :url :title :title-key :iid :comment :refparent
+            :reference :reference-domain :tree-address :refbot :refopiniid :refiid)))
     (hu:collecting-hash-table (:mode :replace)
      (dolist (k allowed-keys)
        (when (gadgets:key-in-hash? k itm)

@@ -23,7 +23,8 @@
   (gadgets:mapcan-by-2
    (lambda (k v) (list k (webhax-validate:normalize-fieldspec-body v)))
    `(:target
-     ((:or (:url :notnull) ,(webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID"))
+     ((:or (:url :notnull)
+           ,(webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID"))
       :description "Target URL")
      :excerpt
      (:string)
@@ -33,7 +34,9 @@
      ((:pickone :options ,(format-flags) :notnull)
       ;;FIXME: pickone-long was a bare symbol. What should it be?
             :widget "pickoneLong")
-     :reference (:url :description "Reference URL")
+     :reference
+     ((:or :url ,(webhax-validate:predicate-test #'warflagger:iid-p "Not an OpinionID"))
+      :description "Reference URL")
      :comment (:string :widget :textentry))))
 
 ;;FIXME: Needs to update automatically from any updates to the userfig, as per

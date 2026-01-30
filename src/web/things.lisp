@@ -228,19 +228,19 @@
   (if getcount
       (get-count (unexecuted (author-references authid)))
       (cl-utilities:collecting
-        (dolist (url (quick-desc (unexecuted (author-references authid))
+        (dolist (ref (quick-desc (unexecuted (author-references authid))
                                  (colm 'reference 'opinion)))
           (cl-utilities:collect
-              (if-let ((opurl (is-location-opinml? url)))
-                (let ((opinion (opinion-exists-p opurl)))
+              (if (warflagger:iid-p ref)
+                  (let ((opinion (opinion-by-id ref)))
+                    (hu:hash
+                     (:type :opinion)
+                     (:key (assoc-cdr :id opinion))
+                     (:id (assoc-cdr :iid opinion))))
                   (hu:hash
-                   (:type :opinion)
-                   (:key (assoc-cdr :id opinion))
-                   (:id (assoc-cdr :iid opinion))))
-                (hu:hash
-                 (:type :reference)
-                 (:key (tryit (get-rooturl-id url)))
-                 (:id url))))))))
+                   (:type :reference)
+                   (:key (tryit (get-rooturl-id ref)))
+                   (:id ref))))))))
 
 (setf (ningle:route *app* "/author-references/*")
       (cljs-page ((title-part "WF: Author: References Made"))

@@ -62,13 +62,11 @@
 (defun opinion-reference-attributes (opinion)
   (let ((ref (assoc-cdr :reference opinion)))
     (when (stringp ref)
-      (let ((opinml (warflagger::is-location-opinml? ref)))
-        (if opinml
-            (let* ((iid (warflagger:get-target-id-from-url (if (stringp opinml) opinml ref)))
-                   (refd-opin (warflagger:opinion-by-id iid)))
-              (list (cons :refd-opinion iid)
-                    (cons :reference-domain (warflagger:uri-domain (assoc-cdr :rooturl refd-opin)))))
-            (list (cons :reference-domain (warflagger:uri-domain ref))))))))
+      (if (warflagger:iid-p ref)
+          (let ((refd (warflagger:opinion-by-id ref)))
+            (list (cons :refd-opinion ref)
+                  (cons :reference-domain (warflagger:uri-domain (assoc-cdr :rooturl refd)))))
+          (list (cons :reference-domain (warflagger:uri-domain ref)))))))
 
 (defun %extend-opinions (plist)
   (mapcan-by-2

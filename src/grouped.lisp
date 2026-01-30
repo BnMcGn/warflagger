@@ -26,6 +26,7 @@
                (mapcar #'opins< (wf/ipfs::tree-address ropin))
                (roots< rrooturl))
              ;;FIXME: how do I know reference will be in title/warstats?
+             ;;For now, only URL refs will come through...
              (roots< (gethash :reference c))))
         (:question
          (opins< (assoc-cdr :iid (opinion-by-id (gethash :id c)))))))))
@@ -55,6 +56,7 @@
     (hu:plist->hash
      (if rootid
          (list
+          ;;References to iids are removed earlier... but we might reconsider that...
           :url refurl
           :display-depth depth
           :rowtype :rooturl
