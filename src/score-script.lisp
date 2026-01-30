@@ -149,7 +149,7 @@
         (hashtags (make-hash-table :test 'equal))
         (direction :neutral)
         (direction-on-root :neutral)
-        (tt-thread (funcall parent-dispatch :info :tt-thread))
+        (tt-thread (and parent-dispatch (funcall parent-dispatch :info :tt-thread)))
         (alternatives nil)
         (on-post-procedures nil)
         (on-save-procedures nil)

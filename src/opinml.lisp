@@ -446,7 +446,8 @@
 (defun safe-warstat-symbol-p (namestr package)
   (cond
     ((eq package :keyword)
-     (member namestr *safe-warstat-symbols* :test #'string-equal))
+     (or (member namestr *safe-warstat-symbols* :test #'string-equal)
+         (member namestr *flag-combined-names* :test #'string-equal)))
     ;;Allow NIL
     ((eq package :current)
      (or (string-equal namestr nil)

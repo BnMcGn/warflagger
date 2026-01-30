@@ -11,7 +11,8 @@
    #:*default-vote*
    #:*flag-colors*
    #:*direction-colors*
-   #:known-flags))
+   #:known-flags
+   #:*flag-combined-names*))
 
 (in-package :warflagger-core)
 
@@ -122,6 +123,14 @@ throw the discussion tree out of whack."
 
 (defparameter *flag-category-keys*
   '(:negative :positive :custodial))
+
+(defparameter *flag-combined-names*
+  (cl-utilities:collecting
+    (loop for cat in *flag-category-keys*
+          for flags in *flag-types-source*
+          do (dolist (flag flags)
+               (cl-utilities:collect
+                   (alexandria:make-keyword (symb cat '- flag)))))))
 
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "LanguageWarning" "Disturbing"
