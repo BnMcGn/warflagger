@@ -440,6 +440,7 @@
   '(:replies-total :replies-immediate :tree-freshness :effect :controversy :direction :direction-on-root
     :x-right :x-wrong :x-up :x-down
     :x-right-source :x-wrong-source :x-up-source :x-down-source
+    :x-right-refs :x-wrong-refs :x-up-refs :x-down-refs
     :neutral :pro :con :hashtags :question :question-answered
     :flag :tag :replies))
 

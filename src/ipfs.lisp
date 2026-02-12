@@ -65,6 +65,27 @@
                                 (warflagger:find-author-id (assoc-cdr :author-id opinion))))
              opinion)))
 
+;;FIXME: Should we count all references, or just the primary?
+(defun get-reference-effect (iid)
+  (let* ((opinion (warflagger:opinion-by-id iid))
+         (reference (assoc-cdr :reference opinion))
+         (warstat (when reference (ipfs-warstats reference))))
+    (when warstat
+      ;;Remember that the referring opinion needs to be good
+      (let ((ostat (ipfs-warstats iid)))
+        (when (< 0 (gethash :effect ostat))
+          (gethash :effect warstat))))))
+
+(defun add-inherited-effects-to-warstat! (warstat)
+  (labels
+      ((sum-effects (iid-list)
+         (reduce #'+ (remove-if-not #'identity (mapcar #'get-reference-effect iid-list)))))
+    (setf (gethash :x-right-refs warstat) (sum-effects (gethash :x-right-source warstat)))
+    (setf (gethash :x-wrong-refs warstat) (sum-effects (gethash :x-wrong-source warstat)))
+    (setf (gethash :x-up-refs warstat) (sum-effects (gethash :x-up-source warstat)))
+    (setf (gethash :x-down-refs warstat) (sum-effects (gethash :x-down-source warstat)))
+    warstat))
+
 (defun objective-data-for-rooturl (rooturl)
   (wf/ipfs:objective-data-for-opinions
    (mapcar #'add-author-to-opinion
@@ -118,9 +139,10 @@
       (ipfs:with-files-write (s (strcat rootpath "warstats.data") :create t :truncate t)
         (princ (serialize-warstat
                 (hu:hash->plist
-                 (warflagger::add-question-info
-                  (warflagger::warstats-from-scsc-results (gethash rooturl results))
-                  (gethash rooturl results)))) s))
+                 (add-inherited-effects-to-warstat!
+                  (warflagger::add-question-info
+                   (warflagger::warstats-from-scsc-results (gethash rooturl results))
+                   (gethash rooturl results))))) s))
       (ipfs:with-files-write (s (strcat rootpath "text.data") :create t :truncate t)
         (princ (serialize-warstat
                 (alexandria:hash-table-plist
@@ -137,9 +159,10 @@
           (ipfs:with-files-write (s (strcat oppath "warstats.data") :create t :truncate t)
             (princ (serialize-warstat
                     (hu:hash->plist
-                     (warflagger::add-question-info
-                      (warflagger::warstats-from-scsc-results (gethash iid results))
-                      (gethash iid results) opinion))) s))
+                     (add-inherited-effects-to-warstat!
+                      (warflagger::add-question-info
+                       (warflagger::warstats-from-scsc-results (gethash iid results))
+                       (gethash iid results) opinion)))) s))
           (ipfs:with-files-write (s (strcat oppath "title.data") :create t :truncate t)
             (princ (serialize-warstat
                     (alexandria:hash-table-plist
