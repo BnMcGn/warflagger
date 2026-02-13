@@ -73,7 +73,7 @@
     (when warstat
       ;;Remember that the referring opinion needs to be good
       (let ((ostat (ipfs-warstats iid)))
-        (when (< 0 (gethash :effect ostat))
+        (when (and (hash-table-p ostat) (< 0 (gethash :effect ostat)))
           (gethash :effect warstat))))))
 
 (defun add-inherited-effects-to-warstat! (warstat)

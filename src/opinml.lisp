@@ -442,7 +442,7 @@
     :x-right-source :x-wrong-source :x-up-source :x-down-source
     :x-right-refs :x-wrong-refs :x-up-refs :x-down-refs
     :neutral :pro :con :hashtags :question :question-answered
-    :flag :tag :replies))
+    :flag :tag :replies :tt-thread))
 
 (defun safe-warstat-symbol-p (namestr package)
   (cond
