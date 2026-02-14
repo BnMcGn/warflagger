@@ -230,7 +230,7 @@
           (:disable
            (setf enabled nil))
           (:save
-           (mapcan #'funcall on-save-procedures)
+           (mapc #'funcall on-save-procedures)
            (let ((data (hu:hash
                         (:ballot-box ballot-box) (:text-ballot-box text-ballot-box)
                         (:title-ballot-box title-ballot-box) (:tree-freshness tree-freshness)
