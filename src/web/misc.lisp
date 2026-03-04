@@ -42,20 +42,22 @@
                                         :message "Name in use. Please choose again."))
                          (email :email))
        (check-authenticated)
-       (if (and screen-name (not *bvi-errors*))
-           (progn
-             (webhax-user::save-signed-up-user
-              (hu:hash (:screen-name screen-name :email email)))
-             (webhax-core:web-redirect (webhax-user:login-destination)))
-           (if *bvi-errors*
-               (%sign-up-form (or screen-name
-                                  (proto:assoc-cdr2 :screen-name *key-web-input*
-                                                    :test #'string-equal))
-                              (or email
-                                  (proto:assoc-cdr2 :email *key-web-input* :test #'string-equal))
-                              (assoc-cdr :screen-name *bvi-errors*)
-                              (assoc-cdr :email *bvi-errors*))
-               (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))))))
+       (if (userfig:new-user-p (authenticated?))
+        (if (and screen-name (not *bvi-errors*))
+            (progn
+              (webhax-user::save-signed-up-user
+               (hu:hash (:screen-name screen-name :email email)))
+              (webhax-core:web-redirect (webhax-user:login-destination)))
+            (if *bvi-errors*
+                (%sign-up-form (or screen-name
+                                   (proto:assoc-cdr2 :screen-name *key-web-input*
+                                                     :test #'string-equal))
+                               (or email
+                                   (proto:assoc-cdr2 :email *key-web-input* :test #'string-equal))
+                               (assoc-cdr :screen-name *bvi-errors*)
+                               (assoc-cdr :email *bvi-errors*))
+                (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))
+        (html-out (:h1 "Already signed up")))))))
 
 (define-parts main-page-parts
   ;;:@css-link "/static/css/push_button.css"
