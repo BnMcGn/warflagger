@@ -24,7 +24,8 @@
        (:input :class *input-tw-classes*
                :type "text" :id "screen-name" :name "screen-name" :value screen-name)
        (when screen-name-error
-         (htm (:div :class "text-red-700" (str screen-name-error)))))
+         (htm (:div :class "text-red-700" (str screen-name-error))))
+       (:h4 "Note: Screen names can't be edited once chosen. Choose carefully!"))
       (:div
        (:label :for "email" "Email:")
        (:input :class *input-tw-classes*
@@ -33,6 +34,8 @@
          (htm (:div :class "text-red-700" (str email-error)))))
       (:input :type "submit" :value "Create"
               :class "py-1 px-3 text-center whitespace-nowrap align-center self-end text-sm font-normal whitespace-nowrap bg-none rounded border border-solid cursor-pointer select-none leading-snug inline-block rc-button w-32"))))))
+
+
 
 (defun webhax-user:sign-up-page ()
   (funcall
@@ -56,7 +59,17 @@
                                    (proto:assoc-cdr2 :email *key-web-input* :test #'string-equal))
                                (assoc-cdr :screen-name *bvi-errors*)
                                (assoc-cdr :email *bvi-errors*))
-                (%sign-up-form (get-openid-display-name) (login-provider-fields :email) nil nil)))
+                (let ((displayname (get-openid-display-name))
+                      (email (login-provider-fields :email)))
+                  ;;FIXME: better way to pretest input?
+                  (%sign-up-form displayname email
+                                 (when (member displayname
+                                               ;;FIXME: may need change
+                                               (webhax-user:list-of-screen-names)
+                                                :test #'equal)
+                                   "Name in use. Please choose another name.")
+                                 (unless (ratify:email-p email)
+                                   "Not an email address")))))
         (html-out (:h1 "Already signed up")))))))
 
 (define-parts main-page-parts

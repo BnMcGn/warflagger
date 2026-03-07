@@ -474,3 +474,32 @@
     (check-type (gethash :x-up warstat) integer)
     (check-type (gethash :x-down warstat) integer)
     warstat))
+
+
+
+#|
+
+Future problem: user ids
+
+- Need to be multihost, unique, traceable, predictable, permanent
+- Need to be referrable by url for various flagging needs
+- current /u/[username] doesn't work for multihost
+- We end up with immutable usernames, which is ambiguous.
+- Probably will want an id similar to pnnk...
+- Generate it from a simple file of username/host, except...
+ - Not all hosts may have a hostname
+ - Hostnames may change
+ - Need a provision for PGP based users
+- We are assuming that UID will be the key for OrbitDB queue that will represent the user.
+ - queue can have a mechanism to point to a new queue in case user wants to switch hosts. also we could derive a way to claim a lost queue.
+- Propose /uu/UID for universal user url?
+- Is it imperative that we have an unchanging format for our UID generation?
+ - Store and retain UID after generation, so that shifts in format/hostname don't matter.
+ - Post the id generation block as the first thing in every user queue?
+ - Initial block can always be accessible over IPFS, given UID
+- Need OrbitDB before much of this can be built. Need to know how queue will be addressed.
+- Appearance and images, social media, websites, visible email, can be added with posts.
+- Multi user is for the host to arrange
+
+|#
+
