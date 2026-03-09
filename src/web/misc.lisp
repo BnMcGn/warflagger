@@ -68,7 +68,7 @@
                                                (webhax-user:list-of-screen-names)
                                                 :test #'equal)
                                    "Name in use. Please choose another name.")
-                                 (unless (ratify:email-p email)
+                                 (unless (or (emptyp email) (ratify:email-p email))
                                    "Not an email address")))))
         (html-out (:h1 "Already signed up")))))))
 
