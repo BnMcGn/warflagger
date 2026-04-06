@@ -175,6 +175,12 @@
             (:div :class "featurebox"
                   (named-text :user-manual)))))
 
+  (setf (ningle:route *app* "/reference-gutde/")
+        (cljs-page ((title-part "WF: Reference Guide"))
+          (html-out
+            (:div :class "featurebox"
+                  (named-text :reference-guide)))))
+
   (setf (ningle:route *app* "/bookmarklet/")
         (cljs-page ()
           (html-out
