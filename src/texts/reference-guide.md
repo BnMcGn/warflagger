@@ -55,6 +55,7 @@ We will want to discuss your reference. Does it have a clean text? In the case o
 
 Conventions for book discussions have not yet been established. Here are some suggestions.
 
--   Textual versions that can be excerpted are preferred. Try [Gutenberg](https://gutenberg.org)
--   Publically available. See [Archive.org](https://archive.org/)
--   Standardized. We could use links to the Library of Congress or, perhaps, Amazon.
+
+*   Textual versions that can be excerpted are preferred. Try [Gutenberg](https://gutenberg.org)
+*   Publically available. See [Archive.org](https://archive.org/)
+*   Standardized. We could use links to the Library of Congress or, perhaps, Amazon.
