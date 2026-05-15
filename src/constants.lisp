@@ -54,6 +54,9 @@ to challenge unquestioned assumptions."
      :evidence
      "You are presenting evidence that rebuts an item or provides an answer to a NeedsEvidence flag."
 
+     :counter-evidence
+     "Disagree by attaching a bad example. Use the reference field to point to an item that would support the target, but does the opposite because it has been downvoted."
+
      :raise-question
      "When you feel that a point has not been covered. For example, when a reporter
 has failed to explore the background and associations of a source. When an
@@ -78,7 +81,10 @@ angle that would derail an argument has been avoided."
      "Use this when you wish to indicate that something is worth noting, even if you aren't ready to agree with it."
 
      :evidence
-     "You are presenting evidence that supports an item.")
+     "You are presenting evidence that supports an item."
+
+     :counter-evidence
+     "Support a target by attaching a bad example. Use the reference field to point to an item that would discredit the target, but does the opposite because it has been downvoted.")
 
 ;;; Custodial:
 
@@ -135,8 +141,8 @@ throw the discussion tree out of whack."
 (defparameter *flag-labels*
   '(("Spam" "Inflammatory" "Disagree" "Dislike" "LanguageWarning" "Disturbing"
      "AlreadyAnswered" "LogicalFallacy"
-     "NeedsEvidence" "Evidence" "RaiseQuestion" "OutOfBounds")
-    ("Funny" "Agree" "Like" "Interesting" "Evidence")
+     "NeedsEvidence" "Evidence" "CounterEvidence" "RaiseQuestion" "OutOfBounds")
+    ("Funny" "Agree" "Like" "Interesting" "Evidence" "CounterEvidence")
     ("Redundant" "OutOfDate" "Retraction" "Correction" "IncorrectFlag"
      "FlagAbuse" "Offtopic" "Arcane" "Blank")))
 
@@ -161,7 +167,8 @@ throw the discussion tree out of whack."
   (list :spam -1 :inflammatory -1 :disagree -1 :dislike -1 :language-warning -1 :disturbing -1
         :already-answered -1 :logical-fallacy -1 :needs-evidence -1 :raise-question -1
         :out-of-bounds -1 :funny 1 :agree 1 :like 1 :interesting 1 :eye-witness 0
-        :am-qualified 0 :second-hand 0 :anecdotal 0 :evidence 0 :disclosure -1 :redundant -1
+        :am-qualified 0 :second-hand 0 :anecdotal 0 :evidence 0 :counter-evidence 0
+        :disclosure -1 :redundant -1
         :out-of-date -1 :retraction -1 :correction -1 :incorrect-flag -1 :flag-abuse -1
            :offtopic -1 :arcane 0 :same-thing 0 :blank 0))
 
@@ -186,6 +193,7 @@ throw the discussion tree out of whack."
         :second-hand "#00adff"
         :anecdotal "#00adff"
         :evidence "#00adff"
+        :counter-evidence "#00adff"
         :disclosure "#9a12c6"
         :redundant "#ffe843"
         :out-of-date "#ffe843"

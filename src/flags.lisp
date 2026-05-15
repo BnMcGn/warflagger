@@ -69,6 +69,12 @@ to challenge unquestioned assumptions.")
     :color "#00adff"
     :description "You are presenting evidence that rebuts an item or provides an answer to a NeedsEvidence flag.")
 
+  (:id :counter-evidence
+   :label "CounterEvidence"
+   :category :negative
+   :color "#00adff"
+   :description "Disagree by attaching a bad example. Use the reference field to point to an item that would support the target, but does the opposite because it has been downvoted.")
+
    (:id :raise-question
     :label "RaiseQuestion"
     :category :negative
@@ -115,6 +121,12 @@ angle that would derail an argument has been avoided.")
    :category :positive
    :color "#00adff"
    :description "You are presenting evidence that supports an item.")
+
+  (:id :counter-evidence
+   :label "CounterEvidence"
+   :category :positive
+   :color "#00adff"
+   :description "Support a target by attaching a bad example. Use the reference field to point to an item that would discredit the target, but does the opposite because it has been downvoted.")
 
 ;;; Custodial:
 

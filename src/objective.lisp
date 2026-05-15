@@ -203,12 +203,14 @@
 (defun opinion-is-answer (opinion)
   (destructuring-bind (cat flag) (assoc-cdr :flag opinion)
     (or (eq flag :disagree)
-        (and (eq flag :evidence) (eq cat :negative)))))
+        (and (or (eq flag :evidence) (eq flag :counter-evidence))
+             (eq cat :negative)))))
 
 (defun opinion-is-supporting-answer (opinion)
   (destructuring-bind (cat flag) (assoc-cdr :flag opinion)
     (or (eq flag :agree)
-        (and (eq flag :evidence) (eq cat :positive)))))
+        (and (or (eq flag :evidence) (eq flag :counter-evidence))
+             (eq cat :positive)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Score script creation

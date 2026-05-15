@@ -559,6 +559,26 @@
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
       (vote-right ref))))
 
+(defflag scsc::negative-counter-evidence
+  (set-direction :con)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (and (enabledp) (directional-p))
+    (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
+      (vote-right ref))))
+
+(defflag scsc::positive-counter-evidence
+  (set-direction :pro)
+  (set-tree-freshness (get-opinion-created))
+  (run-modifiers)
+  (save-flag)
+  (post-flag)
+  (when (and (enabledp) (directional-p))
+    (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
+      (vote-wrong ref))))
+
 (defflag scsc::custodial-redundant
   (set-other-flag :custodial-redundant)
   (set-tree-freshness (get-opinion-created))
