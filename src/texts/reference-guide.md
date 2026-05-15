@@ -19,7 +19,7 @@ We, the community, want to judge the context of a statement ourselves. Please do
 
 Try to find the whole, uncut interview. If you can't get the whole thing, post what you have. We can, in dire cases, reach out to the interviewee for amendments and confirmation.
 
-For video evidence, try to locate the longest uncut version. Confirming alternate angles are also appreciated.
+For video evidence, try to locate the longest uncut version. Are there any other videos of the same moment from other cameras? Alternate angles are always appreciated.
 
 ### Clean
 
@@ -56,6 +56,7 @@ We will want to discuss your reference. Does it have a clean text? In the case o
 Conventions for book discussions have not yet been established. Here are some suggestions.
 
 
-*   Textual versions that can be excerpted are preferred. Try [Gutenberg](https://gutenberg.org)
-*   Publically available. See [Archive.org](https://archive.org/)
-*   Standardized. We could use links to the Library of Congress or, perhaps, Amazon.
+* Textual versions that can be excerpted are preferred. Try [Gutenberg](https://gutenberg.org)
+* Publically available. See [Archive.org](https://archive.org/)
+* Standardized. We could use links to the Library of Congress or, perhaps, Amazon.
+
