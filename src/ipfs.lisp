@@ -390,6 +390,10 @@
   (when (ipfs-opinion-exists-p iid)
     (warflagger:deserialize-warstat (ipfs:files-read (ipfs-opinion-path iid "warstats.data")))))
 
+(defun ipfs-warstats-score (item)
+  (hu:with-keys (:x-right :x-wrong :x-up :x-down) (ipfs-warstats item)
+    (nth-value 2 (warflagger:score-controversy (+ x-right x-up) (+ x-wrong x-down)))))
+
 (defun ipfs-have-text-for-rooturl? (rooturl)
   (and (ipfs-rooturl-exists-p rooturl) (ipfs-file-exists-p (ipfs-rooturl-path "text.data"))))
 

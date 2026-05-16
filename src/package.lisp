@@ -194,4 +194,5 @@
    #:update-ipns
    #:ipfs-write-all-rooturl-data
    #:ipfs-text-info-for-rooturl
-   #:data-not-found))
+   #:data-not-found
+   #:ipfs-warstats-score))

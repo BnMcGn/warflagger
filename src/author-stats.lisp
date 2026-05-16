@@ -51,9 +51,10 @@
           (author-vote-value author))
       (author-vote-value author)))
 
-;;FIXME: Stub. Needs to move somewhere else. Needs to be thought out.
+;;FIXME: Awkward fetch from ipfs. Memoize?
+;; We need score, not effect. Sometimes, like with counter-evidence, we want to know if
+;; warstats are in the negative.
 (defun reference-transferrable-value (reference)
-  (declare (ignore reference))
-  nil)
+  (wf/ipfs:ipfs-warstats-score reference))
 
 (defparameter *reference-vote-multiplier* 2)
