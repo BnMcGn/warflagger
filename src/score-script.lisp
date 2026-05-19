@@ -202,7 +202,8 @@
                    (warflagger:copy-ballot-box (getf params :ballot-box)))))
           (:cast-own-vote
            (warflagger:cast-vote! (which-bb (getf params :applied-to)) param
-                                  (getf params :iid) (getf params :author) (getf params :reference)))
+                                  (getf params :iid) (getf params :author)
+                                  :reference (getf params :reference)))
           (:cast-own-other-vote
            (let ((bb (gethash param other-flags)))
              (warflagger:cast-vote! bb :up (getf params :iid) (getf params :author))))
