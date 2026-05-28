@@ -161,6 +161,10 @@
          (res
            (hu:collecting-hash-table
                (:mode :sum)
+             (hu:collect :right 0)
+             (hu:collect :up 0)
+             (hu:collect :wrong 0)
+             (hu:collect :down 0)
              (dolist (category '(:right :wrong :up :down))
                (dolist (vote (gethash category balbox))
                  (multiple-value-bind (outdir val refkey)

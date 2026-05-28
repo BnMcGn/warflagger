@@ -203,14 +203,15 @@
           (:cast-own-vote
            (warflagger:cast-vote! (which-bb (getf params :applied-to)) param
                                   (getf params :iid) (getf params :author)
-                                  :reference (getf params :reference)))
+                                  :reference (getf params :reference)
+                                  :reversible (getf params :reversible)))
           (:cast-own-other-vote
            (let ((bb (gethash param other-flags)))
              (warflagger:cast-vote! bb :up (getf params :iid) (getf params :author))))
           (:cast-vote
            (funcall parent-dispatch :cast-own-vote param :iid (getf info :iid)
                     :author (getf info :author) :reference (getf params :reference)
-                    :applied-to apply-to))
+                    :reversible (getf params :reversible) :applied-to apply-to))
           (:other-flag
            (setf other-flag param))
           (:post-other-flag
@@ -340,10 +341,10 @@
   (funcall *dispatch* :cast-vote :down))
 (defun vote-up ()
   (funcall *dispatch* :cast-vote :up))
-(defun vote-right (&optional ref)
-  (funcall *dispatch* :cast-vote :right :reference ref))
-(defun vote-wrong (&optional ref)
-  (funcall *dispatch* :cast-vote :wrong :reference ref))
+(defun vote-right (&optional ref reversible)
+  (funcall *dispatch* :cast-vote :right :reference ref :reversible reversible))
+(defun vote-wrong (&optional ref reversible)
+  (funcall *dispatch* :cast-vote :wrong :reference ref :reversible reversible))
 
 (defun apply-hashtag (tag iid author)
   (funcall (funcall *dispatch* :info :parent)
@@ -568,7 +569,7 @@
   (post-flag)
   (when (and (enabledp) (directional-p))
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
-      (vote-right ref))))
+      (vote-right ref t))))
 
 (defflag scsc::positive-counter-evidence
   (set-direction :pro)
@@ -578,7 +579,7 @@
   (post-flag)
   (when (and (enabledp) (directional-p))
     (dolist (ref (wf/ipfs:opinion-references (get-opinion)))
-      (vote-wrong ref))))
+      (vote-wrong ref t))))
 
 (defflag scsc::custodial-redundant
   (set-other-flag :custodial-redundant)
