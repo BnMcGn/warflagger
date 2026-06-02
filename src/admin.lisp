@@ -288,9 +288,13 @@
          (treelink (strcat wf/local-settings:*base-url*
                            "ipns/"
                            wf/local-settings:*ipns-host*
+                           treefile))
+         (localink (strcat "http://127.0.0.1:8080/" "ipns/"
+                           wf/local-settings:*ipns-host*
                            treefile)))
     (values (and opinion t)
             (and (wf/ipfs::ipfs-opinion-exists-p iid) t)
             (and (wf/ipfs::ipfs-warstats-for-opinion iid) t)
             (and (search iid (ipfs:files-read treefile)) t)
-            (and (search iid (dexador:get treelink :insecure t)) t))))
+            (and (search iid (dexador:get treelink :insecure t)) t)
+            (and (search iid (dexador:get localink :insecure t)) t))))
