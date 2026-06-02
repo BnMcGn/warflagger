@@ -55,6 +55,9 @@
 ;; We need score, not effect. Sometimes, like with counter-evidence, we want to know if
 ;; warstats are in the negative.
 (defun reference-transferrable-value (reference)
-  (wf/ipfs:ipfs-warstats-score reference))
+  (handler-case
+      (wf/ipfs:ipfs-warstats-score reference)
+   (wf/ipfs:data-not-found ()
+     0)))
 
 (defparameter *reference-vote-multiplier* 2)
