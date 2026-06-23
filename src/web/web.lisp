@@ -215,7 +215,10 @@
                                  (get-apparent-display-name
                                   (get-user-name)))
                          "WF: Not Logged In")))
-          (user-home-page)))
+          (bind-validated-input
+              (&key
+               (showall :boolean))
+            (user-home-page showall))))
 
   (setf (ningle:route *app* "/u/*")
         (cljs-page (#'author-page-parts)))

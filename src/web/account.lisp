@@ -99,7 +99,7 @@
     (when-let ((screen-name (gethash '(webhax-user:screen-name) values)))
       (warflagger:update-author-field authid :screen-name screen-name))))
 
-(defun user-home-page ()
+(defun user-home-page (showall)
   (check-signed-up)
   (let ((since (userfig:userfig-value 'signed-up))
         (name (get-apparent-display-name (get-user-name))))
@@ -119,7 +119,7 @@
     (pagerless-main-block
      (tag-as-opinion #'author-opinions)
      (list (get-local-user-id (get-user-name)))
-     #'mount-cljs-thing
+     (mount-cljs-thing-func :showall showall)
      (format nil "/author-opinions/~a" uid)
      :trim thing-lister:*thing-summary-width*
      :label "Your Opinions:"
@@ -127,7 +127,7 @@
     (pagerless-main-block
      (tag-as-opinion #'%author-replies)
      (list (get-local-user-id (get-user-name)))
-     #'mount-cljs-thing
+     (mount-cljs-thing-func :showall showall)
      (format nil "/author-replies/~a" uid)
      :trim thing-lister:*thing-summary-width*
      :label "Replies to your Posts:"
@@ -153,7 +153,9 @@
   :@inner
   (lambda ()
     (bind-validated-input
-        ((author :string))
+        ((author :string)
+         &key
+         (showall :boolean))
       (let* ((authid (or (find-author-id author)
                          (webhax-core:web-fail-404)))
              (auth-data (get-author-data authid))
@@ -184,7 +186,7 @@
         (pagerless-main-block
          #'%author-references
          (list authid)
-         #'mount-cljs-thing
+         (mount-cljs-thing-func :showall showall)
          (format nil "/author-references/~a" authid)
          :trim thing-lister:*thing-summary-width*
          :label "Author: References Made"
@@ -205,6 +207,7 @@
          (lambda (x) (mount-cljs-thing
                       x
                       :name "author-open-questions"
+                      :showall showall
                       :url
                       (lisp (format nil "/thing-source/author-open/~a" authid))))
          (format nil "/author-open-questions/~a" authid)
