@@ -19,6 +19,7 @@
                                      (:file "textract-test")
                                      (:file "db-test")
                                      (:file "opinml-test")
+				     (:file "ballot-box-test")
 				     (:file "services-test")
                                      (:file "form-validator-test")
                                      (:file "auth-test"))))

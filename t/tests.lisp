@@ -6,6 +6,10 @@
 
 (in-suite wf-tests)
 
+
+(defun tid (num)
+  (format nil "pnnkaeeeebaeebaeebaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebaeee~2,'0d" num))
+
 (defun test-cleanup ()
   (let* ((opin-path (asdf:system-relative-pathname 'warflagger "t/opinions/"))
          (opins (mapcar #'pathname-name (uiop:directory-files opin-path)))
