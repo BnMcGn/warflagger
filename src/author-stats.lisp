@@ -58,6 +58,6 @@
   (handler-case
       (wf/ipfs:ipfs-warstats-score reference)
    (wf/ipfs:data-not-found ()
-     0)))
+     nil)))
 
 (defparameter *reference-vote-multiplier* 2)
